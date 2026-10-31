@@ -1,0 +1,54 @@
+name: Suggest a text
+description: A free, legal full text (or audio) of a Hugo, Nebula or Locus winner
+title: "Text: "
+labels: ["text"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you! Only links where the rights holder published the text for free, Creative Commons releases or public domain, please. No personal data here.
+  - type: input
+    id: work
+    attributes:
+      label: Work and author
+      placeholder: "Cat Pictures Please — Naomi Kritzer"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Link to the full text
+      placeholder: "https://…"
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Who published it
+      options:
+        - The magazine or publisher (free on their site)
+        - The author's own site
+        - Creative Commons
+        - Public domain
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: lang
+    attributes:
+      label: Language of the text
+      options: [English, Polish, Russian, Other]
+    validations:
+      required: true
+  - type: input
+    id: audio
+    attributes:
+      label: Audio, if there is one (optional)
+      placeholder: "https://… podcast episode"
+  - type: checkboxes
+    id: legal
+    attributes:
+      label: Check
+      options:
+        - label: The whole text is there, free, and published by its rights holder (or under CC / public domain)
+          required: true

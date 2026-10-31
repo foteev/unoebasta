@@ -1,0 +1,23 @@
+name: Bug
+description: Something on the page does not work or looks wrong
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      placeholder: "1. Open My shelf  2. Tap …"
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: "Android 15, Chrome 141 / iPhone, Safari / Windows, Firefox"
+  - type: markdown
+    attributes:
+      value: "A screenshot helps. Please hide anything personal on it, such as your notes or a transfer link (it is a copy of your shelf)."

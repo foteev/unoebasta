@@ -1,0 +1,27 @@
+name: Broken link
+description: A text or audio link that no longer works
+title: "Broken link: "
+labels: ["broken link"]
+body:
+  - type: input
+    id: work
+    attributes:
+      label: Work
+      placeholder: "Title — author"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: The link
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      placeholder: "404, paywall, moved to …"
+  - type: input
+    id: new
+    attributes:
+      label: New address, if you found one (optional)
