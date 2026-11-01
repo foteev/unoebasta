@@ -223,7 +223,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#tab-catalog')); await sleep(30);
   w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(20);
   const picks = $$('#view-catalog .pick');
-  checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && ['Есть несколько минут?', 'Или что-то новое'].includes($('#pk-h').textContent) && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
+  checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && (($('#pk-h').textContent === 'Есть несколько минут?' && $('#pk-h').classList.contains('sr')) || $('#pk-h').textContent === 'Или что-то новое') && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
   checks['home: a card is only cover, title and author, then Read'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').textContent.trim() === (pk.querySelector('.pick-t').textContent + pk.querySelector('.pick-a').textContent + (pk.querySelector('.cover-t') ? pk.querySelector('.cover-t').textContent : '')).trim() && pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать'));
   checks['home: read and listen side by side'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === 2) && !!$('#view-catalog .pick-more');
   checks['home: listen is a headphones button that still names the source'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l && l.querySelector('svg') && /^Слушать · (Clarkesworld|Uncanny Magazine|Lightspeed|Escape Pod|PodCastle|Strange Horizons|LibriVox|ElevenReader)$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore'); });
@@ -534,6 +534,20 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#shelf-sugg [data-sgdel]')); await sleep(80);
   checks['suggestions: remove one → the list is empty'] = /Пока ничего/.test($('#shelf-sugg').textContent);
   w.eval("INBOX_NPUB = ''");
+  // Reading now: clear the whole list at once, with Undo
+  await w.eval(`(async () => { const now = Date.now();
+    await Store.put('positions', { id: 'ext:Q25349436', ext: true, workId: 'Q25349436', title: 'A', source: 'X', sourceUrl: 'https://x.test/a', at: now - 1000 });
+    await Store.put('positions', { id: 'ext:Q2008211', ext: true, workId: 'Q2008211', title: 'B', source: 'X', sourceUrl: 'https://x.test/b', at: now - 2000 });
+    await Store.put('bookmarks', { id: 'r:t1', type: 'recall', key: 'ext:Q25349436', workId: 'Q25349436', note: '', at: now });
+    await Store.put('bookmarks', { id: 'r:t2', type: 'recall', key: 'ext:Q2008211', workId: 'Q2008211', note: 'keep me', at: now });
+    await Store.put('bookmarks', { id: 'pos:t3', type: 'pos', key: 'file:x', title: 'Mark', pct: 3, snippet: 's', at: now }); })()`);
+  click($('#tab-shelf')); await sleep(80);
+  const nReading = $$('#shelf-reading .file-row').length;
+  click($('#reading-clear')); await sleep(150);
+  const bms = await w.eval("Store.all('bookmarks')");
+  checks['reading now: “Clear the list” empties it, keeps notes, bookmarks and Finished'] = nReading >= 2 && $$('#shelf-reading .file-row').length === 0 && !$('#reading-clear') && (await w.eval("Store.all('positions')")).filter(p => !w.eval(`isDone(${JSON.stringify(p.workId)})`)).length === 0 && !bms.some(b => b.id === 'r:t1') && bms.some(b => b.id === 'r:t2') && bms.some(b => b.id === 'pos:t3') && w.eval("isDone('Q130213759')") && /Список очищен/.test($('#toast').textContent);
+  click($('#toast [data-rcundo]')); await sleep(150);
+  checks['reading now: Undo brings the list back'] = $$('#shelf-reading .file-row').length === nReading && (await w.eval("Store.all('bookmarks')")).some(b => b.id === 'r:t1');
   // languages
 
 

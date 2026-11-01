@@ -1,0 +1,18 @@
+name: Links
+# Checks every full-text and audio link once a week and on demand. The run summary lists dead links,
+# links to check by hand and links that moved; the run fails when a link is dead.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 6 * * 1'
+permissions:
+  contents: read
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/check-links.mjs
