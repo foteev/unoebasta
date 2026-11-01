@@ -221,6 +221,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#view-library [data-flen="15"]')); await sleep(20);
   checks['catalog: time filter, a few minutes'] = $$('#view-library .slip').length > 0 && w.eval("[...document.querySelectorAll('#view-library .slip-open')].length") === $$('#view-library .slip').length && $$('#view-library .slip-time').every(x => x.textContent === 'несколько минут');
   click($('#view-library [data-flen="any"]')); await sleep(20);
+  checks['time: novels without Google Books use Open Library pages'] = w.eval("Object.values(WORKS).filter(x => !(x.gb && x.gb.n) && x.ol && x.ol.n).length") > 100 && w.eval("(() => { const x = Object.values(WORKS).find(x => !(x.gb && x.gb.n) && x.ol && x.ol.n && !READ[x.id]); return wordsOf(x.id) === x.ol.n * 280; })()");
   checks['time: neutral words, no exact minutes'] = w.eval("fmtDur(minutesOf('Q190192'))") === 'больше часа' && w.eval("[fmtDur(5), fmtDur(25), fmtDur(26), fmtDur(60), fmtDur(61), fmtDur(600)].join('|')") === 'несколько минут|несколько минут|около часа|около часа|больше часа|больше часа' && !/≈|\d+ мин/.test($('#view-library').textContent.replace(/\d+ стр\./g, ''));
   click($('#theme-btn')); await sleep(10);
   const th1 = w.document.documentElement.dataset.theme;

@@ -49,6 +49,7 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 
 - **Code:** MIT, see [LICENSE](LICENSE).
 - **Award data** in `data/awards.json` comes from [Wikidata](https://www.wikidata.org/) (CC0 1.0).
+- **Page counts and cover IDs** come from [Google Books](https://books.google.com/) and [Open Library](https://openlibrary.org/) (the Internet Archive asserts no copyright over its catalog data).
 - **Descriptions and biographies** in `data/awards.json` are from [Wikipedia](https://www.wikipedia.org/), CC BY-SA 4.0. If you reuse them, keep the attribution and the license.
 - **The stories** belong to their authors and publishers. unoebasta only links to them.
 

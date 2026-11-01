@@ -524,7 +524,7 @@ const DATA = JSON.parse(document.getElementById('awards-data').textContent);
 const CATS = { h: ['N', 'A', 'E', 'S'], n: ['N', 'A', 'E', 'S'], l: ['N', 'SF', 'FN', 'HN', 'FT', 'A', 'E', 'S'] };
 const AWARDS = ['h', 'n', 'l'];
 const WORKS = {};
-for (const [q, w] of Object.entries(DATA.works)) WORKS[q] = { id: q, title: w[0], tpl: w[1] || null, tru: w[2] || null, authors: w[3], isfdb: w[4] || null, fantlab: w[5] || null, pub: w[6] || null, about: (w[7] || w[8] || w[9]) ? { en: w[7] || null, pl: w[8] || null, ru: w[9] || null } : null, wiki: { en: w[10] || null, pl: w[11] || null, ru: w[12] || null }, ex: (DATA.ex && DATA.ex[q]) || null, gb: (DATA.gb && DATA.gb[q]) || null, awards: [] };
+for (const [q, w] of Object.entries(DATA.works)) WORKS[q] = { id: q, title: w[0], tpl: w[1] || null, tru: w[2] || null, authors: w[3], isfdb: w[4] || null, fantlab: w[5] || null, pub: w[6] || null, about: (w[7] || w[8] || w[9]) ? { en: w[7] || null, pl: w[8] || null, ru: w[9] || null } : null, wiki: { en: w[10] || null, pl: w[11] || null, ru: w[12] || null }, ex: (DATA.ex && DATA.ex[q]) || null, gb: (DATA.gb && DATA.gb[q]) || null, ol: (DATA.ol && DATA.ol[q]) || null, awards: [] };
 for (const [aw, cat, y, q, over] of DATA.aw) { const w = WORKS[q]; if (!w) continue; w.awards.push([aw, cat, y]); if (over) w.title = over; }
 for (const w of Object.values(WORKS)) w.awards.sort((a, b) => a[2] - b[2] || AWARDS.indexOf(a[0]) - AWARDS.indexOf(b[0]));
 const AUTHORS = {};
@@ -1271,7 +1271,9 @@ const CAT_FORM = { N: 'novel', SF: 'novel', FN: 'novel', HN: 'novel', FT: 'novel
 const FORM_ORDER = ['novel', 'novella', 'novelette', 'short'];
 const FORM_WORDS = { novel: 100000, novella: 28000, novelette: 11000, short: 4500 };
 function formOf(q) { const w = WORKS[q]; let f = null; if (w) for (const a of w.awards) { const x = CAT_FORM[a[1]]; if (x && (!f || FORM_ORDER.indexOf(x) < FORM_ORDER.indexOf(f))) f = x; } return f || 'short'; }
-function wordsOf(q) { const r = READ[q]; if (r && r.w) return r.w; const w = WORKS[q]; if (w && w.gb && w.gb.n) return w.gb.n * 280; return FORM_WORDS[formOf(q)]; }
+// pages: Google Books first, then the Open Library median across editions
+const pagesOf = q => { const w = WORKS[q]; return (w && ((w.gb && w.gb.n) || (w.ol && w.ol.n))) || null; };
+function wordsOf(q) { const r = READ[q]; if (r && r.w) return r.w; const n = pagesOf(q); if (n) return n * 280; return FORM_WORDS[formOf(q)]; }
 const minutesOf = q => Math.max(1, Math.round(wordsOf(q) / WPM));
 // Neutral: people read at different speeds, so no exact minutes. Same edges as the length choice (LEN).
 function fmtDur(m) { return t(m <= LEN['15'][1] ? 'dur_few' : m <= LEN['40'][1] ? 'dur_hour' : 'dur_more'); }
@@ -1616,7 +1618,7 @@ async function openWork(q) {
     <div class="awards">${awardChips(w, true)}</div>
     <h2>${esc(w.title)}</h2>
     ${altRu ? `<div class="alt">${esc(t('title_ru'))}: ${esc(altRu)}</div>` : ''}${altPl ? `<div class="alt">${esc(t('title_pl'))}: ${esc(altPl)}</div>` : ''}
-    <div class="row">${w.authors.map(a => `<button class="btn btn-small" data-author="${a}">${esc(authorName(a))}</button>`).join('')}<span class="small">${esc(r ? r.pub + ' · ' : '')}${w.pub || ''}${w.gb && w.gb.n ? ' · ' + esc(t('pages', { n: w.gb.n })) : ''} · ${esc(fmtDur(minutesOf(q)))}</span></div>
+    <div class="row">${w.authors.map(a => `<button class="btn btn-small" data-author="${a}">${esc(authorName(a))}</button>`).join('')}<span class="small">${esc(r ? r.pub + ' · ' : '')}${w.pub || ''}${pagesOf(q) ? ' · ' + esc(t('pages', { n: pagesOf(q) })) : ''} · ${esc(fmtDur(minutesOf(q)))}</span></div>
     <div class="flags"><span class="tier tier-${tierOf(q)}">${esc(t('tier_' + tierOf(q)))}</span>${r && r.license ? `<span class="flag">${esc(r.license)}</span>` : ''}${workFlags(w)}</div>
     <div class="row">${doneBtn(q, 'btn btn-small')}${isDone(q) ? `<span class="small">${esc(t('done_on_date', { d: fmtDate(doneAt(q)) }))}</span>` : ''}</div>
     ${availHtml(q)}
