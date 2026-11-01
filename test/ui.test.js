@@ -223,18 +223,19 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#tab-catalog')); await sleep(30);
   w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(20);
   const picks = $$('#view-catalog .pick');
-  checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => /^несколько минут ·/.test(pk.querySelector('.pick-meta').textContent) && w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && ['Есть несколько минут?', 'Или что-то новое'].includes($('#pk-h').textContent) && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
+  checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && ['Есть несколько минут?', 'Или что-то новое'].includes($('#pk-h').textContent) && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
+  checks['home: a card is only cover, title and author, then Read'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').textContent.trim() === (pk.querySelector('.pick-t').textContent + pk.querySelector('.pick-a').textContent + (pk.querySelector('.cover-t') ? pk.querySelector('.cover-t').textContent : '')).trim() && pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать'));
   checks['home: read and listen side by side'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === 2) && !!$('#view-catalog .pick-more');
-  checks['home: listen names the source'] = picks.every(pk => /Слушать/.test(pk.textContent) && /^(Clarkesworld|Uncanny Magazine|Lightspeed|Escape Pod|PodCastle|Strange Horizons|LibriVox|ElevenReader)$/.test(pk.querySelector('.pick-actions .two .ls').textContent));
+  checks['home: listen is a headphones button that still names the source'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l && l.querySelector('svg') && /^Слушать · (Clarkesworld|Uncanny Magazine|Lightspeed|Escape Pod|PodCastle|Strange Horizons|LibriVox|ElevenReader)$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore'); });
   click($('#view-catalog [data-picklen="eve"]')); await sleep(20);
-  checks['home: more-than-an-hour picks are long'] = $$('#view-catalog .pick').length > 0 && $$('#view-catalog .pick .pick-meta').every(m => /^больше часа ·/.test(m.textContent)) && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-picklen="eve"]').textContent === 'Больше часа';
+  checks['home: more-than-an-hour picks are long'] = $$('#view-catalog .pick').length > 0 && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-picklen="eve"]').textContent === 'Больше часа';
   const before = $$('#view-catalog .pick .pick-t').map(x => x.textContent).join('|');
   click($('#view-catalog [data-pickmore]')); await sleep(20);
   checks['home: three others'] = $$('#view-catalog .pick .pick-t').map(x => x.textContent).join('|') !== before || w.eval("pickList('eve').length") <= 3;
   // ✓ Read: off the start screen and random picks, onto the shelf, muted in award lists, Undo in the toast
   w.eval("prefs.pickLen = '40'; renderHome()"); await sleep(10);
   const pk0 = $$('#view-catalog .pick'); const dq = pk0[0].querySelector('.pick-done').dataset.done; const keep = pk0[1].querySelector('.pick-done').dataset.done;
-  checks['done: reads as an action until pressed'] = pk0.every(pk => pk.querySelector('.pick-done').textContent.trim() === 'Отметить прочитанным' && !!pk.querySelector('.pick-done svg circle'));
+  checks['done: a quiet circle that says what it does'] = pk0.every(pk => pk.querySelector('.pick-done').getAttribute('aria-label').startsWith('Отметить прочитанным') && !!pk.querySelector('.pick-done svg circle') && pk.querySelector('.pick-done').textContent.trim() === '');
   click(pk0[0].querySelector('.pick-done')); await sleep(40);
   const pk1 = $$('#view-catalog .pick .pick-done').map(b => b.dataset.done);
   checks['done: leaves the home picks, others stay'] = !pk1.includes(dq) && pk1.includes(keep) && pk1.length === 3 && w.eval(`isDone('${dq}')`);

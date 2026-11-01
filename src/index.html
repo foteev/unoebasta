@@ -559,6 +559,17 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .sugg-list { display: grid; gap: 10px; }
 .sugg.is-sent { opacity: .7; }
 .file-row .small { display: block; overflow-wrap: anywhere; }
+/* the start screen: cover, title, author, Read. Nothing else to read before reading. */
+.pick { position: relative; gap: 14px; }
+.pick-open { padding-right: 40px; align-items: center; }
+.pick-t { font-size: 21px; }
+.pick-actions { grid-template-columns: minmax(0, 1fr) auto; }
+.pick-actions .btn-icon { width: 52px; min-width: 52px; padding: 0; justify-content: center; }
+.pick-actions .btn-icon svg { width: 22px; height: 22px; }
+.pick-done { position: absolute; top: 10px; right: 10px; margin: 0; width: 40px; height: 40px; min-height: 40px; padding: 0; display: grid; place-items: center; color: var(--muted); border-radius: 50%; }
+.pick-done .dk { width: 22px; height: 22px; }
+.pick-done:hover { color: var(--accent); background: var(--accent-soft); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 
 </head>
@@ -1441,13 +1452,13 @@ function listenOpts(q) {
   return o;
 }
 const listenPick = (q, o) => { o = o || listenOpts(q); return o.find(x => x.id === prefs.listen) || o[0]; };
-function listenCtl(q, cls) {
+function listenCtl(q, cls, compact) {
   const o = listenOpts(q); if (!o.length) return ''; const c = listenPick(q, o);
-  const two = (src, arrow) => `<span class="lb">${esc(t('listen_btn'))}${arrow ? ' ↗' : ''}</span><span class="ls">${esc(src)}</span>`;
+  const two = compact ? src => `${ICON.ear}<span class="sr">${esc(t('listen_btn'))} · ${esc(src)}</span>` : (src, arrow) => `<span class="lb">${esc(t('listen_btn'))}${arrow ? ' ↗' : ''}</span><span class="ls">${esc(src)}</span>`;
   const main = c.id === 'pod' ? `<a class="${cls} two" href="${esc(c.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(c.name)}" title="${esc(t('listen_pod', { s: c.name }))}">${two(c.name, true)}</a>`
     : c.id === 'eleven' ? `<button class="${cls} two" data-eleven="${esc(c.url)}" data-wid="${q}" title="${esc(t('listen_tts'))}">${two(c.name, false)}</button>`
     : `<button class="${cls} two" data-say="${q}" title="${esc(t('ls_phone_t'))}">${two(c.name, false)}</button>`;
-  if (o.length < 2) return main;
+  if (o.length < 2 || compact) return main;
   return `<span class="lgrp">${main}<button class="${cls.replace('btn-primary', '').trim()} lmore" data-lsrc="${q}" aria-haspopup="dialog" aria-label="${esc(t('ls_more'))}" title="${esc(t('ls_more'))}">▾</button></span>`;
 }
 let listenFrom = null;
@@ -1518,7 +1529,7 @@ function pickList(k) {
 }
 function pickCard(q) {
   const w = work(q); const a = w.awards[0];
-  return `<article class="pick"><button class="pick-open" data-work="${q}">${coverHtml(q, 's')}<span class="pick-txt"><span class="pick-meta">${esc(fmtDur(minutesOf(q)))} · ${esc(awardName(a[0]))} ${a[2]} · ${esc(catName(a[1]))}</span><span class="pick-t">${esc(w.title)}</span><span class="pick-a">${esc(authorsLine(w))}</span></span></button><div class="pick-actions">${readCtl(q, 'btn btn-primary')}${listenCtl(q, 'btn')}</div><button class="pick-done done-btn" data-done="${q}" aria-pressed="false" title="${esc(t('done_add_t'))}">${doneInner(q)}</button></article>`;
+  return `<article class="pick"><button class="pick-open" data-work="${q}">${coverHtml(q, 's')}<span class="pick-txt"><span class="pick-t">${esc(w.title)}</span><span class="pick-a">${esc(authorsLine(w))}</span></span></button><button class="pick-done" data-done="${q}" aria-pressed="false" aria-label="${esc(t('done_add_t'))}" title="${esc(t('done_add_t'))}">${DONE_ICON.off}</button><div class="pick-actions">${readCtl(q, 'btn btn-primary')}${listenCtl(q, 'btn btn-icon', true)}</div></article>`;
 }
 function renderHome() {
   const v = $('#view-catalog');
