@@ -1,7 +1,9 @@
 // Fetches covers and stores two WebP sizes next to the page:
 //   1. novels and novellas: Open Library, by cover ID (data/awards.json → ol[QID].c);
 //   2. stories with a free text (READ in src/index.html) and no book cover: the picture the magazine shows
-//      for that page (og:image: usually the issue cover, at Reactor the story's illustration).
+//      for that page (og:image: usually the issue cover, at Reactor the story's illustration). When a site
+//      shows the same og:image on many pages (Uncanny: the newest issue), the issue cover on the page is used.
+//   (a story from a collection or anthology can carry the book's cover ID in ol[QID].c with ol[QID].from)
 // Where each picture came from is kept in covers/sources.json; pages without a picture in covers/none.json,
 // so they are not asked again.
 //   covers/s/<QID>.webp — 80×120, lists and picks
@@ -36,20 +38,38 @@ const stories = Object.entries(READ).filter(([q]) => !has(q) && !(data.ol && dat
   .map(([q, r]) => [q, { page: (r.links.find(l => l.kind === 'full') || {}).url }]).filter(([, j]) => j.page);
 const jobs = [...books, ...stories].slice(0, LIMIT);
 console.log(`covers: ${books.length} book covers and ${stories.length} story pages to look at`);
+const abs = (u, base) => { try { return u ? new URL(u.replace(/&amp;/g, '&'), base).href : null; } catch (e) { return null; } };
 const ogImage = (html, base) => {
   const m = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image)["'][^>]*>/i);
   const c = m && m[0].match(/content=["']([^"']+)["']/i);
-  try { return c ? new URL(c[1].replace(/&amp;/g, '&'), base).href : null; } catch (e) { return null; }
+  return c ? abs(c[1], base) : null;
 };
+// the issue cover shown on the page itself (an <img> whose file name says "cover"); not on sites whose sidebars advertise books
+const coverImg = (html, base) => {
+  if (/reactormag\.com|tor\.com/.test(base)) return null;
+  const m = html.match(/<img[^>]+src=["']([^"']*cover[^"']*\.(?:jpe?g|png|webp))["']/i);
+  return m ? abs(m[1], base) : null;
+};
+const BAD = /logo|favicon|default|placeholder|icon|social/i;
 
 let ok = 0, missing = 0, failed = 0;
+// first look at every story page: which og:image is a site's banner (the same on 3+ pages, counting earlier runs)?
+const seen = {};
+for (const u of Object.values(SOURCES)) if (!u.startsWith('openlibrary')) seen[u] = (seen[u] || 0) + 1;
+for (const [, j] of jobs) if (j.page) {
+  try {
+    const p = await fetch(j.page, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(20000) });
+    if (p.ok) { const html = await p.text(), base = p.url || j.page; j.og = ogImage(html, base); j.cover = coverImg(html, base); if (j.og) seen[j.og] = (seen[j.og] || 0) + 1; }
+  } catch (e) { j.err = e.message; }
+  await sleep(300);
+}
 async function one([q, j]) {
   try {
-    if (j.page) { // a story: find the picture of its page
-      const p = await fetch(j.page, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(20000) });
-      const img = p.ok ? ogImage(await p.text(), p.url || j.page) : null;
-      if (!img || /logo|favicon|default|placeholder|icon|social/i.test(img)) { missing++; NONE.add(q); return; }
-      j = { img, src: img };
+    if (j.page) { // a story: its own picture, or the issue cover when the og:image is the site's banner
+      const og = j.og && !BAD.test(j.og) && seen[j.og] < 3 ? j.og : null;
+      const img = og || (j.cover && !BAD.test(j.cover) ? j.cover : null);
+      if (!img) { if (j.err) { failed++; return; } missing++; NONE.add(q); return; }
+      j = { img, src: og ? img : 'issue:' + img };
     }
     const r = await fetch(j.img, { headers: UA, signal: AbortSignal.timeout(20000) });
     if (r.status === 404) { missing++; if (!j.src.startsWith('openlibrary')) NONE.add(q); return; }
@@ -68,7 +88,7 @@ for (let i = 0; i < jobs.length; i += 2) {
   await sleep(300);
 }
 // one picture for many stories is the site's own banner (or the current issue), not this story's: drop it
-const uses = {}; for (const [q, u] of Object.entries(SOURCES)) if (!u.startsWith('openlibrary')) (uses[u] = uses[u] || []).push(q);
+const uses = {}; for (const [q, u] of Object.entries(SOURCES)) if (!/^(openlibrary|issue):/.test(u)) (uses[u] = uses[u] || []).push(q); // an issue cover may serve several stories
 for (const qs of Object.values(uses)) if (qs.length >= 3) for (const q of qs) {
   for (const k of Object.keys(SIZES)) rmSync(join(OUT, k, q + '.webp'), { force: true });
   delete SOURCES[q]; NONE.add(q);
