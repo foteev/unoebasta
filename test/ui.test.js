@@ -20,6 +20,9 @@ const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</bod
       getPublicKey: pkOf,
       nip44: { getConversationKey: (sk, pk) => 'ck:' + pk, encrypt: (txt, ck) => 'enc:' + Buffer.from(txt).toString('base64'), decrypt: (c, ck) => Buffer.from(c.slice(4), 'base64').toString() },
       finalizeEvent: (tpl, sk) => ({ ...tpl, pubkey: pkOf(sk), id: 'e' + relay.length + Math.random().toString(36).slice(2, 6), sig: 'x' }),
+      generateSecretKey: () => require('crypto').randomBytes(32),
+      nip19: { decode: n => ({ type: 'npub', data: 'ab'.repeat(32) }) },
+      nip17: { wrapEvent: (sk, to, text, subject) => ({ kind: 1059, pubkey: pkOf(sk), tags: [['p', to.publicKey]], content: 'sealed:' + Buffer.from(text).toString('base64'), id: 'w' + relay.length, created_at: 1 }) },
       SimplePool: class { publish(relays, ev) { relay.push(ev); return relays.map(() => Promise.resolve('')); } async querySync(relays, f) { return relay.filter(e => e.kind === f.kinds[0] && f.authors.includes(e.pubkey) && e.tags.some(t => t[0] === 'd' && f['#d'].includes(t[1]))); } }
     };
     try { w.eval(fs.readFileSync(path.join(NM, 'qrcode-generator/dist/qrcode.js'), 'utf8') + ';window.qrcode = qrcode;'); } catch (e) {} // the CDN QR library
@@ -503,7 +506,29 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['sync: turning off keeps the data here'] = !w.eval('syncState()') && w.eval("isDone('Q130213759')") && !!$('#sy-on');
   click($('#tab-about')); await sleep(40);
   checks['about: how to sync, in three steps with a link to the shelf'] = $$('#about-sync ol li').length === 3 && !!$('#about-sync [data-goshelf="shelf-sync"]');
+  // suggestions without an account: a private message to the project's key
+  w.eval("INBOX_NPUB = 'npub1test'");
+  w.eval("openForm('suggest', 'Q2008211')"); await sleep(60);
+  $('#sg-url').value = 'https://example.org/left-hand'; $('#sg-form').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true })); await sleep(120);
+  checks['inbox: “Send anonymously” comes first'] = !!$('#sg-send') && /без аккаунта/.test($('#sg-done').textContent);
+  const nRelay = w.__relay.length; click($('#sg-send')); await sleep(300);
+  const pm = w.__relay[w.__relay.length - 1];
+  checks['inbox: one sealed private message to the project, nothing readable outside'] = w.__relay.length === nRelay + 1 && pm.kind === 1059 && pm.tags[0][1] === 'ab'.repeat(32) && !pm.content.includes('left-hand') && Buffer.from(pm.content.slice(7), 'base64').toString().includes('https://example.org/left-hand') && Buffer.from(pm.content.slice(7), 'base64').toString().includes('github.com/foteev/unoebasta/issues/new');
+  checks['inbox: thanks, and the suggestion is marked as sent'] = !$('#sg-sent').hidden && /Спасибо/.test($('#sg-sent').textContent) && (await w.eval("Store.all('suggestions')")).some(x => x.url === 'https://example.org/left-hand' && x.sent);
+  click($('#sg-another')); await sleep(60);
+  checks['suggestions: “Suggest another” opens a fresh form'] = !$('#sg-form').hidden && $('#sg-url').value === '';
+  await w.eval(`Store.put('suggestions', { id: 's-unsent', kind: 'report', workId: 'Q25349436', url: 'https://x.test/b', reason: 'dead', at: Date.now() })`);
+  w.eval("document.getElementById('sheet-form').hidden = true");
+  click($('#tab-shelf')); await sleep(80);
+  const rows = $$('#shelf-sugg .sugg');
+  checks['suggestions on the shelf: one row each, with status, send, GitHub and remove'] = rows.length >= 2 && rows.some(r => /отправлено/.test(r.textContent)) && rows.some(r => /ещё не отправлено/.test(r.textContent)) && rows.every(r => r.querySelector('[data-sgdel]') && r.querySelector('a[data-sggh]')) && !!$('#shelf-sugg [data-sgsend]');
+  click($('#sugg-clear-sent')); await sleep(80);
+  checks['suggestions: “Remove sent” keeps only the unsent'] = $$('#shelf-sugg .sugg').length === 1 && /ещё не отправлено/.test($('#shelf-sugg').textContent);
+  click($('#shelf-sugg [data-sgdel]')); await sleep(80);
+  checks['suggestions: remove one → the list is empty'] = /Пока ничего/.test($('#shelf-sugg').textContent);
+  w.eval("INBOX_NPUB = ''");
   // languages
+
 
   click($('#lang-pl')); await sleep(80);
   checks['pl strings'] = /Czytaj/.test($('#tab-catalog').textContent);
