@@ -487,7 +487,12 @@ body { font: 400 16px/1.55 var(--f-ui); -webkit-font-smoothing: antialiased; }
 .brand-e { font-weight: 300; }
 .motto { font: italic 400 17px/1.4 var(--f-ui); }
 .iconbtn svg { width: 20px; height: 20px; }
-.langs button { font: 500 13px/1 var(--f-ui); letter-spacing: .04em; }
+.langs button { font: 500 13px/1 var(--f-ui); letter-spacing: .04em; min-height: 40px; } /* a finger-sized target */
+.langs { flex: none; } /* all three languages always visible, on the smallest phones too */
+@media (max-width: 380px) { .top .wrap { gap: 8px; } .top .iconbtn { margin-left: 0; } }
+@media (max-width: 719px) { .tabs.wrap { padding-inline: 0; } .tabs button { white-space: nowrap; letter-spacing: 0; } } /* "O projekcie" on one line */
+@media (max-width: 340px) { .tabs button { font-size: 11px; } }
+@media (max-width: 340px) { .brand { font-size: 18px; gap: 6px; } .brand .logo { width: 20px; height: 20px; } .langs button { padding: 6px 8px; } .top .iconbtn { width: 40px; height: 40px; } }
 /* cards: a soft shadow instead of a border */
 .slip, .pick, .panel, .news, .recall, .ylist, .board-wrap { border-color: transparent; box-shadow: var(--shadow); }
 .news { border-left: 3px solid var(--new); } .recall { border-left: 3px solid var(--accent); }
@@ -1906,7 +1911,7 @@ function openAuthor(q) {
   rows.sort((x, y) => (authorSort === 'desc' ? y.y - x.y : x.y - y.y) || AWARDS.indexOf(x.aw) - AWARDS.indexOf(y.aw));
   const nWorks = new Set(rows.map(r => r.w.id)).size;
   const byAw = AWARDS.map(aw => [aw, rows.filter(r => r.aw === aw).length]).filter(x => x[1]);
-  const desc = a.desc[LANG] || a.desc.en;
+  const desc = a.desc[LANG] || ''; // a one-word English label ("writer") reads as a slip in another language
   const years = a.born ? (a.died ? `${a.born}–${a.died}` : t('born', { y: a.born })) : '';
   const el = $('#sheet-author');
   el.innerHTML = sheetBar(authorName(q)) + `<div class="wrap sheet-body">
