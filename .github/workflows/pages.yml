@@ -21,7 +21,7 @@ jobs:
       - run: node scripts/check-secrets.mjs
       - run: node scripts/build-web.mjs
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist/web
   deploy:
