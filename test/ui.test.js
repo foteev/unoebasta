@@ -391,6 +391,12 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const n15 = w.eval("pickList('15').length"); const s15 = [];
   for (let i = 0; i < Math.ceil(n15 / 3); i++) { s15.push(...$$('#view-catalog .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
   checks['picks: every short story shows before any repeats, then a note'] = new Set(s15).size === n15 && /дальше по кругу/.test($('#view-catalog .picks').textContent);
+  // covers: an image when the build found one, otherwise a typographic cover
+  click($('#tab-library')); await sleep(30);
+  checks['covers: every slip has a cover'] = $$('#view-library .slip').every(sl => !!sl.querySelector('.cover'));
+  checks['covers: typographic cover with the title when there is no image'] = (() => { const q = 'Q25349436'; if (w.eval(`(DATA.covers || []).includes('${q}')`)) return true; const c = $(`#view-library .slip-open[data-work="${q}"]`).closest('.slip').querySelector('.cover-t'); return !!c && c.querySelector('.ct').textContent === w.eval(`WORKS['${q}'].title`); })();
+  checks['covers: an image from covers/ when the build lists it'] = w.eval(`(() => { coverHtml('Q190192', 'm'); COVERS.add('Q190192'); const h = coverHtml('Q190192', 'm'); return h.startsWith('<img') && h.includes('src="covers/m/Q190192.webp"') && h.includes('loading="lazy"'); })()`);
+  w.eval("COVERS.delete('Q190192')");
   // sync, steps 1–2: deletion marks, one merge (newer wins), the transfer link and its QR code
   const T0 = Date.now();
   await w.eval(`(async () => { await setDone('Q16990038', true); await setDone('Q16990038', false); })()`);

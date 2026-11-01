@@ -31,13 +31,17 @@ The direct way, as a pull request:
    - `links`: `kind` is `full` or `audio`; `site` is the name readers see.
 4. `npm run build && npm test`. Some tests count the catalog (“71 readable works”, “and 60 more”): update those numbers in `test/ui.test.js`.
 
+## Covers
+
+Novels and novellas show a cover from `covers/`; everything else gets a typographic cover drawn by the page. Covers come from Open Library by the cover ID in `data/awards.json` (`ol.<QID>.c`). When `data/awards.json` changes on `main`, the “Covers” workflow downloads what is missing and redeploys the site. To fix a wrong cover, change or remove its `c` in `ol` and delete the two files in `covers/s` and `covers/m`.
+
 ## Translations
 
 All strings are in the `I18N` object in `src/index.html`, with one block per language (`en`, `pl`, `ru`). Every key must exist in every language. Keep the tone short and plain; the motto stays in English everywhere. A new language means a new block and a button in the header; open an issue first.
 
 ## Code
 
-- **One file, no framework, no build step** beyond inserting the data. Libraries come from cdnjs or jsDelivr with an exact version.
+- **One file, no framework, no build step** beyond inserting the data. Fonts: Jost for the interface, Literata only for the text in the reader. Icons: [Lucide](https://lucide.dev/), inline SVG, stroke 1.6. Libraries come from cdnjs or jsDelivr with an exact version.
 - **Mobile first.** Design and test at 360–390 px first, then wider screens. Touch targets at least 44 px. Light and dark themes. See [docs/mobile-first-ui.md](docs/mobile-first-ui.md).
 - **One main action per screen.** The page is made for busy readers and readers with ADHD: no streaks, badges, blinking or nagging counters.
 - **Readers’ data is sacred.** Read [docs/data-and-sync.md](docs/data-and-sync.md) before you change anything that is stored. In short: only add fields; renaming or dropping one needs a migration step with a test; never touch the bodies of readers’ files.

@@ -1,0 +1,35 @@
+name: Covers
+# Downloads cover images for new entries in data/awards.json (Open Library, by cover ID),
+# commits them to covers/ and redeploys the site.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [data/awards.json, scripts/fetch-covers.mjs]
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: covers
+  cancel-in-progress: false
+jobs:
+  covers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-audit --no-fund sharp@0.34.5
+      - run: node scripts/fetch-covers.mjs
+      - name: Commit new covers and redeploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add covers
+          if git diff --cached --quiet; then echo "No new covers"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Covers from Open Library"
+          git push
+          gh workflow run pages.yml --ref main

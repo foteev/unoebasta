@@ -41,6 +41,7 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 | `data/awards.json` | Prose winners since 1953: awards, works, authors, descriptions |
 | `scripts/build-web.mjs` | Puts the data into the page |
 | `scripts/coverage.mjs` | What exists in each language → `data/coverage.csv` |
+| `scripts/fetch-covers.mjs` | Downloads covers by Open Library cover ID → `covers/s` (80×120) and `covers/m` (160×240), WebP |
 | `scripts/check-secrets.mjs` | Fails on keys, tokens or personal e-mail addresses |
 | `test/ui.test.js` | jsdom tests |
 | `docs/` | How user data is stored, migrated and moved; mobile-first rules |
@@ -52,5 +53,7 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 - **Page counts and cover IDs** come from [Google Books](https://books.google.com/) and [Open Library](https://openlibrary.org/) (the Internet Archive asserts no copyright over its catalog data).
 - **Descriptions and biographies** in `data/awards.json` are from [Wikipedia](https://www.wikipedia.org/), CC BY-SA 4.0. If you reuse them, keep the attribution and the license.
 - **The stories** belong to their authors and publishers. unoebasta only links to them.
+- **Cover images** in `covers/` are fetched from [Open Library](https://openlibrary.org/) by `scripts/fetch-covers.mjs` (the “Covers” workflow). Cover art belongs to its publishers and artists and is shown only so readers can recognize a book. If you hold the rights and want a cover removed, open an issue.
+- **Fonts:** [Jost](https://fonts.google.com/specimen/Jost) and [Literata](https://fonts.google.com/specimen/Literata), SIL Open Font License. **Icons:** [Lucide](https://lucide.dev/), ISC License.
 
 unoebasta is a non-commercial project and is not affiliated with the Hugo, Nebula or Locus awards.
