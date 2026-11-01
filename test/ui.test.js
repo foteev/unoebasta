@@ -12,6 +12,16 @@ const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</bod
     w.scrollTo = () => {};
     if (!w.TextEncoder) { const u = require('util'); w.TextEncoder = u.TextEncoder; w.TextDecoder = u.TextDecoder; }
     w.CompressionStream = CompressionStream; w.DecompressionStream = DecompressionStream; // as in browsers
+    if (!w.crypto.subtle) Object.defineProperty(w.crypto, 'subtle', { value: require('crypto').webcrypto.subtle });
+    // a stand-in for nostr-tools and the relays: events are kept in memory, "encryption" is base64
+    const relay = w.__relay = [];
+    const pkOf = sk => Buffer.from(sk).toString('hex');
+    w.NostrTools = {
+      getPublicKey: pkOf,
+      nip44: { getConversationKey: (sk, pk) => 'ck:' + pk, encrypt: (txt, ck) => 'enc:' + Buffer.from(txt).toString('base64'), decrypt: (c, ck) => Buffer.from(c.slice(4), 'base64').toString() },
+      finalizeEvent: (tpl, sk) => ({ ...tpl, pubkey: pkOf(sk), id: 'e' + relay.length + Math.random().toString(36).slice(2, 6), sig: 'x' }),
+      SimplePool: class { publish(relays, ev) { relay.push(ev); return relays.map(() => Promise.resolve('')); } async querySync(relays, f) { return relay.filter(e => e.kind === f.kinds[0] && f.authors.includes(e.pubkey) && e.tags.some(t => t[0] === 'd' && f['#d'].includes(t[1]))); } }
+    };
     try { w.eval(fs.readFileSync(path.join(NM, 'qrcode-generator/dist/qrcode.js'), 'utf8') + ';window.qrcode = qrcode;'); } catch (e) {} // the CDN QR library
     w.navigator.clipboard = { writeText: async s => { w.__clip = s; } };
     w.addEventListener('error', e => errors.push(e.message));
@@ -468,7 +478,33 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#mv-copy')); await sleep(20);
   checks['sync link: copy'] = w.__clip === $('#mv-link').value;
   checks['sync link: the QR code takes the essentials when the shelf is big'] = w.eval("slimPack({ v: 4, r: { positions: [{ id: 'ext:Q1', mt: 1 }], bookmarks: [{ id: 'd:Q1', type: 'done', mt: 1 }, { id: 'r:1', type: 'recall', mt: Date.now() }], links: [{ id: 'Q1' }] }, x: [['bookmarks', 'w:Q1', 1]] }, 3)").r.bookmarks.length === 1 && w.eval("slimPack({ v: 4, r: { positions: [{ id: 'ext:Q1', mt: 1 }], bookmarks: [], links: [] }, x: [] }, 3)").r.positions.length === 0;
+  // sync through relays: turn on, pair another device with the key link, merge, turn off
+  click($('#tab-shelf')); await sleep(80);
+  checks['sync: My shelf offers to turn it on, with what it does'] = !!$('#sy-on') && /шифруется/.test($('#shelf-data').textContent);
+  await w.eval(`setDone('Q130213759', true)`); await sleep(20);
+  click($('#sy-on')); await sleep(400);
+  const relay = w.__relay;
+  checks['sync: turning on publishes one encrypted app-data event'] = relay.length >= 1 && relay[relay.length - 1].kind === 30078 && relay[relay.length - 1].tags[0][0] === 'd' && relay[relay.length - 1].content.startsWith('enc:') && !relay[relay.length - 1].content.includes('Q130213759');
+  checks['sync: then shows the key link and its QR code'] = /#sync=[\w-]{43}$/.test($('#mv-link').value) && !!$('#sy-out svg.qr') && /не публикуйте/.test($('#sy-out').textContent) && /Синхронизация включена/.test($('#sy-status').textContent);
+  const keyLink = $('#mv-link').value, key = keyLink.split('#sync=')[1];
+  // another device: an empty browser opens the key link
+  await w.eval(`(async () => { saveSync(null); await Store.replaceAll({}); migrated = false; await loadLocal(); })()`);
+  checks['sync: (the other device starts empty)'] = !w.eval("isDone('Q130213759')") && !w.eval('syncState()');
+  w.location.hash = '#sync=' + key; await sleep(200);
+  checks['sync: the key link asks first'] = !$('#move-dialog').hidden && /Подключить это устройство/.test($('#move-dialog').textContent) && !w.location.hash;
+  click($('#move-dialog [data-sygo]')); await sleep(500);
+  checks['sync: … then the shelf arrives from the relays'] = w.eval("isDone('Q130213759')") && w.eval('syncState().key') === key && /Устройство подключено/.test($('#toast').textContent);
+  const before2 = relay.length; await w.eval('syncPush()');
+  checks['sync: nothing new → nothing published'] = relay.length === before2;
+  await w.eval(`setDone('Q16990038', true)`); const r2 = await w.eval('syncPush()');
+  checks['sync: a change here is published'] = r2 === 6 && relay.length === before2 + 1;
+  click($('#tab-shelf')); await sleep(80);
+  click($('#sy-off')); await sleep(80);
+  checks['sync: turning off keeps the data here'] = !w.eval('syncState()') && w.eval("isDone('Q130213759')") && !!$('#sy-on');
+  click($('#tab-about')); await sleep(40);
+  checks['about: how to sync, in three steps with a link to the shelf'] = $$('#about-sync ol li').length === 3 && !!$('#about-sync [data-goshelf="shelf-sync"]');
   // languages
+
   click($('#lang-pl')); await sleep(80);
   checks['pl strings'] = /Czytaj/.test($('#tab-catalog').textContent);
   checks['no runtime errors'] = errors.length === 0;
