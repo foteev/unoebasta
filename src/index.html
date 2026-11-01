@@ -546,6 +546,12 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
 .legend > span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .chip .mk-i { margin-right: 2px; }
+.searchbar { display: flex; gap: 8px; align-items: stretch; }
+.searchbar .search { flex: 1 1 auto; min-width: 0; min-height: 46px; font-size: 16px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); border-color: transparent; }
+.searchbar .btn { min-height: 46px; padding-inline: 18px; }
+.lib-body, #av-body { display: grid; gap: 14px; }
+.sub-h { margin: 6px 0 0; font: 500 18px/1.3 var(--f-display); }
+.count-line .linkbtn { font-size: inherit; }
 </style>
 
 </head>
@@ -741,7 +747,7 @@ const I18N = {
     note_baen: 'Baen sends this page as a file, so the browser downloads a .htm instead of showing it. Add the downloaded file below to read it here, offline.',
     note_doctorow: 'Released by the author under CC BY-NC-SA 1.0: download the TXT or EPUB from his site and add it below to read offline.',
     aw_h2: 'Award structure', aw_p: 'Every Hugo, Nebula and Locus winner in fiction. Tap a year, a category or a work.',
-    v_table: 'Board', v_list: 'List', sort_desc: 'Newest first', sort_asc: 'Oldest first', only_text: 'With text only', search_ph: 'Search title or author',
+    v_table: 'Board', v_list: 'List', sort_desc: 'Newest first', sort_asc: 'Oldest first', only_text: 'With text only', search_ph: 'Title, author, year, magazine, topic…', search_go: 'Search', search_all: 'Found: {n} across all awards, years and categories', search_clear: 'Clear search', search_more: 'Showing the first {n}. Add a word to narrow it down.', search_readable: 'Free to read ({n})', search_other: 'Other winners, no free text yet ({n})',
     lg_text: 'free text', lg_mine: 'your link or file', lg_star: '★ bookmarked', lg_new: 'new',
     crumb_all: 'All years', year_h: '{y}', cat_hist: '{a} · {c}', prev_year: 'Previous year', next_year: 'Next year',
     aw_note: 'Years are ceremony years. SFWA names the Nebula after the publication year, so the “2024 Nebula Awards” were presented in 2025 and appear here under 2025.',
@@ -756,7 +762,7 @@ const I18N = {
     src_line: 'Source: {s}', src_file: 'Your file', loading: 'Loading the page…', load_fail: 'Could not load the page. Open the original instead.',
     form_suggest: 'Suggest for the catalog', form_report: 'Report a link', f_url: 'Page address', f_type: 'What is it', t_full: 'Full text', t_excerpt: 'Excerpt', t_audio: 'Audio', t_translation: 'Translation', f_lang: 'Language', f_comment: 'Comment (optional)', f_link: 'Which link', f_reason: 'What is wrong',
     r_dead: 'The link does not work', r_rights: 'Looks like a copyright violation', r_wrong: 'Wrong text or wrong work', f_submit: 'Save',
-    f_saved: 'Saved on this device. Moderation is not connected yet, so copy the text below and send it to the project when the channel opens.',
+    f_saved: 'Saved on this device. To send it to the project, the button opens a ready issue on GitHub: press “Create” there (a GitHub account is needed). Or copy the text and send it another way.', gh_send: 'Send on GitHub',
     about_h: 'How unoebasta works',
     name_note: 'The name is Italian: uno e basta, “just one, and that’s it”. One more page or one story, and that’s it for today.', about_for_h: 'Who it is for',
     about_for: 'unoebasta is for people who are short on time and attention: busy readers and readers with ADHD. You do not have to choose from hundreds of books or remember where you stopped. A short story is a whole story in one sitting.',
@@ -816,7 +822,7 @@ const I18N = {
     note_baen: 'Baen wysyła tę stronę jako plik, więc przeglądarka pobiera plik .htm zamiast go wyświetlić. Dodaj pobrany plik poniżej, aby czytać go tutaj offline.',
     note_doctorow: 'Autor udostępnił książkę na licencji CC BY-NC-SA 1.0: pobierz TXT lub EPUB z jego strony i dodaj poniżej, aby czytać offline.',
     aw_h2: 'Struktura nagród', aw_p: 'Wszyscy laureaci nagród Hugo, Nebula i Locus w prozie. Wybierz rok, kategorię lub utwór.',
-    v_table: 'Tablica', v_list: 'Lista', sort_desc: 'Najnowsze najpierw', sort_asc: 'Najstarsze najpierw', only_text: 'Tylko z tekstem', search_ph: 'Szukaj tytułu lub autora',
+    v_table: 'Tablica', v_list: 'Lista', sort_desc: 'Najnowsze najpierw', sort_asc: 'Najstarsze najpierw', only_text: 'Tylko z tekstem', search_ph: 'Tytuł, autor, rok, magazyn, temat…', search_go: 'Szukaj', search_all: 'Znaleziono: {n} we wszystkich nagrodach, latach i kategoriach', search_clear: 'Wyczyść wyszukiwanie', search_more: 'Pokazano pierwsze {n}. Dodaj słowo, aby zawęzić.', search_readable: 'Do przeczytania za darmo ({n})', search_other: 'Inni laureaci, na razie bez darmowego tekstu ({n})',
     lg_text: 'darmowy tekst', lg_mine: 'twój link lub plik', lg_star: '★ w zakładkach', lg_new: 'nowe',
     crumb_all: 'Wszystkie lata', year_h: '{y}', cat_hist: '{a} · {c}', prev_year: 'Poprzedni rok', next_year: 'Następny rok',
     aw_note: 'Lata to lata wręczenia. SFWA nazywa Nebulę rokiem publikacji, więc „Nebula Awards 2024” wręczono w 2025 roku i są tu pod rokiem 2025.',
@@ -831,7 +837,7 @@ const I18N = {
     src_line: 'Źródło: {s}', src_file: 'Twój plik', loading: 'Wczytywanie strony…', load_fail: 'Nie udało się wczytać strony. Otwórz oryginał.',
     form_suggest: 'Zaproponuj do katalogu', form_report: 'Zgłoś link', f_url: 'Adres strony', f_type: 'Co to jest', t_full: 'Pełny tekst', t_excerpt: 'Fragment', t_audio: 'Audio', t_translation: 'Przekład', f_lang: 'Język', f_comment: 'Komentarz (opcjonalnie)', f_link: 'Który link', f_reason: 'Co jest nie tak',
     r_dead: 'Link nie działa', r_rights: 'Wygląda na naruszenie praw autorskich', r_wrong: 'Inny tekst lub inny utwór', f_submit: 'Zapisz',
-    f_saved: 'Zapisano na tym urządzeniu. Moderacja nie jest jeszcze podłączona, więc skopiuj tekst poniżej i wyślij go do projektu, gdy kanał zostanie otwarty.',
+    f_saved: 'Zapisano na tym urządzeniu. Aby wysłać to do projektu, przycisk otworzy gotowe zgłoszenie na GitHubie: naciśnij tam „Create” (potrzebne konto GitHub). Albo skopiuj tekst i wyślij go inaczej.', gh_send: 'Wyślij na GitHub',
     about_h: 'Jak działa unoebasta',
     name_note: 'Nazwa jest po włosku: uno e basta, „jedno i wystarczy”. Jeszcze jedna strona albo jedno opowiadanie i na dziś koniec.', about_for_h: 'Dla kogo',
     about_for: 'unoebasta jest dla osób, którym brakuje czasu i skupienia: zapracowanych czytelników i czytelników z ADHD. Nie trzeba wybierać spośród setek książek ani pamiętać, gdzie skończyła się lektura. Opowiadanie to cała historia na jedno posiedzenie.',
@@ -891,7 +897,7 @@ const I18N = {
     note_baen: 'Baen отдаёт эту страницу как файл, поэтому браузер скачивает .htm, а не показывает его. Добавьте скачанный файл ниже, чтобы читать здесь офлайн.',
     note_doctorow: 'Автор выпустил книгу под лицензией CC BY-NC-SA 1.0: скачайте TXT или EPUB с его сайта и добавьте ниже, чтобы читать офлайн.',
     aw_h2: 'Структура премий', aw_p: 'Все лауреаты «Хьюго», «Небьюлы» и «Локуса» в прозе. Нажмите на год, категорию или произведение.',
-    v_table: 'Таблица', v_list: 'Список', sort_desc: 'Сначала новые', sort_asc: 'Сначала старые', only_text: 'Только с текстом', search_ph: 'Поиск по названию или автору',
+    v_table: 'Таблица', v_list: 'Список', sort_desc: 'Сначала новые', sort_asc: 'Сначала старые', only_text: 'Только с текстом', search_ph: 'Название, автор, год, журнал, тема…', search_go: 'Найти', search_all: 'Найдено: {n} по всем премиям, годам и категориям', search_clear: 'Сбросить поиск', search_more: 'Показаны первые {n}. Добавьте слово, чтобы сузить поиск.', search_readable: 'Можно читать бесплатно ({n})', search_other: 'Другие лауреаты, пока без бесплатного текста ({n})',
     lg_text: 'бесплатный текст', lg_mine: 'ваша ссылка или файл', lg_star: '★ в закладках', lg_new: 'новое',
     crumb_all: 'Все годы', year_h: '{y}', cat_hist: '{a} · {c}', prev_year: 'Предыдущий год', next_year: 'Следующий год',
     aw_note: 'Годы — годы вручения. SFWA называет «Небьюлу» по году публикации, поэтому «Небьюла 2024» вручена в 2025 году и стоит здесь в 2025-м.',
@@ -906,7 +912,7 @@ const I18N = {
     src_line: 'Источник: {s}', src_file: 'Ваш файл', loading: 'Загружаю страницу…', load_fail: 'Не удалось загрузить страницу. Откройте оригинал.',
     form_suggest: 'Предложить в каталог', form_report: 'Пожаловаться на ссылку', f_url: 'Адрес страницы', f_type: 'Что это', t_full: 'Полный текст', t_excerpt: 'Отрывок', t_audio: 'Аудио', t_translation: 'Перевод', f_lang: 'Язык', f_comment: 'Комментарий (необязательно)', f_link: 'Какая ссылка', f_reason: 'Что не так',
     r_dead: 'Ссылка не работает', r_rights: 'Похоже на нарушение авторских прав', r_wrong: 'Не тот текст или не то произведение', f_submit: 'Сохранить',
-    f_saved: 'Сохранено на этом устройстве. Модерация пока не подключена: скопируйте текст ниже и отправьте его в проект, когда появится канал.',
+    f_saved: 'Сохранено на этом устройстве. Чтобы отправить в проект, кнопка откроет готовую заявку на GitHub: там нажмите «Create» (нужен аккаунт GitHub). Или скопируйте текст и пришлите его иначе.', gh_send: 'Отправить на GitHub',
     about_h: 'Как устроен unoebasta',
     name_note: 'Название по-итальянски: uno e basta, «одно — и хватит». Ещё одна страница или один рассказ, и на сегодня всё.', about_for_h: 'Для кого',
     about_for: 'unoebasta — для тех, у кого мало времени и трудно удержать внимание: для занятых людей и читателей с СДВГ. Не нужно выбирать из сотен книг и помнить, где остановились. Рассказ — это целая история за один присест.',
@@ -1319,7 +1325,7 @@ async function parseFb2(buf, name) {
 }
 
 /* ---------- local state ---------- */
-let filter = { award: 'all', readable: false, audio: false, starred: false, fresh: false, len: 'any' };
+let filter = { award: 'all', readable: false, audio: false, starred: false, fresh: false, len: 'any', q: '' };
 let local = { files: [], positions: [], links: [], suggestions: [], bookmarks: [], tombs: [] };
 let migrated = false;
 async function loadLocal() {
@@ -1523,26 +1529,15 @@ function renderHome() {
     </section>`;
 }
 function renderCatalog() { renderHome(); renderLibrary(); }
-function renderLibrary() {
+function renderLibrary(onlyBody) {
   const v = $('#view-library');
-  const list = Object.keys(READ).map(work).filter(Boolean)
-    .filter(w => (filter.award === 'all' || w.awards.some(a => a[0] === filter.award))
-      && (!filter.readable || hasText(w.id)) && (!filter.audio || hasAudio(w.id))
-      && (!filter.starred || isStarred(w.id)) && (!filter.fresh || isNew(w.id)) && inLen(w.id, filter.len))
-    .sort((a, b) => latestYear(b) - latestYear(a) || a.title.localeCompare(b.title));
-  const n = list.length;
+  if (onlyBody && $('#lib-body')) { $('#lib-body').innerHTML = libraryBody(); return; }
   v.innerHTML = `
     <div class="intro"><h2>${esc(t('intro_h'))}</h2><p>${esc(t('intro_p'))}</p></div>
-    ${renderNews()}
-    <div class="scroller" role="group">
-      ${['all', ...AWARDS].map(a => `<button class="chip" id="f-${a}" data-award="${a}" aria-pressed="${filter.award === a}">${esc(a === 'all' ? t('f_all') : awardName(a))}</button>`).join('')}
-      <button class="chip" id="f-readable" data-toggle="readable" aria-pressed="${filter.readable}">${esc(t('f_readable'))}</button>
-      <button class="chip" id="f-audio" data-toggle="audio" aria-pressed="${filter.audio}">${esc(t('f_audio'))}</button>
-      <button class="chip" id="f-starred" data-toggle="starred" aria-pressed="${filter.starred}">${esc(t('f_starred'))}</button>
-    </div>
-    <div class="scroller" role="group" aria-label="${esc(t('len_label'))}">${['any', '15', '40', 'eve'].map(x => `<button class="chip chip-small" data-flen="${x}" aria-pressed="${(filter.len || 'any') === x}">${esc(t('len_' + x))}</button>`).join('')}</div>
-    <p class="count-line">${n} ${esc(plural(n, t('works')))}</p>
-    <div class="slips">${list.map(w => { const r = READ[w.id]; const alt = altTitle(w); return `
+    ${searchForm('lib-q', filter.q)}
+    <div id="lib-body" class="lib-body">${libraryBody()}</div>`;
+}
+function slipHtml(w) { const r = READ[w.id]; const alt = altTitle(w); return `
       <article class="slip${isDone(w.id) ? ' is-done' : ''}">
         ${starBtn(w.id)}
         <div class="slip-row">${coverHtml(w.id, 's')}<div class="slip-body">
@@ -1553,9 +1548,73 @@ function renderLibrary() {
         <p class="slip-time">${esc(fmtDur(minutesOf(w.id)))}</p></div></div>
         <div class="flags"><span class="tier tier-${r.tier}">${esc(t('tier_' + r.tier))}</span>${hasAudio(w.id) ? `<span class="flag">${esc(t('f_audio'))}</span>` : ''}${workFlags(w)}</div>
         <div class="slip-actions">${readCtl(w.id, 'btn btn-small')}${listenCtl(w.id, 'btn btn-small')}${doneBtn(w.id, 'btn btn-small btn-ghost')}</div>
-      </article>`; }).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}
+      </article>`; }
+function libraryBody() {
+  if (filter.q) {
+    const found = searchWorks(filter.q), readable = found.filter(q => READ[q]), other = found.filter(q => !READ[q]);
+    return `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>
+      ${readable.length ? `<h3 class="sub-h">${esc(t('search_readable', { n: readable.length }))}</h3><div class="slips">${readable.map(q => slipHtml(work(q))).join('')}</div>` : ''}
+      ${other.length ? `<h3 class="sub-h">${esc(t('search_other', { n: other.length }))}</h3>${searchRows(other)}` : ''}
+      ${found.length ? '' : `<p class="empty">${esc(t('nothing_found'))}</p>`}`;
+  }
+  const list = Object.keys(READ).map(work).filter(Boolean)
+    .filter(w => (filter.award === 'all' || w.awards.some(a => a[0] === filter.award))
+      && (!filter.readable || hasText(w.id)) && (!filter.audio || hasAudio(w.id))
+      && (!filter.starred || isStarred(w.id)) && (!filter.fresh || isNew(w.id)) && inLen(w.id, filter.len))
+    .sort((a, b) => latestYear(b) - latestYear(a) || a.title.localeCompare(b.title));
+  const n = list.length;
+  return `
+    ${renderNews()}
+    <div class="scroller" role="group">
+      ${['all', ...AWARDS].map(a => `<button class="chip" id="f-${a}" data-award="${a}" aria-pressed="${filter.award === a}">${esc(a === 'all' ? t('f_all') : awardName(a))}</button>`).join('')}
+      <button class="chip" id="f-readable" data-toggle="readable" aria-pressed="${filter.readable}">${esc(t('f_readable'))}</button>
+      <button class="chip" id="f-audio" data-toggle="audio" aria-pressed="${filter.audio}">${esc(t('f_audio'))}</button>
+      <button class="chip" id="f-starred" data-toggle="starred" aria-pressed="${filter.starred}">${esc(t('f_starred'))}</button>
+    </div>
+    <div class="scroller" role="group" aria-label="${esc(t('len_label'))}">${['any', '15', '40', 'eve'].map(x => `<button class="chip chip-small" data-flen="${x}" aria-pressed="${(filter.len || 'any') === x}">${esc(t('len_' + x))}</button>`).join('')}</div>
+    <p class="count-line">${n} ${esc(plural(n, t('works')))}</p>
+    <div class="slips">${list.map(slipHtml).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}
     </div>`;
 }
+
+/* ---------- search: one search over all winners ----------
+   Every word of the query must match one of: titles (original, Polish, Russian, the magazine's), authors in
+   EN/PL/RU, year, award and category names in every language, the magazine or publisher, the description.
+   Case, accents, ё and ł do not matter. Titles count most, then authors, then the rest, descriptions least. */
+const fold = x => String(x || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/ё/g, 'е').replace(/ł/g, 'l').replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+let SIDX = null;
+function searchIndex() {
+  if (SIDX) return SIDX;
+  const langs = Object.keys(I18N);
+  SIDX = Object.values(WORKS).map(w => {
+    const r = READ[w.id];
+    const title = ' ' + fold([w.title, w.tpl, w.tru, r && r.alt ? Object.values(r.alt).join(' ') : ''].join(' ')) + ' ';
+    const by = ' ' + fold(w.authors.flatMap(a => AUTHORS[a] ? Object.values(AUTHORS[a].name) : []).join(' ')) + ' ';
+    const meta = ' ' + fold([...new Set(w.awards.flatMap(([a, c, y]) => [y, ...langs.flatMap(l => [I18N[l]['aw_' + a], I18N[l]['cat_' + c]])]))].join(' ') + ' ' + (r ? r.pub + ' ' + r.links.map(l => l.site).join(' ') : '') + ' ' + (w.pub || '')) + ' ';
+    const about = ' ' + fold(w.about ? Object.values(w.about).filter(Boolean).join(' ') : '') + ' ';
+    return { q: w.id, title, by, meta, about };
+  });
+  return SIDX;
+}
+function searchWorks(query) {
+  const words = fold(query).split(' ').filter(x => x.length > 1 || /\d/.test(x)); if (!words.length) return [];
+  const hit = (hay, wd) => { const i = hay.indexOf(wd); return i < 0 ? 0 : hay[i - 1] === ' ' ? 2 : 1; }; // 2: the start of a word
+  const out = [];
+  for (const x of searchIndex()) {
+    let score = 0;
+    for (const wd of words) {
+      const sc = Math.max(hit(x.title, wd) * 4, hit(x.by, wd) * 3, hit(x.meta, wd) * 1.5, wd.length > 3 ? hit(x.about, wd) * 0.6 : 0);
+      if (!sc) { score = 0; break; } score += sc;
+    }
+    if (score) out.push([x.q, score + (READ[x.q] ? 0.5 : 0)]);
+  }
+  return out.sort((a, b) => b[1] - a[1] || latestYear(work(b[0])) - latestYear(work(a[0]))).map(x => x[0]);
+}
+const searchForm = (id, val) => `<form class="searchbar" role="search" data-sform="${id}"><input class="search" id="${id}" name="q" type="search" enterkeyhint="search" autocomplete="off" aria-label="${esc(t('search_go'))}" placeholder="${esc(t('search_ph'))}" value="${esc(val || '')}"><button class="btn btn-primary" type="submit">${esc(t('search_go'))}</button></form>`;
+const awardsLine = w => w.awards.map(([a, c, y]) => `${awardName(a)} ${y} · ${catName(c)}`).join('; ');
+const SEARCH_MAX = 120;
+function searchRows(list) { return `<div class="ylist">${list.slice(0, SEARCH_MAX).map(q => workRow(awardsLine(work(q)), q)).join('')}</div>${list.length > SEARCH_MAX ? `<p class="footnote">${esc(t('search_more', { n: SEARCH_MAX }))}</p>` : ''}`; }
+const clearBtn = () => `<button class="linkbtn" data-sclear="1">${esc(t('search_clear'))}</button>`;
 
 /* ---------- view: Awards (structure) ---------- */
 let AV = Object.assign({ award: 'h', cat: 'S', year: null, mode: 'cats', sort: 'desc', onlyText: false, q: '' }, prefs.av || {});
@@ -1591,7 +1650,7 @@ function decadeChips(years) {
   if (decs.length < 3) return '';
   return `<div class="scroller" role="group" aria-label="${esc(t('jump_to'))}">${decs.map(d => `<button class="chip chip-small" data-jump="${d}">${d}${esc(t('decade_suffix'))}</button>`).join('')}</div>`;
 }
-function renderAwards() {
+function renderAwards(onlyBody) {
   const v = $('#view-awards');
   const wide = WIDE();
   if (AV.mode === 'list') AV.mode = 'years';
@@ -1606,7 +1665,7 @@ function renderAwards() {
   const modes = ['cats', 'years'].concat(wide ? ['table'] : []);
   const modeSeg = `<div class="seg full" role="group">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${AV.mode === m}">${esc(t('v_' + m))}</button>`).join('')}</div>`;
   const tools = `<div class="scroller"><button class="chip" data-av-sort="toggle">${AV.sort === 'desc' ? '↓ ' + esc(t('sort_desc')) : '↑ ' + esc(t('sort_asc'))}</button><button class="chip" data-av-text="1" aria-pressed="${AV.onlyText}">${mk('text')} ${esc(t('only_text'))}</button></div>`;
-  const search = `<input class="search" id="av-q" type="search" enterkeyhint="search" placeholder="${esc(t('search_ph'))}" value="${esc(AV.q)}">`;
+  const search = '';
   const LG = { '▶': 'text', '¶': 'ex', '◌': 'mine', '♪': 'audio', '★': 'star' };
   const legend = `<p class="footnote legend">${t('legend_short').split(' · ').map(x => { const g = x[0], rest = esc(x.slice(2)); return LG[g] ? `<span>${mk(LG[g])} ${rest}</span>` : g === '●' ? `<span><span class="nd"></span> ${rest}</span>` : `<span>${esc(x)}</span>`; }).join(' ')}</p>`;
   const sortY = ys => ys.sort((a, b) => AV.sort === 'desc' ? b - a : a - b);
@@ -1648,7 +1707,9 @@ function renderAwards() {
     head = `${awSeg}${modeSeg}${tools}${search}`;
     body = `<div class="board-wrap"><table class="board"><thead><tr><th></th>${cats.map(c => `<th scope="col"><button data-av-cat-go="${c}">${esc(catName(c))}</button></th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${cats.length + 1}"><p class="empty" style="padding:10px">${esc(t('nothing_found'))}</p></td></tr>`}</tbody></table></div>${legend}`;
   }
-  v.innerHTML = `<div class="intro"><h2>${esc(t('aw_h2'))}</h2><p>${esc(t('aw_p'))}</p></div><div class="controls">${head}</div>${body}
+  if (AV.q) { const found = searchWorks(AV.q); head = ''; body = `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>${found.length ? searchRows(found) : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`; }
+  if (onlyBody && $('#av-body')) { $('#av-head').innerHTML = head; $('#av-body').innerHTML = body; return; }
+  v.innerHTML = `<div class="intro"><h2>${esc(t('aw_h2'))}</h2><p>${esc(t('aw_p'))}</p></div><div class="controls">${searchForm('av-q', AV.q)}<div id="av-head" class="controls">${head}</div></div><div id="av-body">${body}</div>
     <p class="footnote">${esc(t('aw_note'))}</p><p class="footnote">${esc(t('aw_src'))}</p>`;
 }
 function goAwards(patch) { Object.assign(AV, { year: null }, patch.cat ? { mode: 'cats' } : {}, patch); if (!AV.cat) AV.cat = 'S'; if (AV.mode === 'table' && !WIDE()) AV.mode = 'cats'; saveAV(); closeSheets(); setView('awards'); }
@@ -1842,6 +1903,14 @@ function suggestionText(s) {
   const w = work(s.workId);
   return [`[${s.kind === 'report' ? 'REPORT' : 'SUGGEST'}] ${w ? w.title : ''} (${s.workId || ''})`, s.url && `URL: ${s.url}`, s.type && `Type: ${s.type}`, s.lang && `Lang: ${s.lang}`, s.reason && `Reason: ${s.reason}`, s.comment && `Note: ${s.comment}`, `Date: ${new Date(s.at).toISOString().slice(0, 10)}`].filter(Boolean).join('\n');
 }
+// a ready GitHub issue from a suggestion or a report: the reader only presses "Create" (a GitHub account is needed)
+function issueUrl(s) {
+  const w = work(s.workId), name = w ? `${w.title} — ${w.authors.map(enName).join(', ')} (${s.workId})` : s.workId || '';
+  const P = s.kind === 'report'
+    ? { template: 'broken-link.yml', title: `Broken link: ${w ? w.title : ''}`, work: name, url: s.url || '', what: [s.reason, s.comment].filter(Boolean).join(' — ') }
+    : { template: 'add-text.yml', title: `Text: ${w ? w.title : ''}`, work: name, url: s.url || '', lang: { en: 'English', pl: 'Polish', ru: 'Russian' }[s.lang] || 'Other', note: [s.type && 'Type: ' + s.type, s.comment].filter(Boolean).join('\n') };
+  return REPO_URL + '/issues/new?' + Object.entries(P).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
+}
 function openForm(kind, wid) {
   const w = work(wid); const r = READ[wid];
   const el = $('#sheet-form');
@@ -1858,7 +1927,7 @@ function openForm(kind, wid) {
       <div class="field"><label for="sg-comment">${esc(t('f_comment'))}</label><textarea id="sg-comment" rows="3"></textarea></div>
       <div class="row"><button class="btn btn-primary" type="submit">${esc(t('f_submit'))}</button><button class="btn btn-ghost" type="button" data-close>${esc(t('cancel'))}</button></div>
     </form>
-    <div id="sg-done" class="panel" hidden><p class="note">${esc(t('f_saved'))}</p><textarea id="sg-text" rows="7" readonly></textarea><div class="row"><button class="btn" id="sg-copy">${esc(t('copy'))}</button></div></div>
+    <div id="sg-done" class="panel" hidden><p class="note">${esc(t('f_saved'))}</p><div class="row"><a class="btn btn-primary" id="sg-gh" href="${REPO_URL}/issues/new/choose" target="_blank" rel="noopener">${esc(t('gh_send'))} ↗</a></div><textarea id="sg-text" rows="7" readonly></textarea><div class="row"><button class="btn" id="sg-copy">${esc(t('copy'))}</button></div></div>
   </div>`;
   el.hidden = false; el.scrollTop = 0;
   $('#sg-form').addEventListener('submit', async e => {
@@ -1867,7 +1936,7 @@ function openForm(kind, wid) {
     if (report) { s.url = $('#sg-link').value; s.reason = $('#sg-reason').value; }
     else { s.url = $('#sg-url').value.trim(); s.type = $('#sg-type').value; s.lang = $('#sg-lang').value; if (!s.url) return; }
     await Store.put('suggestions', s);
-    $('#sg-form').hidden = true; $('#sg-done').hidden = false; $('#sg-text').value = suggestionText(s);
+    $('#sg-form').hidden = true; $('#sg-done').hidden = false; $('#sg-text').value = suggestionText(s); $('#sg-gh').href = issueUrl(s);
   });
 }
 
@@ -2671,6 +2740,7 @@ document.addEventListener('click', async e => {
   if (d.lang) { LANG = d.lang; prefs.lang = LANG; savePrefs(); applyTheme(); return refreshAll(); }
   if (d.view) { closeSheets(); return setView(d.view); }
   if (d.goshelf) { closeSheets(); setView('shelf'); await renderShelf(); const el = document.getElementById(d.goshelf); if (el) { el.scrollIntoView ? el.scrollIntoView({ block: 'start' }) : 0; el.classList.add('hit'); setTimeout(() => el.classList.remove('hit'), 1800); } return; }
+  if (d.sclear) { const inp = b.closest('section') && b.closest('section').querySelector('form[data-sform] input'); if (inp) { inp.value = ''; runSearch(inp.id, ''); inp.focus(); } return; }
   if (d.award) { filter.award = d.award; return renderCatalog(); }
   if (d.toggle) { filter[d.toggle] = !filter[d.toggle]; return renderCatalog(); }
   if (d.fresh) { filter.fresh = !filter.fresh; if (VIEW !== 'library') setView('library'); return renderCatalog(); }
@@ -2777,10 +2847,20 @@ document.addEventListener('submit', async e => {
   if (!$('#sheet-work').hidden && f.workId) openWork(f.workId); else renderShelf();
 });
 let qT = null;
+function runSearch(id, val) {
+  if (id === 'av-q') { AV.q = val.trim(); renderAwards(true); }
+  if (id === 'lib-q') { filter.q = val.trim(); renderLibrary(true); }
+}
 document.addEventListener('input', e => {
-  if (e.target.id !== 'av-q') return;
-  clearTimeout(qT); const val = e.target.value;
-  qT = setTimeout(() => { AV.q = val.trim(); renderAwards(); const inp = $('#av-q'); if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); } }, 250);
+  if (e.target.id !== 'av-q' && e.target.id !== 'lib-q') return;
+  clearTimeout(qT); const id = e.target.id, val = e.target.value;
+  qT = setTimeout(() => runSearch(id, val), 250);
+});
+document.addEventListener('submit', e => {
+  const f = e.target.closest && e.target.closest('form[data-sform]'); if (!f) return;
+  e.preventDefault(); clearTimeout(qT);
+  const inp = f.querySelector('input'); runSearch(inp.id, inp.value);
+  inp.blur(); // close the phone keyboard so the results are visible
 });
 function closeTopLayer() {
   if (!$('#move-dialog').hidden) return closeMove();

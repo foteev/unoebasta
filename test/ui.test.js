@@ -64,7 +64,29 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const found = $('#view-awards .count-line').textContent;
   checks['search Le Guin finds several'] = +found.match(/\d+/)[0] >= 8;
   const inp2 = $('#av-q'); inp2.value = ''; inp2.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(400);
+  // one search over everything: any category, titles and authors in any language, year, magazine, topic
+  click($('#view-awards [data-av-mode="cats"]')); await sleep(30);
+  const aq = $('#av-q'); aq.value = 'ле гуин'; aq.closest('form').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true })); await sleep(80);
+  checks['search: Awards searches every category, by a Russian author name, with a button'] = !!$('#view-awards form[data-sform] button[type="submit"]') && +$('#view-awards .count-line').textContent.match(/\d+/)[0] >= 8 && /Left Hand of Darkness/.test($('#view-awards').textContent) && /Dispossessed/.test($('#view-awards').textContent);
+  checks['search: the box stays while results change'] = $('#av-q') === aq && aq.value === 'ле гуин';
+  click($('#view-awards [data-sclear]')); await sleep(60);
+  checks['search: clear brings the board back'] = $('#av-q').value === '' && !!$('#view-awards [data-av-cat]');
+  const S = qs => w.eval(`searchWorks(${JSON.stringify(qs)})`);
+  checks['search: Polish and Russian titles'] = S('Diuna').includes('Q190192') && S('дюна').includes('Q190192');
+  checks['search: accents and ё do not matter'] = S('Mieville').some(q => /Miéville/.test(w.eval(`AUTHORS[WORKS['${q}'].authors[0]].name.en`))) && S('ЛЕВАЯ РУКА ТЬМЫ').includes('Q2008211');
+  checks['search: year, award and category words'] = S('хьюго 1966').includes('Q190192') && S('nebula 2015 short story').length >= 1;
+  checks['search: magazine and topic'] = S('clarkesworld').length >= 10 && S('dragon').length >= 3;
+  checks['search: titles rank above descriptions'] = S('dune')[0] === 'Q190192';
+  click($('#tab-library')); await sleep(30);
+  const lq = $('#lib-q'); lq.value = 'Kritzer'; lq.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(400);
+  checks['search: Catalog shows free texts first, then other winners'] = $$('#view-library .slips .slip').length >= 2 && /Cat Pictures Please/.test($('#view-library .slips').textContent) && $('#lib-q') === lq;
+  lq.value = ''; lq.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(400);
+  checks['search: empty box → the whole catalog'] = $$('#view-library .slip').length === 71;
+  const iu = w.eval(`issueUrl({ kind: 'suggest', workId: 'Q25349436', url: 'https://x.test/a', lang: 'ru', type: 'full', comment: 'hi', at: 1 })`);
+  const ir = w.eval(`issueUrl({ kind: 'report', workId: 'Q25349436', url: 'https://x.test/b', reason: 'dead', at: 1 })`);
+  checks['suggestions: a ready GitHub issue, no account data in the page'] = iu.startsWith('https://github.com/foteev/unoebasta/issues/new?template=add-text.yml&') && iu.includes('url=https%3A%2F%2Fx.test%2Fa') && iu.includes('lang=Russian') && iu.includes('Cat%20Pictures%20Please') && ir.includes('template=broken-link.yml') && ir.includes('what=dead');
   // author page
+
   const kr = Object.keys(w.eval('AUTHORS')).find(k => w.eval('AUTHORS')[k].name.en === 'Naomi Kritzer');
   w.eval(`openAuthor('${kr}')`); await sleep(50);
   checks['author: 7 award rows, no table'] = $$('#sheet-author .wrow').length === 7 && !$('#sheet-author table');

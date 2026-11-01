@@ -45,6 +45,10 @@ body:
     attributes:
       label: Audio, if there is one (optional)
       placeholder: "https://… podcast episode"
+  - type: textarea
+    id: note
+    attributes:
+      label: Anything else (optional)
   - type: checkboxes
     id: legal
     attributes:
