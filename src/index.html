@@ -505,7 +505,7 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .cover-s { width: 56px; height: 84px; }
 .cover-m { width: 120px; height: 180px; }
 .cover-t { --ch: 220; background: hsl(var(--ch) 55% 90%); color: hsl(var(--ch) 45% 18%); display: flex; flex-direction: column; justify-content: space-between; padding: 6px 5px 5px 7px; overflow: hidden; text-align: left; }
-.cover-t .ct { font: 500 9px/1.15 var(--f-display); display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.cover-t .ct { font: 500 9px/1.15 var(--f-display); display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: break-word; hyphens: auto; }
 .cover-t .ca { font: 400 7.5px/1.1 var(--f-ui); opacity: .75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cover-m.cover-t { padding: 14px 12px 12px 16px; }
 .cover-m.cover-t .ct { font-size: 17px; -webkit-line-clamp: 6; }
@@ -968,7 +968,7 @@ function coverHtml(q, size) {
   const big = size === 'm';
   if (COVERS.has(q)) return `<img class="cover cover-${big ? 'm' : 's'}" src="covers/${big ? 'm' : 's'}/${q}.webp" alt="" loading="lazy" decoding="async" width="${big ? 120 : 56}" height="${big ? 180 : 84}">`;
   const hue = parseInt(hash(q), 36) % 360, by = (w.authors[0] && authorName(w.authors[0])) || '';
-  return `<div class="cover cover-${big ? 'm' : 's'} cover-t" style="--ch:${hue}" aria-hidden="true"><span class="ct">${esc(w.title)}</span><span class="ca">${esc(by)}</span></div>`;
+  return `<div class="cover cover-${big ? 'm' : 's'} cover-t" style="--ch:${hue}" aria-hidden="true"><span class="ct" lang="en">${esc(w.title)}</span><span class="ca">${esc(by)}</span></div>`;
 }
 
 /* ---------- icons: Lucide (ISC), thin outline ---------- */
