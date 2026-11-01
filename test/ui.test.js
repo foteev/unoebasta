@@ -165,7 +165,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['recall: note saved, reader closed'] = $('#reader').hidden && $('#exit-dialog').hidden && w.eval("local.bookmarks.find(b => b.type === 'recall' && b.key === 'demo:ru').note") === 'Мира нашла письмо';
   w.eval(age + '; renderCatalog()'); await sleep(30);
   let rc = $('#view-catalog .recall');
-  checks['recall: start screen begins with it (after the motto)'] = !!rc && $('#view-catalog').firstElementChild.classList.contains('motto') && /grown-up now\. Say yes/.test($('#view-catalog .motto').textContent) && $('#view-catalog .motto').nextElementSibling === rc && /Мира нашла письмо/.test(rc.textContent) && /40%/.test(rc.textContent) && /Глава 2/.test(rc.textContent) && /Утром мы поехали к морю/.test(rc.textContent);
+  checks['recall: the start screen begins with it, no motto there'] = !!rc && $('#view-catalog').firstElementChild === rc && !$('#view-catalog .motto') && !$('#view-catalog [data-view="library"]') && /grown-up now\. Say yes/.test($('#view-about .motto').textContent) && /Мира нашла письмо/.test(rc.textContent) && /40%/.test(rc.textContent) && /Глава 2/.test(rc.textContent) && /Утром мы поехали к морю/.test(rc.textContent);
   click(rc.querySelector('[data-rcnote]')); await sleep(20);
   rc.querySelector('form.rc-noteform textarea').value = 'Мира нашла письмо. Кто такой Ян?'; submit(rc.querySelector('form.rc-noteform')); await sleep(120);
   checks['recall: note edited on the card'] = /Кто такой Ян/.test($('#view-catalog .recall').textContent);
