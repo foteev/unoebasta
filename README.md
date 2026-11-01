@@ -42,6 +42,7 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 | `scripts/build-web.mjs` | Puts the data into the page |
 | `scripts/coverage.mjs` | What exists in each language → `data/coverage.csv` |
 | `scripts/fetch-covers.mjs` | Downloads covers by Open Library cover ID → `covers/s` (80×120) and `covers/m` (160×240), WebP |
+| `scripts/check-links.mjs` | Checks every text and audio link (the “Links” workflow, weekly) |
 | `scripts/check-secrets.mjs` | Fails on keys, tokens or personal e-mail addresses |
 | `test/ui.test.js` | jsdom tests |
 | `docs/` | How user data is stored, migrated and moved; mobile-first rules |
