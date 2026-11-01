@@ -1,0 +1,15 @@
+name: Comment
+description: Anything: a free text to add, a broken link, an idea
+title: "Feedback: "
+labels: ["feedback"]
+body:
+  - type: input
+    id: work
+    attributes:
+      label: Work (optional)
+  - type: textarea
+    id: comment
+    attributes:
+      label: Comment
+    validations:
+      required: true

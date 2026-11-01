@@ -569,6 +569,7 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .pick-done { justify-self: end; margin: -2px -4px -4px 0; min-height: 40px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; background: none; color: var(--muted); font: 500 14px/1 var(--f-ui); cursor: pointer; }
 .pick-done:hover { color: var(--accent); border-color: var(--accent); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#sg-comment { font: 400 16px/1.5 var(--f-ui); }
 </style>
 
 </head>
@@ -777,9 +778,9 @@ const I18N = {
     imported: 'Saved on this device: {t}', import_err: 'Could not read this file: {e}', pdf_no: 'PDF is not supported yet. Try EPUB, FB2, HTML or TXT.',
     words: '{n} words', resumed: 'Back to {p}%', smaller: 'Smaller text', bigger: 'Larger text', rtheme: 'Reader theme',     bm_add: 'Add a bookmark here', bm_list: 'Bookmarks in this text', bm_added: 'Bookmark added · {p}%', bm_none: 'No bookmarks in this text yet. Tap 🔖 to add one.', bm_open_hint: 'Open the text to jump to this place.',
     src_line: 'Source: {s}', src_file: 'Your file', loading: 'Loading the page…', load_fail: 'Could not load the page. Open the original instead.',
-    form_suggest: 'Suggest for the catalog', form_report: 'Report a link', f_url: 'Page address', f_type: 'What is it', t_full: 'Full text', t_excerpt: 'Excerpt', t_audio: 'Audio', t_translation: 'Translation', f_lang: 'Language', f_comment: 'Comment (optional)', f_link: 'Which link', f_reason: 'What is wrong',
-    r_dead: 'The link does not work', r_rights: 'Looks like a copyright violation', r_wrong: 'Wrong text or wrong work', f_submit: 'Save',
-    f_saved: 'Saved on this device. To send it to the project, the button opens a ready issue on GitHub: press “Create” there (a GitHub account is needed). Or copy the text and send it another way.', sg_another: 'Suggest another', sg_another_report: 'Report another', sg_done_btn: 'Done', sg_sent_on: 'sent {d}', sg_gh_on: 'opened on GitHub {d}', sg_unsent: 'not sent yet', sg_send_again: 'Send again', sg_clear_sent: 'Remove sent', sg_clear_all: 'Clear all', sg_kind_suggest: 'Suggestion', sg_kind_report: 'Report', gh_send: 'Send on GitHub', sg_send: 'Send anonymously', sg_sent: 'Sent to the project. Thank you!', sg_send_fail: 'Could not send right now. Try again, or send it on GitHub.', f_saved_inbox: 'Saved on this device. “Send anonymously” needs no account: the message is encrypted so that only the project can read it. Or open a ready issue on GitHub.',
+   
+   
+    sg_sent_on: 'sent {d}', sg_gh_on: 'opened on GitHub {d}', sg_unsent: 'not sent yet', sg_send_again: 'Send again', sg_clear_sent: 'Remove sent', sg_clear_all: 'Clear all', sg_kind_suggest: 'Suggestion', sg_kind_report: 'Report', fb_title: 'Write to the project', fb_label: 'Your comment', fb_ph: 'A link to a free text, a broken link, an idea: anything', fb_send: 'Send', fb_sent: 'Sent. Thank you! You can write another one.', fb_saved_only: 'Could not send right now: it is kept on My shelf, send it from there later.', fb_gh_opened: 'A ready issue opened on GitHub: press “Create” there. Your comment is also kept on My shelf.', fb_note_inbox: 'No account needed: the message is encrypted so that only the project can read it. A copy stays on My shelf.', fb_note_gh: 'It opens as a ready issue on GitHub (a GitHub account is needed). A copy stays on My shelf.', sg_kind_feedback: 'Comment', sg_send: 'Send anonymously', sg_sent: 'Sent to the project. Thank you!', sg_send_fail: 'Could not send right now. Try again, or send it on GitHub.',
     about_h: 'How unoebasta works',
     name_note: 'The name is Italian: uno e basta, “just one, and that’s it”. One more page or one story, and that’s it for today.', about_for_h: 'Who it is for',
     about_for: 'unoebasta is for people who are short on time and attention: busy readers and readers with ADHD. You do not have to choose from hundreds of books or remember where you stopped. A short story is a whole story in one sitting.',
@@ -852,9 +853,9 @@ const I18N = {
     imported: 'Zapisano na urządzeniu: {t}', import_err: 'Nie udało się odczytać pliku: {e}', pdf_no: 'PDF nie jest jeszcze obsługiwany. Spróbuj EPUB, FB2, HTML lub TXT.',
     words: '{n} słów', resumed: 'Wracamy do {p}%', smaller: 'Mniejszy tekst', bigger: 'Większy tekst', rtheme: 'Motyw czytnika',     bm_add: 'Dodaj zakładkę tutaj', bm_list: 'Zakładki w tym tekście', bm_added: 'Dodano zakładkę · {p}%', bm_none: 'W tym tekście nie ma jeszcze zakładek. Naciśnij 🔖, aby dodać.', bm_open_hint: 'Otwórz tekst, aby przejść do tego miejsca.',
     src_line: 'Źródło: {s}', src_file: 'Twój plik', loading: 'Wczytywanie strony…', load_fail: 'Nie udało się wczytać strony. Otwórz oryginał.',
-    form_suggest: 'Zaproponuj do katalogu', form_report: 'Zgłoś link', f_url: 'Adres strony', f_type: 'Co to jest', t_full: 'Pełny tekst', t_excerpt: 'Fragment', t_audio: 'Audio', t_translation: 'Przekład', f_lang: 'Język', f_comment: 'Komentarz (opcjonalnie)', f_link: 'Który link', f_reason: 'Co jest nie tak',
-    r_dead: 'Link nie działa', r_rights: 'Wygląda na naruszenie praw autorskich', r_wrong: 'Inny tekst lub inny utwór', f_submit: 'Zapisz',
-    f_saved: 'Zapisano na tym urządzeniu. Aby wysłać to do projektu, przycisk otworzy gotowe zgłoszenie na GitHubie: naciśnij tam „Create” (potrzebne konto GitHub). Albo skopiuj tekst i wyślij go inaczej.', sg_another: 'Zaproponuj kolejne', sg_another_report: 'Zgłoś kolejne', sg_done_btn: 'Gotowe', sg_sent_on: 'wysłano {d}', sg_gh_on: 'otwarto na GitHubie {d}', sg_unsent: 'jeszcze nie wysłano', sg_send_again: 'Wyślij ponownie', sg_clear_sent: 'Usuń wysłane', sg_clear_all: 'Wyczyść wszystko', sg_kind_suggest: 'Propozycja', sg_kind_report: 'Zgłoszenie', gh_send: 'Wyślij na GitHub', sg_send: 'Wyślij anonimowo', sg_sent: 'Wysłano do projektu. Dziękujemy!', sg_send_fail: 'Nie udało się teraz wysłać. Spróbuj ponownie albo wyślij przez GitHub.', f_saved_inbox: 'Zapisano na tym urządzeniu. „Wyślij anonimowo” nie wymaga konta: wiadomość jest zaszyfrowana tak, że przeczyta ją tylko projekt. Albo otwórz gotowe zgłoszenie na GitHubie.',
+   
+   
+    sg_sent_on: 'wysłano {d}', sg_gh_on: 'otwarto na GitHubie {d}', sg_unsent: 'jeszcze nie wysłano', sg_send_again: 'Wyślij ponownie', sg_clear_sent: 'Usuń wysłane', sg_clear_all: 'Wyczyść wszystko', sg_kind_suggest: 'Propozycja', sg_kind_report: 'Zgłoszenie', fb_title: 'Napisz do projektu', fb_label: 'Twój komentarz', fb_ph: 'Link do darmowego tekstu, niedziałający link, pomysł: cokolwiek', fb_send: 'Wyślij', fb_sent: 'Wysłano. Dziękujemy! Możesz napisać kolejny.', fb_saved_only: 'Nie udało się teraz wysłać: komentarz zostaje na półce, wyślij go stamtąd później.', fb_gh_opened: 'Na GitHubie otworzyło się gotowe zgłoszenie: naciśnij tam „Create”. Komentarz zostaje też na półce.', fb_note_inbox: 'Bez konta: wiadomość jest zaszyfrowana tak, że przeczyta ją tylko projekt. Kopia zostaje na półce.', fb_note_gh: 'Otworzy się jako gotowe zgłoszenie na GitHubie (potrzebne konto GitHub). Kopia zostaje na półce.', sg_kind_feedback: 'Komentarz', sg_send: 'Wyślij anonimowo', sg_sent: 'Wysłano do projektu. Dziękujemy!', sg_send_fail: 'Nie udało się teraz wysłać. Spróbuj ponownie albo wyślij przez GitHub.',
     about_h: 'Jak działa unoebasta',
     name_note: 'Nazwa jest po włosku: uno e basta, „jedno i wystarczy”. Jeszcze jedna strona albo jedno opowiadanie i na dziś koniec.', about_for_h: 'Dla kogo',
     about_for: 'unoebasta jest dla osób, którym brakuje czasu i skupienia: zapracowanych czytelników i czytelników z ADHD. Nie trzeba wybierać spośród setek książek ani pamiętać, gdzie skończyła się lektura. Opowiadanie to cała historia na jedno posiedzenie.',
@@ -927,9 +928,9 @@ const I18N = {
     imported: 'Сохранено на устройстве: {t}', import_err: 'Не удалось прочитать файл: {e}', pdf_no: 'PDF пока не поддерживается. Попробуйте EPUB, FB2, HTML или TXT.',
     words: '{n} слов', resumed: 'Продолжаем с {p}%', smaller: 'Мельче', bigger: 'Крупнее', rtheme: 'Тема ридера',     bm_add: 'Закладка на этом месте', bm_list: 'Закладки в этом тексте', bm_added: 'Закладка добавлена · {p}%', bm_none: 'В этом тексте закладок пока нет. Нажмите 🔖, чтобы добавить.', bm_open_hint: 'Откройте текст, чтобы перейти к этому месту.',
     src_line: 'Источник: {s}', src_file: 'Ваш файл', loading: 'Загружаю страницу…', load_fail: 'Не удалось загрузить страницу. Откройте оригинал.',
-    form_suggest: 'Предложить в каталог', form_report: 'Пожаловаться на ссылку', f_url: 'Адрес страницы', f_type: 'Что это', t_full: 'Полный текст', t_excerpt: 'Отрывок', t_audio: 'Аудио', t_translation: 'Перевод', f_lang: 'Язык', f_comment: 'Комментарий (необязательно)', f_link: 'Какая ссылка', f_reason: 'Что не так',
-    r_dead: 'Ссылка не работает', r_rights: 'Похоже на нарушение авторских прав', r_wrong: 'Не тот текст или не то произведение', f_submit: 'Сохранить',
-    f_saved: 'Сохранено на этом устройстве. Чтобы отправить в проект, кнопка откроет готовую заявку на GitHub: там нажмите «Create» (нужен аккаунт GitHub). Или скопируйте текст и пришлите его иначе.', sg_another: 'Ещё одно предложение', sg_another_report: 'Ещё одна жалоба', sg_done_btn: 'Готово', sg_sent_on: 'отправлено {d}', sg_gh_on: 'открыто на GitHub {d}', sg_unsent: 'ещё не отправлено', sg_send_again: 'Отправить ещё раз', sg_clear_sent: 'Убрать отправленные', sg_clear_all: 'Очистить всё', sg_kind_suggest: 'Предложение', sg_kind_report: 'Жалоба', gh_send: 'Отправить на GitHub', sg_send: 'Отправить анонимно', sg_sent: 'Отправлено в проект. Спасибо!', sg_send_fail: 'Сейчас не получилось отправить. Попробуйте ещё раз или отправьте через GitHub.', f_saved_inbox: 'Сохранено на этом устройстве. «Отправить анонимно» — без аккаунта: сообщение зашифровано так, что прочитать его может только проект. Или откройте готовую заявку на GitHub.',
+   
+   
+    sg_sent_on: 'отправлено {d}', sg_gh_on: 'открыто на GitHub {d}', sg_unsent: 'ещё не отправлено', sg_send_again: 'Отправить ещё раз', sg_clear_sent: 'Убрать отправленные', sg_clear_all: 'Очистить всё', sg_kind_suggest: 'Предложение', sg_kind_report: 'Жалоба', fb_title: 'Написать в проект', fb_label: 'Ваш комментарий', fb_ph: 'Ссылка на бесплатный текст, сломанная ссылка, идея — что угодно', fb_send: 'Отправить', fb_sent: 'Отправлено. Спасибо! Можно написать ещё.', fb_saved_only: 'Сейчас не получилось отправить: комментарий остался на полке, отправьте его оттуда позже.', fb_gh_opened: 'На GitHub открылась готовая заявка: нажмите там «Create». Комментарий сохранён и на полке.', fb_note_inbox: 'Без аккаунта: сообщение зашифровано так, что прочитать его может только проект. Копия остаётся на полке.', fb_note_gh: 'Откроется готовой заявкой на GitHub (нужен аккаунт GitHub). Копия остаётся на полке.', sg_kind_feedback: 'Комментарий', sg_send: 'Отправить анонимно', sg_sent: 'Отправлено в проект. Спасибо!', sg_send_fail: 'Сейчас не получилось отправить. Попробуйте ещё раз или отправьте через GitHub.',
     about_h: 'Как устроен unoebasta',
     name_note: 'Название по-итальянски: uno e basta, «одно — и хватит». Ещё одна страница или один рассказ, и на сегодня всё.', about_for_h: 'Для кого',
     about_for: 'unoebasta — для тех, у кого мало времени и трудно удержать внимание: для занятых людей и читателей с СДВГ. Не нужно выбирать из сотен книг и помнить, где остановились. Рассказ — это целая история за один присест.',
@@ -1806,7 +1807,7 @@ function renderAbout() {
     <section class="panel" id="about-app"><h4>${esc(t('about_app_h'))}</h4><p class="bio">${linkify(t('about_app'))}</p></section>
     <section class="panel" id="about-data"><h4>${esc(t('about_data_h'))}</h4><p class="bio">${linkify(t('about_data'))}</p></section>
     <section class="panel" id="about-sync"><h4>${esc(t('sy_h'))}</h4><ol class="about-list">${t('about_sync').map(x => `<li>${linkify(x)}</li>`).join('')}</ol><p class="bio small">${esc(t('about_sync_note'))}</p></section>
-    <section class="panel" id="about-src"><h4>${esc(t('about_src_h'))}</h4><p class="bio">${linkify(t('about_src'))}</p><p class="bio" id="about-code">${esc(t('about_code'))} <a href="${REPO_URL}" target="_blank" rel="noopener">github.com/foteev/unoebasta ↗</a></p></section>
+    <section class="panel" id="about-src"><h4>${esc(t('about_src_h'))}</h4><p class="bio">${linkify(t('about_src'))}</p><p class="bio"><button class="btn" data-form="feedback" data-wid="">${esc(t('fb_title'))}</button></p><p class="bio" id="about-code">${esc(t('about_code'))} <a href="${REPO_URL}" target="_blank" rel="noopener">github.com/foteev/unoebasta ↗</a></p></section>
     <div class="row"><button class="btn btn-primary" id="open-demo">${esc(t('demo_btn'))}</button></div>`;
 }
 
@@ -1868,7 +1869,7 @@ async function openWork(q) {
         <li><a href="https://www.wikidata.org/wiki/${q}" target="_blank" rel="noopener">${esc(t('wikidata_t'))} ↗</a></li>
       </ul>
     </section>
-    <div class="row"><button class="btn" data-form="suggest" data-wid="${q}">${esc(t('suggest'))}</button>${r ? `<button class="btn btn-ghost" data-form="report" data-wid="${q}">${esc(t('report'))}</button>` : ''}</div>
+    <div class="row"><button class="btn" data-form="feedback" data-wid="${q}">${esc(t('fb_title'))}</button></div>
   </div>`;
   el.hidden = false; el.scrollTop = 0;
   if (!ab) fetchWikiAbout(q).then(ok => { const slot = $('#about-slot'); const sv = $('#own-link-save'); if (!ok || !slot || el.hidden || !sv || sv.dataset.wid !== q) return; const a2 = aboutFor(null, q); if (a2) slot.innerHTML = aboutPanel(a2, 'w'); });
@@ -1921,7 +1922,8 @@ function openAuthor(q) {
 /* ---------- suggestions and reports (stored locally until moderation exists) ---------- */
 function suggestionText(s) {
   const w = work(s.workId);
-  return [`[${s.kind === 'report' ? 'REPORT' : 'SUGGEST'}] ${w ? w.title : ''} (${s.workId || ''})`, s.url && `URL: ${s.url}`, s.type && `Type: ${s.type}`, s.lang && `Lang: ${s.lang}`, s.reason && `Reason: ${s.reason}`, s.comment && `Note: ${s.comment}`, `Date: ${new Date(s.at).toISOString().slice(0, 10)}`].filter(Boolean).join('\n');
+  const head = s.kind === 'report' ? 'REPORT' : s.kind === 'suggest' && s.url ? 'SUGGEST' : 'FEEDBACK';
+  return [`[${head}] ${w ? w.title + ' (' + s.workId + ')' : ''}`.trim(), s.url && `URL: ${s.url}`, s.type && `Type: ${s.type}`, s.lang && `Lang: ${s.lang}`, s.reason && `Reason: ${s.reason}`, s.comment && (s.url ? 'Note: ' : '') + s.comment, `Date: ${new Date(s.at).toISOString().slice(0, 10)}`].filter(Boolean).join('\n');
 }
 // the project's inbox: suggestions sent without an account arrive as private Nostr messages (NIP-17) to this key.
 // Public key only (npub); the secret stays in the maintainer's Nostr app. Empty = the button is hidden.
@@ -1942,7 +1944,9 @@ async function sendToInbox(s) {
 // a ready GitHub issue from a suggestion or a report: the reader only presses "Create" (a GitHub account is needed)
 function issueUrl(s) {
   const w = work(s.workId), name = w ? `${w.title} — ${w.authors.map(enName).join(', ')} (${s.workId})` : s.workId || '';
-  const P = s.kind === 'report'
+  const P = s.kind === 'feedback' || (!s.url && s.comment)
+    ? { template: 'feedback.yml', title: `Feedback${w ? ': ' + w.title : ''}`, work: w ? name : '', comment: s.comment || '' }
+    : s.kind === 'report'
     ? { template: 'broken-link.yml', title: `Broken link: ${w ? w.title : ''}`, work: name, url: s.url || '', what: [s.reason, s.comment].filter(Boolean).join(' — ') }
     : { template: 'add-text.yml', title: `Text: ${w ? w.title : ''}`, work: name, url: s.url || '', lang: { en: 'English', pl: 'Polish', ru: 'Russian' }[s.lang] || 'Other', note: [s.type && 'Type: ' + s.type, s.comment].filter(Boolean).join('\n') };
   return REPO_URL + '/issues/new?' + Object.entries(P).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
@@ -1950,45 +1954,44 @@ function issueUrl(s) {
 function suggRow(x) {
   const w = work(x.workId), canSend = INBOX_NPUB && syncAvailable();
   const status = x.sent ? t('sg_sent_on', { d: relTime(x.sent) }) : x.gh ? t('sg_gh_on', { d: relTime(x.gh) }) : t('sg_unsent');
-  return `<div class="file-row sugg${x.sent || x.gh ? ' is-sent' : ''}"><div><strong>${esc(t(x.kind === 'report' ? 'sg_kind_report' : 'sg_kind_suggest'))} · ${esc(w ? w.title : x.workId || '')}</strong>${x.url ? `<span class="small">${esc(x.url)}</span>` : ''}${x.comment ? `<span class="snip">${esc(x.comment)}</span>` : ''}<span class="small">${esc(status)}</span></div>
+  return `<div class="file-row sugg${x.sent || x.gh ? ' is-sent' : ''}"><div><strong>${esc(t(x.kind === 'report' ? 'sg_kind_report' : x.kind === 'suggest' && x.url ? 'sg_kind_suggest' : 'sg_kind_feedback'))}${w ? ' · ' + esc(w.title) : ''}</strong>${x.url ? `<span class="small">${esc(x.url)}</span>` : ''}${x.comment ? `<span class="snip">${esc(x.comment)}</span>` : ''}<span class="small">${esc(status)}</span></div>
     <div class="row">${canSend ? `<button class="btn btn-small${x.sent ? '' : ' btn-primary'}" data-sgsend="${esc(x.id)}">${esc(t(x.sent ? 'sg_send_again' : 'sg_send'))}</button>` : ''}<a class="btn btn-small" data-sggh="${esc(x.id)}" href="${esc(issueUrl(x))}" target="_blank" rel="noopener">GitHub ↗</a><button class="btn btn-ghost btn-small" data-sgdel="${esc(x.id)}">${esc(t('del'))}</button></div></div>`;
 }
+// one field and one button: anything a reader wants to tell us (a free text to add, a broken link, an idea);
+// sorted out later. Kept on My shelf; sent anonymously to the project's inbox, or as a ready GitHub issue.
 function openForm(kind, wid) {
-  const w = work(wid); const r = READ[wid];
-  const el = $('#sheet-form');
-  const report = kind === 'report' && r;
-  el.innerHTML = sheetBar(t(report ? 'form_report' : 'form_suggest')) + `<div class="wrap sheet-body">
-    <h2>${esc(t(report ? 'form_report' : 'form_suggest'))}</h2>
-    <p class="small">${esc(w ? w.title : '')}</p>
+  const w = work(wid); const el = $('#sheet-form'); const inbox = INBOX_NPUB && syncAvailable();
+  el.innerHTML = sheetBar(t('fb_title')) + `<div class="wrap sheet-body">
+    <h2>${esc(t('fb_title'))}</h2>
+    ${w ? `<p class="small">${esc(w.title)} · ${esc(authorsLine(w))}</p>` : ''}
     <form id="sg-form" class="panel">
-      ${report ? `<div class="field"><label for="sg-link">${esc(t('f_link'))}</label><select id="sg-link">${r.links.map(l => `<option value="${esc(l.url)}">${esc(l.site)} — ${esc(l.url)}</option>`).join('')}</select></div>
-        <div class="field"><label for="sg-reason">${esc(t('f_reason'))}</label><select id="sg-reason"><option value="dead">${esc(t('r_dead'))}</option><option value="rights">${esc(t('r_rights'))}</option><option value="wrong">${esc(t('r_wrong'))}</option></select></div>`
-      : `<div class="field"><label for="sg-url">${esc(t('f_url'))}</label><input id="sg-url" type="url" inputmode="url" required placeholder="https://"></div>
-        <div class="field"><label for="sg-type">${esc(t('f_type'))}</label><select id="sg-type"><option value="full">${esc(t('t_full'))}</option><option value="excerpt">${esc(t('t_excerpt'))}</option><option value="audio">${esc(t('t_audio'))}</option><option value="translation">${esc(t('t_translation'))}</option></select></div>
-        <div class="field"><label for="sg-lang">${esc(t('f_lang'))}</label><select id="sg-lang"><option>en</option><option>pl</option><option>ru</option><option value="other">…</option></select></div>`}
-      <div class="field"><label for="sg-comment">${esc(t('f_comment'))}</label><textarea id="sg-comment" rows="3"></textarea></div>
-      <div class="row"><button class="btn btn-primary" type="submit">${esc(t('f_submit'))}</button><button class="btn btn-ghost" type="button" data-close>${esc(t('cancel'))}</button></div>
+      <div class="field"><label for="sg-comment">${esc(t('fb_label'))}</label><textarea id="sg-comment" rows="5" required placeholder="${esc(t('fb_ph'))}"></textarea></div>
+      <div class="row"><button class="btn btn-primary" type="submit">${esc(t('fb_send'))}</button></div>
+      <p class="note" id="sg-status" role="status" hidden></p>
+      <p class="small">${esc(t(inbox ? 'fb_note_inbox' : 'fb_note_gh'))}</p>
     </form>
-    <div id="sg-done" class="panel" hidden><p class="note">${esc(t(INBOX_NPUB && syncAvailable() ? 'f_saved_inbox' : 'f_saved'))}</p><div class="row">${INBOX_NPUB && syncAvailable() ? `<button class="btn btn-primary" id="sg-send">${esc(t('sg_send'))}</button>` : ''}<a class="btn${INBOX_NPUB && syncAvailable() ? '' : ' btn-primary'}" id="sg-gh" href="${REPO_URL}/issues/new/choose" target="_blank" rel="noopener">${esc(t('gh_send'))} ↗</a></div><p class="note" id="sg-sent" hidden></p><textarea id="sg-text" rows="7" readonly></textarea><div class="row"><button class="btn" id="sg-copy">${esc(t('copy'))}</button></div>
-      <div class="row"><button class="btn" id="sg-another" data-kind="${report ? 'report' : 'suggest'}" data-wid="${esc(wid)}">${esc(t(report ? 'sg_another_report' : 'sg_another'))}</button><button class="btn btn-ghost" type="button" data-close>${esc(t('sg_done_btn'))}</button></div></div>
   </div>`;
   el.hidden = false; el.scrollTop = 0;
+  const ta = $('#sg-comment');
   $('#sg-form').addEventListener('submit', async e => {
     e.preventDefault();
-    const s = { id: 's' + Date.now(), kind: report ? 'report' : 'suggest', workId: wid, at: Date.now(), comment: $('#sg-comment').value.trim() };
-    if (report) { s.url = $('#sg-link').value; s.reason = $('#sg-reason').value; }
-    else { s.url = $('#sg-url').value.trim(); s.type = $('#sg-type').value; s.lang = $('#sg-lang').value; if (!s.url) return; }
+    const comment = ta.value.trim(); if (!comment) return ta.focus();
+    const s = { id: 's' + Date.now(), kind: kind || 'feedback', workId: wid || null, at: Date.now(), comment };
     await Store.put('suggestions', s);
-    $('#sg-form').hidden = true; $('#sg-done').hidden = false; $('#sg-text').value = suggestionText(s); $('#sg-gh').href = issueUrl(s);
-    $('#sg-gh').onclick = async () => { s.gh = Date.now(); await Store.put('suggestions', s); };
-    const send = $('#sg-send');
-    if (send) send.onclick = async () => {
-      send.disabled = true;
-      let n = 0; try { n = await sendToInbox(s); } catch (e) { console.warn('[unoebasta] inbox', e); }
-      if (n) { s.sent = Date.now(); await Store.put('suggestions', s); $('#sg-sent').textContent = t('sg_sent'); $('#sg-sent').hidden = false; send.hidden = true; }
-      else { send.disabled = false; toast(t('sg_send_fail')); }
-    };
+    const st = $('#sg-status'); let ok = false;
+    if (inbox) {
+      const btn = e.submitter || $('#sg-form button[type="submit"]'); btn.disabled = true;
+      let n = 0; try { n = await sendToInbox(s); } catch (err) { console.warn('[unoebasta] inbox', err); }
+      btn.disabled = false;
+      if (n) { s.sent = Date.now(); ok = true; st.textContent = t('fb_sent'); } else st.textContent = t('fb_saved_only');
+    } else {
+      s.gh = Date.now(); ok = true; window.open(issueUrl(s), '_blank', 'noopener'); st.textContent = t('fb_gh_opened');
+    }
+    await Store.put('suggestions', s);
+    st.hidden = false;
+    if (ok) { ta.value = ''; ta.focus(); } // ready for the next one
   });
+  ta.focus();
 }
 
 /* ---------- ElevenReader hand-off ---------- */
@@ -2922,7 +2925,6 @@ document.addEventListener('click', async e => {
   if (d.sgsend) { const x = (await Store.all('suggestions')).find(z => z.id === d.sgsend); if (!x) return; b.disabled = true; let n = 0; try { n = await sendToInbox(x); } catch (err) {} if (n) { x.sent = Date.now(); await Store.put('suggestions', x); toast(t('sg_sent')); } else toast(t('sg_send_fail')); return renderShelf(); }
   if (d.sgdel) { await Store.del('suggestions', d.sgdel); return renderShelf(); }
   if (b.id === 'sugg-clear-sent' || b.id === 'sugg-clear-all') { for (const x of await Store.all('suggestions')) if (b.id === 'sugg-clear-all' || x.sent || x.gh) await Store.del('suggestions', x.id); return renderShelf(); }
-  if (b.id === 'sg-another') return openForm(d.kind, d.wid);
   if (d.sclear) { const inp = b.closest('section') && b.closest('section').querySelector('form[data-sform] input'); if (inp) { inp.value = ''; runSearch(inp.id, ''); inp.focus(); } return; }
   if (d.award) { filter.award = d.award; return renderCatalog(); }
   if (d.toggle) { filter[d.toggle] = !filter[d.toggle]; return renderCatalog(); }
