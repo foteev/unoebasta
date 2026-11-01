@@ -10,7 +10,7 @@
 // Runs in GitHub Actions (.github/workflows/covers.yml). Locally:
 //   npm install --no-save sharp@0.34.5 && node scripts/fetch-covers.mjs
 // Cover art belongs to its publishers and artists; Open Library hosts it. See README, "Licenses".
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -48,7 +48,7 @@ async function one([q, j]) {
     if (j.page) { // a story: find the picture of its page
       const p = await fetch(j.page, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(20000) });
       const img = p.ok ? ogImage(await p.text(), p.url || j.page) : null;
-      if (!img || /logo|favicon|default|placeholder/i.test(img)) { missing++; NONE.add(q); return; }
+      if (!img || /logo|favicon|default|placeholder|icon|social/i.test(img)) { missing++; NONE.add(q); return; }
       j = { img, src: img };
     }
     const r = await fetch(j.img, { headers: UA, signal: AbortSignal.timeout(20000) });
@@ -66,6 +66,12 @@ async function one([q, j]) {
 for (let i = 0; i < jobs.length; i += 2) {
   await Promise.all(jobs.slice(i, i + 2).map(one));
   await sleep(300);
+}
+// one picture for many stories is the site's own banner (or the current issue), not this story's: drop it
+const uses = {}; for (const [q, u] of Object.entries(SOURCES)) if (!u.startsWith('openlibrary')) (uses[u] = uses[u] || []).push(q);
+for (const qs of Object.values(uses)) if (qs.length >= 3) for (const q of qs) {
+  for (const k of Object.keys(SIZES)) rmSync(join(OUT, k, q + '.webp'), { force: true });
+  delete SOURCES[q]; NONE.add(q);
 }
 writeFileSync(join(OUT, 'sources.json'), JSON.stringify(Object.fromEntries(Object.entries(SOURCES).sort()), null, 1));
 writeFileSync(join(OUT, 'none.json'), JSON.stringify([...NONE].sort()));
