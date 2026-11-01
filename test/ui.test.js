@@ -508,6 +508,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#tab-about')); await sleep(40);
   checks['about: how to sync, in three steps with a link to the shelf'] = $$('#about-sync ol li').length === 3 && !!$('#about-sync [data-goshelf="shelf-sync"]');
   // writing to the project: one comment field and Send; anonymous when the project's inbox key is set
+  checks['feedback: the page ships with the project’s public inbox key (an npub, never a secret)'] = /^npub1[02-9ac-hj-np-z]{58}$/.test(w.eval('INBOX_NPUB'));
   w.eval("INBOX_NPUB = 'npub1test'");
   w.eval("openForm('feedback', 'Q2008211')"); await sleep(60);
   checks['feedback: one field and one button'] = $$('#sg-form textarea').length === 1 && $$('#sg-form input, #sg-form select').length === 0 && $$('#sg-form button').length === 1 && /Left Hand of Darkness/.test($('#sheet-form').textContent);

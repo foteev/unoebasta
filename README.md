@@ -29,7 +29,7 @@ You need Node.js 20 or newer.
 ```sh
 npm ci              # dev tools for the tests only: the page itself has no build dependencies
 npm run build       # src/index.html + data/awards.json → dist/web/index.html (one file)
-npm test            # the page in jsdom: about 150 checks
+npm test            # the page in jsdom: about 190 checks
 npm run check:secrets
 ```
 

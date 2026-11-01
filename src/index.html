@@ -1926,8 +1926,8 @@ function suggestionText(s) {
   return [`[${head}] ${w ? w.title + ' (' + s.workId + ')' : ''}`.trim(), s.url && `URL: ${s.url}`, s.type && `Type: ${s.type}`, s.lang && `Lang: ${s.lang}`, s.reason && `Reason: ${s.reason}`, s.comment && (s.url ? 'Note: ' : '') + s.comment, `Date: ${new Date(s.at).toISOString().slice(0, 10)}`].filter(Boolean).join('\n');
 }
 // the project's inbox: suggestions sent without an account arrive as private Nostr messages (NIP-17) to this key.
-// Public key only (npub); the secret stays in the maintainer's Nostr app. Empty = the button is hidden.
-let INBOX_NPUB = '';
+// Public key only (npub); the secret stays in the maintainer's Nostr app. Empty = the form opens a GitHub issue instead.
+let INBOX_NPUB = 'npub19rz6gye48as57mgdsj60s60ap9d6xn4el4japkhjegw90nu5ysrqn6eeg8';
 async function sendToInbox(s) {
   const N = await nostrLib();
   const to = /^npub1/.test(INBOX_NPUB) ? N.nip19.decode(INBOX_NPUB).data : INBOX_NPUB;
@@ -1937,7 +1937,7 @@ async function sendToInbox(s) {
   try { const ls = await pool.querySync(RELAYS, { kinds: [10050], authors: [to] }, { maxWait: 3000 }); const l = ls.sort((a, b) => b.created_at - a.created_at)[0]; relays = l ? l.tags.filter(x => x[0] === 'relay' && /^wss:\/\//.test(x[1])).map(x => x[1]) : []; } catch (e) {}
   relays = [...new Set([...relays, ...RELAYS])].slice(0, 10);
   const text = suggestionText(s) + '\n\nGitHub: ' + issueUrl(s);
-  const wrap = N.nip17.wrapEvent(N.generateSecretKey(), { publicKey: to }, text, 'unoebasta ' + (s.kind === 'report' ? 'report' : 'suggestion')); // a one-off key: the reader stays anonymous
+  const wrap = N.nip17.wrapEvent(N.generateSecretKey(), { publicKey: to }, text, 'unoebasta ' + (s.kind || 'feedback')); // a one-off key: the reader stays anonymous
   const res = await Promise.allSettled(pool.publish(relays, wrap));
   return res.filter(r => r.status === 'fulfilled').length;
 }
