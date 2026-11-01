@@ -26,6 +26,8 @@ const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</bod
       SimplePool: class { publish(relays, ev) { relay.push(ev); return relays.map(() => Promise.resolve('')); } async querySync(relays, f) { return relay.filter(e => e.kind === f.kinds[0] && f.authors.includes(e.pubkey) && e.tags.some(t => t[0] === 'd' && f['#d'].includes(t[1]))); } }
     };
     try { w.eval(fs.readFileSync(path.join(NM, 'qrcode-generator/dist/qrcode.js'), 'utf8') + ';window.qrcode = qrcode;'); } catch (e) {} // the CDN QR library
+    { const NZ = require(path.join(NM, 'jszip')); w.JSZip = { loadAsync: d => NZ.loadAsync(Buffer.from(new Uint8Array(d))) }; } // the CDN ZIP library (EPUB, DOCX, ODT); its browser build stalls in jsdom, so the Node build stands in
+    if (!w.Blob.prototype.arrayBuffer) w.Blob.prototype.arrayBuffer = function () { return new Promise(r => { const fr = new w.FileReader(); fr.onload = () => r(fr.result); fr.readAsArrayBuffer(this); }); }; // as in browsers
     w.navigator.clipboard = { writeText: async s => { w.__clip = s; } };
     w.addEventListener('error', e => errors.push(e.message));
     // a fake speechSynthesis: records what is said, ends each utterance when told
@@ -548,6 +550,28 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#tab-shelf')); await sleep(60);
   click($('.brand-home .brand-e')); await sleep(60);
   checks['logo and name → start screen'] = fromLogo && !$('#view-catalog').hidden && $('.brand-home').title === 'На главную';
+  // own files: the kind is told by the first bytes; Word, LibreOffice, and the old Russian and Polish code pages
+  const NodeZip = require(path.join(NM, 'jszip'));
+  const mkZip = async files => { const z = new NodeZip(); for (const [k, v] of Object.entries(files)) z.file(k, v); return z.generateAsync({ type: 'uint8array' }); };
+  const parse = async (bytes, name) => { w.__bytes = bytes; return w.eval(`(async () => { try { return await parseFile(new File([new Uint8Array(window.__bytes)], ${JSON.stringify(name)})); } catch (e) { return { error: e.message }; } })()`); };
+  const W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+  const docx = await mkZip({ '[Content_Types].xml': '<Types/>', 'word/document.xml': `<w:document ${W}><w:body><w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Глава первая</w:t></w:r></w:p><w:p><w:r><w:t xml:space="preserve">Главное перед изучением: </w:t></w:r><w:r><w:t>читать медленно.</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Heading2"/></w:pPr><w:r><w:t>Часть вторая</w:t></w:r></w:p><w:tbl><w:tr><w:tc><w:p><w:r><w:t>В таблице</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:sectPr/></w:body></w:document>` });
+  const d1 = await parse([...docx], 'Главное перед изучением'); // no extension, as phones often give it
+  checks['files: DOCX without an extension opens as text, with headings and tables'] = d1.format === 'docx' && d1.title === 'Глава первая' && !/Глава первая/.test(d1.html) && /<h3>Часть вторая<\/h3>/.test(d1.html) && /<p>Главное перед изучением: читать медленно\.<\/p>/.test(d1.html) && /В таблице/.test(d1.html) && !/Content_Types|PK/.test(d1.html);
+  const odt = await mkZip({ mimetype: 'application/vnd.oasis.opendocument.text', 'content.xml': '<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"><office:body><office:text><text:h text:outline-level="1">Rozdział</text:h><text:p>Zażółć<text:s text:c="2"/>gęślą jaźń</text:p></office:text></office:body></office:document-content>' });
+  const o1 = await parse([...odt], 'notatki.odt');
+  checks['files: ODT opens'] = o1.format === 'odt' && o1.title === 'Rozdział' && /Zażółć gęślą jaźń/.test(o1.html);
+  const cp1251 = str => [...str].map(c => { const k = c.charCodeAt(0); return k >= 0x410 && k <= 0x44F ? k - 0x410 + 0xC0 : k === 0x451 ? 0xB8 : k; });
+  const PL = { 'ą': 0xB9, 'ć': 0xE6, 'ę': 0xEA, 'ł': 0xB3, 'ń': 0xF1, 'ó': 0xF3, 'ś': 0x9C, 'ź': 0x9F, 'ż': 0xBF, 'Ż': 0xAF };
+  const cp1250 = str => [...str].map(c => PL[c] || c.charCodeAt(0));
+  const t1 = await parse(cp1251('Привет, это текст в старой кодировке Windows.\n\nВторой абзац, ёлка.'), 'stary.txt');
+  const t2 = await parse(cp1250('Zażółć gęślą jaźń. To jest tekst w starym kodowaniu Windows.'), 'stary-pl.txt');
+  const u16 = [0xFF, 0xFE, ...[...'Текст UTF-16'].flatMap(c => [c.charCodeAt(0) & 255, c.charCodeAt(0) >> 8])];
+  const t3 = await parse(u16, 'notepad.txt');
+  checks['files: TXT in windows-1251, windows-1250 and UTF-16 reads right'] = /Привет, это текст/.test(t1.html) && /ёлка/.test(t1.html) && /Zażółć gęślą jaźń/.test(t2.html) && /Текст UTF-16/.test(t3.html);
+  const junk = await parse(Array.from({ length: 3000 }, (_, i) => (i * 37 + 11) % 256), 'mystery.bin');
+  const oldDoc = await parse([0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0, 0, 0], 'stary.doc');
+  checks['files: a binary file or an old .doc gets a clear message, not a page of symbols'] = /не текст/.test(junk.error || '') && /\.doc/.test(oldDoc.error || '');
   // Reading now: clear the whole list at once, with Undo
   await w.eval(`(async () => { const now = Date.now();
     await Store.put('positions', { id: 'ext:Q25349436', ext: true, workId: 'Q25349436', title: 'A', source: 'X', sourceUrl: 'https://x.test/a', at: now - 1000 });

@@ -5,9 +5,16 @@
   "description": "A single web page for reading Hugo, Nebula and Locus winners that are free and legal online. No app, no server, no accounts.",
   "license": "MIT",
   "homepage": "https://foteev.github.io/unoebasta/",
-  "repository": { "type": "git", "url": "git+https://github.com/foteev/unoebasta.git" },
-  "bugs": { "url": "https://github.com/foteev/unoebasta/issues" },
-  "engines": { "node": ">=20" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/foteev/unoebasta.git"
+  },
+  "bugs": {
+    "url": "https://github.com/foteev/unoebasta/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "node scripts/build-web.mjs",
     "test": "node test/ui.test.js",
@@ -16,6 +23,7 @@
   },
   "devDependencies": {
     "jsdom": "24.1.3",
+    "jszip": "3.10.1",
     "qrcode-generator": "2.0.4"
   }
 }
