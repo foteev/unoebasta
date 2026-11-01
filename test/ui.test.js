@@ -562,6 +562,12 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['reading now: “Clear the list” empties it, keeps notes, bookmarks and Finished'] = nReading >= 2 && $$('#shelf-reading .file-row').length === 0 && !$('#reading-clear') && (await w.eval("Store.all('positions')")).filter(p => !w.eval(`isDone(${JSON.stringify(p.workId)})`)).length === 0 && !bms.some(b => b.id === 'r:t1') && bms.some(b => b.id === 'r:t2') && bms.some(b => b.id === 'pos:t3') && w.eval("isDone('Q130213759')") && /Список очищен/.test($('#toast').textContent);
   click($('#toast [data-rcundo]')); await sleep(150);
   checks['reading now: Undo brings the list back'] = $$('#shelf-reading .file-row').length === nReading && (await w.eval("Store.all('bookmarks')")).some(b => b.id === 'r:t1');
+  // one row: remove from the list (the work stays in the catalog), or mark it finished
+  click($('#shelf-reading [data-rcdrop="ext:Q25349436"]')); await sleep(150);
+  checks['reading now: “Remove from list” takes one row off, the work stays in the catalog'] = $$('#shelf-reading .file-row').length === nReading - 1 && !$('#shelf-reading [data-rcdrop="ext:Q25349436"]') && !!w.eval("WORKS['Q25349436']") && !w.eval("isDone('Q25349436')") && /каталоге/.test($('#toast').textContent);
+  click($('#toast [data-rcundo]')); await sleep(150);
+  click($('#shelf-reading [data-done="Q2008211"]')); await sleep(200);
+  checks['reading now: “Finished” moves the row to Finished'] = w.eval("isDone('Q2008211')") && !$('#shelf-reading [data-rcdrop="ext:Q2008211"]') && /Left Hand of Darkness|Левая рука/.test($('#shelf-done').textContent);
   // languages
 
 
