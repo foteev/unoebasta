@@ -29,7 +29,11 @@ The direct way, as a pull request:
    - `tier`: `t1` Creative Commons, `t2` free at the publisher, `t2us` US public domain.
    - `added`: the current time in UTC; the page shows it in “New since your last visit”.
    - `links`: `kind` is `full` or `audio`; `site` is the name readers see.
-4. `npm run build && npm test`. Some tests count the catalog (“71 readable works”, “and 60 more”): update those numbers in `test/ui.test.js`.
+4. `npm run build && npm test`.
+
+**Many links at once.** A search result in the CSV format of [the search brief](docs/search-brief.md) goes into `data/found/` and is merged with `node scripts/merge-found.mjs data/found/<file>.csv`: full texts and audio become `READ` entries, fragments go to `ex` in `data/awards.json`, rows already on the page are skipped. Wayback snapshots are skipped unless you add `--archive`. Then `node scripts/coverage.mjs` updates `data/coverage.csv`.
+
+**Many links at once.** A search result in the CSV format of [the search brief](docs/search-brief.md) goes into `data/found/` and is merged with `node scripts/merge-found.mjs data/found/<file>.csv`: full texts and audio become `READ` entries, fragments go to `ex` in `data/awards.json`, rows already on the page are skipped. Wayback snapshots are skipped unless you add `--archive`. Then `node scripts/coverage.mjs` updates `data/coverage.csv`.
 
 ## Covers
 

@@ -27,17 +27,19 @@ function availability(q) {
   if (x.r && !a.en) a.en = 'part';
   if (x.lr && !a.ru) a.ru = 'part';
   if (x.lg && !a.pl) a.pl = 'part';
+  for (const o of x.o || []) if (!a[o.l || 'en']) a[o.l || 'en'] = 'part';
   for (const l of LANGS) if (g[l] && !a[l]) a[l] = 'part';
   if (g.s && !a.en) a.en = 'part';
   return a;
 }
-const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS]];
+const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS, 'audio']];
 const tally = {};
 for (const w of Object.values(works).sort((a, b) => b.last - a.last)) {
   const raw = d.works[w.q]; if (!raw) continue;
   const a = availability(w.q);
   const authors = raw[3].map(x => (d.authors[x] || [])[0] || x).join('; ');
-  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none')]);
+  const audio = READ[w.q] && READ[w.q].links.some(l => l.kind === 'audio') ? 'yes' : ''; // a free reading by a person (podcast)
+  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none'), audio]);
   for (const l of LANGS) { const k = `${w.form}|${l}|${a[l] || 'none'}`; tally[k] = (tally[k] || 0) + 1; }
 }
 const csv = rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(',')).join('\n');

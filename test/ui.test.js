@@ -43,14 +43,16 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
 (async () => {
   await sleep(400);
   const checks = {};
-  checks['catalog tab: 71 readable works'] = $$('#view-library .slip').length === 71;
+  const nCatalog = w.eval('Object.keys(READ).filter(q => WORKS[q]).length'); // grows with every batch of found texts
+  checks['catalog tab: every work with a text or audio'] = nCatalog >= 100 && $$('#view-library .slip').length === nCatalog;
   const news = $('#view-library .news');
   checks['news panel for returning user'] = !!news && /прошлого визита/.test(news.textContent);
-  checks['news: 5 newest + "and 60 more" (incl. new audio)'] = news && news.querySelectorAll('li').length === 6 && /60/.test(news.querySelector('li:last-child').textContent);
+  const nNews = w.eval('newsItems().length');
+  checks['news: 5 newest + "and N more" (incl. new audio)'] = news && news.querySelectorAll('li').length === 6 && new RegExp('\\b' + (nNews - 5) + '\\b').test(news.querySelector('li:last-child').textContent);
   checks['quiet dot on the catalog tab, no number'] = $('#news-dot').hidden === false && $('#news-dot').textContent === '' && !!$('#tab-library #news-dot');
   // filter New
   click($('[data-fresh]')); await sleep(50);
-  checks['filter New → 64'] = $$('#view-library .slip').length === 64;
+  checks['filter New → only new works'] = $$('#view-library .slip').length === w.eval('Object.keys(READ).filter(q => WORKS[q] && isNew(q)).length') && $$('#view-library .slip').length < nCatalog;
   click($('[data-fresh]')); await sleep(50);
   // star a work
   const star = $('#view-library [data-star="Q25349436"]'); click(star); await sleep(50);
@@ -103,7 +105,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const lq = $('#lib-q'); lq.value = 'Kritzer'; lq.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(400);
   checks['search: Catalog shows free texts first, then other winners'] = $$('#view-library .slips .slip').length >= 2 && /Cat Pictures Please/.test($('#view-library .slips').textContent) && $('#lib-q') === lq;
   lq.value = ''; lq.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(400);
-  checks['search: empty box → the whole catalog'] = $$('#view-library .slip').length === 71;
+  checks['search: empty box → the whole catalog'] = $$('#view-library .slip').length === nCatalog;
   const iu = w.eval(`issueUrl({ kind: 'suggest', workId: 'Q25349436', url: 'https://x.test/a', lang: 'ru', type: 'full', comment: 'hi', at: 1 })`);
   const ir = w.eval(`issueUrl({ kind: 'report', workId: 'Q25349436', url: 'https://x.test/b', reason: 'dead', at: 1 })`);
   checks['suggestions: a ready GitHub issue, no account data in the page'] = iu.startsWith('https://github.com/foteev/unoebasta/issues/new?template=add-text.yml&') && iu.includes('url=https%3A%2F%2Fx.test%2Fa') && iu.includes('lang=Russian') && iu.includes('Cat%20Pictures%20Please') && ir.includes('template=broken-link.yml') && ir.includes('what=dead');
