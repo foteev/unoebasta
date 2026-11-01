@@ -26,6 +26,7 @@ function availability(q) {
   const x = (d.ex || {})[q] || {}, g = (d.gb || {})[q] || {};
   if (x.r && !a.en) a.en = 'part';
   if (x.lr && !a.ru) a.ru = 'part';
+  if (x.lg && !a.pl) a.pl = 'part';
   for (const l of LANGS) if (g[l] && !a[l]) a[l] = 'part';
   if (g.s && !a.en) a.en = 'part';
   return a;

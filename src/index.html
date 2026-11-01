@@ -1404,7 +1404,8 @@ function workFlags(w) {
   return f.join('');
 }
 function tierOf(q) { return READ[q] ? READ[q].tier : (hasExcerpt(q) ? 't3' : 't4'); }
-// excerpt links: r = Reactor (Tor) excerpt post path, lr = LitRes book path (free fragment in Russian)
+// excerpt links: r = Reactor (Tor) excerpt post path, lr = LitRes book path (free fragment in Russian),
+// lg = Legimi ebook page (the page shows a free fragment of the Polish edition)
 // excerpt links: Reactor (Tor excerpt post), LitRes (free fragment of a Russian edition),
 // Google Books previews the publisher allows (gb: {en|pl|ru: [volumeId, isbn], n: pages, s: [volumeId, collection title, isbn] for a short work inside a collection})
 const gbUrl = (id, q) => `https://books.google.com/books?id=${encodeURIComponent(id)}${q ? '&q=' + encodeURIComponent('"' + q + '"') : '&printsec=frontcover'}`;
@@ -1413,7 +1414,8 @@ function excerptLinks(q) {
   const x = w.ex || {}, g = w.gb || {}, out = [];
   if (x.r) { const audio = /audio-excerpt/.test(x.r); out.push({ url: 'https://reactormag.com' + x.r, site: 'Reactor (Tor)', lang: 'EN', html: !audio, audio }); }
   if (x.lr) out.push({ url: 'https://www.litres.ru' + x.lr, site: LANG === 'ru' ? 'ЛитРес' : 'LitRes', lang: 'RU', html: true });
-  for (const l of ['en', 'pl', 'ru']) if (g[l] && !(l === 'en' && x.r) && !(l === 'ru' && x.lr)) out.push({ url: gbUrl(g[l][0]), site: 'Google Books', lang: l.toUpperCase(), gb: { id: g[l][0], isbn: g[l][1], lang: l } });
+  if (x.lg) out.push({ url: 'https://www.legimi.pl' + x.lg, site: 'Legimi', lang: 'PL', html: true });
+  for (const l of ['en', 'pl', 'ru']) if (g[l] && !(l === 'en' && x.r) && !(l === 'ru' && x.lr) && !(l === 'pl' && x.lg)) out.push({ url: gbUrl(g[l][0]), site: 'Google Books', lang: l.toUpperCase(), gb: { id: g[l][0], isbn: g[l][1], lang: l } });
   if (g.s) out.push({ url: gbUrl(g.s[0], w.title), site: 'Google Books', lang: 'EN', coll: g.s[1] });
   const L = LANG.toUpperCase(); out.sort((a, b) => (b.lang === L) - (a.lang === L));
   return out;

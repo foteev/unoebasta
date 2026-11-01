@@ -206,7 +206,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // excerpts and multi-part texts
   const dune2 = Object.values(w.eval('WORKS')).find(x => x.title === 'Dune');
   w.eval(`openWork('${dune2.id}')`); await sleep(60);
-  checks['availability: Dune RU = fragment'] = /RU фрагмент/.test($('#sheet-work .avail').textContent) && /PL пока нет/.test($('#sheet-work .avail').textContent);
+  checks['availability: Dune RU and PL = fragment (LitRes, Legimi)'] = /RU фрагмент/.test($('#sheet-work .avail').textContent) && /PL фрагмент/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work a[href^="https://www.legimi.pl/ebook-diuna"]') && !!$('#sheet-work a[href^="https://www.litres.ru/"]');
   checks['excerpt: Dune shows LitRes fragment'] = !!$('#sheet-work a[href^="https://www.litres.ru/book/frenk-gerbert/"][href$="/chitat-onlayn/"]') && /Фрагмент · RU/.test($('#sheet-work').textContent);
   w.eval("openWork('Q53828903')"); await sleep(60);
   checks['excerpt: All Systems Red shows Reactor excerpt'] = !!$('#sheet-work a[href="https://reactormag.com/meet-murderbot-in-chapter-one-of-martha-wells-all-systems-red/"]');
