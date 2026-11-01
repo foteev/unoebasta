@@ -540,6 +540,12 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .small { font-size: 13px; line-height: 1.45; }
 .note { font-size: 15px; line-height: 1.5; }
 .panel h4 { color: var(--ink); opacity: .72; }
+.mk-i { display: inline-block; vertical-align: -2px; flex: none; }
+.cell .cm { align-items: center; }
+.tm, .tm .mk-i { color: var(--accent); } .sm { color: #d99a00; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.legend > span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.chip .mk-i { margin-right: 2px; }
 </style>
 
 </head>
@@ -741,7 +747,7 @@ const I18N = {
     aw_note: 'Years are ceremony years. SFWA names the Nebula after the publication year, so the “2024 Nebula Awards” were presented in 2025 and appear here under 2025.',
     aw_src: 'Data: Wikidata (CC0), checked selectively against sfadb.com; the latest year may lag. Biographies and book descriptions: Wikipedia, CC BY-SA 4.0.',
     found: '{n} found', nothing_found: 'Nothing found.',
-    shelf_bm: 'Bookmarks', shelf_bm_works: 'Works', shelf_bm_places: 'Places in texts', empty_bm: 'Tap ☆ on a work or 🔖 in the reader to keep it here.',
+    shelf_bm: 'Bookmarks', shelf_bm_works: 'Works', shelf_bm_places: 'Places in texts', empty_bm: 'Tap ☆ on a work, or the bookmark button in the reader, to keep it here.',
     shelf_reading: 'Reading now', shelf_files: 'Files on this device', shelf_links: 'My links', shelf_sugg: 'My suggestions and reports', shelf_data: 'Data on this device', mv_h: 'On another device', mv_what: 'The link carries your places, notes, Finished marks, bookmarks, history and a few settings. Your own book files stay here: add them there once more, and your place in the book will be found.', mv_make: 'Link for another device', mv_scan: 'Point the phone camera at the code, or send yourself the link.', mv_scan_part: 'The code holds the essentials: recent places, notes and Finished. The link holds everything.', mv_noqr: 'Too much for a code: send yourself the link.', mv_link_label: 'Link', mv_copy: 'Copy link', mv_share: 'Send…', mv_warn: 'The link is a copy of your shelf: don’t post it anywhere. It works only at this same page address.', mv_qr_label: 'QR code of the link for another device', mv_full_h: 'Full copy, with your files', mv_q_h: 'Bring your shelf from another device?', mv_q: 'The records merge with what is already here: for each one, the newer version stays. Nothing is lost.', mv_n_places: 'places: {n}', mv_n_done: 'finished: {n}', mv_n_notes: 'notes: {n}', mv_n_marks: 'bookmarks: {n}', mv_n_links: 'your links: {n}', mv_go: 'Bring it here', mv_later: 'Not now', mv_done: 'Done. Records updated: {n}.', mv_same: 'Everything from the link is already here.', mv_bad: 'The link is damaged or cut short. Make a new one.', mv_newer: 'The link comes from a newer version of unoebasta. Reload the page and open the link again.', mv_fail_qr: 'The QR code did not load. Send yourself the link.',
     empty_reading: 'Open any text in the reader and your place will appear here.', empty_files: 'No files yet. Add a TXT, HTML, EPUB or FB2 file to read offline.', empty_links: 'No own links yet. Add one on a work\'s page.', empty_sugg: 'Nothing yet.',
     storage: 'Used: {u} of about {q}', export: 'Export', import: 'Import', export_hint: 'Copy this text to move your shelf to another device.', import_hint: 'Paste exported text and press Import.', import_done: 'Imported: {n} records', import_bad: 'This text is not a shelf export.',
@@ -776,7 +782,7 @@ const I18N = {
     demo: [
       'This short sample lets you test the reader. Scroll a little, close it, then open it again: it returns to the paragraph where you stopped.',
       'Your place is saved as the number of the paragraph, how far into it you were, and a short fingerprint of its first words. If the text is reformatted, the fingerprint finds the same paragraph again.',
-      'Tap 🔖 to add a bookmark at the current paragraph and ≡ to see all bookmarks in this text. Bookmarks also appear on your shelf.',
+      'In the reader, the bookmark button marks the current paragraph and the list button shows all bookmarks in this text. Bookmarks also appear on your shelf.',
       'The position is written a second or two after you stop scrolling, when you switch to another tab and when you close the reader. Each record is about two hundred bytes.',
       'Nothing leaves this device. To move your shelf to another phone, use Export on the shelf and paste the text there.',
       'A tap on the text hides the buttons; another tap brings them back. Under Aa: text size, light or dark theme and paragraph highlight. The bar shows how many minutes are left.',
@@ -816,7 +822,7 @@ const I18N = {
     aw_note: 'Lata to lata wręczenia. SFWA nazywa Nebulę rokiem publikacji, więc „Nebula Awards 2024” wręczono w 2025 roku i są tu pod rokiem 2025.',
     aw_src: 'Dane: Wikidata (CC0), wyrywkowo sprawdzone z sfadb.com; ostatni rok może być niepełny. Biografie i opisy książek: Wikipedia, CC BY-SA 4.0.',
     found: 'Znaleziono: {n}', nothing_found: 'Nic nie znaleziono.',
-    shelf_bm: 'Zakładki', shelf_bm_works: 'Utwory', shelf_bm_places: 'Miejsca w tekstach', empty_bm: 'Naciśnij ☆ przy utworze lub 🔖 w czytniku, aby zapisać go tutaj.',
+    shelf_bm: 'Zakładki', shelf_bm_works: 'Utwory', shelf_bm_places: 'Miejsca w tekstach', empty_bm: 'Naciśnij ☆ przy utworze albo przycisk zakładki w czytniku, aby zapisać go tutaj.',
     shelf_reading: 'Czytam teraz', shelf_files: 'Pliki na tym urządzeniu', shelf_links: 'Moje linki', shelf_sugg: 'Moje propozycje i zgłoszenia', shelf_data: 'Dane na tym urządzeniu', mv_h: 'Na innym urządzeniu', mv_what: 'Link przenosi miejsca w lekturze, notatki, oznaczenia „Przeczytane”, zakładki, historię i kilka ustawień. Własne pliki książek zostają tutaj: dodaj je tam jeszcze raz, a miejsce w książce się odnajdzie.', mv_make: 'Link na inne urządzenie', mv_scan: 'Skieruj aparat telefonu na kod albo wyślij sobie link.', mv_scan_part: 'Kod zawiera najważniejsze: ostatnie miejsca, notatki i Przeczytane. Wszystko jest w linku.', mv_noqr: 'Za dużo danych na kod: wyślij sobie link.', mv_link_label: 'Link', mv_copy: 'Kopiuj link', mv_share: 'Wyślij…', mv_warn: 'Link to kopia twojej półki: nie publikuj go. Działa tylko pod tym samym adresem strony.', mv_qr_label: 'Kod QR z linkiem na inne urządzenie', mv_full_h: 'Pełna kopia, z własnymi plikami', mv_q_h: 'Przenieść półkę z innego urządzenia?', mv_q: 'Wpisy połączą się z tym, co już tu jest: z każdej pary zostaje nowsza wersja. Nic nie zginie.', mv_n_places: 'miejsca: {n}', mv_n_done: 'przeczytane: {n}', mv_n_notes: 'notatki: {n}', mv_n_marks: 'zakładki: {n}', mv_n_links: 'własne linki: {n}', mv_go: 'Przenieś', mv_later: 'Nie teraz', mv_done: 'Gotowe. Zaktualizowano wpisów: {n}.', mv_same: 'Wszystko z linku już tu jest.', mv_bad: 'Link jest uszkodzony albo ucięty. Utwórz nowy.', mv_newer: 'Link pochodzi z nowszej wersji unoebasta. Odśwież stronę i otwórz link ponownie.', mv_fail_qr: 'Kod QR się nie wczytał. Wyślij sobie link.',
     empty_reading: 'Otwórz dowolny tekst w czytniku, a tutaj pojawi się miejsce, w którym skończyłeś.', empty_files: 'Brak plików. Dodaj TXT, HTML, EPUB lub FB2, aby czytać offline.', empty_links: 'Brak własnych linków. Dodaj link na stronie utworu.', empty_sugg: 'Na razie nic.',
     storage: 'Zajęte: {u} z ok. {q}', export: 'Eksportuj', import: 'Importuj', export_hint: 'Skopiuj ten tekst, aby przenieść półkę na inne urządzenie.', import_hint: 'Wklej wyeksportowany tekst i naciśnij Importuj.', import_done: 'Zaimportowano rekordów: {n}', import_bad: 'To nie jest eksport półki.',
@@ -851,7 +857,7 @@ const I18N = {
     demo: [
       'Ten krótki tekst pozwala sprawdzić czytnik. Przewiń trochę, zamknij go i otwórz ponownie: wróci do akapitu, na którym skończyłeś.',
       'Miejsce zapisuje się jako numer akapitu, odległość od jego początku i krótki odcisk pierwszych słów. Jeśli tekst zmieni układ, odcisk pozwala znaleźć ten sam akapit.',
-      'Naciśnij 🔖, aby dodać zakładkę przy bieżącym akapicie, i ≡, aby zobaczyć wszystkie zakładki w tym tekście. Zakładki pojawiają się też na półce.',
+      'W czytniku przycisk zakładki zaznacza bieżący akapit, a przycisk listy pokazuje wszystkie zakładki w tym tekście. Zakładki pojawiają się też na półce.',
       'Pozycja zapisuje się sekundę lub dwie po zatrzymaniu przewijania, gdy przełączasz kartę i gdy zamykasz czytnik. Jeden wpis ma około dwustu bajtów.',
       'Nic nie opuszcza tego urządzenia. Aby przenieść półkę na inny telefon, użyj eksportu i wklej tekst na drugim urządzeniu.',
       'Dotknięcie tekstu chowa przyciski, kolejne je przywraca. Pod Aa: rozmiar tekstu, jasny lub ciemny motyw i podświetlenie akapitu. Pasek pokazuje, ile minut zostało.',
@@ -891,7 +897,7 @@ const I18N = {
     aw_note: 'Годы — годы вручения. SFWA называет «Небьюлу» по году публикации, поэтому «Небьюла 2024» вручена в 2025 году и стоит здесь в 2025-м.',
     aw_src: 'Данные: Wikidata (CC0), выборочно сверены с sfadb.com; последний год может быть неполным. Биографии и описания книг: Википедия, CC BY-SA 4.0.',
     found: 'Найдено: {n}', nothing_found: 'Ничего не найдено.',
-    shelf_bm: 'Закладки', shelf_bm_works: 'Произведения', shelf_bm_places: 'Места в текстах', empty_bm: 'Нажмите ☆ у произведения или 🔖 в ридере, чтобы сохранить его здесь.',
+    shelf_bm: 'Закладки', shelf_bm_works: 'Произведения', shelf_bm_places: 'Места в текстах', empty_bm: 'Нажмите ☆ у произведения или кнопку закладки в читалке, чтобы сохранить его здесь.',
     shelf_reading: 'Читаю сейчас', shelf_files: 'Файлы на этом устройстве', shelf_links: 'Мои ссылки', shelf_sugg: 'Мои предложения и жалобы', shelf_data: 'Данные на этом устройстве', mv_h: 'На другом устройстве', mv_what: 'Ссылка переносит места чтения, заметки, «Прочитано», закладки, историю и пару настроек. Свои файлы книг остаются здесь: добавьте их там ещё раз, и место в книге найдётся само.', mv_make: 'Ссылка для другого устройства', mv_scan: 'Наведите камеру телефона на код или отправьте себе ссылку.', mv_scan_part: 'В коде только главное: последние места, заметки и «Прочитано». Всё целиком — по ссылке.', mv_noqr: 'Для кода данных слишком много: отправьте себе ссылку.', mv_link_label: 'Ссылка', mv_copy: 'Копировать ссылку', mv_share: 'Отправить…', mv_warn: 'Ссылка — это копия вашей полки: не публикуйте её. Она работает только на этом же адресе страницы.', mv_qr_label: 'QR-код ссылки для другого устройства', mv_full_h: 'Полная копия, со своими файлами', mv_q_h: 'Перенести полку с другого устройства?', mv_q: 'Записи сольются с тем, что уже есть здесь: из двух версий остаётся более свежая. Ничего не пропадёт.', mv_n_places: 'места чтения: {n}', mv_n_done: 'прочитано: {n}', mv_n_notes: 'заметки: {n}', mv_n_marks: 'закладки: {n}', mv_n_links: 'свои ссылки: {n}', mv_go: 'Перенести', mv_later: 'Не сейчас', mv_done: 'Готово. Обновлено записей: {n}.', mv_same: 'Всё из ссылки здесь уже есть.', mv_bad: 'Ссылка повреждена или обрезана. Создайте её заново.', mv_newer: 'Ссылка из более новой версии unoebasta. Обновите страницу и откройте ссылку снова.', mv_fail_qr: 'QR-код не загрузился. Отправьте себе ссылку.',
     empty_reading: 'Откройте любой текст в ридере, и здесь появится место, где вы остановились.', empty_files: 'Файлов пока нет. Добавьте TXT, HTML, EPUB или FB2, чтобы читать офлайн.', empty_links: 'Своих ссылок пока нет. Добавьте ссылку на странице произведения.', empty_sugg: 'Пока ничего.',
     storage: 'Занято: {u} из примерно {q}', export: 'Экспорт', import: 'Импорт', export_hint: 'Скопируйте этот текст, чтобы перенести полку на другое устройство.', import_hint: 'Вставьте экспортированный текст и нажмите «Импорт».', import_done: 'Импортировано записей: {n}', import_bad: 'Это не экспорт полки.',
@@ -926,7 +932,7 @@ const I18N = {
     demo: [
       'Этот короткий текст нужен, чтобы проверить ридер. Прокрутите немного, закройте его и откройте снова: он вернётся к абзацу, на котором вы остановились.',
       'Место сохраняется как номер абзаца, насколько вы в него углубились, и короткий отпечаток первых слов. Если вёрстка текста изменится, по отпечатку найдётся тот же абзац.',
-      'Нажмите 🔖, чтобы поставить закладку на текущем абзаце, и ≡, чтобы увидеть все закладки в этом тексте. Закладки появляются и на полке.',
+      'В читалке кнопка закладки отмечает текущий абзац, а кнопка списка показывает все закладки в этом тексте. Закладки появляются и на полке.',
       'Позиция записывается через секунду-две после остановки прокрутки, при переходе на другую вкладку и при закрытии ридера. Одна запись занимает около двухсот байт.',
       'Ничего не покидает это устройство. Чтобы перенести полку на другой телефон, сделайте экспорт на полке и вставьте текст там.',
       'Касание текста прячет кнопки, следующее касание возвращает их. Под Aa — размер текста, светлая или тёмная тема и подсветка абзаца. Вверху видно, сколько минут осталось.',
@@ -999,6 +1005,16 @@ const ICON = {
   prev: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"/></svg>',
   next: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"/></svg>'
 };
+
+// tiny marks in the Awards lists: free text, excerpt, your link or file, audio, bookmarked
+const MK_PATH = {
+  text: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  ex: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  mine: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  audio: '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'
+};
+const mk = k => `<svg class="mk-i mk-${k}" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" fill="${k === 'star' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${MK_PATH[k]}</svg>`;
 
 /* ---------- preferences (localStorage) ---------- */
 const PREFS_KEY = 'fantastic-prefs', VISIT_KEY = 'fantastic-visit';
@@ -1547,7 +1563,7 @@ AV.q = ''; // search text is not remembered
 function saveAV() { prefs.av = { award: AV.award, mode: AV.mode, cat: AV.cat, sort: AV.sort, onlyText: AV.onlyText }; savePrefs(); }
 const WIDE = () => !!(window.matchMedia && window.matchMedia('(min-width: 900px)').matches);
 function marksHtml(q) {
-  return `${hasText(q) ? `<span class="tm" title="${esc(t('lg_text'))}">▶</span>` : isMine(q) ? `<span class="mm" title="${esc(t('lg_mine'))}">◌</span>` : hasExcerpt(q) ? `<span class="xm" title="${esc(t('tier_t3'))}">¶</span>` : ''}${hasAudio(q) ? '<span class="am">♪</span>' : ''}${isStarred(q) ? '<span class="sm">★</span>' : ''}${isNew(q) ? `<span class="nd" title="${esc(t('flag_new'))}"></span>` : ''}`;
+  return `${hasText(q) ? `<span class="tm" title="${esc(t('lg_text'))}">${mk('text')}</span>` : isMine(q) ? `<span class="mm" title="${esc(t('lg_mine'))}">${mk('mine')}</span>` : hasExcerpt(q) ? `<span class="xm" title="${esc(t('tier_t3'))}">${mk('ex')}</span>` : ''}${hasAudio(q) ? `<span class="am">${mk('audio')}</span>` : ''}${isStarred(q) ? `<span class="sm">${mk('star')}</span>` : ''}${isNew(q) ? `<span class="nd" title="${esc(t('flag_new'))}"></span>` : ''}`;
 }
 // one row = one tap target: year column (opens the year) + work (opens the card)
 function yearRow(y, q, showYear, dec) {
@@ -1589,9 +1605,10 @@ function renderAwards() {
   const awSeg = `<div class="seg full" role="group" aria-label="${esc(t('col_award'))}">${awOpts.map(a => `<button data-av-award="${a}" aria-pressed="${AV.award === a}">${esc(a === 'all' ? t('aw_all_short') : awardName(a))}</button>`).join('')}</div>`;
   const modes = ['cats', 'years'].concat(wide ? ['table'] : []);
   const modeSeg = `<div class="seg full" role="group">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${AV.mode === m}">${esc(t('v_' + m))}</button>`).join('')}</div>`;
-  const tools = `<div class="scroller"><button class="chip" data-av-sort="toggle">${AV.sort === 'desc' ? '↓ ' + esc(t('sort_desc')) : '↑ ' + esc(t('sort_asc'))}</button><button class="chip" data-av-text="1" aria-pressed="${AV.onlyText}">▶ ${esc(t('only_text'))}</button></div>`;
+  const tools = `<div class="scroller"><button class="chip" data-av-sort="toggle">${AV.sort === 'desc' ? '↓ ' + esc(t('sort_desc')) : '↑ ' + esc(t('sort_asc'))}</button><button class="chip" data-av-text="1" aria-pressed="${AV.onlyText}">${mk('text')} ${esc(t('only_text'))}</button></div>`;
   const search = `<input class="search" id="av-q" type="search" enterkeyhint="search" placeholder="${esc(t('search_ph'))}" value="${esc(AV.q)}">`;
-  const legend = `<p class="footnote">${esc(t('legend_short'))}</p>`;
+  const LG = { '▶': 'text', '¶': 'ex', '◌': 'mine', '♪': 'audio', '★': 'star' };
+  const legend = `<p class="footnote legend">${t('legend_short').split(' · ').map(x => { const g = x[0], rest = esc(x.slice(2)); return LG[g] ? `<span>${mk(LG[g])} ${rest}</span>` : g === '●' ? `<span><span class="nd"></span> ${rest}</span>` : `<span>${esc(x)}</span>`; }).join(' ')}</p>`;
   const sortY = ys => ys.sort((a, b) => AV.sort === 'desc' ? b - a : a - b);
   let head = '', body = '';
   if (AV.year) {

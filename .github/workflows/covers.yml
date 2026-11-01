@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [data/awards.json, scripts/fetch-covers.mjs]
+    paths: [data/awards.json, src/index.html, scripts/fetch-covers.mjs]
 permissions:
   contents: write
   actions: write
