@@ -71,6 +71,13 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['sort toggle → 1953 first'] = /1953/.test($('#view-awards .yrow').textContent);
   click($('#view-awards [data-av-award="l"]')); await sleep(50);
   checks['locus 8 category chips'] = $$('#view-awards [data-av-cat]').length === 8;
+  // "All" by category: every award at once, one row per work, the awards named on it
+  click($('#view-awards [data-av-award="all"]')); await sleep(50);
+  click($('#view-awards [data-av-cat="S"]')); await sleep(50);
+  const allRows = $$('#view-awards .yrow'), hugoS = w.eval("DATA.aw.filter(x => x[0] === 'h' && x[1] === 'S').length");
+  checks['awards “All” by category: more than one award, no duplicates, awards named'] = $$('#view-awards [data-av-cat]').length === 4 && allRows.length > hugoS && allRows.length < w.eval("DATA.aw.filter(x => x[1] === 'S').length") && allRows.some(r => /,/.test((r.querySelector('.wmeta') || {}).textContent || '')) && /^Все/.test($('#view-awards .count-line').textContent);
+  click($('#view-awards [data-av-cat="N"]')); await sleep(50);
+  checks['awards “All” novels include Locus fantasy novels'] = $$('#view-awards .wmeta').some(m => /Локус · /.test(m.textContent));
   click($('#view-awards [data-av-mode="years"]')); await sleep(30);
   click($('#view-awards [data-av-award="all"]')); await sleep(50);
   const inp = $('#av-q'); inp.value = 'Le Guin'; inp.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(400);

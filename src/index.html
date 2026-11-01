@@ -1652,10 +1652,10 @@ function marksHtml(q) {
   return `${hasText(q) ? `<span class="tm" title="${esc(t('lg_text'))}">${mk('text')}</span>` : isMine(q) ? `<span class="mm" title="${esc(t('lg_mine'))}">${mk('mine')}</span>` : hasExcerpt(q) ? `<span class="xm" title="${esc(t('tier_t3'))}">${mk('ex')}</span>` : ''}${hasAudio(q) ? `<span class="am">${mk('audio')}</span>` : ''}${isStarred(q) ? `<span class="sm">${mk('star')}</span>` : ''}${isNew(q) ? `<span class="nd" title="${esc(t('flag_new'))}"></span>` : ''}`;
 }
 // one row = one tap target: year column (opens the year) + work (opens the card)
-function yearRow(y, q, showYear, dec) {
+function yearRow(y, q, showYear, dec, tag) {
   const w = work(q);
   const dn = isDone(q);
-  return `<div class="yrow${dn ? ' is-done' : ''}"${dec ? ` data-dec="${dec}"` : ''}>${showYear ? `<button class="yr" data-av-year="${y}" aria-label="${y}">${y}</button>` : '<span class="yr"></span>'}<button class="yw" data-work="${q}"><span class="yt">${esc(w.title)}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}${altTitle(w) ? ' · ' + esc(altTitle(w)) : ''}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
+  return `<div class="yrow${dn ? ' is-done' : ''}"${dec ? ` data-dec="${dec}"` : ''}>${showYear ? `<button class="yr" data-av-year="${y}" aria-label="${y}">${y}</button>` : '<span class="yr"></span>'}<button class="yw" data-work="${q}">${tag ? `<span class="wmeta">${esc(tag)}</span>` : ''}<span class="yt">${esc(w.title)}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}${altTitle(w) ? ' · ' + esc(altTitle(w)) : ''}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
 }
 const doneTag = () => `<b class="dtag">✓ ${esc(t('done_mark'))}</b> · `;
 function workRow(meta, q) {
@@ -1682,12 +1682,15 @@ function renderAwards(onlyBody) {
   const wide = WIDE();
   if (AV.mode === 'list') AV.mode = 'years';
   if (AV.mode === 'table' && !wide) AV.mode = 'cats';
-  if (AV.award === 'all' && AV.mode !== 'years' && !AV.year) AV.award = 'h';
+  if (AV.award === 'all' && AV.mode === 'table' && !AV.year) AV.award = 'h'; // the board is one award at a time
   const aw = AV.award === 'all' ? 'h' : AV.award;
-  const catsOf = a => CATS[a].filter(c => DATA.aw.some(x => x[0] === a && x[1] === c));
+  // "All": novels of every kind (Locus: SF, fantasy, horror, first novel) count as Novel
+  const GROUP = { N: ['N', 'SF', 'FN', 'HN', 'FT'], A: ['A'], E: ['E'], S: ['S'] };
+  const ALL = AV.award === 'all';
+  const catsOf = a => ALL ? Object.keys(GROUP) : CATS[a].filter(c => DATA.aw.some(x => x[0] === a && x[1] === c));
   if (!AV.cat || !catsOf(aw).includes(AV.cat)) AV.cat = catsOf(aw).includes('S') ? 'S' : catsOf(aw)[0];
   const awList = AV.award === 'all' ? AWARDS : [AV.award];
-  const awOpts = (AV.mode === 'years' || AV.year) ? ['all', ...AWARDS] : AWARDS;
+  const awOpts = (AV.mode === 'table' && !AV.year) ? AWARDS : ['all', ...AWARDS];
   const awSeg = `<div class="seg full" role="group" aria-label="${esc(t('col_award'))}">${awOpts.map(a => `<button data-av-award="${a}" aria-pressed="${AV.award === a}">${esc(a === 'all' ? t('aw_all_short') : awardName(a))}</button>`).join('')}</div>`;
   const modes = ['cats', 'years'].concat(wide ? ['table'] : []);
   const modeSeg = `<div class="seg full" role="group">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${AV.mode === m}">${esc(t('v_' + m))}</button>`).join('')}</div>`;
@@ -1705,15 +1708,17 @@ function renderAwards(onlyBody) {
     head = `<div class="yearbar"><button class="btn btn-ghost" data-av-clear="1">← ${esc(t('crumb_all'))}</button><div class="yearnav"><button class="btn" data-av-year="${allYears[i - 1] || ''}" ${i > 0 ? '' : 'disabled'} aria-label="${esc(t('prev_year'))}">‹</button><strong>${y}</strong><button class="btn" data-av-year="${allYears[i + 1] || ''}" ${i < allYears.length - 1 ? '' : 'disabled'} aria-label="${esc(t('next_year'))}">›</button></div></div>${awSeg}`;
     body = secs || `<p class="empty">${esc(t('nothing_found'))}</p>`;
   } else if (AV.mode === 'cats') {
-    const ys = sortY(Object.keys(BOARD[aw] || {}).map(Number));
+    const ys = sortY([...new Set(awList.flatMap(a => Object.keys(BOARD[a] || {}).map(Number)))]);
     const shown = []; let rows = '', lastDec = null, count = 0;
     for (const y of ys) {
-      const qs = ((BOARD[aw][y] || {})[AV.cat] || []).filter(q => passText(q) && matchQ(q));
-      qs.forEach((q, k) => { const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec; rows += yearRow(y, q, k === 0, mark); count++; });
+      const by = new Map(); // a work that won several awards that year is one row, with every award named
+      for (const a of awList) for (const c of (ALL ? GROUP[AV.cat] : [AV.cat])) for (const q of ((BOARD[a] || {})[y] || {})[c] || []) if (passText(q) && matchQ(q)) { if (!by.has(q)) by.set(q, []); const n = awardName(a) + (ALL && c !== AV.cat ? ' · ' + catName(c) : ''); if (!by.get(q).includes(n)) by.get(q).push(n); }
+      const qs = [...by.keys()];
+      qs.forEach((q, k) => { const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec; const ns = by.get(q); rows += yearRow(y, q, k === 0, mark, ALL ? ns.join(ns.some(n => n.includes(' · ')) ? '; ' : ', ') : ''); count++; });
       if (qs.length) shown.push(y);
     }
     head = `${awSeg}${modeSeg}<div class="scroller" role="group" aria-label="${esc(t('col_cat'))}">${catsOf(aw).map(c => `<button class="chip" data-av-cat="${c}" aria-pressed="${AV.cat === c}">${esc(catName(c))}</button>`).join('')}</div>${tools}${search}${decadeChips(shown)}`;
-    body = `<p class="count-line">${esc(awardName(aw))} · ${esc(catName(AV.cat))} · ${esc(t('found', { n: fmtNum(count) }))}</p>${count ? `<div class="ylist">${rows}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
+    body = `<p class="count-line">${esc(ALL ? t('aw_all_short') : awardName(aw))} · ${esc(catName(AV.cat))} · ${esc(t('found', { n: fmtNum(count) }))}</p>${count ? `<div class="ylist">${rows}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
   } else if (AV.mode === 'years') {
     const ys = sortY([...new Set(DATA.aw.filter(x => awList.includes(x[0])).map(x => x[2]))]);
     let count = 0; const shown = []; let lastDec = null;
