@@ -34,9 +34,11 @@ const SOURCES = readJson('sources.json', {}), NONE = new Set(readJson('none.json
 const has = q => Object.keys(SIZES).every(k => existsSync(join(OUT, k, q + '.webp')));
 for (const [q, o] of Object.entries(data.ol || {})) if (o.c && has(q) && !SOURCES[q]) SOURCES[q] = `openlibrary:${o.c}`;
 const books = Object.entries(data.ol || {}).filter(([q, o]) => o.c && !has(q)).map(([q, o]) => [q, { img: `${BASE}${o.c}-M.jpg?default=false`, src: `openlibrary:${o.c}` }]);
-const stories = Object.entries(READ).filter(([q]) => !has(q) && !(data.ol && data.ol[q] && data.ol[q].c) && !NONE.has(q))
+// covers named by hand (data/awards.json → cov[QID] = image URL): when a page hides its issue cover from robots
+const named = Object.entries(data.cov || {}).filter(([q]) => !has(q)).map(([q, img]) => [q, { img, src: 'issue:' + img }]);
+const stories = Object.entries(READ).filter(([q]) => !has(q) && !(data.ol && data.ol[q] && data.ol[q].c) && !(data.cov && data.cov[q]) && !NONE.has(q))
   .map(([q, r]) => [q, { page: (r.links.find(l => l.kind === 'full') || {}).url }]).filter(([, j]) => j.page);
-const jobs = [...books, ...stories].slice(0, LIMIT);
+const jobs = [...books, ...named, ...stories].slice(0, LIMIT);
 console.log(`covers: ${books.length} book covers and ${stories.length} story pages to look at`);
 const BAD = /logo|favicon|default|placeholder|icon|social|avatar|gravatar/i;
 const abs = (u, base) => { try { return u ? new URL(u.replace(/&amp;/g, '&'), base).href : null; } catch (e) { return null; } };
@@ -49,7 +51,7 @@ const ogImage = (html, base) => {
 // name says "cover" or "illustration", lazy-loaded ones included; not the og:image banner, and not on sites
 // whose sidebars advertise books
 const coverImg = (html, base, og) => {
-  if (/reactormag\.com|tor\.com/.test(base)) return null;
+  if (/reactormag\.com|tor\.com|strangehorizons\.com/.test(base)) return null;
   for (const m of html.matchAll(/["'\s(,]((?:https?:)?[^"'\s(),]*(?:cover|illustration)[^"'\s(),]*\.(?:jpe?g|png|webp))/gi)) {
     const u = abs(m[1], base); if (u && u !== og && !BAD.test(u)) return u;
   }
