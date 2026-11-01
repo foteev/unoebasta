@@ -534,6 +534,13 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#shelf-sugg [data-sgdel]')); await sleep(80);
   checks['suggestions: remove one → the list is empty'] = /Пока ничего/.test($('#shelf-sugg').textContent);
   w.eval("INBOX_NPUB = ''");
+  // the logo and the name lead to the start screen
+  click($('#tab-about')); await sleep(60);
+  click($('.brand-home .logo')); await sleep(60);
+  const fromLogo = !$('#view-catalog').hidden && $('#tab-catalog').getAttribute('aria-selected') === 'true';
+  click($('#tab-shelf')); await sleep(60);
+  click($('.brand-home .brand-e')); await sleep(60);
+  checks['logo and name → start screen'] = fromLogo && !$('#view-catalog').hidden && $('.brand-home').title === 'На главную';
   // Reading now: clear the whole list at once, with Undo
   await w.eval(`(async () => { const now = Date.now();
     await Store.put('positions', { id: 'ext:Q25349436', ext: true, workId: 'Q25349436', title: 'A', source: 'X', sourceUrl: 'https://x.test/a', at: now - 1000 });
