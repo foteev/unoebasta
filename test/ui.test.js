@@ -235,7 +235,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // ✓ Read: off the start screen and random picks, onto the shelf, muted in award lists, Undo in the toast
   w.eval("prefs.pickLen = '40'; renderHome()"); await sleep(10);
   const pk0 = $$('#view-catalog .pick'); const dq = pk0[0].querySelector('.pick-done').dataset.done; const keep = pk0[1].querySelector('.pick-done').dataset.done;
-  checks['done: a quiet circle that says what it does'] = pk0.every(pk => pk.querySelector('.pick-done').getAttribute('aria-label').startsWith('Отметить прочитанным') && !!pk.querySelector('.pick-done svg circle') && pk.querySelector('.pick-done').textContent.trim() === '');
+  checks['done: on the start screen it says “Уже читал(а)”, under Read'] = pk0.every(pk => pk.querySelector('.pick-done').textContent.trim() === 'Уже читал(а)' && pk.querySelector('.pick-actions').nextElementSibling === pk.querySelector('.pick-done') && /уйдёт с первого экрана/.test(pk.querySelector('.pick-done').title));
   click(pk0[0].querySelector('.pick-done')); await sleep(40);
   const pk1 = $$('#view-catalog .pick .pick-done').map(b => b.dataset.done);
   checks['done: leaves the home picks, others stay'] = !pk1.includes(dq) && pk1.includes(keep) && pk1.length === 3 && w.eval(`isDone('${dq}')`);
