@@ -10,7 +10,7 @@ _You’re the grown-up now. Say yes._
 
 - **Pure reading.** One static page. No app, no server, no accounts, no subscriptions, no ads, no analytics.
 - **Legal texts only.** The page links to the magazine or publisher that posted a story, to Creative Commons releases and to public domain archives. It never copies a text.
-- **Your data stays in your browser.** Places, notes, finished marks, bookmarks and your own files live in IndexedDB on the device. Moving them to another device happens through a link you make yourself (`#move=…`, never sent to any server).
+- **Your data stays in your browser.** Places, notes, finished marks, bookmarks and your own files live in IndexedDB on the device. Sync between your devices needs no account: a secret key, carried once by a link or QR code, encrypts the shelf on the device, and public Nostr relays keep only the ciphertext. A one-time move link (`#move=…`) works too.
 - **No keys, no personal data in this repository.** The page needs no API keys. CI rejects anything that looks like one.
 
 ## Help

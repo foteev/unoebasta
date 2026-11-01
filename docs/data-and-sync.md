@@ -46,4 +46,12 @@ Steps so far: **2→3** every record gets `at` and a book label `book: { title, 
 - a QR code is drawn when the link fits 1,400 characters; a larger shelf gets a code with the essentials and the full link;
 - opening the link asks first, removes it from the address bar, then merges.
 
-**Next** (see the project discussion): the link becomes a device key, and an encrypted copy goes to public Nostr relays (NIP-78 app data, NIP-44 encryption), so devices sync on their own. Any relay holds only ciphertext; the main copy stays in the browser.
+## Sync through Nostr relays
+
+- **The key.** "Turn on sync" makes 32 random bytes (localStorage `fantastic-sync`, never exported). "Connect another device" shows them as `#sync=<base64url>` in a link and a QR code; the other device opens it and asks first.
+- **From the key:** a Nostr secret key `sha256(key ‖ "unoebasta/nostr-key")` and a label `d = hex(sha256(key ‖ "unoebasta/label"))[0..24]`. Same key → same identity on every device; nobody can tie the label to a person.
+- **The event.** `syncPack()` → deflate → base64url → NIP-44 encrypted to itself → kind 30078 (NIP-78), tag `d`, published to six relays run by different people (`RELAYS` in `src/index.html`). Replaceable: each relay keeps only the newest. Kept under ~40 KB; a bigger shelf drops old history first (`slimPack`).
+- **When.** Pull + merge when the page opens and when you come back to it (at most every 30 s); push 4 s after a local change and when the page is hidden; "Sync now" on the shelf. A push happens only when the content changed (`h` = hash of the pack).
+- **Library.** nostr-tools 2.25.2 from jsDelivr, loaded only when sync is on.
+- **Safety.** Relays see ciphertext, the author key (random), the label and times. The main copy stays in the browser: a relay that forgets the event only delays the next sync. Losing every device and the key link loses the copy on the relays too.
+- **Checked** in tests with an in-memory relay, and against the real relays from a browser: all six accept and return a ~40 KB kind-30078 event and keep only the newest.
