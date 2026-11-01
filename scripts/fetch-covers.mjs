@@ -38,19 +38,24 @@ const stories = Object.entries(READ).filter(([q]) => !has(q) && !(data.ol && dat
   .map(([q, r]) => [q, { page: (r.links.find(l => l.kind === 'full') || {}).url }]).filter(([, j]) => j.page);
 const jobs = [...books, ...stories].slice(0, LIMIT);
 console.log(`covers: ${books.length} book covers and ${stories.length} story pages to look at`);
+const BAD = /logo|favicon|default|placeholder|icon|social|avatar|gravatar/i;
 const abs = (u, base) => { try { return u ? new URL(u.replace(/&amp;/g, '&'), base).href : null; } catch (e) { return null; } };
 const ogImage = (html, base) => {
   const m = html.match(/<meta[^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image)["'][^>]*>/i);
   const c = m && m[0].match(/content=["']([^"']+)["']/i);
   return c ? abs(c[1], base) : null;
 };
-// the issue cover shown on the page itself (an <img> whose file name says "cover"); not on sites whose sidebars advertise books
-const coverImg = (html, base) => {
+// the issue cover (or the story's illustration) shown on the page itself: any image URL on the page whose file
+// name says "cover" or "illustration", lazy-loaded ones included; not the og:image banner, and not on sites
+// whose sidebars advertise books
+const coverImg = (html, base, og) => {
   if (/reactormag\.com|tor\.com/.test(base)) return null;
-  const m = html.match(/<img[^>]+src=["']([^"']*cover[^"']*\.(?:jpe?g|png|webp))["']/i);
-  return m ? abs(m[1], base) : null;
+  for (const m of html.matchAll(/["'\s(,]((?:https?:)?[^"'\s(),]*(?:cover|illustration)[^"'\s(),]*\.(?:jpe?g|png|webp))/gi)) {
+    const u = abs(m[1], base); if (u && u !== og && !BAD.test(u)) return u;
+  }
+  return null;
 };
-const BAD = /logo|favicon|default|placeholder|icon|social/i;
+
 
 let ok = 0, missing = 0, failed = 0;
 // first look at every story page: which og:image is a site's banner (the same on 3+ pages, counting earlier runs)?
@@ -59,7 +64,7 @@ for (const u of Object.values(SOURCES)) if (!u.startsWith('openlibrary')) seen[u
 for (const [, j] of jobs) if (j.page) {
   try {
     const p = await fetch(j.page, { headers: UA, redirect: 'follow', signal: AbortSignal.timeout(20000) });
-    if (p.ok) { const html = await p.text(), base = p.url || j.page; j.og = ogImage(html, base); j.cover = coverImg(html, base); if (j.og) seen[j.og] = (seen[j.og] || 0) + 1; }
+    if (p.ok) { const html = await p.text(), base = p.url || j.page; j.og = ogImage(html, base); j.cover = coverImg(html, base, j.og); if (j.og) seen[j.og] = (seen[j.og] || 0) + 1; }
   } catch (e) { j.err = e.message; }
   await sleep(300);
 }
