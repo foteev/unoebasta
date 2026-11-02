@@ -11,9 +11,9 @@ You are helping **unoebasta** (https://foteev.github.io/unoebasta/, code and dat
 | Novel | 236 | 1 | 43 | 57 | 88 | 1 | 103 |
 | Novella | 131 | 4 | 20 | 6 | 8 | 1 | 101 |
 | Novelette | 142 | 50 | 6 | – | – | 24 | 81 |
-| Short story | 147 | 60 | 1 | – | – | 27 | 79 |
+| Short story | 147 | 60 | 1 | – | – | 32 | 79 |
 
-There are 115 full texts and 53 works with audio. All of them are in English, because translations are under copyright.
+There are 115 full texts and 58 works with audio. All of them are in English, because translations are under copyright.
 
 **Spanish is new** and has nothing on the page yet. A Spanish translation is known for 149 of 236 novels, 43 of 131 novellas, 31 of 142 novelettes and 47 of 147 short stories (`title_es`).
 
