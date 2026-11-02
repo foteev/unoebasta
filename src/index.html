@@ -664,7 +664,12 @@ const DATA = JSON.parse(document.getElementById('awards-data').textContent);
 const CATS = { h: ['N', 'A', 'E', 'S'], n: ['N', 'A', 'E', 'S'], l: ['N', 'SF', 'FN', 'HN', 'FT', 'A', 'E', 'S'] };
 const AWARDS = ['h', 'n', 'l'];
 const WORKS = {};
-for (const [q, w] of Object.entries(DATA.works)) WORKS[q] = { id: q, title: w[0], tpl: w[1] || null, tru: w[2] || null, tes: (DATA.t_es && DATA.t_es[q]) || null, authors: w[3], isfdb: w[4] || null, fantlab: w[5] || null, pub: w[6] || null, about: (w[7] || w[8] || w[9]) ? { en: w[7] || null, pl: w[8] || null, ru: w[9] || null } : null, wiki: { en: w[10] || null, pl: w[11] || null, ru: w[12] || null }, ex: (DATA.ex && DATA.ex[q]) || null, gb: (DATA.gb && DATA.gb[q]) || null, ol: (DATA.ol && DATA.ol[q]) || null, awards: [] };
+// Translated titles: Polish and Russian from Wikidata (works[q][1], [2]), any language from a t_<lang> map
+// (t_es, and whatever merge-found.mjs adds as the search grows). Wikidata's title wins where both exist.
+const TITLE_LANGS = Object.keys(DATA).filter(k => /^t_[a-z]{2,3}$/.test(k)).map(k => k.slice(2));
+const bareTitle = s => String(s).replace(/\s*\((?:[^()]*\s)?(?:novel|novella|short story|powieść|opowiadanie|nowela|роман|рассказ|повесть|novela|relato|cuento)(?:\s[^()]*)?\)\s*$/iu, ''); // a Wikipedia note such as "(роман)"
+function titlesOf(q, w) { const o = {}; for (const l of TITLE_LANGS) if (DATA['t_' + l][q]) o[l] = bareTitle(DATA['t_' + l][q]); if (w[1]) o.pl = bareTitle(w[1]); if (w[2]) o.ru = bareTitle(w[2]); return o; }
+for (const [q, w] of Object.entries(DATA.works)) WORKS[q] = { id: q, title: w[0], titles: titlesOf(q, w), authors: w[3], isfdb: w[4] || null, fantlab: w[5] || null, pub: w[6] || null, about: (w[7] || w[8] || w[9]) ? { en: w[7] || null, pl: w[8] || null, ru: w[9] || null } : null, wiki: { en: w[10] || null, pl: w[11] || null, ru: w[12] || null }, ex: (DATA.ex && DATA.ex[q]) || null, gb: (DATA.gb && DATA.gb[q]) || null, ol: (DATA.ol && DATA.ol[q]) || null, awards: [] };
 for (const [aw, cat, y, q, over] of DATA.aw) { const w = WORKS[q]; if (!w) continue; w.awards.push([aw, cat, y]); if (over) w.title = over; }
 for (const w of Object.values(WORKS)) w.awards.sort((a, b) => a[2] - b[2] || AWARDS.indexOf(a[0]) - AWARDS.indexOf(b[0]));
 const AUTHORS = {};
@@ -836,7 +841,7 @@ const I18N = {
     sec_mine: 'My materials', own_link: 'Own link', own_link_ph: 'Paste a page address', own_link_saved: 'Saved on this device', own_edit: 'Edit', archived: 'archive', cov_h: 'What you can read today', cov_full: 'Full text', cov_frag: 'Fragment', cov_audio: 'Audio', cov_all: 'Winners', cov_total: 'Altogether', cov_langs: 'Fragments by language: EN {en} · PL {pl} · RU {ru} · ES {es}. Full texts are in English for now: translations are under copyright.', cov_help: 'The list grows with readers. Know a free, legal text, translation or reading of a winner? Write to us: anonymous, no account. Searchers and AI agents can use the search brief.', cov_brief: 'Search brief', own_note: 'Note or title (optional)', file_note: 'Name or note (optional)', file_note_ph: 'e.g. Russian translation, EPUB from the publisher', file_rename: 'Name', file_note_saved: 'Saved', own_note_ph: 'e.g. Polish translation, Nowa Fantastyka 2019', own_update: 'Save changes', own_link_bad: 'Enter a page address starting with https://',
     own_file: 'File for offline reading', own_file_hint: 'TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX or ODT. The file is stored only on this device.', doc_no: 'This is an old Word file (.doc). Save it as DOCX or TXT and add it again.', rtf_no: 'RTF does not open here. Save it as DOCX or TXT and add it again.', file_unknown: 'This file is not a text this reader knows. TXT, HTML, EPUB, FB2, DOCX and ODT open here.', choose_file: 'Add file',
     sec_more: 'Editions, translations, bibliography', isfdb_t: 'ISFDB: editions and translations', fantlab_t: 'FantLab: Russian translations', wikidata_t: 'Wikidata',
-    title_pl: 'Polish title', title_ru: 'Russian title', title_es: 'Spanish title', lang_h: 'Language',
+    title_orig: 'Original title', lang_h: 'Language',
     suggest: 'Suggest for the catalog', report: 'Report a link',
     author_awards: 'Awards', author_works_n: '{n} winning works', bio_none: 'No Wikipedia article yet.', bio_fallback: 'No article in English yet.', bio_fallback_en: 'No article in this language yet. English version below.', bio_src: 'Text: Wikipedia, CC BY-SA 4.0', wiki_link: 'Wikipedia', isfdb_a: 'ISFDB bibliography', fantlab_a: 'FantLab',
     col_year: 'Year', col_award: 'Award', col_cat: 'Category', col_work: 'Work', col_text: 'Text',
@@ -912,7 +917,7 @@ const I18N = {
     sec_mine: 'Moje materiały', own_link: 'Własny link', own_link_ph: 'Wklej adres strony', own_link_saved: 'Zapisano na tym urządzeniu', own_edit: 'Zmień', archived: 'archiwum', cov_h: 'Co już można przeczytać', cov_full: 'Cały tekst', cov_frag: 'Fragment', cov_audio: 'Audio', cov_all: 'Laureaci', cov_total: 'Razem', cov_langs: 'Fragmenty według języka: EN {en} · PL {pl} · RU {ru} · ES {es}. Całe teksty są na razie po angielsku: tłumaczenia chroni prawo autorskie.', cov_help: 'Lista rośnie dzięki czytelnikom. Znasz darmowy, legalny tekst, tłumaczenie albo nagranie laureata? Napisz do nas: anonimowo, bez konta. Szukającym i agentom AI pomoże instrukcja wyszukiwania.', cov_brief: 'Instrukcja wyszukiwania', own_note: 'Notatka lub tytuł (opcjonalnie)', file_note: 'Nazwa lub notatka (opcjonalnie)', file_note_ph: 'np. przekład rosyjski, EPUB od wydawcy', file_rename: 'Nazwa', file_note_saved: 'Zapisano', own_note_ph: 'np. przekład polski, Nowa Fantastyka 2019', own_update: 'Zapisz zmiany', own_link_bad: 'Wpisz adres strony zaczynający się od https://',
     own_file: 'Plik do czytania offline', own_file_hint: 'TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX lub ODT. Plik jest przechowywany tylko na tym urządzeniu.', doc_no: 'To stary plik Worda (.doc). Zapisz go jako DOCX lub TXT i dodaj ponownie.', rtf_no: 'RTF się tu nie otwiera. Zapisz plik jako DOCX lub TXT i dodaj ponownie.', file_unknown: 'Ten plik nie jest tekstem, który czytnik zna. Otwierają się TXT, HTML, EPUB, FB2, DOCX i ODT.', choose_file: 'Dodaj plik',
     sec_more: 'Wydania, przekłady, bibliografia', isfdb_t: 'ISFDB: wydania i przekłady', fantlab_t: 'FantLab: przekłady rosyjskie', wikidata_t: 'Wikidata',
-    title_pl: 'Tytuł polski', title_ru: 'Tytuł rosyjski', title_es: 'Tytuł hiszpański', lang_h: 'Język',
+    title_orig: 'Tytuł oryginalny', lang_h: 'Język',
     suggest: 'Zaproponuj do katalogu', report: 'Zgłoś link',
     author_awards: 'Nagrody', author_works_n: 'Nagrodzone utwory: {n}', bio_none: 'Brak artykułu w Wikipedii.', bio_fallback: 'Brak artykułu po polsku.', bio_fallback_en: 'Brak artykułu po polsku. Poniżej wersja angielska.', bio_src: 'Tekst: Wikipedia, CC BY-SA 4.0', wiki_link: 'Wikipedia', isfdb_a: 'Bibliografia ISFDB', fantlab_a: 'FantLab',
     col_year: 'Rok', col_award: 'Nagroda', col_cat: 'Kategoria', col_work: 'Utwór', col_text: 'Tekst',
@@ -988,7 +993,7 @@ const I18N = {
     sec_mine: 'Мои материалы', own_link: 'Своя ссылка', own_link_ph: 'Вставьте адрес страницы', own_link_saved: 'Сохранено на этом устройстве', own_edit: 'Изменить', archived: 'архив', cov_h: 'Что уже можно прочитать', cov_full: 'Целиком', cov_frag: 'Фрагмент', cov_audio: 'Аудио', cov_all: 'Лауреатов', cov_total: 'Всего', cov_langs: 'Фрагменты по языкам: EN {en} · PL {pl} · RU {ru} · ES {es}. Целиком тексты пока только на английском: переводы защищены авторским правом.', cov_help: 'Список растёт благодаря читателям. Знаете бесплатный легальный текст, перевод или аудиозапись лауреата? Напишите нам: анонимно, без аккаунта. Тем, кто ищет, и ИИ-агентам поможет инструкция по поиску.', cov_brief: 'Инструкция по поиску', own_note: 'Заметка или название (необязательно)', file_note: 'Название или заметка (необязательно)', file_note_ph: 'например, русский перевод, EPUB от издателя', file_rename: 'Название', file_note_saved: 'Сохранено', own_note_ph: 'например, польский перевод, Nowa Fantastyka 2019', own_update: 'Сохранить изменения', own_link_bad: 'Введите адрес страницы, начиная с https://',
     own_file: 'Файл для чтения офлайн', own_file_hint: 'TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX или ODT. Файл хранится только на этом устройстве.', doc_no: 'Это старый файл Word (.doc). Сохраните его как DOCX или TXT и добавьте снова.', rtf_no: 'RTF здесь не открывается. Сохраните файл как DOCX или TXT и добавьте снова.', file_unknown: 'Этот файл — не текст, который знает читалка. Открываются TXT, HTML, EPUB, FB2, DOCX и ODT.', choose_file: 'Добавить файл',
     sec_more: 'Издания, переводы, библиография', isfdb_t: 'ISFDB: издания и переводы', fantlab_t: 'FantLab: русские переводы', wikidata_t: 'Wikidata',
-    title_pl: 'Польское название', title_ru: 'Русское название', title_es: 'Испанское название', lang_h: 'Язык',
+    title_orig: 'Оригинальное название', lang_h: 'Язык',
     suggest: 'Предложить в каталог', report: 'Пожаловаться на ссылку',
     author_awards: 'Премии', author_works_n: 'Произведений-лауреатов: {n}', bio_none: 'Статьи в Википедии пока нет.', bio_fallback: 'Статьи на русском пока нет.', bio_fallback_en: 'Статьи на русском пока нет. Ниже английская версия.', bio_src: 'Текст: Википедия, CC BY-SA 4.0', wiki_link: 'Википедия', isfdb_a: 'Библиография ISFDB', fantlab_a: 'FantLab',
     col_year: 'Год', col_award: 'Премия', col_cat: 'Категория', col_work: 'Произведение', col_text: 'Текст',
@@ -1059,7 +1064,7 @@ const I18N = {
     news_more: "y {n} más: mostrar solo lo nuevo", ex_note: "Un fragmento o vista previa gratuitos que permite la editorial, normalmente los primeros capítulos. El libro entero no es gratis.", note_collection: "El relato forma parte de una colección: el enlace lleva a la página de descarga gratuita del libro entero (Creative Commons).", eleven: "Escuchar en ElevenReader", ed_title: "Escuchar en ElevenReader", ed_copied: "Se copió el enlace al texto.", ed_copy_fail: "Copia el enlace: mantenlo pulsado y elige Copiar.", ed_copy_again: "Copiar otra vez", ed_step2: "Después se abre la ventana de importación de ElevenReader. Pega el enlace en «Paste text or URLs» y pulsa Upload.", ed_step3: "El texto aparece en tu biblioteca de ElevenReader: pulsa ▶ y escucha.",
     ed_flash: "Si durante un segundo aparece «Failed to process your file», no le hagas caso: justo después se abre la ventana de importación.", ed_account: "Hace falta una cuenta de ElevenReader; el plan gratuito incluye 10 horas de escucha al mes.", ed_open: "Abrir ElevenReader", eleven_open: "Abrir ElevenReader", eleven_file_web: "Guardar como .html", share_fail: "No se pudo abrir el menú de compartir.", saved_file: "Archivo guardado. Ábrelo en ElevenReader con + → Upload file.", save_declined: "Se canceló el guardado.", sec_mine: "Mis materiales", own_link: "Enlace propio", own_link_ph: "Pega la dirección de una página", own_link_saved: "Guardado en este dispositivo", own_edit: "Editar", archived: "archivo", cov_h: "Qué puedes leer hoy", cov_full: "Texto completo", cov_frag: "Fragmento", cov_audio: "Audio", cov_all: "Obras", cov_total: "En total",
     cov_langs: "Fragmentos por idioma: EN {en} · PL {pl} · RU {ru} · ES {es}. Por ahora los textos completos están en inglés: las traducciones tienen derechos de autor.", cov_help: "La lista crece con los lectores. ¿Conoces un texto, una traducción o una lectura en voz alta gratuitos y legales de una obra ganadora? Escríbenos: es anónimo, sin cuenta. Quienes buscan y los agentes de IA pueden usar la guía de búsqueda.", cov_brief: "Guía de búsqueda", own_note: "Nota o título (opcional)", file_note: "Nombre o nota (opcional)", file_note_ph: "p. ej. traducción al español, EPUB de la editorial", file_rename: "Nombre", file_note_saved: "Guardado", own_note_ph: "p. ej. traducción al español, una revista de 2019", own_update: "Guardar cambios", own_link_bad: "Escribe una dirección que empiece por https://", own_file: "Archivo para leer sin conexión",
-    own_file_hint: "TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX u ODT. El archivo se guarda solo en este dispositivo.", doc_no: "Es un archivo antiguo de Word (.doc). Guárdalo como DOCX o TXT y vuelve a añadirlo.", rtf_no: "RTF no se abre aquí. Guárdalo como DOCX o TXT y vuelve a añadirlo.", file_unknown: "Este archivo no es un texto que este lector conozca. Aquí se abren TXT, HTML, EPUB, FB2, DOCX y ODT.", choose_file: "Añadir archivo", sec_more: "Ediciones, traducciones, bibliografía", isfdb_t: "ISFDB: ediciones y traducciones", fantlab_t: "FantLab: traducciones al ruso", wikidata_t: "Wikidata", title_pl: "Título en polaco", title_ru: "Título en ruso", title_es: "Título en español", lang_h: "Idioma", suggest: "Sugerir para el catálogo", report: "Avisar de un enlace", author_awards: "Premios", author_works_n: "{n} obras premiadas", bio_none: "Todavía no hay artículo en Wikipedia.",
+    own_file_hint: "TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX u ODT. El archivo se guarda solo en este dispositivo.", doc_no: "Es un archivo antiguo de Word (.doc). Guárdalo como DOCX o TXT y vuelve a añadirlo.", rtf_no: "RTF no se abre aquí. Guárdalo como DOCX o TXT y vuelve a añadirlo.", file_unknown: "Este archivo no es un texto que este lector conozca. Aquí se abren TXT, HTML, EPUB, FB2, DOCX y ODT.", choose_file: "Añadir archivo", sec_more: "Ediciones, traducciones, bibliografía", isfdb_t: "ISFDB: ediciones y traducciones", fantlab_t: "FantLab: traducciones al ruso", wikidata_t: "Wikidata", title_orig: "Título original", lang_h: "Idioma", suggest: "Sugerir para el catálogo", report: "Avisar de un enlace", author_awards: "Premios", author_works_n: "{n} obras premiadas", bio_none: "Todavía no hay artículo en Wikipedia.",
     bio_fallback: "Todavía no hay artículo en inglés.", bio_fallback_en: "Todavía no hay artículo en este idioma. Abajo, la versión en inglés.", bio_src: "Texto: Wikipedia, CC BY-SA 4.0", wiki_link: "Wikipedia", isfdb_a: "Bibliografía en ISFDB", fantlab_a: "FantLab", col_year: "Año", col_award: "Premio", col_cat: "Categoría", col_work: "Obra", col_text: "Texto", note_rabbit: "El autor rechazó públicamente el Hugo de 2023 por la polémica de la votación.", note_baen: "Baen envía esta página como archivo, así que el navegador descarga un .htm en lugar de mostrarla. Añade abajo el archivo descargado para leerlo aquí, sin conexión.", note_doctorow: "El autor lo publicó con licencia CC BY-NC-SA 1.0: descarga el TXT o el EPUB de su sitio y añádelo abajo para leerlo sin conexión.", aw_h2: "Estructura de premios",
     aw_p: "Todos los ganadores de los Hugo, Nebula y Locus en ficción. Pulsa un año, una categoría o una obra.", v_table: "Tablero", v_list: "Lista", sort_desc: "Más recientes primero", sort_asc: "Más antiguos primero", only_text: "Solo con texto", search_ph: "Título o autor", search_go: "Buscar", search_all: "Encontradas: {n} en todos los premios, años y categorías", search_clear: "Borrar la búsqueda", search_more: "Se muestran las primeras {n}. Añade una palabra para afinar.", search_readable: "Para leer gratis ({n})", search_other: "Otros ganadores, todavía sin texto gratis ({n})", lg_text: "texto gratis", lg_mine: "tu enlace o archivo", lg_star: "★ guardado", lg_new: "nuevo", crumb_all: "Todos los años", year_h: "{y}", cat_hist: "{a} · {c}", prev_year: "Año anterior", next_year: "Año siguiente",
     aw_note: "Los años son los de la ceremonia. SFWA nombra los Nebula por el año de publicación, así que los «Premios Nebula 2024» se entregaron en 2025 y aparecen aquí en 2025.", aw_src: "Datos: Wikidata (CC0), cotejados en parte con sfadb.com; el último año puede ir con retraso. Biografías y descripciones de libros: Wikipedia, CC BY-SA 4.0.", found: "{n} encontradas", nothing_found: "No se encontró nada.", shelf_bm: "Guardados", shelf_bm_works: "Obras", shelf_bm_places: "Lugares en los textos", empty_bm: "Pulsa ☆ en una obra, o el botón de marcador en el lector, para tenerla aquí.", shelf_reading: "Leyendo ahora", shelf_files: "Archivos en este dispositivo", shelf_links: "Mis enlaces", shelf_sugg: "Mis sugerencias y avisos", shelf_data: "Datos en este dispositivo", sy_h: "Sincronizar entre tus dispositivos",
@@ -1113,7 +1118,12 @@ const work = q => WORKS[q];
 const readInfo = q => READ[q] || null;
 const hasText = q => !!(READ[q] && READ[q].links.some(l => l.kind === 'full'));
 const hasAudio = q => !!(READ[q] && READ[q].links.some(l => l.kind === 'audio'));
-const altTitle = w => { const r = READ[w.id]; const o = r && r.alt && r.alt[LANG]; if (o) return o; if (LANG === 'ru' && w.tru) return w.tru; if (LANG === 'pl' && w.tpl) return w.tpl; if (LANG === 'es' && w.tes) return w.tes; return null; };
+// The title in the interface language (a text's own translated title first), else null: then the original is shown.
+const altTitle = w => { const r = READ[w.id]; const o = r && r.alt && r.alt[LANG]; if (o) return o; return (w.titles && w.titles[LANG]) || null; };
+const titleOf = w => altTitle(w) || w.title;
+const origOf = w => { const a = altTitle(w); return a && a !== w.title ? w.title : null; };
+// what a reading record is called: its own name for a file, the work's title in the interface language otherwise
+const recTitle = (p, w) => (w && (!p.title || p.title === w.title)) ? titleOf(w) : p.title;
 const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } };
 const latestYear = w => Math.max(...w.awards.map(a => a[2]));
 
@@ -1655,7 +1665,7 @@ function openListenSheet(q) {
   const m = $('#listen-dialog'); listenFrom = document.activeElement;
   m.innerHTML = `<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ls-title">
     <h3 id="ls-title">${esc(t('ls_title'))}</h3>
-    ${w ? `<p class="small">${esc(w.title)} · ${esc(fmtDur(minutesOf(q)))}</p>` : ''}
+    ${w ? `<p class="small">${esc(titleOf(w))} · ${esc(fmtDur(minutesOf(q)))}</p>` : ''}
     <div class="lopts">${o.map(x => `<button class="lopt" data-lgo="${x.id}" data-wid="${q}" aria-current="${x.id === c.id}"><span class="lo-n">${esc(x.name)}${x.id === 'pod' ? ' ↗' : ''}</span><span class="lo-s">${esc(x.sub)}</span>${x.id === c.id ? '<span class="lo-c" aria-hidden="true">✓</span>' : ''}</button>`).join('')}</div>
     <label class="check"><input type="checkbox" id="ls-remember" checked> ${esc(t('ls_remember'))}</label>
     <div class="modal-actions"><button class="btn btn-ghost" data-lclose="1">${esc(t('cancel'))}</button></div>
@@ -1683,7 +1693,7 @@ function renderNews() {
     if (i.type === 'change') { const ys = [Math.min(...AWARDS.map(a => YEARS[a][0])), Math.max(...AWARDS.map(a => YEARS[a][1]))]; return `<li><span class="what">${esc(t('flag_new'))}</span><span>${esc(t(i.key, { n: fmtNum(DATA.aw.length), from: ys[0], to: ys[1] }))}</span><button class="linkbtn" data-view="awards">${esc(t('chg_open'))}</button></li>`; }
     const w = work(i.q);
     const what = i.type === 'work' ? t('news_work') : t(i.kind === 'audio' ? 'news_link_audio' : 'news_link_full');
-    return `<li><span class="what">${esc(what)}</span><button class="linkbtn" data-work="${w.id}">${esc(w.title)}</button><span class="small">${esc(authorsLine(w))} · ${w.awards.map(a => awardName(a[0]) + ' ' + a[2]).join(', ')}</span></li>`;
+    return `<li><span class="what">${esc(what)}</span><button class="linkbtn" data-work="${w.id}">${esc(titleOf(w))}</button><span class="small">${esc(authorsLine(w))} · ${w.awards.map(a => awardName(a[0]) + ' ' + a[2]).join(', ')}</span></li>`;
   }).join('');
   const moreLi = more ? `<li><button class="linkbtn" data-fresh="1">${esc(t('news_more', { n: more }))}</button></li>` : '';
   return `<section class="news" aria-label="${esc(head)}"><h3>${esc(head)}</h3><ul>${li}${moreLi}</ul>${nWorks ? `<div class="row"><button class="chip" data-fresh="1" aria-pressed="${filter.fresh}">${esc(t('f_new'))}</button><button class="btn btn-ghost btn-small" id="news-seen">${esc(t('news_seen'))}</button></div>` : `<div class="row"><button class="btn btn-ghost btn-small" id="news-seen">${esc(t('news_seen'))}</button></div>`}</section>`;
@@ -1728,7 +1738,7 @@ function pickList(k) {
 }
 function pickCard(q) {
   const w = work(q); const a = w.awards[0];
-  return `<article class="pick"><button class="pick-open" data-work="${q}">${coverHtml(q, 's')}<span class="pick-txt"><span class="pick-t">${esc(w.title)}</span><span class="pick-a">${esc(authorsLine(w))}</span></span></button><div class="pick-actions">${readCtl(q, 'btn btn-primary')}${listenCtl(q, 'btn btn-icon', true)}</div><button class="pick-done" data-done="${q}" title="${esc(t('done_add_t'))}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>${esc(t('pick_read_it'))}</span></button></article>`;
+  return `<article class="pick"><button class="pick-open" data-work="${q}">${coverHtml(q, 's')}<span class="pick-txt"><span class="pick-t">${esc(titleOf(w))}</span><span class="pick-a">${esc(authorsLine(w))}</span></span></button><div class="pick-actions">${readCtl(q, 'btn btn-primary')}${listenCtl(q, 'btn btn-icon', true)}</div><button class="pick-done" data-done="${q}" title="${esc(t('done_add_t'))}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>${esc(t('pick_read_it'))}</span></button></article>`;
 }
 function renderHome() {
   const v = $('#view-catalog');
@@ -1756,13 +1766,13 @@ function renderLibrary(onlyBody) {
 }
 // the language of the text and of the reading, dimmed when the reader does not know it
 function langChips(q) { const w = workLangs(q), m = myLangs(); const ls = [...new Set([...w.full, ...w.audio])]; return ls.map(l => `<span class="flag flag-lang${m.includes(l) ? '' : ' far'}" title="${esc(langName(l))}">${esc(l.toUpperCase())}</span>`).join(''); }
-function slipHtml(w) { const r = READ[w.id]; const alt = altTitle(w); return `
+function slipHtml(w) { const r = READ[w.id]; const orig = origOf(w); return `
       <article class="slip${isDone(w.id) ? ' is-done' : ''}">
         ${starBtn(w.id)}
         <div class="slip-row">${coverHtml(w.id, 's')}<div class="slip-body">
         <div class="awards">${awardChips(w, false)}</div>
-        <button class="slip-open" data-work="${w.id}"><h3>${esc(w.title)}</h3></button>
-        ${alt ? `<div class="alt">${esc(alt)}</div>` : ''}
+        <button class="slip-open" data-work="${w.id}"><h3>${esc(titleOf(w))}</h3></button>
+        ${orig ? `<div class="alt" lang="en">${esc(orig)}</div>` : ''}
         <p class="byline">${esc(authorsLine(w))} · ${esc(r.pub)} · ${w.pub || ''}</p>
         <p class="slip-time">${esc(fmtDur(minutesOf(w.id)))}</p></div></div>
         <div class="flags">${langChips(w.id)}<span class="tier tier-${r.tier}">${esc(t('tier_' + r.tier))}</span>${hasAudio(w.id) ? `<span class="flag">${esc(t('f_audio'))}</span>` : ''}${workFlags(w)}</div>
@@ -1808,7 +1818,7 @@ function searchIndex() {
   const langs = Object.keys(I18N);
   SIDX = Object.values(WORKS).map(w => {
     const r = READ[w.id];
-    const title = ' ' + fold([w.title, w.tpl, w.tru, w.tes, r && r.alt ? Object.values(r.alt).join(' ') : ''].join(' ')) + ' ';
+    const title = ' ' + fold([w.title, ...Object.values(w.titles), r && r.alt ? Object.values(r.alt).join(' ') : ''].join(' ')) + ' ';
     const by = ' ' + fold(w.authors.flatMap(a => AUTHORS[a] ? Object.values(AUTHORS[a].name) : []).join(' ')) + ' ';
     const meta = ' ' + fold([...new Set(w.awards.flatMap(([a, c, y]) => [y, ...langs.flatMap(l => [I18N[l]['aw_' + a], I18N[l]['cat_' + c]])]))].join(' ') + ' ' + (r ? r.pub + ' ' + r.links.map(l => l.site).join(' ') : '') + ' ' + (w.pub || '')) + ' ';
     const about = ' ' + fold(w.about ? Object.values(w.about).filter(Boolean).join(' ') : '') + ' ';
@@ -1848,21 +1858,21 @@ function marksHtml(q) {
 function yearRow(y, q, showYear, dec, tag) {
   const w = work(q);
   const dn = isDone(q);
-  return `<div class="yrow${dn ? ' is-done' : ''}"${dec ? ` data-dec="${dec}"` : ''}>${showYear ? `<button class="yr" data-av-year="${y}" aria-label="${y}">${y}</button>` : '<span class="yr"></span>'}<button class="yw" data-work="${q}">${tag ? `<span class="wmeta">${esc(tag)}</span>` : ''}<span class="yt">${esc(w.title)}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}${altTitle(w) ? ' · ' + esc(altTitle(w)) : ''}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
+  return `<div class="yrow${dn ? ' is-done' : ''}"${dec ? ` data-dec="${dec}"` : ''}>${showYear ? `<button class="yr" data-av-year="${y}" aria-label="${y}">${y}</button>` : '<span class="yr"></span>'}<button class="yw" data-work="${q}">${tag ? `<span class="wmeta">${esc(tag)}</span>` : ''}<span class="yt">${esc(titleOf(w))}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}${origOf(w) ? ' · ' + esc(origOf(w)) : ''}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
 }
 const doneTag = () => `<b class="dtag">✓ ${esc(t('done_mark'))}</b> · `;
 function workRow(meta, q) {
   const w = work(q); const dn = isDone(q);
-  return `<div class="wrow${dn ? ' is-done' : ''}"><button class="wbtn" data-work="${q}"><span class="wmeta">${esc(meta)}</span><span class="yt">${esc(w.title)}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
+  return `<div class="wrow${dn ? ' is-done' : ''}"><button class="wbtn" data-work="${q}"><span class="wmeta">${esc(meta)}</span><span class="yt">${esc(titleOf(w))}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
 }
 function cellHtml(q) {
   const w = work(q); const cls = ['cell']; if (hasText(q)) cls.push('has-text'); if (isMine(q)) cls.push('mine'); if (isDone(q)) cls.push('is-done');
-  return `<button class="${cls.join(' ')}" data-work="${q}"><span class="ct">${esc(w.title)}</span><span class="ca">${isDone(q) ? doneTag() : ''}${esc(authorsLine(w))}</span><span class="cm">${marksHtml(q)}</span></button>`;
+  return `<button class="${cls.join(' ')}" data-work="${q}"><span class="ct">${esc(titleOf(w))}</span><span class="ca">${isDone(q) ? doneTag() : ''}${esc(authorsLine(w))}</span><span class="cm">${marksHtml(q)}</span></button>`;
 }
 const passText = q => !AV.onlyText || hasText(q) || isMine(q);
 function matchQ(q) {
   if (!AV.q) return true; const s = AV.q.toLowerCase(); const w = work(q);
-  return [w.title, w.tpl, w.tru, w.tes, ...w.authors.flatMap(a => Object.values(AUTHORS[a].name))].some(x => x && x.toLowerCase().includes(s));
+  return [w.title, ...Object.values(w.titles), ...w.authors.flatMap(a => Object.values(AUTHORS[a].name))].some(x => x && x.toLowerCase().includes(s));
 }
 const decadeOf = y => Math.floor(y / 10) * 10;
 function decadeChips(years) {
@@ -1957,17 +1967,17 @@ async function renderShelf() {
   let est = null; try { est = await navigator.storage?.estimate?.(); } catch (e) {}
   v.innerHTML = `
     <section class="panel" id="shelf-reading"><h4>${esc(t('shelf_reading'))}</h4>
-      ${reading.length ? reading.map(p => { const ln = lastNote(p.id); const sn = ln ? '✎ ' + ln.note : p.text || p.snippet ? '«' + (p.text || p.snippet).slice(0, 100) + '…»' : ''; return `<div class="file-row"><div><strong>${esc(p.title)}</strong><span class="small">${esc([p.byline, p.ext ? extWhere(p) : p.pct + '%', relTime(p.at)].filter(Boolean).join(' · '))}</span>${sn ? `<span class="snip">${esc(sn)}</span>` : ''}</div><div class="row"><button class="btn btn-small" data-rcopen="${esc(p.id)}">${esc(t('rc_recall'))}</button>${canResume(p.id) ? `<button class="btn btn-small" data-rcgo="${esc(p.id)}">${esc(t('read'))}</button>` : p.ext && p.via !== 'eleven' ? `<a class="btn btn-small" href="${esc(p.sourceUrl)}" target="_blank" rel="noopener" data-track="${esc(p.workId)}" data-via="${esc(p.via)}" data-site="${esc(p.source)}">${esc(p.source)} ↗</a>` : ''}${p.workId && WORKS[p.workId] ? `<button class="btn btn-ghost btn-small" data-done="${esc(p.workId)}" title="${esc(t('done_add_t'))}">✓ ${esc(t('rc_done_short'))}</button>` : ''}<button class="btn btn-ghost btn-small" data-rcdrop="${esc(p.id)}" title="${esc(t('rc_drop_t'))}">${esc(t('rc_drop'))}</button></div></div>`; }).join('') : `<p class="empty">${esc(t('empty_reading'))}</p>`}
+      ${reading.length ? reading.map(p => { const ln = lastNote(p.id); const sn = ln ? '✎ ' + ln.note : p.text || p.snippet ? '«' + (p.text || p.snippet).slice(0, 100) + '…»' : ''; return `<div class="file-row"><div><strong>${esc(recTitle(p, work(p.workId)))}</strong><span class="small">${esc([p.byline, p.ext ? extWhere(p) : p.pct + '%', relTime(p.at)].filter(Boolean).join(' · '))}</span>${sn ? `<span class="snip">${esc(sn)}</span>` : ''}</div><div class="row"><button class="btn btn-small" data-rcopen="${esc(p.id)}">${esc(t('rc_recall'))}</button>${canResume(p.id) ? `<button class="btn btn-small" data-rcgo="${esc(p.id)}">${esc(t('read'))}</button>` : p.ext && p.via !== 'eleven' ? `<a class="btn btn-small" href="${esc(p.sourceUrl)}" target="_blank" rel="noopener" data-track="${esc(p.workId)}" data-via="${esc(p.via)}" data-site="${esc(p.source)}">${esc(p.source)} ↗</a>` : ''}${p.workId && WORKS[p.workId] ? `<button class="btn btn-ghost btn-small" data-done="${esc(p.workId)}" title="${esc(t('done_add_t'))}">✓ ${esc(t('rc_done_short'))}</button>` : ''}<button class="btn btn-ghost btn-small" data-rcdrop="${esc(p.id)}" title="${esc(t('rc_drop_t'))}">${esc(t('rc_drop'))}</button></div></div>`; }).join('') : `<p class="empty">${esc(t('empty_reading'))}</p>`}
       ${reading.length > 1 ? `<div class="row"><button class="btn btn-ghost btn-small btn-danger" id="reading-clear">${esc(t('rc_clear'))}</button></div>` : ''}
       <label class="check"><input type="checkbox" id="set-asknote"${prefs.askNote !== false ? ' checked' : ''}> ${esc(t('set_ask'))}</label>
     </section>
     <section class="panel" id="shelf-bm"><h4>${esc(t('shelf_bm'))}</h4>
       ${bmWorks.length || bmPlaces.length ? '' : `<p class="empty">${esc(t('empty_bm'))}</p>`}
-      ${bmWorks.length ? `<span class="small">${esc(t('shelf_bm_works'))}</span>` + bmWorks.map(b => { const w = work(b.workId); return `<div class="file-row"><div><strong>${esc(w.title)}</strong><span class="small">${esc(authorsLine(w))} · ${w.awards.map(a => awardName(a[0]) + ' ' + a[2]).join(', ')}</span></div><div class="row"><button class="btn btn-small" data-work="${w.id}">${esc(t('open'))}</button>${starBtn(w.id)}</div></div>`; }).join('') : ''}
+      ${bmWorks.length ? `<span class="small">${esc(t('shelf_bm_works'))}</span>` + bmWorks.map(b => { const w = work(b.workId); return `<div class="file-row"><div><strong>${esc(titleOf(w))}</strong><span class="small">${esc(authorsLine(w))} · ${w.awards.map(a => awardName(a[0]) + ' ' + a[2]).join(', ')}</span></div><div class="row"><button class="btn btn-small" data-work="${w.id}">${esc(t('open'))}</button>${starBtn(w.id)}</div></div>`; }).join('') : ''}
       ${bmPlaces.length ? `<span class="small">${esc(t('shelf_bm_places'))}</span>` + bmPlaces.map(b => `<div class="file-row"><div><strong>${esc(b.title)} · ${b.pct}%</strong><span class="snip">«${esc(b.snippet)}…»</span></div><div class="row"><button class="btn btn-small" data-gobm="${esc(b.id)}">${esc(t('read'))}</button><button class="btn btn-ghost btn-small btn-danger" data-delbm="${esc(b.id)}">${esc(t('del'))}</button></div></div>`).join('') : ''}
     </section>
     <section class="panel" id="shelf-done"><h4>${esc(t('shelf_done'))}${done.length ? ` · ${done.length}` : ''}</h4>
-      ${done.length ? done.map(b => { const w = work(b.workId); return `<div class="file-row"><div><strong>${esc(w.title)}</strong><span class="small">${esc(authorsLine(w))} · ${esc(t('done_on_date', { d: fmtDate(b.at) }))}</span></div><div class="row"><button class="btn btn-small" data-work="${w.id}">${esc(t('open'))}</button><button class="btn btn-ghost btn-small" data-done="${w.id}" aria-pressed="true" title="${esc(t('done_del_t'))}">${esc(t('done_del_short'))}</button></div></div>`; }).join('') : `<p class="empty">${esc(t('empty_done'))}</p>`}
+      ${done.length ? done.map(b => { const w = work(b.workId); return `<div class="file-row"><div><strong>${esc(titleOf(w))}</strong><span class="small">${esc(authorsLine(w))} · ${esc(t('done_on_date', { d: fmtDate(b.at) }))}</span></div><div class="row"><button class="btn btn-small" data-work="${w.id}">${esc(t('open'))}</button><button class="btn btn-ghost btn-small" data-done="${w.id}" aria-pressed="true" title="${esc(t('done_del_t'))}">${esc(t('done_del_short'))}</button></div></div>`; }).join('') : `<p class="empty">${esc(t('empty_done'))}</p>`}
     </section>
     <section class="panel" id="shelf-langs"><h4>${esc(t('langs_h'))}</h4>
       <p class="small">${esc(t('langs_note'))}</p>
@@ -1988,7 +1998,7 @@ async function renderShelf() {
       <div class="row"><label class="btn btn-primary" for="shelf-file">${esc(t('choose_file'))}</label><input id="shelf-file" type="file" accept=".txt,.htm,.html,.xhtml,.epub,.fb2,.zip,.docx,.odt" data-note="shelf-file-note" hidden></div>
     </section>
     <section class="panel" id="shelf-links"><h4>${esc(t('shelf_links'))}</h4>
-      ${local.links.length ? local.links.map(l => { const w = work(l.id); return `<div class="file-row"><div><strong>${esc(w ? w.title : l.id)}</strong>${l.note ? `<span class="snip">${esc(l.note)}</span>` : ''}<a class="small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a></div><button class="btn btn-ghost btn-small" data-work="${esc(l.id)}">${esc(t('open'))}</button></div>`; }).join('') : `<p class="empty">${esc(t('empty_links'))}</p>`}
+      ${local.links.length ? local.links.map(l => { const w = work(l.id); return `<div class="file-row"><div><strong>${esc(w ? titleOf(w) : l.id)}</strong>${l.note ? `<span class="snip">${esc(l.note)}</span>` : ''}<a class="small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.url)}</a></div><button class="btn btn-ghost btn-small" data-work="${esc(l.id)}">${esc(t('open'))}</button></div>`; }).join('') : `<p class="empty">${esc(t('empty_links'))}</p>`}
     </section>
     <section class="panel" id="shelf-sugg"><h4>${esc(t('shelf_sugg'))}</h4>
       ${local.suggestions.length ? `<div class="sugg-list">${local.suggestions.slice().sort((a, b) => b.at - a.at).map(suggRow).join('')}</div>
@@ -2069,12 +2079,12 @@ async function openWork(q) {
   const exs = full ? [] : excerptLinks(q);
   const isPdf = u => /\.pdf($|[?#])/i.test(u);
   const el = $('#sheet-work');
-  const altPl = w.tpl, altRu = (r && r.alt && r.alt.ru) || w.tru, altEs = (r && r.alt && r.alt.es) || w.tes;
+  const orig = origOf(w);
   const ab = aboutFor(null, q);
-  el.innerHTML = sheetBar(w.title, starBtn(q)) + `<div class="wrap sheet-body">
+  el.innerHTML = sheetBar(titleOf(w), starBtn(q)) + `<div class="wrap sheet-body">
     <div class="work-head">${coverHtml(q, 'm')}<div class="work-head-t"><div class="awards">${awardChips(w, true)}</div>
-    <h2>${esc(w.title)}</h2></div></div>
-    ${[['ru', altRu], ['pl', altPl], ['es', altEs]].filter(x => x[1]).sort((a, b) => (b[0] === LANG) - (a[0] === LANG)).map(([l, v]) => `<div class="alt">${esc(t('title_' + l))}: ${esc(v)}</div>`).join('')}
+    <h2>${esc(titleOf(w))}</h2></div></div>
+    ${orig ? `<div class="alt">${esc(t('title_orig'))}: <span lang="en">${esc(orig)}</span></div>` : ''}
     <div class="row">${w.authors.map(a => `<button class="btn btn-small" data-author="${a}">${esc(authorName(a))}</button>`).join('')}<span class="small">${esc(r ? r.pub + ' · ' : '')}${w.pub || ''}${pagesOf(q) ? ' · ' + esc(t('pages', { n: pagesOf(q) })) : ''} · ${esc(fmtDur(minutesOf(q)))}</span></div>
     <div class="flags"><span class="tier tier-${tierOf(q)}">${esc(t('tier_' + tierOf(q)))}</span>${r && r.license ? `<span class="flag">${esc(r.license)}</span>` : ''}${workFlags(w)}</div>
     <div class="row">${doneBtn(q, 'btn btn-small')}${isDone(q) ? `<span class="small">${esc(t('done_on_date', { d: fmtDate(doneAt(q)) }))}</span>` : ''}</div>
@@ -2124,7 +2134,7 @@ function openGbViewer(ident, id, lang, wid) {
   const w = work(wid); const el = $('#sheet-gb');
   const msg = esc(t('gb_none'));
   const doc = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body,#v{margin:0;width:100%;height:100%;font:15px/1.4 system-ui,sans-serif}p{padding:16px}</style><script src="https://www.google.com/books/jsapi.js"><\/script><script>google.books.load({language:${JSON.stringify(LANG)}});google.books.setOnLoadCallback(function(){var v=document.getElementById('v');v.style.width=innerWidth+'px';v.style.height=innerHeight+'px';var g=new google.books.DefaultViewer(v);g.load(${JSON.stringify(ident)},function(){v.innerHTML='<p>${msg}</p>'});addEventListener('resize',function(){v.style.width=innerWidth+'px';v.style.height=innerHeight+'px';g.resize()})});<\/script></head><body><div id="v"></div></body></html>`;
-  el.innerHTML = sheetBar(w ? w.title : 'Google Books', `<a class="btn btn-ghost btn-small" href="${esc(gbUrl(id))}" target="_blank" rel="noopener">Google Books ↗</a>`) + `<iframe class="gb-frame" title="${esc(t('ex_preview', { l: lang.toUpperCase(), site: 'Google Books' }))}" srcdoc="${esc(doc)}"></iframe>`;
+  el.innerHTML = sheetBar(w ? titleOf(w) : 'Google Books', `<a class="btn btn-ghost btn-small" href="${esc(gbUrl(id))}" target="_blank" rel="noopener">Google Books ↗</a>`) + `<iframe class="gb-frame" title="${esc(t('ex_preview', { l: lang.toUpperCase(), site: 'Google Books' }))}" srcdoc="${esc(doc)}"></iframe>`;
   el.hidden = false;
 }
 
@@ -2207,7 +2217,7 @@ function openForm(kind, wid) {
   const w = work(wid); const el = $('#sheet-form'); const inbox = INBOX_NPUB && syncAvailable();
   el.innerHTML = sheetBar(t('fb_title')) + `<div class="wrap sheet-body">
     <h2>${esc(t('fb_title'))}</h2>
-    ${w ? `<p class="small">${esc(w.title)} · ${esc(authorsLine(w))}</p>` : ''}
+    ${w ? `<p class="small">${esc(titleOf(w))} · ${esc(authorsLine(w))}</p>` : ''}
     <form id="sg-form" class="panel">
       <div class="field"><label for="sg-comment">${esc(t('fb_label'))}</label><textarea id="sg-comment" rows="5" required placeholder="${esc(t('fb_ph'))}"></textarea></div>
       <div class="row"><button class="btn btn-primary" type="submit">${esc(t('fb_send'))}</button></div>
@@ -2259,7 +2269,7 @@ function openElevenDialog(url, wid, copied) {
   const w = work(wid); const m = $('#eleven-dialog');
   m.innerHTML = `<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ed-title">
     <h3 id="ed-title">${esc(t('ed_title'))}</h3>
-    ${w ? `<p class="small">${esc(w.title)} · ${esc(authorsLine(w))}</p>` : ''}
+    ${w ? `<p class="small">${esc(titleOf(w))} · ${esc(authorsLine(w))}</p>` : ''}
     <ol class="steps">
       <li class="${copied ? 'done' : ''}"><div>${esc(copied ? t('ed_copied') : t('ed_copy_fail'))}<span class="copybox">${esc(url)}</span><button class="btn btn-small" data-edcopy="${esc(url)}">${esc(t('ed_copy_again'))}</button></div></li>
       <li><div>${esc(t('ed_step2'))}</div></li>
@@ -2430,14 +2440,14 @@ function recallHome() {
   return `<section class="recall" aria-labelledby="rc-h">
     <button class="rc-hide" data-rchide="${esc(p.id)}" aria-label="${esc(t('rc_hide'))}" title="${esc(t('rc_hide'))}">×</button>
     <p class="kicker" id="rc-h">${esc(t('rc_kicker'))} · ${esc(relTime(p.at))}</p>
-    <h3>${w ? `<button data-work="${w.id}">${esc(p.title)}</button>` : esc(p.title)}</h3>
+    <h3>${w ? `<button data-work="${w.id}">${esc(recTitle(p, w))}</button>` : esc(p.title)}</h3>
     ${by ? `<p class="small">${esc(by)}</p>` : ''}
     ${recallCore(p)}
     ${noteForm(p)}
     <div class="rc-actions">${continueCtl(p)}${noteBtn(p)}${p.workId && WORKS[p.workId] ? doneBtn(p.workId, 'btn btn-ghost') : ''}</div>
     ${!canResume(p.id) && p.id.startsWith('url:') ? `<p class="note">${esc(t('rc_orig_hint'))}</p>` : ''}
     ${recallMore(p, { id: 'home' })}
-    ${others.length ? `<div class="rc-others"><span class="small">${esc(t('rc_others'))}</span><div class="scroller">${others.map(o => `<button class="chip" data-rcpick="${esc(o.id)}">${esc(o.title)} · ${o.ext ? '↗' : o.pct + '%'}</button>`).join('')}</div></div>` : ''}
+    ${others.length ? `<div class="rc-others"><span class="small">${esc(t('rc_others'))}</span><div class="scroller">${others.map(o => `<button class="chip" data-rcpick="${esc(o.id)}">${esc(recTitle(o, work(o.workId)))} · ${o.ext ? '↗' : o.pct + '%'}</button>`).join('')}</div></div>` : ''}
   </section>`;
 }
 function workRecall(q) {
@@ -2559,7 +2569,7 @@ function endHtml() {
   const e = endInfo(); if (!e) return '';
   const w = work(e.q);
   if (isDone(e.q)) return `<section class="rdone" id="rdone"><p class="rdone-k">${esc(t('end_k'))}</p><p>✓ ${esc(t('end_already', { d: fmtDate(doneAt(e.q)) }))}</p><div class="row"><button class="rbtn" id="r-end-close">${esc(t('end_close'))}</button></div></section>`;
-  return `<section class="rdone" id="rdone"><p class="rdone-k">${esc(t('end_k'))}</p><p>${esc(t('end_q', { t: w.title }))}</p><div class="row"><button class="rbtn rdone-yes" id="r-done">${esc(t('end_yes'))}</button></div></section>`;
+  return `<section class="rdone" id="rdone"><p class="rdone-k">${esc(t('end_k'))}</p><p>${esc(t('end_q', { t: titleOf(w) }))}</p><div class="row"><button class="rbtn rdone-yes" id="r-done">${esc(t('end_yes'))}</button></div></section>`;
 }
 function redrawEnd() { const el = $('#rdone'); if (el) el.outerHTML = endHtml(); }
 async function openReader({ key, title, byline, html, source, sourceUrl, workId, jumpTo }) {

@@ -91,7 +91,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // one search over everything: any category, titles and authors in any language, year, magazine, topic
   click($('#view-awards [data-av-mode="cats"]')); await sleep(30);
   const aq = $('#av-q'); aq.value = 'ле гуин'; aq.closest('form').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true })); await sleep(80);
-  checks['search: Awards searches every category, by a Russian author name, with a button'] = !!$('#view-awards form[data-sform] button[type="submit"]') && +$('#view-awards .count-line').textContent.match(/\d+/)[0] >= 8 && /Left Hand of Darkness/.test($('#view-awards').textContent) && /Dispossessed/.test($('#view-awards').textContent);
+  checks['search: Awards searches every category, by a Russian author name, with a button'] = !!$('#view-awards form[data-sform] button[type="submit"]') && +$('#view-awards .count-line').textContent.match(/\d+/)[0] >= 8 && /Левая рука тьмы/.test($('#view-awards').textContent) && /Обделённые|Dispossessed/.test($('#view-awards').textContent);
   checks['search: the box stays while results change'] = $('#av-q') === aq && aq.value === 'ле гуин';
   click($('#view-awards [data-sclear]')); await sleep(60);
   checks['search: clear brings the board back'] = $('#av-q').value === '' && !!$('#view-awards [data-av-cat]');
@@ -129,7 +129,8 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const dune = Object.values(w.eval('WORKS')).find(x => x.title === 'Dune');
   w.eval(`openWork('${dune.id}')`); await sleep(50);
   checks['dune card: excerpt note instead of full text + own link'] = /Бесплатный фрагмент или предпросмотр/.test($('#sheet-work').textContent) && !/Бесплатного легального текста/.test($('#sheet-work').textContent) && !!$('#own-link');
-  checks['dune ru title from Wikidata'] = /Русское название/.test($('#sheet-work').textContent);
+  checks['titles: no Wikipedia notes such as (рассказ Ле Гуин) in a title'] = w.eval("WORKS.Q21404517.titles.ru") === 'Сур' && w.eval("bareTitle('Kamienne niebo (powieść N.K. Jemisin)')") === 'Kamienne niebo' && w.eval("bareTitle('Rok 1984 (wydanie II)')") === 'Rok 1984 (wydanie II)';
+  checks['titles: the work is called by its Russian title, the original underneath'] = $('#sheet-work h2').textContent === 'Дюна' && $('#sheet-work .alt').textContent === 'Оригинальное название: Dune';
   // own link with a note
   $('#own-link').value = 'https://example.org/dune-pl'; $('#own-note').value = 'Polski przekład, test';
   click($('#own-link-save')); await sleep(80);
@@ -541,7 +542,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['feedback: the page ships with the project’s public inbox key (an npub, never a secret)'] = /^npub1[02-9ac-hj-np-z]{58}$/.test(w.eval('INBOX_NPUB'));
   w.eval("INBOX_NPUB = 'npub1test'");
   w.eval("openForm('feedback', 'Q2008211')"); await sleep(60);
-  checks['feedback: one field and one button'] = $$('#sg-form textarea').length === 1 && $$('#sg-form input, #sg-form select').length === 0 && $$('#sg-form button').length === 1 && /Left Hand of Darkness/.test($('#sheet-form').textContent);
+  checks['feedback: one field and one button'] = $$('#sg-form textarea').length === 1 && $$('#sg-form input, #sg-form select').length === 0 && $$('#sg-form button').length === 1 && /Левая рука тьмы/.test($('#sheet-form').textContent);
   const nRelay = w.__relay.length;
   $('#sg-comment').value = 'Full text: https://example.org/left-hand'; $('#sg-form').dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true })); await sleep(300);
   const pm = w.__relay[w.__relay.length - 1], pmText = Buffer.from(pm.content.slice(7), 'base64').toString();
@@ -639,11 +640,22 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // languages
 
 
+  w.eval("openWork('Q27903111')"); await sleep(60);
+  checks['titles: in Russian, a work with no Russian title shows the original only, never another language'] = $('#sheet-work h2').textContent === 'The Paper Menagerie' && !$('#sheet-work .alt') && !/El zoo de papel|Испанск/.test($('#sheet-work').textContent);
+  w.eval('closeSheets()');
+  const qRu = w.eval("Object.keys(READ).find(q => WORKS[q] && WORKS[q].titles.ru && WORKS[q].titles.ru !== WORKS[q].title)");
+  click($('#tab-library')); await sleep(80);
+  const lq2 = $('#lib-q'); lq2.value = w.eval(`WORKS['${qRu}'].titles.ru`); lq2.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(250);
+  const slipRu = $(`#view-library .slip-open[data-work="${qRu}"]`);
+  checks['titles: the catalog card shows the Russian title, the original underneath'] = !!slipRu && slipRu.textContent.trim() === w.eval(`WORKS['${qRu}'].titles.ru`) && slipRu.closest('.slip').querySelector('.alt').textContent === w.eval(`WORKS['${qRu}'].title`);
+  lq2.value = ''; lq2.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(150);
   click($('#lang-es')); await sleep(80);
   checks['es: the interface switches to Spanish'] = $('#tab-catalog').textContent.trim() === 'Leer' && $('#tab-library').textContent.trim() === 'Catálogo' && $('#tab-shelf').textContent.trim() === 'Mi estante' && $('#lang-es').getAttribute('aria-pressed') === 'true' && w.document.documentElement.lang === 'es';
   checks['es: same keys and placeholders as English'] = w.eval(`Object.keys(I18N.en).every(k => k in I18N.es && JSON.stringify((JSON.stringify(I18N.en[k]).match(/\\{[\\w:-]+\\}/g) || []).sort()) === JSON.stringify((JSON.stringify(I18N.es[k]).match(/\\{[\\w:-]+\\}/g) || []).sort()))`);
   w.eval("openWork('Q2008211')"); await sleep(60);
-  checks['es: a work shows its Spanish title and what exists in Spanish'] = /^Título en español: La mano izquierda de la oscuridad$/.test($('#sheet-work .alt').textContent) && /ES nada todavía/.test($('#sheet-work .avail').textContent) && /Novela/.test($('#sheet-work').textContent);
+  checks['es: a work is called by its Spanish title, the original underneath, and shows what exists in Spanish'] = $('#sheet-work h2').textContent === 'La mano izquierda de la oscuridad' && $('#sheet-work .alt').textContent === 'Título original: The Left Hand of Darkness' && /ES nada todavía/.test($('#sheet-work .avail').textContent) && /Novela/.test($('#sheet-work').textContent);
+  w.eval("openWork('Q27903111')"); await sleep(60);
+  checks['es: The Paper Menagerie is El zoo de papel in Spanish'] = $('#sheet-work h2').textContent === 'El zoo de papel' && /The Paper Menagerie/.test($('#sheet-work .alt').textContent);
   w.eval('closeSheets()');
   checks['es: coverage counts Spanish fragments'] = /ES 0/.test($('#about-cov').textContent) && /Qué puedes leer hoy/.test($('#about-cov').textContent);
   const sel = $('#lang-sel'); sel.value = 'ru'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(80);

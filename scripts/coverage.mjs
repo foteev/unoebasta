@@ -32,15 +32,18 @@ function availability(q) {
   if (g.s && !a.en) a.en = 'part';
   return a;
 }
-// title_es: the title of a known Spanish translation (ISFDB, Wikidata), empty when none is known
-const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS, 'audio', 'title_es']];
+// title_pl, title_ru, title_es: the title of a known translation (Wikidata works[q][1], [2]; the t_<lang> maps,
+// which merge-found.mjs fills from what the search finds), empty when none is known
+const titleIn = (q, l) => (l === 'pl' && d.works[q][1]) || (l === 'ru' && d.works[q][2]) || (d['t_' + l] || {})[q] || '';
+const TLANGS = LANGS.filter(l => l !== 'en');
+const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS, 'audio', ...TLANGS.map(l => 'title_' + l)]];
 const tally = {};
 for (const w of Object.values(works).sort((a, b) => b.last - a.last)) {
   const raw = d.works[w.q]; if (!raw) continue;
   const a = availability(w.q);
   const authors = raw[3].map(x => (d.authors[x] || [])[0] || x).join('; ');
   const audio = READ[w.q] && READ[w.q].links.some(l => l.kind === 'audio') ? 'yes' : ''; // a free reading by a person (podcast)
-  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none'), audio, (d.t_es || {})[w.q] || '']);
+  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none'), audio, ...TLANGS.map(l => titleIn(w.q, l))]);
   for (const l of LANGS) { const k = `${w.form}|${l}|${a[l] || 'none'}`; tally[k] = (tally[k] || 0) + 1; }
 }
 const csv = rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(',')).join('\n');

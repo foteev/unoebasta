@@ -1,5 +1,6 @@
 // Merges a search result (CSV in the format of claude/search-agent-prompt.md) into the page:
-//   full texts and audio → READ in src/index.html; fragments → ex in data/awards.json.
+//   full texts and audio → READ in src/index.html; fragments → ex in data/awards.json;
+//   the title of a translation (title column of a pl/ru/es/… row) → t_<lang> in data/awards.json, when none is known yet.
 // Usage: node scripts/merge-found.mjs data/found/2026-11-02.csv [--archive]
 //   --archive also takes Wayback snapshots (archive=yes); without it they are listed and skipped.
 // Rows already on the page are skipped, so a file can be merged twice. kind=none rows are only counted.
@@ -36,12 +37,20 @@ const READ = new Function(src.slice(src.indexOf('const READ = {'), src.indexOf('
 const rows = parseCsv(readFileSync(file, 'utf8'));
 const by = {}; for (const r of rows) (by[r.qid] = by[r.qid] || []).push(r);
 
-const lines = [], skipped = [], frag = [], none = [];
+const lines = [], skipped = [], frag = [], none = [], titles = [];
+// a translation's title as the page shows it, without a series note in brackets
+const cleanTitle = s => s.replace(/\s*[([][^()[\]]*[)\]]\s*$/, '').replace(/\s+/g, ' ').trim();
+const knownTitle = (q, l) => (l === 'pl' && data.works[q][1]) || (l === 'ru' && data.works[q][2]) || (data['t_' + l] || {})[q];
 for (const [q, rs] of Object.entries(by)) {
   if (!data.works[q]) { skipped.push(`${q}: not a winner in data/awards.json`); continue; }
   const ok = rs.filter(r => r.kind !== 'none' && r.url && (ARCHIVE || r.archive !== 'yes'));
   for (const r of rs) if (r.archive === 'yes' && !ARCHIVE) skipped.push(`${q} ${r.title}: Wayback snapshot (${r.site}) — run with --archive to take it`);
   if (rs.every(r => r.kind === 'none')) none.push(q);
+  for (const r of ok) {
+    const l = (r.lang || 'en').toLowerCase(), tt = cleanTitle(r.title || '');
+    if (l === 'en' || !/^[a-z]{2,3}$/.test(l) || !tt || tt === data.works[q][0] || knownTitle(q, l)) continue;
+    (data['t_' + l] = data['t_' + l] || {})[q] = tt; titles.push(`${q} ${l}: ${tt}`);
+  }
   // fragments → ex: Reactor keeps its short form (r), every other site goes to o: [{ u, s, l }]
   for (const r of ok.filter(r => r.kind === 'fragment')) {
     const ex = data.ex[q] = data.ex[q] || {}, u = clean(r.url), host = new URL(u).hostname;
@@ -75,5 +84,6 @@ data.ex_at = ADDED.slice(0, 10);
 writeFileSync(dataPath, JSON.stringify(data));
 console.log(`READ: ${lines.length} works added (full text or audio)`);
 console.log(`fragments: ${frag.length} added${frag.length ? ' — ' + frag.join(', ') : ''}`);
+console.log(`titles of translations: ${titles.length} added${titles.length ? ' — ' + titles.join(', ') : ''}`);
 console.log(`searched, nothing found: ${none.length}`);
 if (skipped.length) console.log('skipped:\n  ' + skipped.join('\n  '));

@@ -19,10 +19,10 @@ There are 115 full texts and 53 works with audio. All of them are in English, be
 
 **The worklist.** Download https://raw.githubusercontent.com/foteev/unoebasta/main/data/coverage.csv. It has one row per work:
 
-- columns: `qid, title, authors, form, awards, latest, pages, en, pl, ru, es, audio, title_es`;
+- columns: `qid, title, authors, form, awards, latest, pages, en, pl, ru, es, audio, title_pl, title_ru, title_es`;
 - `audio` is `yes` when a free reading by a person is already on the page;
 - `en`, `pl`, `ru` and `es` are each `full`, `part` or `none`;
-- `title_es` is the title of a known Spanish translation (from ISFDB, Wikidata or Lecturalia); empty means none is known (a translation may still exist);
+- `title_pl`, `title_ru`, `title_es` are the titles of known translations (from Wikidata, ISFDB, Lecturalia and earlier searches); empty means none is known (a translation may still exist);
 - a work is a target for a language when that column is `none`, or when it is `part` and you are looking for a full text.
 
 **Helpers in https://raw.githubusercontent.com/foteev/unoebasta/main/data/awards.json:**
@@ -137,7 +137,7 @@ qid,title,form,lang,kind,site,url,tier,license,words,pub,part,archive,evidence,c
 
 **Fields:**
 - `qid`: Wikidata id from coverage.csv, for example `Q25349436`.
-- `title`: the title as shown at the URL, in that language.
+- `title`: the title as shown at the URL, in that language. For a `pl`, `ru` or `es` row this becomes the work's title in that language on the page when none is known yet, so copy it exactly as the edition shows it, without series notes.
 - `form`: `novel` / `novella` / `novelette` / `short story` (copy from coverage.csv).
 - `lang`: `en` / `pl` / `ru` / `es`, the language of the text at the URL.
 - `kind`:
