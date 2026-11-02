@@ -17,9 +17,10 @@
   },
   "scripts": {
     "build": "node scripts/build-web.mjs",
-    "test": "node test/ui.test.js",
+    "test": "node --test test/pipeline.test.mjs && node test/ui.test.js",
     "check:secrets": "node scripts/check-secrets.mjs",
-    "coverage": "node scripts/coverage.mjs"
+    "coverage": "node scripts/coverage.mjs",
+    "search": "node scripts/search.mjs"
   },
   "devDependencies": {
     "jsdom": "24.1.3",

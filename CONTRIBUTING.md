@@ -33,7 +33,7 @@ The direct way, as a pull request:
 
 **Many links at once.** A search result in the CSV format of [the search brief](docs/search-brief.md) goes into `data/found/` and is merged with `node scripts/merge-found.mjs data/found/<file>.csv`: full texts and audio become `READ` entries, fragments go to `ex` in `data/awards.json`, rows already on the page are skipped. Wayback snapshots are skipped unless you add `--archive`. Then `node scripts/coverage.mjs` updates `data/coverage.csv`.
 
-**Many links at once.** A search result in the CSV format of [the search brief](docs/search-brief.md) goes into `data/found/` and is merged with `node scripts/merge-found.mjs data/found/<file>.csv`: full texts and audio become `READ` entries, fragments go to `ex` in `data/awards.json`, rows already on the page are skipped. Wayback snapshots are skipped unless you add `--archive`. Then `node scripts/coverage.mjs` updates `data/coverage.csv`.
+**Automated discovery.** See [the search pipeline](docs/search-pipeline.md) for cached, resumable candidate searches and explicit review before CSV export. The importer also adds new links to existing works and handles each language separately.
 
 ## Covers
 
@@ -49,7 +49,7 @@ All strings are in the `I18N` object in `src/index.html`, with one block per lan
 - **Mobile first.** Design and test at 360–390 px first, then wider screens. Touch targets at least 44 px. Light and dark themes. See [docs/mobile-first-ui.md](docs/mobile-first-ui.md).
 - **One main action per screen.** The page is made for busy readers and readers with ADHD: no streaks, badges, blinking or nagging counters.
 - **Readers’ data is sacred.** Read [docs/data-and-sync.md](docs/data-and-sync.md) before you change anything that is stored. In short: only add fields; renaming or dropping one needs a migration step with a test; never touch the bodies of readers’ files.
-- **Tests.** Add a check in `test/ui.test.js` for what you change. `npm test` must pass.
+- **Tests.** Add a check in `test/ui.test.js` for UI behavior or `test/pipeline.test.mjs` for search/import behavior. `npm test` must pass.
 - **UI changes:** add a screenshot at 360 px to the pull request.
 
 ## Pull requests

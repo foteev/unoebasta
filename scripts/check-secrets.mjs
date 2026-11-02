@@ -6,7 +6,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SKIP_DIRS = new Set(['.git', 'node_modules', 'dist']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', 'dist', '.cache']);
 const TEXT = /\.(html|m?js|json|md|csv|ya?ml|css|txt|py|sh|toml)$|^\.[a-z]+$|^[A-Z]+$/i;
 
 const PATTERNS = [

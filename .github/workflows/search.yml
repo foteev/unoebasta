@@ -1,0 +1,78 @@
+name: Search candidates
+on:
+  workflow_dispatch:
+    inputs:
+      lang:
+        description: Text language
+        type: choice
+        options: [en, pl, ru, es]
+        default: en
+      kind:
+        description: Missing coverage to search
+        type: choice
+        options: [all, full, audio, fragment]
+        default: all
+      limit:
+        description: Maximum works (1–500)
+        default: '50'
+      providers:
+        description: Comma-separated providers
+        default: clarkesworld,escapepod,podcastle,pseudopod,gutenberg,librivox,google
+      qids:
+        description: Optional comma-separated QIDs
+        default: ''
+      retry_searched:
+        description: Include historical kind=none rows
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: search-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache/restore@v4
+        with:
+          path: .cache/search
+          key: search-v1-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            search-v1-${{ github.ref_name }}-
+      - name: Discover candidates
+        id: discover
+        env:
+          SEARCH_LANG: ${{ inputs.lang }}
+          SEARCH_KIND: ${{ inputs.kind }}
+          SEARCH_LIMIT: ${{ inputs.limit }}
+          SEARCH_PROVIDERS: ${{ inputs.providers }}
+          SEARCH_QIDS: ${{ inputs.qids }}
+          SEARCH_RETRY: ${{ inputs.retry_searched }}
+        shell: bash
+        run: |
+          args=(run --lang "$SEARCH_LANG" --kind "$SEARCH_KIND" --limit "$SEARCH_LIMIT" --providers "$SEARCH_PROVIDERS")
+          if [[ -n "$SEARCH_QIDS" ]]; then args+=(--qid "$SEARCH_QIDS"); fi
+          if [[ "$SEARCH_RETRY" == "true" ]]; then args+=(--retry-searched); fi
+          npm run search -- "${args[@]}"
+      - name: Save review queue and checkpoint (no story bodies)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: search-review-${{ github.run_id }}
+          path: .cache/search/state.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Preserve progress for the next run, including partial failures
+        if: always() && hashFiles('.cache/search/state.json') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/search
+          key: search-v1-${{ github.ref_name }}-${{ github.run_id }}
