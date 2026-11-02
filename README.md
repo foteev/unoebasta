@@ -20,7 +20,7 @@ Everyone is welcome, no programming needed for most of it:
 - **Know a free, legal full text of a winner?** [Suggest a text](https://github.com/foteev/unoebasta/issues/new?template=add-text.yml).
 - **A link is broken?** [Report it](https://github.com/foteev/unoebasta/issues/new?template=broken-link.yml).
 - **Something is wrong on your phone?** [Report a bug](https://github.com/foteev/unoebasta/issues/new?template=bug.yml).
-- **Translations** (English, Polish, Russian today), **code** and **design**: see [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Translations** (English, Spanish, Polish, Russian today), **code** and **design**: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Develop
 
@@ -37,7 +37,7 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 
 | Path | What it is |
 |---|---|
-| `src/index.html` | The whole page: markup, styles, script, strings in EN/PL/RU. Free texts are the `READ` table, keyed by Wikidata ID |
+| `src/index.html` | The whole page: markup, styles, script, strings in EN/ES/PL/RU. Free texts are the `READ` table, keyed by Wikidata ID |
 | `data/awards.json` | Prose winners since 1953: awards, works, authors, descriptions |
 | `scripts/build-web.mjs` | Puts the data into the page |
 | `scripts/coverage.mjs` | What exists in each language → `data/coverage.csv` |

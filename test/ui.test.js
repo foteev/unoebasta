@@ -639,6 +639,17 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // languages
 
 
+  click($('#lang-es')); await sleep(80);
+  checks['es: the interface switches to Spanish'] = $('#tab-catalog').textContent.trim() === 'Leer' && $('#tab-library').textContent.trim() === 'Catálogo' && $('#tab-shelf').textContent.trim() === 'Mi estante' && $('#lang-es').getAttribute('aria-pressed') === 'true' && w.document.documentElement.lang === 'es';
+  checks['es: same keys and placeholders as English'] = w.eval(`Object.keys(I18N.en).every(k => k in I18N.es && JSON.stringify((JSON.stringify(I18N.en[k]).match(/\\{[\\w:-]+\\}/g) || []).sort()) === JSON.stringify((JSON.stringify(I18N.es[k]).match(/\\{[\\w:-]+\\}/g) || []).sort()))`);
+  w.eval("openWork('Q2008211')"); await sleep(60);
+  checks['es: a work shows its Spanish title and what exists in Spanish'] = /^Título en español: La mano izquierda de la oscuridad$/.test($('#sheet-work .alt').textContent) && /ES nada todavía/.test($('#sheet-work .avail').textContent) && /Novela/.test($('#sheet-work').textContent);
+  w.eval('closeSheets()');
+  checks['es: coverage counts Spanish fragments'] = /ES 0/.test($('#about-cov').textContent) && /Qué puedes leer hoy/.test($('#about-cov').textContent);
+  const sel = $('#lang-sel'); sel.value = 'ru'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(80);
+  checks['language picker on phones: the native list switches the language'] = $('#tab-catalog').textContent.trim() === 'Читать' && $('#lang-cur').textContent === 'RU' && $('#lang-sel').getAttribute('aria-label') === 'Язык';
+  sel.value = 'es'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(80);
+  checks['es: plural and numbers'] = w.eval("plural(1, t('works')) + ' ' + plural(5, t('works'))") === 'obra obras';
   click($('#lang-pl')); await sleep(80);
   checks['pl strings'] = /Czytaj/.test($('#tab-catalog').textContent);
   checks['no runtime errors'] = errors.length === 0;
