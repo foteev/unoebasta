@@ -175,6 +175,8 @@ Q2008211,The Left Hand of Darkness,novel,ru,none,,,,,,,,,"Not on LitRes; AST sit
 
 ## 5. How to work
 
+For automated candidate discovery, checkpoints and reviewed CSV export, see [the search pipeline](search-pipeline.md). Automated matches still require every manual verification described above.
+
 - Go by the priority order above. Work in batches of about 50 works and deliver each batch as a CSV.
 - Do not guess URLs. Every `url` must be one you opened and checked.
 - When a magazine moved (Tor.com became reactormag.com, for example), report the URL where the story is now.

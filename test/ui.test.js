@@ -39,6 +39,7 @@ const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</bod
 });
 const w = dom.window, $ = s => w.document.querySelector(s), $$ = s => [...w.document.querySelectorAll(s)];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const waitFor = async predicate => { const end = Date.now() + 2000; while (!predicate() && Date.now() < end) await sleep(20); };
 const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 (async () => {
   await sleep(400);
@@ -248,7 +249,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(20);
   const picks = $$('#view-catalog .pick');
   checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && (($('#pk-h').textContent === 'Есть несколько минут?' && $('#pk-h').classList.contains('sr')) || $('#pk-h').textContent === 'Или что-то новое') && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
-  checks['home: a card is only cover, title and author, then Read'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').textContent.trim() === (pk.querySelector('.pick-t').textContent + pk.querySelector('.pick-a').textContent + (pk.querySelector('.cover-t') ? pk.querySelector('.cover-t').textContent : '')).trim() && pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать'));
+  checks['home: a card is only cover, title and author, then Read'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').children.length === 2 && pk.querySelector('.pick-open').firstElementChild.classList.contains('cover') && [...pk.querySelector('.pick-txt').children].map(el => el.className).join(',') === 'pick-t,pick-a' && pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать'));
   checks['home: read and listen side by side'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === 2) && !!$('#view-catalog .pick-more');
   checks['home: listen is a headphones button that still names the source'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l && l.querySelector('svg') && /^Слушать · \S.*$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore'); });
   click($('#view-catalog [data-picklen="eve"]')); await sleep(20);
@@ -352,7 +353,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("renderLibrary()"); await sleep(10);
   click($(`#view-library [data-lsrc="${podWork}"]`)); await sleep(10);
   checks['listen: phone voice offered for a saved file'] = $$('#listen-dialog .lopt').length === 3 && /без интернета/.test($('#listen-dialog [data-lgo="phone"]').textContent);
-  w.__said.length = 0; click($('#listen-dialog [data-lgo="phone"]')); await sleep(150);
+  w.__said.length = 0; click($('#listen-dialog [data-lgo="phone"]')); await waitFor(() => w.__said.some(u => u.onend && /Первый абзац/.test(u.text)));
   checks['listen: phone voice opens the file and speaks'] = !$('#reader').hidden && w.__said.some(u => u.onend && /Первый абзац/.test(u.text)) && w.eval('prefs.listen') === 'phone';
   w.eval('closeReader()'); await sleep(80);
   checks['listen: main button now says Phone voice'] = $(`#view-library [data-lsrc="${podWork}"]`).closest('.lgrp').querySelector('.ls').textContent === 'Голос телефона';
