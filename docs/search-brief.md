@@ -10,10 +10,10 @@ You are helping **unoebasta** (https://foteev.github.io/unoebasta/, code and dat
 |---|---|---|---|---|---|---|---|
 | Novel | 236 | 1 | 43 | 57 | 88 | 1 | 103 |
 | Novella | 131 | 4 | 20 | 6 | 8 | 1 | 101 |
-| Novelette | 142 | 42 | 6 | – | – | 22 | 89 |
-| Short story | 147 | 50 | – | – | – | 23 | 92 |
+| Novelette | 142 | 50 | 6 | – | – | 24 | 81 |
+| Short story | 147 | 60 | 1 | – | – | 27 | 79 |
 
-There are 97 full texts and 47 works with audio. All of them are in English, because translations are under copyright.
+There are 115 full texts and 53 works with audio. All of them are in English, because translations are under copyright.
 
 **The worklist.** Download https://raw.githubusercontent.com/foteev/unoebasta/main/data/coverage.csv. It has one row per work:
 

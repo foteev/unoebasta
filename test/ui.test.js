@@ -223,6 +223,12 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['availability: Cat Pictures Please EN = full text'] = /EN полный текст/.test($('#sheet-work .av-full').textContent);
   w.eval("openWork('Q29994374')"); await sleep(60);
   checks['parts: Silently and Very Fast has part 2'] = !!$('#sheet-work a[href="https://clarkesworldmagazine.com/valente_11_11/"]') && /Часть 2/.test($('#sheet-work').textContent);
+  w.eval("openWork('Q7049279')"); await sleep(60);
+  checks['found batch 3: None So Blind offers the author text and human reading'] = /EN полный текст/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work a[href="https://sites.google.com/site/joehaldemansf/books/short-stories"]') && w.eval("listenOpts('Q7049279').some(x => x.id === 'pod' && /starshipsofano499joehaldeman/.test(x.url))");
+  w.eval("openWork('Q28015722')"); await sleep(60);
+  checks['found batch 3: Rachel in Love labels the archived text and retains audio'] = !!$('#sheet-work a[href^="https://web.archive.org/web/"]') && /архив/.test($('#sheet-work a[href^="https://web.archive.org/web/"]').textContent) && w.eval("READ.Q28015722.links.some(x => x.kind === 'audio' && /ep447-rachel-love/.test(x.url))");
+  w.eval("openWork('Q20737828')"); await sleep(60);
+  checks['found batch 3: Bloodchild is an excerpt with all three pages, not a full text'] = /EN фрагмент/.test($('#sheet-work .avail').textContent) && !$('#sheet-work .av-full') && $$('#sheet-work a[href^="https://www.bookbrowse.com/excerpts/"]').length === 3;
   w.eval('closeSheets()');
   // Google Books: preview opens inside the app (embedded viewer), pages in the card
   const gq = w.eval("Object.keys(WORKS).find(q => WORKS[q].gb && WORKS[q].gb.en && WORKS[q].gb.n && !READ[q] && !(WORKS[q].ex && WORKS[q].ex.r))");
@@ -321,6 +327,11 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("prefs.ttsRate = 1; savePrefs()");
   checks['say: chunker'] = w.eval("sayChunks('One. Two two! Three three three? ' + 'word '.repeat(80), 60).every(c => c.length <= 60)") && w.eval("textLang('Это русский текст')") === 'ru-RU' && w.eval("textLang('Zażółć gęślą jaźń, ąę łńś')") === 'pl-PL';
   w.eval('closeReader()'); await sleep(80);
+  const errorsBeforeClose = errors.length;
+  await w.eval("openReader({ key: 'test:reader-close', title: 'Test', html: '<p>Text</p>', source: 'Test' })");
+  w.eval('closeReader()'); await sleep(50);
+  checks['reader: closing before the next animation frame leaves no runtime error'] = w.eval('R') === null && $('#reader').hidden && errors.length === errorsBeforeClose;
+  await w.eval("Store.del('positions', 'test:reader-close'); loadLocal()");
   // Listen: ▾ chooser, phone voice for a saved file, remembered choice
   w.eval("renderHome()"); await sleep(10);
   const podWork = w.eval("Object.keys(READ).find(q => READ[q].links.some(l => l.kind === 'audio') && fullLink(q))");
