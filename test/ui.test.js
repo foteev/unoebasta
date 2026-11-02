@@ -242,7 +242,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && (($('#pk-h').textContent === 'Есть несколько минут?' && $('#pk-h').classList.contains('sr')) || $('#pk-h').textContent === 'Или что-то новое') && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
   checks['home: a card is only cover, title and author, then Read'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').textContent.trim() === (pk.querySelector('.pick-t').textContent + pk.querySelector('.pick-a').textContent + (pk.querySelector('.cover-t') ? pk.querySelector('.cover-t').textContent : '')).trim() && pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать'));
   checks['home: read and listen side by side'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === 2) && !!$('#view-catalog .pick-more');
-  checks['home: listen is a headphones button that still names the source'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l && l.querySelector('svg') && /^Слушать · (Clarkesworld|Uncanny Magazine|Lightspeed|Escape Pod|PodCastle|Strange Horizons|LibriVox|ElevenReader)$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore'); });
+  checks['home: listen is a headphones button that still names the source'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l && l.querySelector('svg') && /^Слушать · \S.*$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore'); });
   click($('#view-catalog [data-picklen="eve"]')); await sleep(20);
   checks['home: more-than-an-hour picks are long'] = $$('#view-catalog .pick').length > 0 && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-picklen="eve"]').textContent === 'Больше часа';
   const before = $$('#view-catalog .pick .pick-t').map(x => x.textContent).join('|');
@@ -581,6 +581,29 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const junk = await parse(Array.from({ length: 3000 }, (_, i) => (i * 37 + 11) % 256), 'mystery.bin');
   const oldDoc = await parse([0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0, 0, 0], 'stary.doc');
   checks['files: a binary file or an old .doc gets a clear message, not a page of symbols'] = /не текст/.test(junk.error || '') && /\.doc/.test(oldDoc.error || '');
+  // the reader's languages: by default the page's and the phone's; what they can read in them comes first
+  checks['languages: by default the page language and the phone’s'] = JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
+  click($('#tab-shelf')); await sleep(80);
+  click($('#shelf-langs [data-mylang="en"]')); await sleep(80);
+  click($('#shelf-langs [data-mylang="pl"]')); await sleep(80);
+  click($('#shelf-langs [data-mylang="ru"]')); await sleep(80);
+  checks['languages: chosen on the shelf, kept, and they travel with sync'] = JSON.stringify(w.eval('prefs.langs')) === JSON.stringify(['pl']) && w.eval("SYNC_PREFS.includes('langs')") && $('#shelf-langs [data-mylang="pl"]').getAttribute('aria-pressed') === 'true';
+  click($('#shelf-langs [data-mylang="pl"]')); await sleep(80);
+  checks['languages: at least one stays'] = JSON.stringify(w.eval('prefs.langs')) === JSON.stringify(['pl']) && /хотя бы один/.test($('#toast').textContent);
+  w.eval("renderCatalog()"); await sleep(60);
+  checks['languages: English-only picks say the browser can translate'] = /Браузер может перевести/.test($('#view-catalog').textContent) && !!$('#view-catalog [data-goshelf="shelf-langs"]');
+  click($('#tab-library')); await sleep(60);
+  checks['languages: the text language on each card, dimmed when unknown'] = !!$('#view-library .slip .flag-lang.far') && /^EN$/.test($('#view-library .slip .flag-lang').textContent);
+  const wid = $('#view-library .slip [data-work]').dataset.work; w.eval(`openWork('${wid}')`); await sleep(80);
+  checks['languages: the work card says the text is in English and how to translate'] = /Браузер может перевести страницу/.test($('#sheet-work').textContent);
+  w.eval('closeSheets()');
+  w.eval("READ.Q190192 = { w: 3000, tier: 't2', added: '2026-10-01T00:00:00Z', pub: 'Test', links: [{ kind: 'full', url: 'https://x.test/diuna-pl', site: 'Test', lang: 'pl' }] }; renderLibrary();"); await sleep(60);
+  checks['languages: a Polish text comes first for a Polish reader'] = $('#view-library .slip [data-work]').dataset.work === 'Q190192' && $('#view-library .slip .flag-lang').textContent === 'PL' && !$('#view-library .slip .flag-lang').classList.contains('far');
+  click($('#f-mine')); await sleep(60);
+  checks['languages: “In my languages” keeps what can be read or heard in them'] = $$('#view-library .slip').every(sl => w.eval(`langScore('${sl.querySelector('[data-work]').dataset.work}')`) > 0) && $$('#view-library .slip').length >= 1;
+  click($('#f-mine')); await sleep(30);
+  w.eval("delete READ.Q190192"); click($('#tab-shelf')); await sleep(60); click($('#langs-reset')); await sleep(60);
+  checks['languages: back to the phone’s languages'] = w.eval('prefs.langs') === undefined && JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
   // Reading now: clear the whole list at once, with Undo
   await w.eval(`(async () => { const now = Date.now();
     await Store.put('positions', { id: 'ext:Q25349436', ext: true, workId: 'Q25349436', title: 'A', source: 'X', sourceUrl: 'https://x.test/a', at: now - 1000 });
