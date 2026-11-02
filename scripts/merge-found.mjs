@@ -60,7 +60,7 @@ for (const [q, rs] of Object.entries(by)) {
   const main = text[0] || voice[0];
   const words = text.reduce((n, r) => n + (+r.words || 0), 0);
   const baen = text.some(r => /baen\.com/.test(r.url));
-  const link = (r, kind) => `{ kind: '${kind}', url: ${sq(clean(r.url))}, site: ${sq(r.site)}${r.part ? `, part: ${+r.part}` : ''}${kind === 'full' && baen ? ', downloads: true' : ''}${r.lang && r.lang !== 'en' ? `, lang: ${sq(r.lang)}` : ''} }`;
+  const link = (r, kind) => `{ kind: '${kind}', url: ${sq(clean(r.url))}, site: ${sq(r.site.replace(/\s*\(Wayback\)\s*$/i, ''))}${r.archive === 'yes' ? ', archive: true' : ''}${r.part ? `, part: ${+r.part}` : ''}${kind === 'full' && baen ? ', downloads: true' : ''}${r.lang && r.lang !== 'en' ? `, lang: ${sq(r.lang)}` : ''} }`;
   const fields = [words ? `w: ${words}` : null, `tier: ${sq(main.tier && main.tier !== 'frag' ? main.tier : 't2')}`, `added: ${sq(ADDED)}`, `pub: ${sq(main.pub.split(';')[0].trim())}`,
     main.license ? `license: ${sq(main.license)}` : null, baen ? `note: 'note_baen'` : null,
     `links: [${[...text.map(r => link(r, 'full')), ...voice.map(r => link(r, 'audio'))].join(', ')}]`].filter(Boolean);

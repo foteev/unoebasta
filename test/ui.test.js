@@ -133,6 +133,11 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   $('#own-link').value = 'https://example.org/dune-pl'; $('#own-note').value = 'Polski przekład, test';
   click($('#own-link-save')); await sleep(80);
   checks['own link + note saved'] = w.eval("local.links.some(l => l.url === 'https://example.org/dune-pl' && l.note === 'Polski przekład, test')") && /Polski przekład, test/.test($('#sheet-work .saved-link').textContent);
+  checks['own link: saved as a card with a check mark, the form folds away'] = /✓/.test($('#own-card .saved-ok').textContent) && $('#own-form').hidden && !$('#own-card').hidden;
+  click($('#own-link-edit')); await sleep(30);
+  const editing = !$('#own-form').hidden && $('#own-card').hidden && $('#own-link').value === 'https://example.org/dune-pl';
+  click($('#own-link-cancel')); await sleep(30);
+  checks['own link: Edit opens the form, Cancel brings the card back'] = editing && $('#own-form').hidden && !$('#own-card').hidden;
   // offline file with a name: saved via the import path, then renamed
   const rec = await w.eval("saveFile({ title: 'Dune (EPUB)', byline: 'Frank Herbert', html: '<p>Text</p>', format: 'epub', workId: '" + dune.id + "', note: 'Русский перевод' })");
   w.eval(`openWork('${dune.id}')`); await sleep(80);
@@ -517,6 +522,8 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#sy-off')); await sleep(80);
   checks['sync: turning off keeps the data here'] = !w.eval('syncState()') && w.eval("isDone('Q130213759')") && !!$('#sy-on');
   click($('#tab-about')); await sleep(40);
+  const covSum = $('#about-cov .cov-sum td:last-child');
+  checks['about: what you can read today, counted from the data, with a way to help'] = !!covSum && +covSum.textContent.replace(/\D/g, '') === w.eval('Object.keys(WORKS).length') && $$('#about-cov tbody tr').length === 5 && !!$('#about-cov [data-form="feedback"]') && !!$('#about-cov a[href$="docs/search-brief.md"]');
   checks['about: how to sync, in three steps with a link to the shelf'] = $$('#about-sync ol li').length === 3 && !!$('#about-sync [data-goshelf="shelf-sync"]');
   // writing to the project: one comment field and Send; anonymous when the project's inbox key is set
   checks['feedback: the page ships with the project’s public inbox key (an npub, never a secret)'] = /^npub1[02-9ac-hj-np-z]{58}$/.test(w.eval('INBOX_NPUB'));
