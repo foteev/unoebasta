@@ -1,0 +1,59 @@
+name: Check Google Books key
+on:
+  push:
+    branches: [verify-google-books-key-20261102]
+    paths: [.github/workflows/check-google-books-key.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Verify Google Books credentials and quota
+        env:
+          GOOGLE_BOOKS_API_KEY: ${{ secrets.GOOGLE_BOOKS_API_KEY }}
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          import { appendFileSync } from 'node:fs';
+          const key = (process.env.GOOGLE_BOOKS_API_KEY || '').trim();
+          const report = data => {
+            console.log(JSON.stringify(data));
+            appendFileSync(process.env.GITHUB_STEP_SUMMARY, 'Google Books check: ' + JSON.stringify(data) + '\n');
+          };
+          if (!key) { report({ key_present: false }); process.exit(1); }
+          const url = new URL('https://www.googleapis.com/books/v1/volumes');
+          url.search = new URLSearchParams({ q: 'intitle:Dune inauthor:Frank Herbert', maxResults: '1' }).toString();
+          try {
+            const response = await fetch(url, { headers: { 'x-goog-api-key': key }, redirect: 'error', signal: AbortSignal.timeout(30000) });
+            const data = await response.json();
+            const info = data.error?.details?.find(d => d['@type']?.endsWith('ErrorInfo'));
+            const result = { key_present: true, http_status: response.status, api_status: data.error?.status || 'OK',
+              reason: info?.reason || data.error?.errors?.[0]?.reason || '',
+              quota_limit: info?.metadata?.quota_limit_value || '', returned_volumes: data.items?.length || 0 };
+            report(result);
+            if (!response.ok || !Number.isFinite(data.totalItems)) process.exit(1);
+          } catch {
+            report({ key_present: true, request_completed: false }); process.exit(1);
+          }
+          JS
+      - run: npm ci
+      - name: Retry the ten deferred Google Books searches
+        env:
+          GOOGLE_BOOKS_API_KEY: ${{ secrets.GOOGLE_BOOKS_API_KEY }}
+        run: node scripts/search.mjs run --lang en --kind fragment --providers google --limit 50 --retry-searched --qid Q4966150,Q134700900,Q7800850,Q7810658,Q7836111,Q5416574,Q47007737,Q25397805,Q6811186,Q21404517 --state .cache/search/google-key-check.json
+      - name: Save review queue
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: google-books-check
+          path: .cache/search/google-key-check.json
+          if-no-files-found: ignore
+          retention-days: 30
