@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { FOUND_FIELDS, parseCsv, toCsv, validateFound } from '../scripts/lib/csv.mjs';
@@ -93,6 +93,20 @@ test('HTTP 429 honors Retry-After; 404 is not retried; same URL requests coalesc
   await assert.rejects(other.get('https://example.org/missing'), e => e.status === 404); assert.equal(misses, 1);
 });
 
+test('Google key goes only to the Books API header and stays out of cache and errors', async t => {
+  const dir = temp(t), secret = 'mock-google-credential', requests = [];
+  const http = new CachedHttp({ dir, googleBooksApiKey: secret, pause: async () => {}, retries: 0,
+    fetchImpl: async (url, options) => { requests.push({ url, options }); return new Response('reflected ' + secret); } });
+  const result = await http.get('https://www.googleapis.com/books/v1/volumes?q=example');
+  assert.equal(requests[0].options.headers['x-goog-api-key'], secret); assert.equal(requests[0].options.redirect, 'error');
+  assert.equal(requests[0].url.includes(secret), false); assert.equal(JSON.stringify(result).includes(secret), false);
+  for (const f of readdirSync(dir)) assert.equal(readFileSync(join(dir, f), 'utf8').includes(secret), false);
+  await http.get('https://example.org/story'); await http.get('https://www.googleapis.com/other/v1/items');
+  assert.equal(requests[1].options.headers['x-goog-api-key'], undefined); assert.equal(requests[2].options.headers['x-goog-api-key'], undefined);
+  const broken = new CachedHttp({ dir, googleBooksApiKey: secret, retries: 0, pause: async () => {}, fetchImpl: async () => { throw new Error('failure ' + secret); } });
+  await assert.rejects(broken.get('https://www.googleapis.com/books/v1/volumes?q=error'), e => !e.message.includes(secret));
+});
+
 test('exact titles and authors reject homonyms and misleading fuzzy matches', () => {
   assert.equal(titleMatch('Gold', 'Golden'), false); assert.equal(titleMatch('Angel', 'The Angel Pattern'), false);
   assert.equal(titleMatch('L’Été', "L'ete"), true);
@@ -118,9 +132,22 @@ test('only the specific LibriVox empty-result 404 counts as no matches', async (
 
 test('Google Books uses ALL_PAGES and PARTIAL with country, never auto-approves', async () => {
   const item = { id: 'abc-1', volumeInfo: { title: 'Red Planet', authors: ['Robert A. Heinlein'], language: 'en' }, accessInfo: { viewability: 'ALL_PAGES', country: 'US' } };
-  const http = { get: async () => metadata({ totalItems: 2, items: [item, { ...item, id: 'abc-2', accessInfo: { viewability: 'NO_PAGES' } }] }) };
+  const http = { googleBooksConfigured: true, get: async () => metadata({ totalItems: 2, items: [item, { ...item, id: 'abc-2', accessInfo: { viewability: 'NO_PAGES' } }] }) };
   const { candidates } = await PROVIDERS.google.search(work(), 'en', http);
   assert.equal(candidates.length, 1); assert.equal(candidates[0].country, 'US'); assert.equal(candidates[0].proposed_kind, 'fragment');
+});
+
+test('missing Google key is explicit, makes no request, and retries after configuration', async t => {
+  const statePath = join(temp(t), 'state.json'), state = loadState(statePath); let requests = 0;
+  const http = { googleBooksConfigured: false, get: async () => { requests++; return metadata({ totalItems: 0 }); } };
+  const options = { catalog: catalog(), state, statePath, http, providers: ['google'], lang: 'en', kind: 'fragment', now: () => instant };
+  let result = await runSearch(options);
+  assert.equal(result.configuration_required, 1); assert.equal(result.errors, 0); assert.equal(requests, 0);
+  assert.equal(Object.values(state.checks)[0].status, 'configuration_required');
+  assert.deepEqual(approvedRows(state, catalog()), []);
+  http.googleBooksConfigured = true; result = await runSearch(options);
+  assert.equal(result.checked, 1); assert.equal(result.resumed, 0); assert.equal(requests, 1);
+  assert.equal(Object.values(state.checks)[0].status, 'not_found');
 });
 
 test('Gutenberg official metadata matches author, title and language', async () => {

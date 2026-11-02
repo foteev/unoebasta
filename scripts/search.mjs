@@ -21,6 +21,7 @@ const HELP = `Usage: npm run search -- <run|list|approve|reject|export> [options
   export: --out data/found/YYYY-MM-DD.csv (approved rows only; refuses overwrite)
   All commands: --state .cache/search/state.json
   run also accepts --cache .cache/search/http. Use --refresh to repeat completed checks.
+  Google Books requires environment variable GOOGLE_BOOKS_API_KEY (Actions secret of the same name).
   State and cached responses stay local. Errors never become kind=none.`;
 
 try {
@@ -45,7 +46,7 @@ try {
       if (forms.some(f => !FORMS.includes(f))) throw new Error('Unknown form');
       const summary = await runSearch({ catalog: loadCatalog(root), state, statePath, lang, kind, limit, providers, forms,
         qids: opts.qid ? opts.qid.split(',') : [], retrySearched: !!opts['retry-searched'], refresh: !!opts.refresh,
-        http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http') }),
+        http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http'), googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '' }),
         onCheck: c => console.log(`${c.qid} ${c.lang} ${c.provider}: ${c.status}${c.error ? ' — ' + c.error : ''}`) });
       console.log(JSON.stringify(summary));
       if (summary.errors) process.exitCode = 1;

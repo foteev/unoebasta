@@ -24,7 +24,7 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
   qids = [], forms = [], retrySearched = false, limit = 50, refresh = false, maxAge = 7 * 86400000,
   now = () => new Date().toISOString(), onCheck = () => {}, registry = PROVIDERS }) {
   const works = selectWorks(catalog, { lang, kind, qids, forms, retrySearched, limit });
-  const summary = { works: works.length, checked: 0, resumed: 0, candidates: 0, errors: 0 };
+  const summary = { works: works.length, checked: 0, resumed: 0, candidates: 0, errors: 0, configuration_required: 0 };
   for (const w of works) for (const id of providers) {
     const provider = registry[id];
     if (!provider) throw new Error(`Unknown provider: ${id}`);
@@ -32,11 +32,11 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
     if (!provider.languages.includes(lang) || !goals.length) continue;
     const key = hash(JSON.stringify([PROVIDER_VERSION, id, w.qid, w.titles[lang], w.authors, w.form, lang, goals]));
     const old = state.checks[key], instant = now();
-    if (!refresh && old && !['error', 'blocked'].includes(old.status) && Date.parse(instant) - Date.parse(old.checked_at) < maxAge) { summary.resumed++; continue; }
+    if (!refresh && old && !['error', 'blocked', 'configuration_required'].includes(old.status) && Date.parse(instant) - Date.parse(old.checked_at) < maxAge) { summary.resumed++; continue; }
     const check = { qid: w.qid, lang, goals, provider: id, checked_at: instant };
     const requested = new Set();
     try {
-      const result = await provider.search(w, lang, { get: url => { requested.add(url); return http.get(url); } });
+      const result = await provider.search(w, lang, { googleBooksConfigured: http?.googleBooksConfigured, get: url => { requested.add(url); return http.get(url); } });
       if (!Array.isArray(result.candidates) || !result.scope) throw new Error('Invalid provider result');
       const ids = []; let known = 0;
       for (const candidate of result.candidates) {
@@ -52,8 +52,9 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
     } catch (e) {
       // A cached challenge page or invalid schema must not poison subsequent retries.
       for (const url of requested) http.invalidate?.(url);
-      Object.assign(check, { status: [401, 403, 429].includes(e.status) ? 'blocked' : 'error', error: e.message });
-      summary.errors++;
+      const status = e.code === 'CONFIGURATION_REQUIRED' ? 'configuration_required' : [401, 403, 429].includes(e.status) ? 'blocked' : 'error';
+      Object.assign(check, { status, error: e.message });
+      if (status === 'configuration_required') summary.configuration_required++; else summary.errors++;
     }
     state.checks[key] = check; state.updated_at = now(); state.catalog_fingerprint = catalog.fingerprint;
     writeJson(statePath, state); summary.checked++; onCheck(check);
