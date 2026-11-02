@@ -37,6 +37,7 @@ test('import adds links to existing works, keeps metadata and is idempotent', ()
   const first = mergeFound(source({ Q1: entry }), data(), [r], { now: instant });
   const result = readTable(first.source).Q1;
   assert.equal(result.links.length, 2); assert.equal(result.note, 'keep'); assert.equal(result.w, 5000); assert.equal(result.pub, 'Original');
+  assert.equal(result.added, entry.added); assert.equal(result.links[1].added, instant);
   assert.equal(result.links[1].url, 'https://example.org/audio'); assert.equal(first.stats.updated, 1);
   const again = mergeFound(first.source, first.data, [r], { now: '2027-01-01T00:00:00Z' });
   assert.equal(again.source, first.source); assert.deepEqual(again.data, first.data); assert.equal(again.stats.links, 0);

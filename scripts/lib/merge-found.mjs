@@ -52,6 +52,7 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
       for (const r of chosen) {
         if (entry.links.some(l => key(l) === key(r))) continue;
         const link = { kind: r.kind, url: cleanUrl(r.url), site: siteName(r.site) };
+        if (read[qid]) link.added = now;
         if (r.archive === 'yes') link.archive = true;
         if (r.part) link.part = +r.part;
         if (r.lang !== 'en') link.lang = r.lang;
@@ -68,7 +69,7 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
       if (main.license) entry.license = main.license; else delete entry.license;
       if (selected.some(r => r.kind === 'full' && /(^|\.)baen\.com$/.test(new URL(r.url).hostname))) entry.note = 'note_baen';
     }
-    entry.added = now;
+    if (!read[qid]) entry.added = now;
     changed.set(qid, entry); stats.links += entry.links.length - before;
     if (read[qid]) stats.updated++; else stats.added++;
   }
