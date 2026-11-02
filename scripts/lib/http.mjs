@@ -27,10 +27,13 @@ async function bodyText(response, limit, { truncate = false, controller } = {}) 
 }
 
 export class CachedHttp {
-  constructor({ dir, fetchImpl = fetch, pause = sleep, now = Date.now, retries = 2, timeout = 30000, ttl = 7 * 86400000, delay = 1000 } = {}) {
+  constructor({ dir, fetchImpl = fetch, pause = sleep, now = Date.now, retries = 2, timeout = 30000, ttl = 7 * 86400000, delay = 1000, googleBooksApiKey = '' } = {}) {
     Object.assign(this, { dir, fetchImpl, pause, now, retries, timeout, ttl, delay });
+    this.googleBooksApiKey = googleBooksApiKey.trim();
     this.hosts = new Map(); this.pending = new Map(); this.memory = new Map();
   }
+  get googleBooksConfigured() { return !!this.googleBooksApiKey; }
+  redact(value) { return this.googleBooksApiKey ? String(value).replaceAll(this.googleBooksApiKey, '[REDACTED]') : value; }
   async get(url) {
     const cached = this.memory.get(url);
     if (cached && this.now() - Date.parse(cached.checked_at) < this.ttl) return { ...cached, cached: true };
@@ -45,7 +48,8 @@ export class CachedHttp {
     let cached;
     try { cached = readJson(path, null); } catch { /* A broken cache is refetched. */ }
     if (cached?.url === url && this.now() - Date.parse(cached.checked_at) < this.ttl) return { ...cached, cached: true };
-    const host = new URL(url).hostname;
+    const parsed = new URL(url), host = parsed.hostname;
+    const credentialed = this.googleBooksConfigured && parsed.origin === 'https://www.googleapis.com' && parsed.pathname.startsWith('/books/v1/');
     const previous = this.hosts.get(host) || Promise.resolve();
     let release; const gate = new Promise(resolve => { release = resolve; });
     this.hosts.set(host, gate);
@@ -56,17 +60,24 @@ export class CachedHttp {
         const controller = new AbortController(), timer = setTimeout(() => controller.abort(), this.timeout);
         let response, result, failure;
         try {
-          response = await this.fetchImpl(url, { signal: controller.signal, headers: { 'User-Agent': 'unoebasta-metadata/1.0 (+https://github.com/foteev/unoebasta)', Accept: 'application/json,text/html,text/csv;q=0.9' } });
+          const headers = { 'User-Agent': 'unoebasta-metadata/1.0 (+https://github.com/foteev/unoebasta)', Accept: 'application/json,text/html,text/csv;q=0.9' };
+          if (credentialed) headers['x-goog-api-key'] = this.googleBooksApiKey;
+          response = await this.fetchImpl(url, { signal: controller.signal, headers, redirect: credentialed ? 'error' : 'follow' });
           if (!response.ok) {
             const error = new HttpError(`HTTP ${response.status} at ${url}`, response.status);
-            error.body = await bodyText(response, 4000, { truncate: true, controller });
+            error.body = this.redact(await bodyText(response, 4000, { truncate: true, controller }));
             throw error;
           }
           const limit = 64 * 1024 * 1024;
           if (+response.headers.get('content-length') > limit) { controller.abort(); throw new HttpError('Response exceeds 64 MiB'); }
           const body = await bodyText(response, limit, { controller });
-          result = { url, final_url: response.url || url, checked_at: new Date(this.now()).toISOString(), body };
-        } catch (e) { failure = e; } finally { clearTimeout(timer); }
+          result = { url, final_url: this.redact(response.url || url), checked_at: new Date(this.now()).toISOString(), body: this.redact(body) };
+        } catch (e) {
+          // DOMException.message is read-only. Wrap rather than mutate errors when redacting.
+          failure = new HttpError(this.redact(e?.message || String(e)), e?.status || 0);
+          failure.name = e?.name || 'Error';
+          if (e?.body) failure.body = this.redact(e.body);
+        } finally { clearTimeout(timer); }
         if (result) { writeJson(path, result); return { ...result, cached: false }; }
         const status = failure.status || 0;
         if (attempt >= this.retries || (status && status !== 429 && status < 500)) throw failure;

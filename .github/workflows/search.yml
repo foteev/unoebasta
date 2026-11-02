@@ -50,6 +50,7 @@ jobs:
       - name: Discover candidates
         id: discover
         env:
+          GOOGLE_BOOKS_API_KEY: ${{ secrets.GOOGLE_BOOKS_API_KEY }}
           SEARCH_LANG: ${{ inputs.lang }}
           SEARCH_KIND: ${{ inputs.kind }}
           SEARCH_LIMIT: ${{ inputs.limit }}

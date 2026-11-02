@@ -1,6 +1,6 @@
 # Search and review pipeline
 
-The discovery CLI reads the versioned `awards.json`, `READ` table and previous `data/found/*.csv` files. It does not need a live GitHub download of `coverage.csv`, a backend, credentials or API keys. The [search brief](search-brief.md) remains the authority for rights and manual verification.
+The discovery CLI reads the versioned `awards.json`, `READ` table and previous `data/found/*.csv` files. It does not need a live GitHub download of `coverage.csv` or a backend. Google Books requires an API key; the other six providers work without one. The [search brief](search-brief.md) remains the authority for rights and manual verification.
 
 ## Collect candidates
 
@@ -12,6 +12,14 @@ npm run search -- list
 ```
 
 Providers: `clarkesworld`, `escapepod`, `podcastle`, `pseudopod` (English publisher search pages), `gutenberg` (official metadata CSV), `librivox` (human recordings) and `google` (book previews). Narrow a run with `--providers gutenberg,librivox`, `--qid Q123,Q456`, `--lang es` or `--kind audio`. Non-English searches require a known translated title; these adapters do not discover translation titles.
+
+### Google Books key
+
+[Google requires an API key or OAuth identifier for public API data](https://developers.google.com/books/docs/v1/using#APIKey). Enable **Books API** in your Google Cloud project, create an API key and restrict its API access to Books API. Check the project's available request quota: a key identifies the project but does not bypass an exhausted or zero quota.
+
+For Actions, add a repository secret named `GOOGLE_BOOKS_API_KEY` under **Settings → Secrets and variables → Actions → New repository secret**. The workflow reads it on its next run. Locally, provide the same environment variable through your shell or secret manager. Do not put its value in a command argument, CSV, source file or chat.
+
+The CLI sends the key in the `x-goog-api-key` header only to the HTTPS Books API endpoint, rejects redirects for those requests and redacts reflected key values from responses and errors. URLs, artifacts and the static page contain no key. Without configuration, Google checks are marked `configuration_required` without making requests; other providers continue. Once configured, these checks retry automatically on the next run. Auth/quota failures remain `blocked`, never `not_found`.
 
 Completed checks resume for seven days. Errors and blocked requests are retried on the next invocation. `--refresh` repeats completed checks; successful HTTP responses still use their seven-day cache. Delete `.cache/search/http` to force fresh network requests. Historical `kind=none` rows are skipped by language unless `--retry-searched` is supplied; that flag allows searching different providers after a previous manual run.
 

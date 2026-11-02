@@ -56,6 +56,10 @@ async function librivox(w, lang, http) {
 }
 
 async function google(w, lang, http) {
+  if (!http.googleBooksConfigured) {
+    const error = new Error('Google Books needs GOOGLE_BOOKS_API_KEY; set it in the environment or repository Actions secrets');
+    error.code = 'CONFIGURATION_REQUIRED'; throw error;
+  }
   const url = new URL('https://www.googleapis.com/books/v1/volumes');
   url.search = new URLSearchParams({ q: `intitle:"${w.titles[lang]}" ${w.authors.map(a => `inauthor:"${a}"`).join(' ')}`,
     langRestrict: lang, printType: 'books', maxResults: '40', projection: 'full' }).toString();
