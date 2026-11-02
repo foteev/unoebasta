@@ -103,8 +103,14 @@ test('Google key goes only to the Books API header and stays out of cache and er
   for (const f of readdirSync(dir)) assert.equal(readFileSync(join(dir, f), 'utf8').includes(secret), false);
   await http.get('https://example.org/story'); await http.get('https://www.googleapis.com/other/v1/items');
   assert.equal(requests[1].options.headers['x-goog-api-key'], undefined); assert.equal(requests[2].options.headers['x-goog-api-key'], undefined);
-  const broken = new CachedHttp({ dir, googleBooksApiKey: secret, retries: 0, pause: async () => {}, fetchImpl: async () => { throw new Error('failure ' + secret); } });
+  const broken = new CachedHttp({ dir, googleBooksApiKey: secret, retries: 0, pause: async () => {}, fetchImpl: async () => { throw new DOMException('failure ' + secret, 'AbortError'); } });
   await assert.rejects(broken.get('https://www.googleapis.com/books/v1/volumes?q=error'), e => !e.message.includes(secret));
+});
+
+test('HTTP timeout preserves AbortError without mutating its read-only message', async t => {
+  const http = new CachedHttp({ dir: temp(t), timeout: 5, retries: 0, pause: async () => {},
+    fetchImpl: (_url, { signal }) => new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(new DOMException('Aborted request', 'AbortError')))) });
+  await assert.rejects(http.get('https://example.org/slow'), e => e.name === 'AbortError' && e.message === 'Aborted request');
 });
 
 test('exact titles and authors reject homonyms and misleading fuzzy matches', () => {

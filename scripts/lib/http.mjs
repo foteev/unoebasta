@@ -72,7 +72,12 @@ export class CachedHttp {
           if (+response.headers.get('content-length') > limit) { controller.abort(); throw new HttpError('Response exceeds 64 MiB'); }
           const body = await bodyText(response, limit, { controller });
           result = { url, final_url: this.redact(response.url || url), checked_at: new Date(this.now()).toISOString(), body: this.redact(body) };
-        } catch (e) { failure = e; failure.message = this.redact(failure.message); } finally { clearTimeout(timer); }
+        } catch (e) {
+          // DOMException.message is read-only. Wrap rather than mutate errors when redacting.
+          failure = new HttpError(this.redact(e?.message || String(e)), e?.status || 0);
+          failure.name = e?.name || 'Error';
+          if (e?.body) failure.body = this.redact(e.body);
+        } finally { clearTimeout(timer); }
         if (result) { writeJson(path, result); return { ...result, cached: false }; }
         const status = failure.status || 0;
         if (attempt >= this.retries || (status && status !== 429 && status < 500)) throw failure;
