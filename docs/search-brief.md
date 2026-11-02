@@ -15,11 +15,14 @@ You are helping **unoebasta** (https://foteev.github.io/unoebasta/, code and dat
 
 There are 115 full texts and 53 works with audio. All of them are in English, because translations are under copyright.
 
+**Spanish is new** and has nothing on the page yet. A Spanish translation is known for 149 of 236 novels, 43 of 131 novellas, 31 of 142 novelettes and 47 of 147 short stories (`title_es`).
+
 **The worklist.** Download https://raw.githubusercontent.com/foteev/unoebasta/main/data/coverage.csv. It has one row per work:
 
-- columns: `qid, title, authors, form, awards, latest, pages, en, pl, ru, audio`;
+- columns: `qid, title, authors, form, awards, latest, pages, en, pl, ru, es, audio, title_es`;
 - `audio` is `yes` when a free reading by a person is already on the page;
-- `en`, `pl` and `ru` are each `full`, `part` or `none`;
+- `en`, `pl`, `ru` and `es` are each `full`, `part` or `none`;
+- `title_es` is the title of a known Spanish translation (from ISFDB, Wikidata or Lecturalia); empty means none is known (a translation may still exist);
 - a work is a target for a language when that column is `none`, or when it is `part` and you are looking for a full text.
 
 **Helpers in https://raw.githubusercontent.com/foteev/unoebasta/main/data/awards.json:**
@@ -85,7 +88,8 @@ There are 115 full texts and 53 works with audio. All of them are in English, be
 3. **Audio of the same story:** the magazine's podcast episode, or Escape Pod, PodCastle or Pseudopod.
 4. **Polish or Russian full text, only from legal free publishers of translations:**
    - Russian: the DARKER webzine (horror, licensed translations), "Мир фантастики" online publications, authors' own sites;
-   - Polish: Szortal, Esensja, Nowa Fantastyka online pieces published with permission.
+   - Polish: Szortal, Esensja, Nowa Fantastyka online pieces published with permission;
+   - Spanish: only a translation posted by the rights holder or with stated permission (the author's site, a magazine that says the translation is authorized). University "digital library" sites and blogs that host whole commercial ebooks or stories do not count.
    - Check the translation's rights note. If you are unsure, mark `archive=unsure` in `evidence`.
 
 ### Novellas
@@ -94,6 +98,7 @@ There are 115 full texts and 53 works with audio. All of them are in English, be
 2. English fragment: Reactor/Tor.com "excerpt" posts, publisher excerpt pages, Google Books preview.
 3. Polish fragment: Legimi book page (`https://www.legimi.pl/ebook-…,b<id>.html`), or a Woblink, Empik or publisher fragment.
 4. Russian fragment: LitRes (`https://www.litres.ru/book/…/chitat-onlayn/`), or a publisher's fragment (AST, Eksmo, Fanzon).
+5. Spanish fragment, only when the novella is published on its own (not inside a collection): the same places as for novels below.
 
 ### Novels
 
@@ -107,12 +112,20 @@ There are 115 full texts and 53 works with audio. All of them are in English, be
    - LitRes first, using the Russian title from `works[QID][2]` or FantLab.
    - Many Western classics are no longer on LitRes. Then try publishers' sites: AST, Eksmo, Fanzon, Азбука.
 
+5. **Spanish fragment** (no novel has one yet; start with the works that have a `title_es`):
+   - **Casa del Libro** (`https://www.casadellibro.com/libro-…/<ISBN>/<id>`): report the book page only if it has a **"Leer primeras páginas"** button. That button opens a publisher-supplied EPUB extract (`extraits.tea-ebook.com/…`); put that EPUB URL in `evidence`. Many Penguin Random House (Nova, Ediciones B), Alianza/Runas and Nocturna books have it; most Minotauro books do not.
+   - **Planeta de Libros** (`https://www.planetadelibros.com/libro-…/<id>`) for Minotauro and other Planeta books: report only if the page offers a first chapter ("Leer primer capítulo" or a link from https://www.planetadelibros.com/libros-primeros-capitulos).
+   - **Google Books** preview of the Spanish edition with visible pages (`https://books.google.com/books?id=…`).
+   - Other publishers' own fragment pages (Gigamesh, Crononauta, Duermevela, Bóveda, Hidra) if they show text without login.
+   - To find the Spanish title: `title_es`, then https://www.lecturalia.com, La Tercera Fundación (https://tercerafundacion.net) or the Casa del Libro search.
+   - Use the current Spanish edition from Spain or Latin America; one fragment per work is enough.
+
 **Priority order:**
 1. English full texts of short stories and novelettes.
 2. Audio for them.
 3. Novella texts and fragments.
-4. Polish and Russian novel fragments.
-5. Polish and Russian translations of short forms.
+4. Polish, Russian and Spanish novel fragments.
+5. Polish, Russian and Spanish translations of short forms.
 
 ## 4. How to report: one CSV, one row per link
 
@@ -126,12 +139,12 @@ qid,title,form,lang,kind,site,url,tier,license,words,pub,part,archive,evidence,c
 - `qid`: Wikidata id from coverage.csv, for example `Q25349436`.
 - `title`: the title as shown at the URL, in that language.
 - `form`: `novel` / `novella` / `novelette` / `short story` (copy from coverage.csv).
-- `lang`: `en` / `pl` / `ru`, the language of the text at the URL.
+- `lang`: `en` / `pl` / `ru` / `es`, the language of the text at the URL.
 - `kind`:
   - `full`: the complete text;
   - `audio`: the complete story read aloud;
   - `fragment`: an excerpt or preview.
-- `site`: the name readers will see, for example `Clarkesworld`, `Uncanny Magazine`, `Project Gutenberg`, `Escape Pod`, `Legimi`, `ЛитРес`, `Google Books`.
+- `site`: the name readers will see, for example `Clarkesworld`, `Uncanny Magazine`, `Project Gutenberg`, `Escape Pod`, `Legimi`, `ЛитРес`, `Casa del Libro`, `Google Books`.
 - `url`: the clean canonical URL.
 - `tier`:
   - `t1`: Creative Commons, or public domain everywhere;

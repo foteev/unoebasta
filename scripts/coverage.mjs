@@ -12,7 +12,7 @@ const READ = new Function(src.slice(src.indexOf('const READ = {'), src.indexOf('
 
 const FORM = { N: 'novel', SF: 'novel', FN: 'novel', HN: 'novel', FT: 'novel', A: 'novella', E: 'novelette', S: 'short story' };
 const RANK = ['novel', 'novella', 'novelette', 'short story'];
-const LANGS = ['en', 'pl', 'ru'];
+const LANGS = ['en', 'pl', 'ru', 'es'];
 const works = {};
 for (const [aw, cat, y, q] of d.aw) {
   const w = (works[q] = works[q] || { q, awards: [], form: null, last: 0 });
@@ -21,7 +21,7 @@ for (const [aw, cat, y, q] of d.aw) {
   w.last = Math.max(w.last, y);
 }
 function availability(q) {
-  const a = { en: '', pl: '', ru: '' };
+  const a = { en: '', pl: '', ru: '', es: '' };
   const r = READ[q]; if (r) for (const l of r.links) if (l.kind === 'full') a[l.lang || 'en'] = 'full';
   const x = (d.ex || {})[q] || {}, g = (d.gb || {})[q] || {};
   if (x.r && !a.en) a.en = 'part';
@@ -32,14 +32,15 @@ function availability(q) {
   if (g.s && !a.en) a.en = 'part';
   return a;
 }
-const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS, 'audio']];
+// title_es: the title of a known Spanish translation (ISFDB, Wikidata), empty when none is known
+const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS, 'audio', 'title_es']];
 const tally = {};
 for (const w of Object.values(works).sort((a, b) => b.last - a.last)) {
   const raw = d.works[w.q]; if (!raw) continue;
   const a = availability(w.q);
   const authors = raw[3].map(x => (d.authors[x] || [])[0] || x).join('; ');
   const audio = READ[w.q] && READ[w.q].links.some(l => l.kind === 'audio') ? 'yes' : ''; // a free reading by a person (podcast)
-  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none'), audio]);
+  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none'), audio, (d.t_es || {})[w.q] || '']);
   for (const l of LANGS) { const k = `${w.form}|${l}|${a[l] || 'none'}`; tally[k] = (tally[k] || 0) + 1; }
 }
 const csv = rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(',')).join('\n');

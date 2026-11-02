@@ -658,7 +658,7 @@ const DATA = JSON.parse(document.getElementById('awards-data').textContent);
 const CATS = { h: ['N', 'A', 'E', 'S'], n: ['N', 'A', 'E', 'S'], l: ['N', 'SF', 'FN', 'HN', 'FT', 'A', 'E', 'S'] };
 const AWARDS = ['h', 'n', 'l'];
 const WORKS = {};
-for (const [q, w] of Object.entries(DATA.works)) WORKS[q] = { id: q, title: w[0], tpl: w[1] || null, tru: w[2] || null, authors: w[3], isfdb: w[4] || null, fantlab: w[5] || null, pub: w[6] || null, about: (w[7] || w[8] || w[9]) ? { en: w[7] || null, pl: w[8] || null, ru: w[9] || null } : null, wiki: { en: w[10] || null, pl: w[11] || null, ru: w[12] || null }, ex: (DATA.ex && DATA.ex[q]) || null, gb: (DATA.gb && DATA.gb[q]) || null, ol: (DATA.ol && DATA.ol[q]) || null, awards: [] };
+for (const [q, w] of Object.entries(DATA.works)) WORKS[q] = { id: q, title: w[0], tpl: w[1] || null, tru: w[2] || null, tes: (DATA.t_es && DATA.t_es[q]) || null, authors: w[3], isfdb: w[4] || null, fantlab: w[5] || null, pub: w[6] || null, about: (w[7] || w[8] || w[9]) ? { en: w[7] || null, pl: w[8] || null, ru: w[9] || null } : null, wiki: { en: w[10] || null, pl: w[11] || null, ru: w[12] || null }, ex: (DATA.ex && DATA.ex[q]) || null, gb: (DATA.gb && DATA.gb[q]) || null, ol: (DATA.ol && DATA.ol[q]) || null, awards: [] };
 for (const [aw, cat, y, q, over] of DATA.aw) { const w = WORKS[q]; if (!w) continue; w.awards.push([aw, cat, y]); if (over) w.title = over; }
 for (const w of Object.values(WORKS)) w.awards.sort((a, b) => a[2] - b[2] || AWARDS.indexOf(a[0]) - AWARDS.indexOf(b[0]));
 const AUTHORS = {};
@@ -1550,7 +1550,7 @@ function excerptLinks(q) {
   if (x.lr) out.push({ url: 'https://www.litres.ru' + x.lr, site: LANG === 'ru' ? 'ЛитРес' : 'LitRes', lang: 'RU', html: true });
   if (x.lg) out.push({ url: 'https://www.legimi.pl' + x.lg, site: 'Legimi', lang: 'PL', html: true });
   for (const o of x.o || []) out.push({ url: o.u, site: o.s, lang: (o.l || 'en').toUpperCase(), html: true });
-  for (const l of ['en', 'pl', 'ru']) if (g[l] && !(l === 'en' && x.r) && !(l === 'ru' && x.lr) && !(l === 'pl' && x.lg)) out.push({ url: gbUrl(g[l][0]), site: 'Google Books', lang: l.toUpperCase(), gb: { id: g[l][0], isbn: g[l][1], lang: l } });
+  for (const l of ['en', 'pl', 'ru', 'es']) if (g[l] && !(l === 'en' && x.r) && !(l === 'ru' && x.lr) && !(l === 'pl' && x.lg)) out.push({ url: gbUrl(g[l][0]), site: 'Google Books', lang: l.toUpperCase(), gb: { id: g[l][0], isbn: g[l][1], lang: l } });
   if (g.s) out.push({ url: gbUrl(g.s[0], w.title), site: 'Google Books', lang: 'EN', coll: g.s[1] });
   const L = LANG.toUpperCase(); out.sort((a, b) => (b.lang === L) - (a.lang === L));
   return out;
@@ -1769,7 +1769,7 @@ function searchIndex() {
   const langs = Object.keys(I18N);
   SIDX = Object.values(WORKS).map(w => {
     const r = READ[w.id];
-    const title = ' ' + fold([w.title, w.tpl, w.tru, r && r.alt ? Object.values(r.alt).join(' ') : ''].join(' ')) + ' ';
+    const title = ' ' + fold([w.title, w.tpl, w.tru, w.tes, r && r.alt ? Object.values(r.alt).join(' ') : ''].join(' ')) + ' ';
     const by = ' ' + fold(w.authors.flatMap(a => AUTHORS[a] ? Object.values(AUTHORS[a].name) : []).join(' ')) + ' ';
     const meta = ' ' + fold([...new Set(w.awards.flatMap(([a, c, y]) => [y, ...langs.flatMap(l => [I18N[l]['aw_' + a], I18N[l]['cat_' + c]])]))].join(' ') + ' ' + (r ? r.pub + ' ' + r.links.map(l => l.site).join(' ') : '') + ' ' + (w.pub || '')) + ' ';
     const about = ' ' + fold(w.about ? Object.values(w.about).filter(Boolean).join(' ') : '') + ' ';
@@ -1823,7 +1823,7 @@ function cellHtml(q) {
 const passText = q => !AV.onlyText || hasText(q) || isMine(q);
 function matchQ(q) {
   if (!AV.q) return true; const s = AV.q.toLowerCase(); const w = work(q);
-  return [w.title, w.tpl, w.tru, ...w.authors.flatMap(a => Object.values(AUTHORS[a].name))].some(x => x && x.toLowerCase().includes(s));
+  return [w.title, w.tpl, w.tru, w.tes, ...w.authors.flatMap(a => Object.values(AUTHORS[a].name))].some(x => x && x.toLowerCase().includes(s));
 }
 const decadeOf = y => Math.floor(y / 10) * 10;
 function decadeChips(years) {

@@ -97,6 +97,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['search: clear brings the board back'] = $('#av-q').value === '' && !!$('#view-awards [data-av-cat]');
   const S = qs => w.eval(`searchWorks(${JSON.stringify(qs)})`);
   checks['search: Polish and Russian titles'] = S('Diuna').includes('Q190192') && S('дюна').includes('Q190192');
+  checks['search: Spanish titles of known translations'] = S('La mano izquierda de la oscuridad').includes('Q2008211') && S('el zoo de papel').includes('Q27903111');
   checks['search: accents and ё do not matter'] = S('Mieville').some(q => /Miéville/.test(w.eval(`AUTHORS[WORKS['${q}'].authors[0]].name.en`))) && S('ЛЕВАЯ РУКА ТЬМЫ').includes('Q2008211');
   checks['search: year, award and category words'] = S('хьюго 1966').includes('Q190192') && S('nebula 2015 short story').length >= 1;
   checks['search: magazine and topic'] = S('clarkesworld').length >= 10 && S('dragon').length >= 3;
