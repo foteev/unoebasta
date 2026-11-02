@@ -2453,7 +2453,7 @@ async function refreshRecallViews() {
 
 /* ---------- reader ---------- */
 let R = null; // current reading session
-function readerBlocks() { return [...$('#rbody').children].filter(n => n.textContent.trim() || n.querySelector('img')); }
+function readerBlocks() { const body = $('#rbody'); return body ? [...body.children].filter(n => n.textContent.trim() || n.querySelector('img')) : []; } // empty once the reader has closed (a late timer)
 function currentPlace() {
   const box = $('#reader'); const blocks = readerBlocks(); if (!blocks.length) return null;
   const top = box.scrollTop + barH() + 4;
