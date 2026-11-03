@@ -168,6 +168,10 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#r-close')); await sleep(80);
   click($('#tab-shelf')); await sleep(80);
   checks['shelf shows own link note'] = /Polski przekład, test/.test($('#view-shelf').textContent);
+  checks['shelf: every panel starts collapsed with a keyboard-accessible summary'] = $$('#view-shelf > details').length === 9 && $$('#view-shelf > details').every(el => !el.open && el.querySelector('summary h4') && el.querySelector('summary svg'));
+  click($('#shelf-bm summary')); await sleep(30);
+  await w.eval('renderShelf()');
+  checks['shelf: an expanded panel stays open after rendering'] = $('#shelf-bm').open;
   checks['shelf shows bookmarks'] = /Закладки/.test($('#view-shelf').textContent) && $$('#view-shelf [data-gobm]').length === 1 && /Cat Pictures Please/.test($('#view-shelf').textContent);
   // mark news seen
   click($('#tab-library')); await sleep(30); click($('#news-seen')); await sleep(30);
@@ -289,6 +293,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#theme-btn')); await sleep(10);
   checks['theme: toggles light/dark'] = (th1 === 'dark' || th1 === 'light') && w.document.documentElement.dataset.theme !== th1;
   w.eval('openDemo()'); await sleep(80);
+  await waitFor(() => /осталось|почти конец/.test($('#rleft').textContent));
   checks['reader: time left shown'] = /осталось|почти конец/.test($('#rleft').textContent);
   click($('#rbody p')); await sleep(10);
   checks['reader: tap hides the bar'] = $('#reader').classList.contains('chrome-off');
@@ -436,7 +441,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['back: … and a work card'] = $('#sheet-work').hidden;
   // what you open elsewhere becomes your reading history and status; Hide is a ✕ in the card's corner
   click($('#tab-catalog')); await sleep(30);
-  const trk = $('#view-catalog .pick a[data-track]'); const tq = trk.dataset.track; const tTitle = w.eval(`work('${tq}').title`);
+  const trk = $('#view-catalog .pick a[data-track]'); const tq = trk.dataset.track; const tTitle = w.eval(`titleOf(work('${tq}'))`);
   click(trk); await sleep(80);
   const rcard = $('#view-catalog .recall');
   checks['track: Read ↗ puts the story first in You were reading'] = !!rcard && rcard.querySelector('h3').textContent.trim() === tTitle && /Открыто на/.test(rcard.textContent) && !!rcard.querySelector('a[data-track]');
@@ -601,11 +606,14 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#shelf-langs [data-mylang="en"]')); await sleep(80);
   click($('#shelf-langs [data-mylang="pl"]')); await sleep(80);
   click($('#shelf-langs [data-mylang="ru"]')); await sleep(80);
+  checks['languages: edits are a draft until Save'] = w.eval('prefs.langs') === undefined && $('#shelf-langs [data-mylang="pl"]').getAttribute('aria-pressed') === 'true';
+  click($('#langs-save')); await sleep(80);
   checks['languages: chosen on the shelf, kept, and they travel with sync'] = JSON.stringify(w.eval('prefs.langs')) === JSON.stringify(['pl']) && w.eval("SYNC_PREFS.includes('langs')") && $('#shelf-langs [data-mylang="pl"]').getAttribute('aria-pressed') === 'true';
+  checks['languages: Save persists the choice for a reload'] = JSON.stringify(JSON.parse(w.localStorage.getItem('fantastic-prefs')).langs) === JSON.stringify(['pl']);
   click($('#shelf-langs [data-mylang="pl"]')); await sleep(80);
   checks['languages: at least one stays'] = JSON.stringify(w.eval('prefs.langs')) === JSON.stringify(['pl']) && /хотя бы один/.test($('#toast').textContent);
   w.eval("renderCatalog()"); await sleep(60);
-  checks['languages: English-only picks say the browser can translate'] = /Браузер может перевести/.test($('#view-catalog').textContent) && !!$('#view-catalog [data-goshelf="shelf-langs"]');
+  checks['languages: saved Polish choice does not silently suggest English texts'] = !$('#view-catalog .pick') && /Полного текста/.test($('#view-catalog').textContent) && !!$('#view-catalog [data-goshelf="shelf-langs"]') && !!$('#view-catalog .home-excerpts a');
   click($('#tab-library')); await sleep(60);
   checks['languages: the text language on each card, dimmed when unknown'] = !!$('#view-library .slip .flag-lang.far') && /^EN$/.test($('#view-library .slip .flag-lang').textContent);
   const wid = $('#view-library .slip [data-work]').dataset.work; w.eval(`openWork('${wid}')`); await sleep(80);
@@ -613,6 +621,9 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval('closeSheets()');
   w.eval("READ.Q190192 = { w: 3000, tier: 't2', added: '2026-10-01T00:00:00Z', pub: 'Test', links: [{ kind: 'full', url: 'https://x.test/diuna-pl', site: 'Test', lang: 'pl' }] }; renderLibrary();"); await sleep(60);
   checks['languages: a Polish text comes first for a Polish reader'] = $('#view-library .slip [data-work]').dataset.work === 'Q190192' && $('#view-library .slip .flag-lang').textContent === 'PL' && !$('#view-library .slip .flag-lang').classList.contains('far');
+  w.eval("prefs.pickLen = '15'; READ.Q190192.links.unshift({kind:'full',url:'https://x.test/dune-en',site:'English fixture'}); renderHome()");
+  checks['languages: one matching full text is shown without filling with other languages'] = $$('#view-catalog .pick').length === 1 && $('#view-catalog .pick [data-work]').dataset.work === 'Q190192';
+  checks['languages: Read opens the matching language even when English is listed first'] = $('#view-catalog .pick a[data-track]').href === 'https://x.test/diuna-pl';
   click($('#f-mine')); await sleep(60);
   checks['languages: “In my languages” keeps what can be read or heard in them'] = $$('#view-library .slip').every(sl => w.eval(`langScore('${sl.querySelector('[data-work]').dataset.work}')`) > 0) && $$('#view-library .slip').length >= 1;
   click($('#f-mine')); await sleep(30);
@@ -629,7 +640,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const nReading = $$('#shelf-reading .file-row').length;
   click($('#reading-clear')); await sleep(150);
   const bms = await w.eval("Store.all('bookmarks')");
-  checks['reading now: “Clear the list” empties it, keeps notes, bookmarks and Finished'] = nReading >= 2 && $$('#shelf-reading .file-row').length === 0 && !$('#reading-clear') && (await w.eval("Store.all('positions')")).filter(p => !w.eval(`isDone(${JSON.stringify(p.workId)})`)).length === 0 && !bms.some(b => b.id === 'r:t1') && bms.some(b => b.id === 'r:t2') && bms.some(b => b.id === 'pos:t3') && w.eval("isDone('Q130213759')") && /Список очищен/.test($('#toast').textContent);
+  checks['reading now: “Delete all” empties it, keeps notes, bookmarks and Finished'] = nReading >= 2 && $$('#shelf-reading .file-row').length === 0 && $('#reading-clear').disabled && (await w.eval("Store.all('positions')")).filter(p => !w.eval(`isDone(${JSON.stringify(p.workId)})`)).length === 0 && !bms.some(b => b.id === 'r:t1') && bms.some(b => b.id === 'r:t2') && bms.some(b => b.id === 'pos:t3') && w.eval("isDone('Q130213759')") && /Список очищен/.test($('#toast').textContent);
   click($('#toast [data-rcundo]')); await sleep(150);
   checks['reading now: Undo brings the list back'] = $$('#shelf-reading .file-row').length === nReading && (await w.eval("Store.all('bookmarks')")).some(b => b.id === 'r:t1');
   // one row: remove from the list (the work stays in the catalog), or mark it finished
@@ -666,6 +677,40 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['es: plural and numbers'] = w.eval("plural(1, t('works')) + ' ' + plural(5, t('works'))") === 'obra obras';
   click($('#lang-pl')); await sleep(80);
   checks['pl strings'] = /Czytaj/.test($('#tab-catalog').textContent);
+  // Shelf deletion is scoped to a section and leaves sync deletion marks; Undo never rewrites file bodies.
+  await w.eval(`(async () => { await Store.replaceAll({
+    files: [{ id: 'shelf-file', title: 'Long test title', byline: 'Author', format: 'txt', words: 100, size: 45, html: '<p>Keep this file body exactly.</p>', at: 1 }],
+    positions: [{ id: 'file:shelf-file', title: 'Long test title', pct: 25, at: 1 }, { id: 'ext:Q2008211', workId: 'Q2008211', title: 'The Left Hand of Darkness', ext: true, at: 2 }],
+    bookmarks: [{ id: 'w:Q25349436', type: 'work', workId: 'Q25349436', at: 1 }, { id: 'pos:shelf', type: 'pos', key: 'file:shelf-file', title: 'Bookmarked place', pct: 25, snippet: 'Keep this', at: 1 }, { id: 'd:Q190192', type: 'done', workId: 'Q190192', at: 1 }, { id: 'r:shelf', type: 'recall', key: 'file:shelf-file', title: 'Long test title', note: 'Keep my note', at: 1 }],
+    links: [{ id: 'Q190192', url: 'https://example.org/my-link', note: 'Keep this link', at: 1 }], suggestions: [{ id: 'shelf-suggestion', kind: 'feedback', text: 'Test private draft', at: 1 }]
+  }); await loadLocal(); })()`);
+  click($('#tab-shelf')); await sleep(100);
+  checks['shelf: every saved-item section has Delete all and rows have Delete'] = ['bm', 'done', 'files', 'links', 'data'].every(s => !!$(`#shelf-${s} [data-shelfclear]`)) && !!$('#reading-clear') && !!$('#sugg-clear-all') && !!$('#shelf-bm [data-shelfdel="bm"]') && !!$('#shelf-links [data-shelfdel="links"]') && !!$('#shelf-files [data-delfile]') && !!$('#shelf-sugg [data-sgdel]');
+  click($('#shelf-links [data-shelfdel="links"]')); await sleep(100);
+  checks['shelf: individual own-link Delete leaves other sections alone'] = (await w.eval("Store.all('links')")).length === 0 && (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('bookmarks')")).length === 4;
+  click($('#toast [data-shelfundo]')); await sleep(100);
+  const beforeLinkDelete = await w.eval('syncPack()');
+  click($('#shelf-links [data-shelfclear]')); await sleep(100);
+  await w.eval(`syncMerge(${JSON.stringify(beforeLinkDelete)})`); await sleep(60);
+  checks['shelf: deleted links do not return from an older synced shelf'] = (await w.eval("Store.all('links')")).length === 0 && (await w.eval("Store.all('tombs')")).some(x => x.id === 'links|Q190192');
+  click($('#toast [data-shelfundo]')); await sleep(100);
+  click($('#shelf-bm [data-shelfclear]')); await sleep(100);
+  const afterBookmarks = await w.eval("Store.all('bookmarks')");
+  checks['shelf: Delete all bookmarks preserves Finished and reading notes'] = !afterBookmarks.some(b => ['work', 'pos'].includes(b.type)) && afterBookmarks.some(b => b.type === 'done') && afterBookmarks.some(b => b.note === 'Keep my note');
+  click($('#toast [data-shelfundo]')); await sleep(100);
+  w.confirm = () => true;
+  click($('#shelf-files [data-shelfclear]')); await sleep(100);
+  checks['shelf: deleting files removes their places and notes, keeps unrelated progress'] = (await w.eval("Store.all('files')")).length === 0 && !(await w.eval("Store.all('positions')")).some(p => p.id === 'file:shelf-file') && (await w.eval("Store.all('positions')")).some(p => p.id === 'ext:Q2008211') && !(await w.eval("Store.all('bookmarks')")).some(b => b.key === 'file:shelf-file');
+  click($('#toast [data-shelfundo]')); await sleep(100);
+  checks['shelf: Undo restores the exact file body and related notes'] = (await w.eval("Store.get('files', 'shelf-file')")).html === '<p>Keep this file body exactly.</p>' && (await w.eval("Store.all('bookmarks')")).some(b => b.note === 'Keep my note');
+  w.confirm = () => false;
+  click($('#shelf-data [data-shelfclear]')); await sleep(50);
+  checks['shelf: cancelling Delete all saved items preserves the data'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1;
+  w.confirm = () => true;
+  click($('#shelf-data [data-shelfclear]')); await sleep(100);
+  checks['shelf: Delete all saved items clears personal records and retains deletion marks'] = (await Promise.all(['files', 'positions', 'bookmarks', 'links', 'suggestions'].map(s => w.eval(`Store.all('${s}')`)))).every(a => a.length === 0) && (await w.eval("Store.all('tombs')")).length > 0;
+  click($('#toast [data-shelfundo]')); await sleep(100);
+  checks['shelf: Undo all restores each saved-item section'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1 && (await w.eval("Store.all('suggestions')")).length === 1 && (await w.eval("Store.all('positions')")).length === 2;
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);
