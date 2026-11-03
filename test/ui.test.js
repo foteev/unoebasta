@@ -250,6 +250,17 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['excerpt: All Systems Red shows Reactor excerpt'] = !!$('#sheet-work a[href="https://reactormag.com/meet-murderbot-in-chapter-one-of-martha-wells-all-systems-red/"]');
   w.eval("openWork('Q25349436')"); await sleep(60);
   checks['availability: Cat Pictures Please EN = full text'] = /EN полный текст/.test($('#sheet-work .av-full').textContent);
+  w.eval("openWork('Q19947428')"); await sleep(50);
+  checks['audio pilot: Silverberg uses the published Russian title and sourced summary'] = $('#sheet-work h2').textContent === 'Раз солдат, два солдат...' && /виртуальные личности/.test($('#sheet-work #about-slot').textContent) && !!$('#about-slot a[href="https://fantlab.ru/work22792"]') && !/Википедия/.test($('#about-slot').textContent);
+  checks['audio pilot: Russian text and audio are distinguished and source verification is visible'] = /RU полный текст · аудио/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work a[href="https://flibusta.info/b/404336/read"]') && !!$('#sheet-work .audio-source a[href="https://www.youtube.com/watch?v=det3gpWwLWI"]') && /разрешение не подтверждено/.test($('#sheet-work .audio-source').textContent) && /полнота независимо не проверена/.test($('#sheet-work .audio-source').textContent);
+  checks['audio pilot: original publisher text is retained'] = w.eval("READ.Q19947428.tier === 't2' && READ.Q19947428.links.some(l => l.kind === 'full' && /baen/.test(l.url))");
+  const audioPref = w.eval('prefs.langs'), originalAudioLinks = w.eval('READ.Q19947428.links.slice()');
+  w.eval("prefs.langs = ['ru']; READ.Q19947428.links.push({kind:'audio',lang:'en',site:'English narrator',url:'https://example.test/en-audio'},{kind:'audio',lang:'pl',site:'Polski lektor',url:'https://example.test/pl-audio'})");
+  const audioOptions = w.eval("listenOpts('Q19947428')");
+  checks['audio pilot: Listen chooses preferred language and offers all recordings'] = audioOptions.filter(x => x.type === 'audio').length === 3 && audioOptions[0].url === 'https://www.youtube.com/watch?v=det3gpWwLWI' && /русский/i.test(audioOptions[0].name) && /разрешение не подтверждено/.test(audioOptions[0].sub);
+  w.__restoreAudio = originalAudioLinks; w.__restoreLangs = audioPref; w.eval('READ.Q19947428.links = window.__restoreAudio; prefs.langs = window.__restoreLangs');
+  w.eval("openWork('Q41793715')"); await sleep(50);
+  checks['audio pilot: external-only recording is not called publisher-authorized'] = /Внешний источник/.test($('#sheet-work .tier').textContent) && !/у издателя/.test($('#sheet-work .tier').textContent) && /RU аудио/.test($('#sheet-work .avail').textContent);
   w.eval("openWork('Q29994374')"); await sleep(60);
   checks['parts: Silently and Very Fast has part 2'] = !!$('#sheet-work a[href="https://clarkesworldmagazine.com/valente_11_11/"]') && /Часть 2/.test($('#sheet-work').textContent);
   w.eval("openWork('Q7049279')"); await sleep(60);

@@ -2,7 +2,7 @@
   "name": "unoebasta",
   "version": "0.4.0",
   "private": true,
-  "description": "A single web page for reading Hugo, Nebula and Locus winners that are free and legal online. No app, no server, no accounts.",
+  "description": "A single web page with text and audio links for Hugo, Nebula and Locus winners. No app, no server, no accounts.",
   "license": "MIT",
   "homepage": "https://foteev.github.io/unoebasta/",
   "repository": {
@@ -22,7 +22,8 @@
     "coverage": "node scripts/coverage.mjs",
     "search": "node scripts/search.mjs",
     "search:continue": "node scripts/search.mjs continue",
-    "research": "node scripts/research.mjs"
+    "research": "node scripts/research.mjs",
+    "audio:plan": "node scripts/research.mjs plan --lang all --kind audio --providers youtube,akniga,librivox,publisher --limit 40 --out .cache/search/audio-plan.json"
   },
   "devDependencies": {
     "jsdom": "24.1.3",

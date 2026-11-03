@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "at": "2026-11-03T20:11:34.055Z",
+  "discovery_model": "gpt-6-luna",
+  "review": "Parent assistant cross-checked bibliography and individual source pages; metadata-level review, no end-to-end listening.",
+  "work_language_targets": 10,
+  "published_rows": 6,
+  "csv": "data/found/2026-11-03-community-audio.csv",
+  "recordings": [
+    {
+      "qid": "Q19947428",
+      "title": "Раз солдат, два солдат...",
+      "language": "ru",
+      "source": "youtube",
+      "url": "https://www.youtube.com/watch?v=det3gpWwLWI",
+      "site": "YouTube · Кирилл Головин · 1:33:52",
+      "pub": "1989 story; recording listed in 2018",
+      "rights": "unknown",
+      "verification": "metadata",
+      "evidence": "Browser-visible video title, channel Редакция Кирилла Головина and duration match the story; corroborated by https://akniga.org/silverberg-robert-raz-soldat-dva-soldat (1:34:04). Video not listened through; completeness inferred from source listing; permission unknown."
+    },
+    {
+      "qid": "Q41793715",
+      "title": "Музыка, звучащая в крови",
+      "language": "ru",
+      "source": "akniga",
+      "url": "https://akniga.org/bir-greg-muzyka-zvuchaschaya-v-krovi",
+      "site": "Аудиокниги Клуб · Кирилл Головин · 1:07:20",
+      "pub": "1983 story; recording 2021",
+      "rights": "unknown",
+      "verification": "metadata",
+      "evidence": "Opened source: Greg Bear, Blood Music original title, 1983 story, Kirill Golovin and 01:07:20 player. https://fantlab.ru/work36499 distinguishes this story from the 1985 novel. Metadata checked, not listened through; permission unknown."
+    },
+    {
+      "qid": "Q27968157",
+      "title": "Ждущие звёзды",
+      "language": "ru",
+      "source": "akniga",
+      "url": "https://akniga.org/de-bodar-alett-zhduschie-zvezdy",
+      "site": "Аудиокниги Клуб · Кирилл Головин · 1:05:25",
+      "pub": "2013 story; recording 2021",
+      "rights": "unknown",
+      "verification": "metadata",
+      "evidence": "Opened source: Aliette de Bodard, The Waiting Stars original title, Kirill Golovin and 01:05:25 player. https://fantlab.ru/work523118 lists the Russian title as an online amateur translation. Metadata checked, not listened through; permission unknown."
+    },
+    {
+      "qid": "Q1315237",
+      "title": "Вдогонку за солнцем",
+      "language": "ru",
+      "source": "akniga",
+      "url": "https://akniga.org/lendis-dzheffri-vdogonku-za-solncem",
+      "site": "Аудиокниги Клуб · Кирилл Головин · 46:41",
+      "pub": "1991 story; recording 2019",
+      "rights": "unknown",
+      "verification": "metadata",
+      "evidence": "Followed narrator index to individual source page: Geoffrey Landis, A Walk in the Sun original title, Kirill Golovin and 46:41 player. Identity corroborated at https://fantlab.ru/work56605. Metadata checked, not listened through; permission unknown."
+    },
+    {
+      "qid": "Q61685459",
+      "title": "Плаванье в Византий",
+      "language": "ru",
+      "source": "akniga",
+      "url": "https://akniga.org/silverberg-robert-plavane-v-vizantiy",
+      "site": "Аудиокниги Клуб · Кирилл Головин · 2:30:14",
+      "pub": "1985 novella; recording 2020",
+      "rights": "unknown",
+      "verification": "metadata",
+      "evidence": "Opened source: Robert Silverberg, 1985 work, Kirill Golovin and 02:30:14 player; identity corroborated at https://fantlab.ru/work14848. Page title is a spelling variant of Плавание в Византий. Metadata checked, not listened through; permission unknown."
+    },
+    {
+      "qid": "Q4540312",
+      "title": "«Покайся, Арлекин!» — сказал Тиктакщик",
+      "language": "ru",
+      "source": "akniga",
+      "url": "https://akniga.org/ellison-harlan-pokaysya-arlekin-skazal-tiktakschik",
+      "site": "Аудиокниги Клуб · Кирилл Головин · 30:40",
+      "pub": "1965 story; recording 2019",
+      "rights": "unknown",
+      "verification": "metadata",
+      "evidence": "Opened source: Harlan Ellison, original English title in alternate names, Kirill Golovin and 30:40 player. Metadata checked, not listened through; permission unknown."
+    }
+  ],
+  "silverberg_audio": {
+    "en": "Commercial anthology found; no free standalone recording located",
+    "pl": "No match in scoped searches",
+    "ru": "Narrator YouTube page confirmed; Akniga alternate access retained",
+    "es": "Published title resolved; no audio match in scoped searches"
+  },
+  "unresolved": [
+    {
+      "qid": "Q3190243",
+      "language": "ru",
+      "note": "No matching individual recording found; anthology search remains open"
+    }
+  ],
+  "russian_text": {
+    "qid": "Q19947428",
+    "url": "https://flibusta.info/b/404336/read",
+    "source": "Флибуста (flibusta.info)",
+    "rights": "unknown",
+    "verification": "page",
+    "evidence": "Indexed reading page matches Robert Silverberg and Russian story title, with opening through final Atahualpa exchange and translator notes. GPT Luna opened the specific reading page in an ordinary browser without login or 403 and saw story text and notes; parent cross-checked indexed beginning and ending against the Russian anthology page. Direct automated Python request returned403; access can vary. Permission unknown. Approximate word count is an estimate, not a measured count. This flibusta.info-branded source is not asserted to be the official Flibusta service.",
+    "checked_at": "2026-11-03T20:25:14.186Z",
+    "csv": "data/found/2026-11-03-silverberg-russian-text.csv"
+  }
+}

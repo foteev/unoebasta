@@ -52,6 +52,20 @@ test('import handles languages independently and upgrades audio-only metadata', 
   assert.equal(entry.links[2].lang, 'es'); assert.equal(result.data.t_es.Q1, 'Planeta rojo');
 });
 
+test('external recordings preserve unknown permission and do not relabel existing publisher text', () => {
+  const old = { tier: 't2', pub: 'Publisher', links: [{ kind: 'full', site: 'Publisher', url: 'https://example.org/en' }] };
+  const audio = row({ kind: 'audio', tier: 'external', words: '', lang: 'ru', title: 'Планета', url: 'https://www.youtube.com/watch?v=recording' });
+  const result = mergeFound(source({ Q1: old }), data(), [audio], { now: instant });
+  const entry = readTable(result.source).Q1;
+  assert.equal(entry.tier, 't2'); assert.equal(entry.pub, old.pub);
+  assert.equal(entry.links[1].rights, 'unknown'); assert.equal(entry.links[1].verification, 'metadata');
+  assert.equal(entry.links[1].checked_at, instant); assert.equal(entry.links[1].evidence, audio.evidence);
+  assert.equal(mergeFound(result.source, result.data, [audio]).source, result.source);
+  assert.throws(() => validateFound({ ...audio, license: 'CC BY 4.0' }), /unverified/);
+  const onlyAudio = readTable(mergeFound(source({}), data(), [audio]).source).Q1;
+  assert.equal(onlyAudio.tier, 'external'); assert.equal(onlyAudio.links[0].rights, 'unknown');
+});
+
 test('multipart sets must be complete, unique and remain idempotent', () => {
   const rs = [row({ part: '1', url: 'https://example.org/1' }), row({ part: '2', url: 'https://example.org/2' })];
   assert.throws(() => mergeFound(source({}), data(), rs.slice(1)), /incomplete/);

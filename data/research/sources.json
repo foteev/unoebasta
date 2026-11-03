@@ -255,6 +255,53 @@
         "any"
       ],
       "next_action": "Read the preserved evidence, identify the specific publication or source, and record a scoped follow-up. This note is not a global negative."
+    },
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "mode": "manual",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "audio"
+      ],
+      "url": "https://www.youtube.com/",
+      "next_action": "Search published titles and author variants. Open the video; record channel, language, narrator, duration, whole story versus sample and playback restrictions. Treat permission as unknown unless evidenced; use tier external for reviewed metadata-only external links."
+    },
+    {
+      "id": "akniga",
+      "name": "Аудиокниги Клуб",
+      "mode": "manual",
+      "languages": [
+        "ru"
+      ],
+      "kinds": [
+        "audio"
+      ],
+      "url": "https://akniga.org/",
+      "next_action": "Match original title, author and story versus novel; inspect the recording page, narrator, duration and player. Preserve permission as unknown and completeness as metadata-level unless independently checked."
+    },
+    {
+      "id": "external",
+      "name": "External catalog or community source",
+      "mode": "manual",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "full",
+        "audio",
+        "fragment",
+        "title"
+      ],
+      "next_action": "Record the exact public page, title, all authors, language, edition and format. External portals including Flibusta may provide leads; do not infer permission from free access or download/rehost texts. Verified external full/audio links use tier external, not publisher/CC tiers."
     }
   ]
 }

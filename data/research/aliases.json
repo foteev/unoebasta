@@ -7,6 +7,41 @@
       "value": "10^16 to 1",
       "origin": "data/found/2026-11-02.csv:95; https://clarkesworldmagazine.com/kelly_12_13_reprint/",
       "recorded_at": "2026-11-01T23:36:22Z"
+    },
+    {
+      "qid": "Q19947428",
+      "lang": "ru",
+      "value": "Раз солдат, два солдат...",
+      "origin": "https://fantlab.ru/work22792; О. Зверева, 2009",
+      "recorded_at": "2026-11-03T20:09:53.402Z"
+    },
+    {
+      "qid": "Q19947428",
+      "lang": "es",
+      "value": "Entra un soldado, después otro",
+      "origin": "https://www.ciencia-ficcion.com/premios/ignotus/igno2001.htm; Gigamesh 25, Ignotus 2001",
+      "recorded_at": "2026-11-03T20:09:54.435Z"
+    },
+    {
+      "qid": "Q41793715",
+      "lang": "ru",
+      "value": "Музыка, звучащая в крови",
+      "origin": "https://fantlab.ru/work36499; 1983 story, distinct from 1985 novel",
+      "recorded_at": "2026-11-03T20:09:55.455Z"
+    },
+    {
+      "qid": "Q27968157",
+      "lang": "ru",
+      "value": "Ждущие звёзды",
+      "origin": "https://fantlab.ru/work523118; listed as online amateur translation",
+      "recorded_at": "2026-11-03T20:09:56.506Z"
+    },
+    {
+      "qid": "Q1315237",
+      "lang": "ru",
+      "value": "Вдогонку за солнцем",
+      "origin": "https://fantlab.ru/work56605; М. Савина-Баблоян, 2007",
+      "recorded_at": "2026-11-03T20:09:57.486Z"
     }
   ],
   "authors": [

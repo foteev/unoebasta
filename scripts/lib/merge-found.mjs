@@ -52,6 +52,7 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
       for (const r of chosen) {
         if (entry.links.some(l => key(l) === key(r))) continue;
         const link = { kind: r.kind, url: cleanUrl(r.url), site: siteName(r.site) };
+        if (r.tier === 'external') Object.assign(link, { tier: 'external', rights: 'unknown', verification: r.kind === 'full' ? 'page' : 'metadata', evidence: r.evidence, checked_at: r.checked_at });
         if (read[qid]) link.added = now;
         if (r.archive === 'yes') link.archive = true;
         if (r.part) link.part = +r.part;
