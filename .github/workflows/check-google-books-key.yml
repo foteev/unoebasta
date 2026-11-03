@@ -1,4 +1,4 @@
-name: Multilingual research smoke
+name: Continue multilingual search
 on:
   push:
     branches: [verify-google-books-key-20261102]
@@ -8,44 +8,36 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 83ea31377a038d92cdd3904a2b8810999c034c35
+          ref: 7b0aa3f08df5783c3b209a99bb2c26e704c7ff5f
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Plan across four languages
-        run: node scripts/research.mjs plan --lang all --kind fragment --limit 12
-      - name: Discover previews in four languages
+      - name: Continue one real batch
         env:
           GOOGLE_BOOKS_API_KEY: ${{ secrets.GOOGLE_BOOKS_API_KEY }}
-        shell: bash
-        run: |
-          for lang in en pl ru es; do
-            node scripts/search.mjs run --lang "$lang" --kind fragment --providers google --forms novel,novella --limit 3
-          done
-      - name: Summarize scoped outcomes and pending candidates
+        run: npm run search:continue -- --limit 50
+      - name: Show results
         if: always()
         run: |
-          node --input-type=module <<'JS'
-          import { readFileSync, appendFileSync } from 'node:fs';
-          const state = JSON.parse(readFileSync('.cache/search/state.json', 'utf8'));
-          const checks = Object.values(state.checks);
-          const result = { checks: checks.length, by_language: Object.fromEntries(['en','pl','ru','es'].map(lang => [lang, checks.filter(c => c.lang === lang).reduce((a,c) => (a[c.status] = (a[c.status] || 0) + 1, a), {})])), candidates: Object.values(state.candidates).map(c => ({ id:c.id,qid:c.qid,lang:c.lang,title:c.title,url:c.url,country:c.country,viewability:c.viewability,status:c.review.status })) };
-          console.log(JSON.stringify(result, null, 2));
-          appendFileSync(process.env.GITHUB_STEP_SUMMARY, '```json\n' + JSON.stringify(result,null,2) + '\n```\n');
-          JS
-      - name: Save plan, registry and pending review queue
+          cat .cache/search/report.json
+          npm run search -- list
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat .cache/search/report.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve research and review queue
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: multilingual-research-smoke
+          name: search-continuation
           path: |
             .cache/search/state.json
             .cache/search/plan.json
+            .cache/search/report.json
             data/research/
           retention-days: 30
