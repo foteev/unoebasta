@@ -203,7 +203,7 @@ table.board { border-collapse: separate; border-spacing: 0; width: 100%; font-si
 .author-counts { color: var(--muted); font-size: 13px; font-weight: 400; }
 .author-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .author-sort { max-width: 100%; }
-.author-sort select { min-height: 44px; max-width: 100%; font-size: 16px; border-radius: 24px; }
+.author-sort select { min-height: 44px; max-width: 100%; font-size: 16px; border-radius: 24px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); padding: 8px 14px; }
 
 #agent-dialog textarea { width: 100%; min-height: 240px; max-height: 50vh; resize: vertical; font-size: 16px; }
 .cell .award-meta { display: block; margin-bottom: 4px; color: var(--accent); font-size: 12px; line-height: 1.4; }
@@ -467,9 +467,9 @@ textarea { resize: vertical; font: 12px/1.45 var(--f-mono); }
 .cov thead th { font-weight: 500; color: var(--muted); font-size: 12px; }
 .cov .cov-sum th, .cov .cov-sum td { font-weight: 600; border-bottom: 0; }
 .cov-overview { display: grid; gap: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 6px 0 10px; }
-.cov-overview > div { display: flex; flex-direction: column-reverse; justify-content: end; gap: 6px; padding: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; }
+.cov-overview > div { display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; padding: 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; }
 .cov-overview dt { font-size: 13px; line-height: 1.4; color: var(--muted); overflow-wrap: anywhere; }
-.cov-overview dd { margin: 0; font: 600 28px/1.2 var(--f-ui); font-variant-numeric: tabular-nums; }
+.cov-overview dd { order: -1; margin: 0; font: 600 28px/1.2 var(--f-ui); font-variant-numeric: tabular-nums; }
 .cov-views { margin-bottom: 6px; }
 .cov-views button { min-height: 44px; flex: 1; }
 .cov-note { font-size: 13px; line-height: 1.6; margin: 12px 0; }
@@ -490,6 +490,7 @@ textarea { resize: vertical; font: 12px/1.45 var(--f-mono); }
   .cov .cov-sum { background: var(--accent-soft); }
   .cov-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cov-overview > div:first-child { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; }
+  .cov-overview > div:first-child dd { order: 0; }
 }
 @media (max-width: 440px) { .cov-contribute .row { display: grid; } .cov-contribute .btn { width: 100%; } }
 .saved-link strong { font: 600 15px/1.3 var(--f-read); overflow-wrap: anywhere; }

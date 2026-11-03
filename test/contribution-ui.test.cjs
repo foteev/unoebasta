@@ -87,8 +87,8 @@ const assert = require('node:assert/strict');
       await page.locator('#lang-sel').selectOption(width===360?'pl':'ru');
       for(const view of ['forms','languages']) {
         await page.locator(`[data-cov-view="${view}"]`).click();
-        const layout=await page.locator('#about-cov').evaluate(el=>({width:innerWidth,scroll:document.documentElement.scrollWidth,table:el.querySelector('.cov').getBoundingClientRect().width,min:Math.min(...[...el.querySelectorAll('button,a')].map(b=>b.getBoundingClientRect().height)),cards:getComputedStyle(el.querySelector('.cov tbody tr')).display}));
-        assert.ok(layout.scroll<=width+1);assert.ok(layout.min>=44);assert.equal(layout.cards,'grid');coverageLayouts.push({...layout,theme,view});
+        const layout=await page.locator('#about-cov').evaluate(el=>({width:innerWidth,scroll:document.documentElement.scrollWidth,table:el.querySelector('.cov').getBoundingClientRect().width,min:Math.min(...[...el.querySelectorAll('button,a')].map(b=>b.getBoundingClientRect().height)),cards:getComputedStyle(el.querySelector('.cov tbody tr')).display,statsTop:[...el.querySelectorAll('.cov-overview dd')].slice(1).map(x=>x.getBoundingClientRect().top)}));
+        assert.ok(layout.scroll<=width+1);assert.ok(layout.min>=44);assert.equal(layout.cards,'grid');assert.ok(Math.abs(layout.statsTop[0]-layout.statsTop[1])<=1);coverageLayouts.push({...layout,theme,view});
         await page.locator('#about-cov').screenshot({path:join(out,`coverage-${view}-${width}-${theme}.png`),animations:'disabled'});
       }
     }
