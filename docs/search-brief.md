@@ -47,8 +47,17 @@ Notes: group by QID and language; record sourced aliases, translator/edition ref
 
 ## Submit
 
-If GitHub access is available, fork the repository, create a branch and open one PR to `foteev/unoebasta:main`. Change **only the new CSV and optional note**. PR description: assigned QIDs, additions by language/format, verification limits and unresolved leads. Do not modify source code, generated coverage, awards data, dependencies, tests, workflows or agent instructions. Do not request maintainer credentials.
+Anyone with a normal GitHub account can propose a contribution to this public repository through their own **fork**. No invitation, write access to `foteev/unoebasta`, project API key or maintainer credentials are needed. Searching and reading the public catalog do not require GitHub sign-in.
 
-If GitHub access is unavailable, return the CSV and notes to the reader. Do not claim a PR was created. No particular AI model, subscription or API key is required by this contract.
+If the reader's agent has an authenticated GitHub integration that can create forks, commits and pull requests:
+
+1. Refresh the latest `foteev/unoebasta:main` data and remove duplicate findings.
+2. Fork `foteev/unoebasta` into the contributor's own account and create a branch there.
+3. Add **only the new CSV and optional note**. Do not modify source code, generated coverage, awards data, dependencies, tests, workflows or agent instructions.
+4. Open one PR from that fork's branch to `foteev/unoebasta:main`. Describe assigned QIDs, additions by language/format, verification limits and unresolved leads.
+
+If the agent cannot write to GitHub, return the ready CSV and notes instead. A reader with a GitHub account can create a fork, upload the files to a new branch using GitHub's web interface, then choose **Contribute → Open pull request**. Do not claim a PR was created unless it actually exists. No particular AI model, subscription or API key is required by this contract.
+
+GitHub requires sign-in to open a PR; it does not accept anonymous PRs. A reader without GitHub can send an individual link and description through unoebasta's existing message form (Nostr), or pass a completed findings batch to a contributor who can submit it. The site does not automatically turn messages into PRs.
 
 Maintainers review the findings, then run the existing importer, coverage generator, build and tests. The automated submission check validates file scope, schema, identities and duplicates; it does not certify source truth, completeness or permission. Merging a submission CSV alone does not publish its links on the site.

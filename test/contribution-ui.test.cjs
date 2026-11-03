@@ -70,8 +70,8 @@ const assert = require('node:assert/strict');
       await page.locator('#lang-sel').selectOption(lang);assert.ok(await page.locator('#about-contribute [data-agent-task]').textContent());
     }
     await page.evaluate(()=>{document.querySelector('#toast').hidden=true;});
-    await page.setViewportSize({width:1280,height:1100});
     await page.locator('#lang-sel').selectOption('en');
+    await page.setViewportSize({width:1280,height:1100});
     await page.locator('[data-cov-view="languages"]').click();
     assert.equal(await page.locator('#about-cov tbody tr').count(),5);
     const coverage=await page.evaluate(()=>coverageStats());
