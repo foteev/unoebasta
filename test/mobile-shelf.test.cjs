@@ -29,7 +29,7 @@ const assert = require('node:assert/strict');
     await page.locator('#tab-shelf').click();
     await page.waitForFunction(() => document.querySelectorAll('#view-shelf > details').length === 9);
     assert.equal(await page.locator('#view-shelf > details[open]').count(), 0, 'Shelf starts collapsed');
-    await page.screenshot({ path: join(out, 'shelf-390-collapsed.png'), fullPage: true });
+    await page.screenshot({ path: join(out, 'shelf-390-collapsed.png'), fullPage: true, animations: 'disabled' });
     await page.locator('#shelf-langs summary').focus(); await page.keyboard.press('Enter');
     assert.equal(await page.locator('#shelf-langs').getAttribute('open'), '', 'Keyboard opens native details');
     for (const lang of ['es', 'en', 'ru']) {
@@ -44,7 +44,7 @@ const assert = require('node:assert/strict');
     assert.deepEqual(await page.evaluate(() => prefs.langs), ['es'], 'Saved choice survives a real reload');
     assert.equal(await page.locator('#view-catalog .pick').count(), 0, 'No English fallback after choosing Spanish');
     assert.ok(await page.locator('#view-catalog .home-excerpts a').count(), 'Spanish excerpt is offered');
-    await page.screenshot({ path: join(out, 'read-390-spanish.png'), fullPage: true });
+    await page.screenshot({ path: join(out, 'read-390-spanish.png'), fullPage: true, animations: 'disabled' });
     await page.evaluate(async () => {
       await Store.put('files', { id: 'qa-file', title: 'Тестовая книга с длинным названием для проверки мобильной полки', byline: 'Тестовый автор', format: 'txt', words: 100, size: 42, html: '<p>QA file body.</p>', at: Date.now() });
       await Store.put('bookmarks', { id: 'w:Q25349436', type: 'work', workId: 'Q25349436', at: Date.now() });
@@ -61,7 +61,7 @@ const assert = require('node:assert/strict');
         summaryMin: Math.min(...[...document.querySelectorAll('#view-shelf summary')].map(el => el.getBoundingClientRect().height)) }));
       assert.ok(layout.scroll <= layout.width + 1, `No horizontal overflow at ${width}px (${theme})`);
       assert.ok(layout.summaryMin >= 44, 'Summary touch targets are at least 44px'); layouts.push({ theme, ...layout });
-      if (width === 390 && theme === 'light') await page.screenshot({ path: join(out, 'shelf-390-expanded.png'), fullPage: true });
+      await page.screenshot({ path: join(out, `shelf-${width}-${theme}.png`), fullPage: true, animations: 'disabled' });
     }
     await page.locator('#shelf-links [data-shelfdel]').click();
     await page.waitForFunction(() => !local.links.length);
