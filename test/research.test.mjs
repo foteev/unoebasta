@@ -33,6 +33,7 @@ test('publication-only lead, annotations and decisions survive save, refresh and
   const lead = addLead(r, { qid: 'Q1', lang: 'ru', kind: 'fragment', source: 'publisher', hint: 'Translation may be in collection X', origin: 'Bibliography record', target: { publication: 'Collection X; translator Y; ISBN not yet identified' }, next_action: 'Find the contents and official publisher sample' }, NOW);
   noteLead(r, lead.id, 'The title may differ between editions', NOW); saveResearch(dir, r);
   const saved = loadResearch(dir); assert.equal(saved.leads[0].target.url, undefined); assert.equal(saved.leads[0].notes[0].text, 'The title may differ between editions');
+  const snapshot = JSON.stringify(saved); mergeResearch(saved, structuredClone(saved)); assert.equal(JSON.stringify(saved), snapshot);
   const incoming = structuredClone(saved); incoming.leads[0].next_action = 'Generic adapter default'; incoming.leads[0].notes.push({ at: LATER, text: 'Another bibliography mentions it' });
   mergeResearch(saved, incoming); assert.equal(saved.leads[0].notes.length, 2); assert.equal(saved.leads[0].next_action, 'Find the contents and official publisher sample');
   assert.throws(() => addLead(saved, { qid: 'Q1', lang: 'en', kind: 'full', source: 'author', hint: 'Secret URL', origin: 'test', target: { url: 'https://example.org/?key=do-not-store' } }), /Credential/);

@@ -158,7 +158,7 @@ export function mergeResearch(base, incoming = {}) {
     if (JSON.stringify([old.qid, old.lang, old.kind, old.source, old.target]) !== JSON.stringify([lead.qid, lead.lang, lead.kind, lead.source, lead.target])) throw new Error(`Conflicting lead identity ${lead.id}`);
     for (const field of ['notes', 'decisions']) {
       const values = [...(old[field] || []), ...(lead[field] || [])];
-      old[field] = [...new Map(values.map(v => [JSON.stringify(v), v])).values()];
+      if (values.length || old[field] !== undefined) old[field] = [...new Map(values.map(v => [JSON.stringify(v), v])).values()];
     }
     if (lead.hint !== old.hint && !old.notes.some(n => n.text === lead.hint)) old.notes.push({ at: lead.updated_at, text: lead.hint });
     if (Date.parse(lead.last_checked || 0) > Date.parse(old.last_checked || 0)) old.last_checked = lead.last_checked;
