@@ -1,3 +1,7 @@
+# Reader-delegated contribution tasks
+
+When the request contains an assigned-QID contribution task, follow [docs/search-brief.md](docs/search-brief.md). Deliver only one new findings CSV and an optional matching note, or notes only. Do not run the maintainer import/publication workflow or modify code, coverage, the research registry or these instructions. The model is chosen by the reader.
+
 # Catalog research
 
 When asked to **continue search**, follow [docs/continue-search.md](docs/continue-search.md) and the verification rules in [docs/search-brief.md](docs/search-brief.md).

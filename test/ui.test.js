@@ -61,7 +61,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // awards tab — phone layout (no matchMedia in jsdom = narrow screen)
   click($('#tab-awards')); await sleep(50);
   checks['phone: no table'] = !$('#view-awards table.board');
-  checks['phone: category picker'] = $$('#view-awards [data-av-cat]').length === 4;
+  checks['phone: category picker'] = $$('#view-awards [data-av-cat]').length === 5;
   const ss = $$('#view-awards .yrow');
   checks['hugo short story list ~71'] = ss.length >= 68 && ss.length <= 74;
   checks['decade jump chips'] = $$('#view-awards [data-jump]').length >= 7;
@@ -75,12 +75,12 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#view-awards [data-av-sort]')); await sleep(50);
   checks['sort toggle → 1953 first'] = /1953/.test($('#view-awards .yrow').textContent);
   click($('#view-awards [data-av-award="l"]')); await sleep(50);
-  checks['locus 8 category chips'] = $$('#view-awards [data-av-cat]').length === 8;
+  checks['locus 8 category chips'] = $$('#view-awards [data-av-cat]').length === 9;
   // "All" by category: every award at once, one row per work, the awards named on it
   click($('#view-awards [data-av-award="all"]')); await sleep(50);
   click($('#view-awards [data-av-cat="S"]')); await sleep(50);
   const allRows = $$('#view-awards .yrow'), hugoS = w.eval("DATA.aw.filter(x => x[0] === 'h' && x[1] === 'S').length");
-  checks['awards “All” by category: more than one award, no duplicates, awards named'] = $$('#view-awards [data-av-cat]').length === 4 && allRows.length > hugoS && allRows.length < w.eval("DATA.aw.filter(x => x[1] === 'S').length") && allRows.some(r => /,/.test((r.querySelector('.wmeta') || {}).textContent || '')) && /^Все/.test($('#view-awards .count-line').textContent);
+  checks['awards “All” by category: more than one award, no duplicates, awards named'] = $$('#view-awards [data-av-cat]').length === 5 && allRows.length > hugoS && allRows.length < w.eval("DATA.aw.filter(x => x[1] === 'S').length") && allRows.some(r => /,/.test((r.querySelector('.wmeta') || {}).textContent || '')) && /^Все/.test($('#view-awards .count-line').textContent);
   click($('#view-awards [data-av-cat="N"]')); await sleep(50);
   checks['awards “All” novels include Locus fantasy novels'] = $$('#view-awards .wmeta').some(m => /Локус · /.test(m.textContent));
   click($('#view-awards [data-av-mode="years"]')); await sleep(30);
@@ -148,6 +148,17 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.matchMedia = q => ({ matches: /min-width: 900px/.test(q) }); w.eval('renderAwards()');
   checks['back to desktop: all-awards board restored'] = !!$('#view-awards table.board') && $('#view-awards [data-av-award="all"]').getAttribute('aria-pressed') === 'true';
   w.matchMedia = undefined; w.eval('renderAwards()');
+  w.eval("Object.assign(AV,{award:'all',cat:'all',mode:'cats',onlyText:false,year:null,q:''}); renderAwards()");
+  checks['all categories: every work/year once, categories and prizes labelled'] = $$('#view-awards .yrow').length === w.eval("new Set(DATA.aw.map(x=>x[2]+'|'+x[3])).size") && $$('#view-awards .wmeta').every(x=>x.textContent.includes(' · ')) && $('#view-awards [data-av-cat="all"]').getAttribute('aria-pressed') === 'true';
+  click($('#view-awards [data-av-mode="authors"]')); await sleep(40);
+  checks['authors: direct author cards and winning works are discoverable'] = $$('#view-awards .author-open').length > 100 && !!$('#view-awards [data-author="Q314553"]') && $$('#view-awards .authorsec .wrow').length > 500;
+  click($('#view-awards [data-author="Q314553"]')); await sleep(30);
+  checks['authors: name opens biography and award history'] = !$('#sheet-author').hidden && /Силверберг/.test($('#sheet-author h2').textContent) && $$('#sheet-author .wrow').length > 3;
+  w.eval('closeSheets()');
+  click($('#view-awards [data-av-award="n"]')); click($('#view-awards [data-av-cat="S"]')); click($('#view-awards [data-av-text]')); await sleep(40);
+  const authorWorks=$$('#view-awards .authorsec [data-work]');
+  checks['authors: award, category and text filters apply together'] = authorWorks.length > 0 && authorWorks.every(el=>w.eval(`WORKS['${el.dataset.work}'].awards.some(a=>a[0]==='n'&&a[1]==='S') && (hasText('${el.dataset.work}')||isMine('${el.dataset.work}'))`));
+  w.eval("Object.assign(AV,{award:'h',cat:'S',mode:'cats',onlyText:false,q:''}); renderAwards()");
   // work card for a catalog-only work (Dune)
   const dune = Object.values(w.eval('WORKS')).find(x => x.title === 'Dune');
   w.eval(`openWork('${dune.id}')`); await sleep(50);
@@ -210,7 +221,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['recall: note saved, reader closed'] = $('#reader').hidden && $('#exit-dialog').hidden && w.eval("local.bookmarks.find(b => b.type === 'recall' && b.key === 'demo:ru').note") === 'Мира нашла письмо';
   w.eval(age + '; renderCatalog()'); await sleep(30);
   let rc = $('#view-catalog .recall');
-  checks['recall: the start screen begins with it, no motto there'] = !!rc && $('#view-catalog').firstElementChild === rc && !$('#view-catalog .motto') && !$('#view-catalog [data-view="library"]') && /grown-up now\. Say yes/.test($('#view-about .motto').textContent) && /Мира нашла письмо/.test(rc.textContent) && /40%/.test(rc.textContent) && /Глава 2/.test(rc.textContent) && /Утром мы поехали к морю/.test(rc.textContent);
+  checks['recall: the start screen begins with it, no motto there'] = !!rc && $('#view-catalog').firstElementChild === rc && !$('#view-catalog .motto') && !$('#view-catalog [data-view="library"]') && $('#view-about .motto').textContent === '20 minute adventure' && /Мира нашла письмо/.test(rc.textContent) && /40%/.test(rc.textContent) && /Глава 2/.test(rc.textContent) && /Утром мы поехали к морю/.test(rc.textContent);
   click(rc.querySelector('[data-rcnote]')); await sleep(20);
   rc.querySelector('form.rc-noteform textarea').value = 'Мира нашла письмо. Кто такой Ян?'; submit(rc.querySelector('form.rc-noteform')); await sleep(120);
   checks['recall: note edited on the card'] = /Кто такой Ян/.test($('#view-catalog .recall').textContent);
@@ -757,6 +768,18 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['shelf: Delete all saved items clears personal records and retains deletion marks'] = (await Promise.all(['files', 'positions', 'bookmarks', 'links', 'suggestions'].map(s => w.eval(`Store.all('${s}')`)))).every(a => a.length === 0) && (await w.eval("Store.all('tombs')")).length > 0;
   click($('#toast [data-shelfundo]')); await sleep(100);
   checks['shelf: Undo all restores each saved-item section'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1 && (await w.eval("Store.all('suggestions')")).length === 1 && (await w.eval("Store.all('positions')")).length === 2;
+  const privateSugg=w.eval('local.suggestions'); w.eval("local.suggestions=[{comment:'PRIVATE-READER-NOTE-12345'}]");
+  const singleTask=w.eval("buildSearchTask('Q19947428')"), batchTask=w.eval("buildSearchTask('batch')");
+  w.__savedSuggestions=privateSugg;w.eval('local.suggestions=window.__savedSuggestions');
+  const payload=task=>JSON.parse(task.split('PUBLIC CATALOG SNAPSHOT (refresh main before submitting):\n')[1]);
+  checks['agent task: one work with four-language scope, current URLs and canonical rules'] = payload(singleTask).length===1 && payload(singleTask)[0].qid==='Q19947428' && singleTask.includes('coverage.csv') && singleTask.includes('Change **only the new CSV') && payload(singleTask)[0].existing_links.some(x=>x.url.includes('det3gpWwLWI'));
+  checks['agent task: random batch has five distinct public works and no shelf data'] = payload(batchTask).length===5 && new Set(payload(batchTask).map(x=>x.qid)).size===5 && !singleTask.includes('PRIVATE-READER-NOTE-12345') && !batchTask.includes('PRIVATE-READER-NOTE-12345');
+  w.eval("copyAgentTask('Q19947428')"); await sleep(30);
+  checks['agent task: clipboard receives a ready task'] = w.__clip && w.__clip.includes('Assigned QIDs: Q19947428');
+  const clipboardWrite=w.navigator.clipboard.writeText;w.navigator.clipboard.writeText=async()=>{throw Error('denied')};
+  w.eval("copyAgentTask('Q19947428')"); await sleep(30);
+  checks['agent task: clipboard denial provides a selectable fallback'] = !$('#agent-dialog').hidden && $('#agent-task-text').readOnly && payload($('#agent-task-text').value)[0].qid==='Q19947428';
+  w.eval('closeAgentTask()');w.navigator.clipboard.writeText=clipboardWrite;
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);
