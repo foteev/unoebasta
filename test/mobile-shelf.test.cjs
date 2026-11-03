@@ -49,17 +49,31 @@ const assert = require('node:assert/strict');
       await Store.put('files', { id: 'qa-file', title: 'Тестовая книга с длинным названием для проверки мобильной полки', byline: 'Тестовый автор', format: 'txt', words: 100, size: 42, html: '<p>QA file body.</p>', at: Date.now() });
       await Store.put('bookmarks', { id: 'w:Q25349436', type: 'work', workId: 'Q25349436', at: Date.now() });
       await Store.put('links', { id: 'Q190192', url: 'https://example.test/my-book', note: 'Проверка удаления личной ссылки', at: Date.now() });
+      await Store.put('suggestions', { id: 'qa-comment', kind: 'feedback', workId: 'Q190192', comment: 'Исходный текст комментария сохраняется.', sent: Date.now(), at: Date.now() });
     });
     await page.locator('#tab-shelf').click();
     await page.waitForFunction(() => document.querySelector('#shelf-files [data-delfile]'));
+    for (const lang of ['en', 'es', 'pl', 'ru']) {
+      await page.locator('#lang-sel').selectOption(lang);
+      await page.waitForFunction(lang => document.documentElement.lang === lang && document.querySelector('#sugg-clear-all').textContent.trim() === I18N[lang].shelf_delete_all, lang);
+      assert.equal(await page.locator('#shelf-sugg .snip').textContent(), 'Исходный текст комментария сохраняется.', 'Saved feedback is preserved across language switches');
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.locator('#lang-en').click();
+    await page.waitForFunction(() => document.documentElement.lang === 'en' && document.querySelector('#sugg-clear-all').textContent.trim() === 'Delete all');
+    await page.evaluate(() => { for (const el of document.querySelectorAll('#view-shelf > details')) el.open = el.id === 'shelf-sugg'; });
+    await page.screenshot({ path: join(out, 'shelf-desktop-danger.png'), fullPage: true, animations: 'disabled' });
+    await page.locator('#lang-ru').click();
+    await page.waitForFunction(() => document.documentElement.lang === 'ru');
     const layouts = [];
     for (const width of [360, 390]) for (const theme of ['light', 'dark']) {
       await page.setViewportSize({ width, height: width === 360 ? 740 : 844 });
       await page.evaluate(theme => { prefs.theme = theme; savePrefs(); applyTheme(); }, theme);
-      await page.evaluate(() => { for (const id of ['shelf-files', 'shelf-langs', 'shelf-links']) document.getElementById(id).open = true; });
+      await page.evaluate(() => { for (const id of ['shelf-files', 'shelf-langs', 'shelf-links', 'shelf-sugg']) document.getElementById(id).open = true; });
       const layout = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth,
         summaryMin: Math.min(...[...document.querySelectorAll('#view-shelf summary')].map(el => el.getBoundingClientRect().height)) }));
       assert.ok(layout.scroll <= layout.width + 1, `No horizontal overflow at ${width}px (${theme})`);
+      assert.ok(await page.evaluate(() => getComputedStyle(document.getElementById('shelf-danger')).borderTopColor !== getComputedStyle(document.getElementById('shelf-data')).borderTopColor), 'Global danger border is distinct from ordinary panels');
       assert.ok(layout.summaryMin >= 44, 'Summary touch targets are at least 44px'); layouts.push({ theme, ...layout });
       await page.screenshot({ path: join(out, `shelf-${width}-${theme}.png`), fullPage: true, animations: 'disabled' });
     }
@@ -67,9 +81,11 @@ const assert = require('node:assert/strict');
     await page.waitForFunction(() => !local.links.length);
     assert.ok(await page.evaluate(async () => (await Store.all('tombs')).some(x => x.id === 'links|Q190192')), 'Delete leaves a sync deletion mark');
     await page.locator('#toast [data-shelfundo]').click(); await page.waitForFunction(() => local.links.length === 1);
-    await page.locator('#shelf-data summary').click();
+    await page.evaluate(() => { for (const el of document.querySelectorAll('#view-shelf > details')) el.open = false; });
+    assert.equal(await page.evaluate(() => document.querySelector('#view-shelf').lastElementChild.id), 'shelf-danger', 'Global danger zone stays at the bottom');
+    assert.equal(await page.locator('#shelf-danger').evaluate(el => !!el.closest('details')), false, 'Global deletion is not hidden in a collapsed panel');
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('#shelf-data [data-shelfclear]').click(); await page.waitForFunction(() => !local.files.length && !local.links.length);
+    await page.locator('#shelf-danger [data-shelfclear]').click(); await page.waitForFunction(() => !local.files.length && !local.links.length);
     await page.locator('#toast [data-shelfundo]').click(); await page.waitForFunction(() => local.files.length === 1);
     assert.equal(await page.evaluate(() => local.files[0].html), '<p>QA file body.</p>', 'Undo preserves file contents');
     assert.deepEqual(errors, [], 'No browser runtime errors');
