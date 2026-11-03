@@ -34,10 +34,12 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
     const entry = structuredClone(read[qid] || { links: [] }), before = entry.links.length;
     const hadFull = entry.links.some(l => l.kind === 'full');
     const selected = [];
-    for (const rs of groups(ok.filter(r => ['full', 'audio'].includes(r.kind)), r => `${r.lang}|${r.kind}`).values()) {
-      // Keep all existing sources; select one new source per language and kind, including every part.
-      const site = [...new Set(rs.map(r => r.site))].sort((a, b) => rank(a) - rank(b))[0];
-      const chosen = rs.filter(r => r.site === site).sort((a, b) => (+a.part || 0) - (+b.part || 0));
+    const candidates = ok.filter(r => ['full', 'audio'].includes(r.kind))
+      .sort((a, b) => (a.tier === 'external') - (b.tier === 'external') || rank(a.site) - rank(b.site));
+    for (const rs of groups(candidates, r => `${r.lang}|${r.kind}|${siteName(r.site)}`).values()) {
+      // Keep every reviewed site, with multipart validation scoped to that site/language/kind.
+      const site = rs[0].site;
+      const chosen = rs.slice().sort((a, b) => (+a.part || 0) - (+b.part || 0));
       const combined = [...entry.links.filter(l => l.kind === chosen[0].kind && (l.lang || 'en') === chosen[0].lang && l.site === siteName(site)), ...chosen];
       if (combined.some(r => r.part)) {
         if (combined.some(r => !r.part)) throw new Error(`${qid}: cannot mix numbered and unnumbered parts for ${site}`);
@@ -64,7 +66,7 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
     if (entry.links.length === before) continue;
     const texts = selected.filter(r => r.kind === 'full'), main = texts.find(r => r.lang === 'en') || texts[0] || selected[0];
     if (!read[qid] || (!hadFull && texts.length)) {
-      const words = texts.filter(r => r.lang === main.lang).reduce((n, r) => n + (+r.words || 0), 0);
+      const words = main.part ? texts.filter(r => r.lang === main.lang && siteName(r.site) === siteName(main.site) && r.part).reduce((n, r) => n + (+r.words || 0), 0) : +main.words || 0;
       if (words) entry.w = words;
       entry.tier = main.tier; entry.pub = main.pub.split(';')[0].trim();
       if (main.license) entry.license = main.license; else delete entry.license;

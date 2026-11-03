@@ -55,7 +55,7 @@ npm run build
 npm test
 ```
 
-The importer validates the whole CSV before writing. It adds links to existing works, preserves their previous sources, handles each language/kind independently and requires consecutive multipart sets. One new source per language/kind is selected using the publisher preference order. New links on existing works carry their own `added` timestamp; the work keeps its original date so News announces the new recording or text link. Duplicate links are ignored; a second identical import does not change timestamps. Wayback requires `--archive`. Submit the reviewed CSV and resulting catalog changes in a PR; Pages deploys when merged into `main`.
+The importer validates the whole CSV before writing. It adds links to existing works, preserves their previous sources, handles each language/kind independently and requires consecutive multipart sets. Every distinct reviewed site is retained for each language/kind. Known-permission sources are ordered before unverified external sources within a new batch; publisher preference affects ordering, never eligibility. Alternative copies do not add together their word counts; only numbered parts of the chosen text source are summed. New links on existing works carry their own `added` timestamp; the work keeps its original date so News announces the new recording or text link. Duplicate links are ignored; a second identical import does not change timestamps. Wayback requires `--archive`. Submit the reviewed CSV and resulting catalog changes in a PR; Pages deploys when merged into `main`.
 
 ## GitHub Actions
 

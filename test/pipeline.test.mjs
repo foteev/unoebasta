@@ -66,6 +66,34 @@ test('external recordings preserve unknown permission and do not relabel existin
   assert.equal(onlyAudio.tier, 'external'); assert.equal(onlyAudio.links[0].rights, 'unknown');
 });
 
+test('universal import keeps publisher and multiple external sites without adding alternative word counts', () => {
+  const rows = [
+    row({site:'Community',tier:'external',url:'https://community.example/story',words:'1600',evidence:'Opened matching story; permission unknown'}),
+    row({site:'Clarkesworld',url:'https://clarkesworldmagazine.com/story',words:'1000'}),
+    row({site:'Narrator One',kind:'audio',tier:'external',words:'',url:'https://www.youtube.com/watch?v=one',evidence:'Matching metadata only; permission unknown'}),
+    row({site:'Narrator Two',kind:'audio',tier:'external',words:'',url:'https://audio.example/story',evidence:'Matching player sampled; permission unknown'})
+  ];
+  const first=mergeFound(source({}),data(),parseCsv(toCsv(rows))), entry=readTable(first.source).Q1;
+  assert.equal(entry.links.length,4);assert.equal(entry.w,1000);assert.equal(entry.tier,'t2');
+  assert.equal(entry.links[0].site,'Clarkesworld');
+  for(const link of entry.links.slice(1)){assert.equal(link.rights,'unknown');assert.equal(link.checked_at,instant);assert.ok(link.evidence);assert.equal(link.verification,link.kind==='audio'?'metadata':'page');}
+  assert.equal(mergeFound(first.source,first.data,rows).source,first.source);
+  const parts=[row({site:'One',part:'1',url:'https://one.example/1',words:'400'}),row({site:'One',part:'2',url:'https://one.example/2',words:'600'}),row({site:'Other',url:'https://other.example/story',words:'1800'})];
+  assert.equal(readTable(mergeFound(source({}),data(),parts).source).Q1.w,1000);
+  assert.throws(()=>mergeFound(source({}),data(),[...parts,row({site:'Broken',part:'2',url:'https://broken.example/2'})]),/incomplete/);
+});
+
+test('universal CSV intake imports external full texts and audio in all four languages', () => {
+  const rows=['en','pl','ru','es'].flatMap(lang=>['full','audio'].map(kind=>row({lang,kind,tier:'external',site:'Unlisted public portal',url:`https://public.example/${lang}/${kind}`,words:kind==='full'?'1200':'',evidence:'Opened author/title/language; accessible page; permission unknown; audio metadata only'})));
+  const first=mergeFound(source({}),data(),parseCsv(toCsv(rows))),entry=readTable(first.source).Q1;
+  assert.equal(entry.links.length,8);assert.equal(entry.tier,'external');assert.equal(entry.w,1200);
+  for(const lang of ['en','pl','ru','es'])for(const kind of ['full','audio']){
+    const link=entry.links.find(l=>(l.lang||'en')===lang&&l.kind===kind);
+    assert.equal(link.rights,'unknown');assert.equal(link.verification,kind==='audio'?'metadata':'page');assert.equal(link.checked_at,instant);
+  }
+  assert.equal(mergeFound(first.source,first.data,rows).source,first.source);
+});
+
 test('multipart sets must be complete, unique and remain idempotent', () => {
   const rs = [row({ part: '1', url: 'https://example.org/1' }), row({ part: '2', url: 'https://example.org/2' })];
   assert.throws(() => mergeFound(source({}), data(), rs.slice(1)), /incomplete/);
