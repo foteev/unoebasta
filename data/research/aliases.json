@@ -1,0 +1,1470 @@
+{
+  "version": 1,
+  "titles": [
+    {
+      "qid": "Q4546842",
+      "lang": "en",
+      "value": "10^16 to 1",
+      "origin": "data/found/2026-11-02.csv:95; https://clarkesworldmagazine.com/kelly_12_13_reprint/",
+      "recorded_at": "2026-11-01T23:36:22Z"
+    }
+  ],
+  "authors": [
+    {
+      "qid": "Q123078",
+      "lang": "ru",
+      "value": "Роберт Хайнлайн",
+      "origin": "data/awards.json#authors/Q123078/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q130779",
+      "lang": "ru",
+      "value": "Ким Стенли Робинсон",
+      "origin": "data/awards.json#authors/Q130779/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q16204354",
+      "lang": "ru",
+      "value": "Энн Леки",
+      "origin": "data/awards.json#authors/Q16204354/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q171091",
+      "lang": "pl",
+      "value": "Philip Kindred Dick",
+      "origin": "data/awards.json#authors/Q171091/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q171091",
+      "lang": "ru",
+      "value": "Филип Дик",
+      "origin": "data/awards.json#authors/Q171091/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q715256",
+      "lang": "ru",
+      "value": "Фрэнк Райли",
+      "origin": "data/awards.json#authors/Q715256/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1760899",
+      "lang": "ru",
+      "value": "Марк Клифтон",
+      "origin": "data/awards.json#authors/Q1760899/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q181659",
+      "lang": "ru",
+      "value": "Урсула Крёбер Ле Гуин",
+      "origin": "data/awards.json#authors/Q181659/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q188987",
+      "lang": "ru",
+      "value": "Уильям Гибсон",
+      "origin": "data/awards.json#authors/Q188987/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q210059",
+      "lang": "ru",
+      "value": "Нил Гейман",
+      "origin": "data/awards.json#authors/Q210059/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q217110",
+      "lang": "ru",
+      "value": "Орсон Скотт Кард",
+      "origin": "data/awards.json#authors/Q217110/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q229369",
+      "lang": "ru",
+      "value": "Лоис Макмастер Буджолд",
+      "origin": "data/awards.json#authors/Q229369/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q232772",
+      "lang": "ru",
+      "value": "Сюзанна Кларк",
+      "origin": "data/awards.json#authors/Q232772/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q234030",
+      "lang": "ru",
+      "value": "Кэролайн Черри",
+      "origin": "data/awards.json#authors/Q234030/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q234700",
+      "lang": "ru",
+      "value": "Конни Уиллис",
+      "origin": "data/awards.json#authors/Q234700/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q240786",
+      "lang": "ru",
+      "value": "Роберт Чарльз Уилсон",
+      "origin": "data/awards.json#authors/Q240786/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q242162",
+      "lang": "ru",
+      "value": "Вонда Макинтайр",
+      "origin": "data/awards.json#authors/Q242162/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2427544",
+      "lang": "ru",
+      "value": "Нора Джемисин",
+      "origin": "data/awards.json#authors/Q2427544/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q248867",
+      "lang": "ru",
+      "value": "Джеймс Блиш",
+      "origin": "data/awards.json#authors/Q248867/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q260560",
+      "lang": "ru",
+      "value": "Кейт Вильгельм",
+      "origin": "data/awards.json#authors/Q260560/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q26116",
+      "lang": "ru",
+      "value": "Паоло Бачигалупи",
+      "origin": "data/awards.json#authors/Q26116/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q268371",
+      "lang": "ru",
+      "value": "Джоан Виндж",
+      "origin": "data/awards.json#authors/Q268371/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q277308",
+      "lang": "ru",
+      "value": "Джон Скальци",
+      "origin": "data/awards.json#authors/Q277308/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q286116",
+      "lang": "ru",
+      "value": "Альфред Бестер",
+      "origin": "data/awards.json#authors/Q286116/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q294625",
+      "lang": "ru",
+      "value": "Клиффорд Дональд Саймак",
+      "origin": "data/awards.json#authors/Q294625/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q295406",
+      "lang": "ru",
+      "value": "Роджер Желязны",
+      "origin": "data/awards.json#authors/Q295406/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q296256",
+      "lang": "ru",
+      "value": "Филип Хосе Фармер",
+      "origin": "data/awards.json#authors/Q296256/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q297538",
+      "lang": "ru",
+      "value": "Дэн Симмонс",
+      "origin": "data/awards.json#authors/Q297538/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q312405",
+      "lang": "ru",
+      "value": "Вернор Виндж",
+      "origin": "data/awards.json#authors/Q312405/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q312641",
+      "lang": "ru",
+      "value": "Фредерик Пол",
+      "origin": "data/awards.json#authors/Q312641/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q312853",
+      "lang": "ru",
+      "value": "Нил Стивенсон",
+      "origin": "data/awards.json#authors/Q312853/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q313185",
+      "lang": "ru",
+      "value": "Фриц Лейбер",
+      "origin": "data/awards.json#authors/Q313185/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q313466",
+      "lang": "ru",
+      "value": "Майкл Шейбон",
+      "origin": "data/awards.json#authors/Q313466/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q315069",
+      "lang": "ru",
+      "value": "Дэвид Брин",
+      "origin": "data/awards.json#authors/Q315069/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q316610",
+      "lang": "ru",
+      "value": "Ларри Нивен",
+      "origin": "data/awards.json#authors/Q316610/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q319196",
+      "lang": "ru",
+      "value": "Чайна Мьевиль",
+      "origin": "data/awards.json#authors/Q319196/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q34660",
+      "lang": "ru",
+      "value": "Джоан Роулинг",
+      "origin": "data/awards.json#authors/Q34660/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q347461",
+      "lang": "ru",
+      "value": "Джо Холдеман",
+      "origin": "data/awards.json#authors/Q347461/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q34981",
+      "lang": "ru",
+      "value": "Айзек Азимов",
+      "origin": "data/awards.json#authors/Q34981/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q104038379",
+      "lang": "ru",
+      "value": "Нги Во",
+      "origin": "data/awards.json#authors/Q104038379/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1193871",
+      "lang": "ru",
+      "value": "Аллен Стил",
+      "origin": "data/awards.json#authors/Q1193871/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1443070",
+      "lang": "ru",
+      "value": "Спайдер Робинсон",
+      "origin": "data/awards.json#authors/Q1443070/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4975117",
+      "lang": "ru",
+      "value": "Джинн Робинсон",
+      "origin": "data/awards.json#authors/Q4975117/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q20631001",
+      "lang": "ru",
+      "value": "Амаль Эль-Мохтар",
+      "origin": "data/awards.json#authors/Q20631001/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q243027",
+      "lang": "ru",
+      "value": "Элизабет Мун",
+      "origin": "data/awards.json#authors/Q243027/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q260054",
+      "lang": "ru",
+      "value": "Кэтрин Азаро",
+      "origin": "data/awards.json#authors/Q260054/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q271973",
+      "lang": "ru",
+      "value": "Пат Мёрфи",
+      "origin": "data/awards.json#authors/Q271973/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q28870552",
+      "lang": "ru",
+      "value": "Сара Пинскер",
+      "origin": "data/awards.json#authors/Q28870552/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q314553",
+      "lang": "ru",
+      "value": "Роберт Силверберг",
+      "origin": "data/awards.json#authors/Q314553/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q317491",
+      "lang": "ru",
+      "value": "Грег Бир",
+      "origin": "data/awards.json#authors/Q317491/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q358312",
+      "lang": "ru",
+      "value": "Грегори Бенфорд",
+      "origin": "data/awards.json#authors/Q358312/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q361149",
+      "lang": "ru",
+      "value": "Джин Вулф",
+      "origin": "data/awards.json#authors/Q361149/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q362742",
+      "lang": "ru",
+      "value": "Роберт Сойер",
+      "origin": "data/awards.json#authors/Q362742/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4225496",
+      "lang": "ru",
+      "value": "Мэри Робинетт Коваль",
+      "origin": "data/awards.json#authors/Q4225496/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q438164",
+      "lang": "ru",
+      "value": "Сэмюэль Дилэни",
+      "origin": "data/awards.json#authors/Q438164/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q438330",
+      "lang": "ru",
+      "value": "Джо Уолтон",
+      "origin": "data/awards.json#authors/Q438330/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q444362",
+      "lang": "ru",
+      "value": "Никола Гриффит",
+      "origin": "data/awards.json#authors/Q444362/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q455510",
+      "lang": "ru",
+      "value": "Майкл Суэнвик",
+      "origin": "data/awards.json#authors/Q455510/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q469370",
+      "lang": "ru",
+      "value": "Элизабет Скарборо",
+      "origin": "data/awards.json#authors/Q469370/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q47087",
+      "lang": "ru",
+      "value": "Артур Чарльз Кларк",
+      "origin": "data/awards.json#authors/Q47087/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q5084448",
+      "lang": "ru",
+      "value": "Чарли Джейн Андерс",
+      "origin": "data/awards.json#authors/Q5084448/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q53411010",
+      "lang": "pl",
+      "value": "Rebecca F. Kuang",
+      "origin": "data/awards.json#authors/Q53411010/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q53411010",
+      "lang": "ru",
+      "value": "Ребекка Ф. Куанг",
+      "origin": "data/awards.json#authors/Q53411010/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q65312484",
+      "lang": "ru",
+      "value": "Ф. Джели Кларк",
+      "origin": "data/awards.json#authors/Q65312484/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q6774606",
+      "lang": "ru",
+      "value": "Марта Уэллс",
+      "origin": "data/awards.json#authors/Q6774606/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q715241",
+      "lang": "ru",
+      "value": "Джек Макдевит",
+      "origin": "data/awards.json#authors/Q715241/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7934",
+      "lang": "ru",
+      "value": "Фрэнк Герберт",
+      "origin": "data/awards.json#authors/Q7934/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q953288",
+      "lang": "ru",
+      "value": "Майкл Бишоп",
+      "origin": "data/awards.json#authors/Q953288/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q181677",
+      "lang": "ru",
+      "value": "Джордж Р. Р. Мартин",
+      "origin": "data/awards.json#authors/Q181677/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q242643",
+      "lang": "ru",
+      "value": "Наоми Новик",
+      "origin": "data/awards.json#authors/Q242643/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q268755",
+      "lang": "ru",
+      "value": "Патриция Маккиллип",
+      "origin": "data/awards.json#authors/Q268755/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q285007",
+      "lang": "ru",
+      "value": "Питер Бигл",
+      "origin": "data/awards.json#authors/Q285007/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q345249",
+      "lang": "ru",
+      "value": "Чарльз Стросс",
+      "origin": "data/awards.json#authors/Q345249/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3476794",
+      "lang": "ru",
+      "value": "Шонан Макгуайр",
+      "origin": "data/awards.json#authors/Q3476794/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q363810",
+      "lang": "ru",
+      "value": "Тим Пауэрс",
+      "origin": "data/awards.json#authors/Q363810/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q433291",
+      "lang": "ru",
+      "value": "Эллен Кашнер",
+      "origin": "data/awards.json#authors/Q433291/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q450737",
+      "lang": "pl",
+      "value": "Sheri Tepper",
+      "origin": "data/awards.json#authors/Q450737/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q450737",
+      "lang": "ru",
+      "value": "Шери Теппер",
+      "origin": "data/awards.json#authors/Q450737/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q46248",
+      "lang": "ru",
+      "value": "Терри Пратчетт",
+      "origin": "data/awards.json#authors/Q46248/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q465179",
+      "lang": "ru",
+      "value": "Мэрион Зиммер Брэдли",
+      "origin": "data/awards.json#authors/Q465179/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q465851",
+      "lang": "ru",
+      "value": "Сара Монетт",
+      "origin": "data/awards.json#authors/Q465851/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q50379894",
+      "lang": "ru",
+      "value": "Фонда Ли",
+      "origin": "data/awards.json#authors/Q50379894/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1038440",
+      "lang": "ru",
+      "value": "Джефф Вандермеер",
+      "origin": "data/awards.json#authors/Q1038440/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q185714",
+      "lang": "ru",
+      "value": "Дэниел Киз",
+      "origin": "data/awards.json#authors/Q185714/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2305628",
+      "lang": "ru",
+      "value": "Алексей Паншин",
+      "origin": "data/awards.json#authors/Q2305628/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q239739",
+      "lang": "ru",
+      "value": "Октавия Батлер",
+      "origin": "data/awards.json#authors/Q239739/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q357839",
+      "lang": "ru",
+      "value": "Уолтер Майкл Миллер",
+      "origin": "data/awards.json#authors/Q357839/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q378807",
+      "lang": "ru",
+      "value": "Джон Браннер",
+      "origin": "data/awards.json#authors/Q378807/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q58640138",
+      "lang": "ru",
+      "value": "Аркади Мартин",
+      "origin": "data/awards.json#authors/Q58640138/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q607588",
+      "lang": "ru",
+      "value": "Лю Цысинь",
+      "origin": "data/awards.json#authors/Q607588/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7901282",
+      "lang": "ru",
+      "value": "Урсула Вернон",
+      "origin": "data/awards.json#authors/Q7901282/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q16198845",
+      "lang": "ru",
+      "value": "Роберт Джексон Беннетт",
+      "origin": "data/awards.json#authors/Q16198845/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1857523",
+      "lang": "ru",
+      "value": "Роберт Рид",
+      "origin": "data/awards.json#authors/Q1857523/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q220883",
+      "lang": "ru",
+      "value": "Пол Уильям Андерсон",
+      "origin": "data/awards.json#authors/Q220883/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q233046",
+      "lang": "ru",
+      "value": "Энн Маккефри",
+      "origin": "data/awards.json#authors/Q233046/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q234928",
+      "lang": "pl",
+      "value": "James Tiptree",
+      "origin": "data/awards.json#authors/Q234928/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q234928",
+      "lang": "ru",
+      "value": "Джеймс Типтри-младший",
+      "origin": "data/awards.json#authors/Q234928/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q238438",
+      "lang": "ru",
+      "value": "Нэнси Кресс",
+      "origin": "data/awards.json#authors/Q238438/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q256959",
+      "lang": "ru",
+      "value": "Люциус Шепард",
+      "origin": "data/awards.json#authors/Q256959/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q265270",
+      "lang": "ru",
+      "value": "Джоанна Расс",
+      "origin": "data/awards.json#authors/Q265270/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3138815",
+      "lang": "ru",
+      "value": "Кидж Джонсон",
+      "origin": "data/awards.json#authors/Q3138815/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q316785",
+      "lang": "ru",
+      "value": "Грег Иган",
+      "origin": "data/awards.json#authors/Q316785/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q316788",
+      "lang": "ru",
+      "value": "Джек Уильямсон",
+      "origin": "data/awards.json#authors/Q316788/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3877423",
+      "lang": "ru",
+      "value": "Ннеди Окорафор",
+      "origin": "data/awards.json#authors/Q3877423/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q434029",
+      "lang": "ru",
+      "value": "Тимоти Зан",
+      "origin": "data/awards.json#authors/Q434029/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q446941",
+      "lang": "ru",
+      "value": "Гордон Диксон",
+      "origin": "data/awards.json#authors/Q446941/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q455780",
+      "lang": "ru",
+      "value": "Гарри Тёртлдав",
+      "origin": "data/awards.json#authors/Q455780/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q457608",
+      "lang": "ru",
+      "value": "Брендон Сандерсон",
+      "origin": "data/awards.json#authors/Q457608/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q503095",
+      "lang": "ru",
+      "value": "Тед Чан",
+      "origin": "data/awards.json#authors/Q503095/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q504805",
+      "lang": "ru",
+      "value": "Джон Варли",
+      "origin": "data/awards.json#authors/Q504805/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q809012",
+      "lang": "ru",
+      "value": "Барри Брукс Лонгиер",
+      "origin": "data/awards.json#authors/Q809012/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q913403",
+      "lang": "ru",
+      "value": "Майк Резник",
+      "origin": "data/awards.json#authors/Q913403/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1444345",
+      "lang": "ru",
+      "value": "Терри Биссон",
+      "origin": "data/awards.json#authors/Q1444345/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q266947",
+      "lang": "ru",
+      "value": "Пэт Кэдиган",
+      "origin": "data/awards.json#authors/Q266947/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q299933",
+      "lang": "pl",
+      "value": "Maureen McHugh",
+      "origin": "data/awards.json#authors/Q299933/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q299933",
+      "lang": "ru",
+      "value": "Морин Макхью",
+      "origin": "data/awards.json#authors/Q299933/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3066599",
+      "lang": "ru",
+      "value": "Джон Кессел",
+      "origin": "data/awards.json#authors/Q3066599/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q311253",
+      "lang": "ru",
+      "value": "Харлан Эллисон",
+      "origin": "data/awards.json#authors/Q311253/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q312995",
+      "lang": "ru",
+      "value": "Брюс Стерлинг",
+      "origin": "data/awards.json#authors/Q312995/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q373836",
+      "lang": "ru",
+      "value": "Джеймс Патрик Келли",
+      "origin": "data/awards.json#authors/Q373836/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4221522",
+      "lang": "ru",
+      "value": "Кэтлин Ребека Кирнан",
+      "origin": "data/awards.json#authors/Q4221522/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4389768",
+      "lang": "ru",
+      "value": "Линда Нагата",
+      "origin": "data/awards.json#authors/Q4389768/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q736447",
+      "lang": "ru",
+      "value": "Джон Краули",
+      "origin": "data/awards.json#authors/Q736447/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q859065",
+      "lang": "ru",
+      "value": "Кэтрин М. Валенте",
+      "origin": "data/awards.json#authors/Q859065/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q110436",
+      "lang": "ru",
+      "value": "Кори Доктороу",
+      "origin": "data/awards.json#authors/Q110436/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1190926",
+      "lang": "ru",
+      "value": "Келли Линк",
+      "origin": "data/awards.json#authors/Q1190926/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q151720",
+      "lang": "ru",
+      "value": "Кен Лю",
+      "origin": "data/awards.json#authors/Q151720/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q440744",
+      "lang": "ru",
+      "value": "Лиза Таттл",
+      "origin": "data/awards.json#authors/Q440744/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2394387",
+      "lang": "ru",
+      "value": "Йолен, Джейн",
+      "origin": "data/awards.json#authors/Q2394387/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q259888",
+      "lang": "ru",
+      "value": "Кейдж Бейкер",
+      "origin": "data/awards.json#authors/Q259888/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2939834",
+      "lang": "ru",
+      "value": "Кэрол Эмшвиллер",
+      "origin": "data/awards.json#authors/Q2939834/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3136498",
+      "lang": "ru",
+      "value": "Алан Бреннерт",
+      "origin": "data/awards.json#authors/Q3136498/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3666432",
+      "lang": "ru",
+      "value": "Чарльз Льюис Грант",
+      "origin": "data/awards.json#authors/Q3666432/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q380869",
+      "lang": "ru",
+      "value": "Аластер Рейнольдс",
+      "origin": "data/awards.json#authors/Q380869/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4383379",
+      "lang": "ru",
+      "value": "Карен Джой Фаулер",
+      "origin": "data/awards.json#authors/Q4383379/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q446973",
+      "lang": "ru",
+      "value": "Кристин Кэтрин Раш",
+      "origin": "data/awards.json#authors/Q446973/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q892",
+      "lang": "pl",
+      "value": "John Ronald Reuel Tolkien",
+      "origin": "data/awards.json#authors/Q892/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q892",
+      "lang": "ru",
+      "value": "Джон Рональд Руэл Толкин",
+      "origin": "data/awards.json#authors/Q892/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1174539",
+      "lang": "ru",
+      "value": "Дэвид Герролд",
+      "origin": "data/awards.json#authors/Q1174539/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q240253",
+      "lang": "ru",
+      "value": "Теодор Старджон",
+      "origin": "data/awards.json#authors/Q240253/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2495863",
+      "lang": "ru",
+      "value": "Джеффри Форд",
+      "origin": "data/awards.json#authors/Q2495863/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4977667",
+      "lang": "ru",
+      "value": "Брюс Холланд Роджерс",
+      "origin": "data/awards.json#authors/Q4977667/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q5342047",
+      "lang": "ru",
+      "value": "Эдвард Брайант",
+      "origin": "data/awards.json#authors/Q5342047/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q5982082",
+      "lang": "ru",
+      "value": "Ричард МакКенна",
+      "origin": "data/awards.json#authors/Q5982082/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q601304",
+      "lang": "ru",
+      "value": "Элизабет Хэнд",
+      "origin": "data/awards.json#authors/Q601304/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q720562",
+      "lang": "ru",
+      "value": "Гарднер Дозуа",
+      "origin": "data/awards.json#authors/Q720562/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q725065",
+      "lang": "ru",
+      "value": "Джеймс Морроу",
+      "origin": "data/awards.json#authors/Q725065/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7457969",
+      "lang": "ru",
+      "value": "Северна Парк",
+      "origin": "data/awards.json#authors/Q7457969/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q918443",
+      "lang": "ru",
+      "value": "Джеффри Лэндис",
+      "origin": "data/awards.json#authors/Q918443/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1029497",
+      "lang": "pl",
+      "value": "Sarah Bear Elizabeth Wishnevsky",
+      "origin": "data/awards.json#authors/Q1029497/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1029497",
+      "lang": "ru",
+      "value": "Элизабет Бир",
+      "origin": "data/awards.json#authors/Q1029497/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2095351",
+      "lang": "ru",
+      "value": "Лоуренс Уотт-Эванс",
+      "origin": "data/awards.json#authors/Q2095351/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q238702",
+      "lang": "ru",
+      "value": "Брайан Олдис",
+      "origin": "data/awards.json#authors/Q238702/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3071789",
+      "lang": "ru",
+      "value": "Ричард Уилсон",
+      "origin": "data/awards.json#authors/Q3071789/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4760631",
+      "lang": "ru",
+      "value": "Энди Дункан",
+      "origin": "data/awards.json#authors/Q4760631/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q550614",
+      "lang": "ru",
+      "value": "Джордж Алек Эффинджер",
+      "origin": "data/awards.json#authors/Q550614/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q6829419",
+      "lang": "ru",
+      "value": "Майкл Коннер",
+      "origin": "data/awards.json#authors/Q6829419/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q940958",
+      "lang": "ru",
+      "value": "Джефф Райман",
+      "origin": "data/awards.json#authors/Q940958/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q943997",
+      "lang": "ru",
+      "value": "Чарльз Шеффилд",
+      "origin": "data/awards.json#authors/Q943997/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q312632",
+      "lang": "ru",
+      "value": "Джек Вэнс",
+      "origin": "data/awards.json#authors/Q312632/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q376859",
+      "lang": "ru",
+      "value": "Сирил Корнблат",
+      "origin": "data/awards.json#authors/Q376859/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q329999",
+      "lang": "ru",
+      "value": "Эрик Фрэнк Рассел",
+      "origin": "data/awards.json#authors/Q329999/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q355879",
+      "lang": "ru",
+      "value": "Роберт Блох",
+      "origin": "data/awards.json#authors/Q355879/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q441603",
+      "lang": "ru",
+      "value": "Сюзи Макки Чарнас",
+      "origin": "data/awards.json#authors/Q441603/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q720787",
+      "lang": "ru",
+      "value": "Дэвид Лэнгфорд",
+      "origin": "data/awards.json#authors/Q720787/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q782991",
+      "lang": "ru",
+      "value": "Эйв Дэвидсон",
+      "origin": "data/awards.json#authors/Q782991/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1029714",
+      "lang": "ru",
+      "value": "Джанет Каган",
+      "origin": "data/awards.json#authors/Q1029714/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1818293",
+      "lang": "ru",
+      "value": "Томас Олде Хёвелт",
+      "origin": "data/awards.json#authors/Q1818293/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q26470186",
+      "lang": "ru",
+      "value": "Хао Цзинфан",
+      "origin": "data/awards.json#authors/Q26470186/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q455228",
+      "lang": "ru",
+      "value": "Иен Макдональд",
+      "origin": "data/awards.json#authors/Q455228/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q550449",
+      "lang": "ru",
+      "value": "Мюррей Лейнстер",
+      "origin": "data/awards.json#authors/Q550449/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1443787",
+      "lang": "ru",
+      "value": "Кэтрин Маклин",
+      "origin": "data/awards.json#authors/Q1443787/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q316138",
+      "lang": "ru",
+      "value": "Майкл Муркок",
+      "origin": "data/awards.json#authors/Q316138/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q720797",
+      "lang": "ru",
+      "value": "Билл Джонсон",
+      "origin": "data/awards.json#authors/Q720797/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q983672",
+      "lang": "ru",
+      "value": "Питер Уоттс",
+      "origin": "data/awards.json#authors/Q983672/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1354608",
+      "lang": "ru",
+      "value": "Эрин Моргенштерн",
+      "origin": "data/awards.json#authors/Q1354608/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q16204372",
+      "lang": "ru",
+      "value": "Ли юн ха",
+      "origin": "data/awards.json#authors/Q16204372/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q180373",
+      "lang": "ru",
+      "value": "Жаклин Кэри",
+      "origin": "data/awards.json#authors/Q180373/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2000229",
+      "lang": "ru",
+      "value": "Роберт Л. Форвард",
+      "origin": "data/awards.json#authors/Q2000229/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q2577687",
+      "lang": "ru",
+      "value": "Майкл Флинн",
+      "origin": "data/awards.json#authors/Q2577687/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q270204",
+      "lang": "ru",
+      "value": "Нало Хопкинсон",
+      "origin": "data/awards.json#authors/Q270204/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q3036044",
+      "lang": "ru",
+      "value": "Дональд Кингсбери",
+      "origin": "data/awards.json#authors/Q3036044/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7943942",
+      "lang": "ru",
+      "value": "Вилар Кафтан",
+      "origin": "data/awards.json#authors/Q7943942/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q1159871",
+      "lang": "ru",
+      "value": "Дэниел Абрахам",
+      "origin": "data/awards.json#authors/Q1159871/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q6142591",
+      "lang": "ru",
+      "value": "Джеймс Кори",
+      "origin": "data/awards.json#authors/Q6142591/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q18608460",
+      "lang": "ru",
+      "value": "Тай Френк",
+      "origin": "data/awards.json#authors/Q18608460/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q370377",
+      "lang": "pl",
+      "value": "Joe Hill King",
+      "origin": "data/awards.json#authors/Q370377/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q370377",
+      "lang": "ru",
+      "value": "Джо Хилл",
+      "origin": "data/awards.json#authors/Q370377/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q410",
+      "lang": "ru",
+      "value": "Карл Эдвард Саган",
+      "origin": "data/awards.json#authors/Q410/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q440100",
+      "lang": "ru",
+      "value": "Джонатан Летем",
+      "origin": "data/awards.json#authors/Q440100/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q448241",
+      "lang": "ru",
+      "value": "Сара Зеттел",
+      "origin": "data/awards.json#authors/Q448241/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q448545",
+      "lang": "ru",
+      "value": "Патриция Энтони",
+      "origin": "data/awards.json#authors/Q448545/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4718489",
+      "lang": "pl",
+      "value": "Alexander C. Irvine",
+      "origin": "data/awards.json#authors/Q4718489/1",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q4718489",
+      "lang": "ru",
+      "value": "Александр Ирвин",
+      "origin": "data/awards.json#authors/Q4718489/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7152017",
+      "lang": "ru",
+      "value": "Пол Левинсон",
+      "origin": "data/awards.json#authors/Q7152017/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7403395",
+      "lang": "ru",
+      "value": "Саладин Ахмед",
+      "origin": "data/awards.json#authors/Q7403395/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7781648",
+      "lang": "ru",
+      "value": "Теодора Госс",
+      "origin": "data/awards.json#authors/Q7781648/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q938710",
+      "lang": "ru",
+      "value": "С. П. Сомтоу",
+      "origin": "data/awards.json#authors/Q938710/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q16211564",
+      "lang": "ru",
+      "value": "Марлон Джеймс",
+      "origin": "data/awards.json#authors/Q16211564/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q184785",
+      "lang": "ru",
+      "value": "Энн Райс",
+      "origin": "data/awards.json#authors/Q184785/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q288198",
+      "lang": "ru",
+      "value": "Барбара Хэмбли",
+      "origin": "data/awards.json#authors/Q288198/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q39829",
+      "lang": "ru",
+      "value": "Стивен Кинг",
+      "origin": "data/awards.json#authors/Q39829/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7150797",
+      "lang": "ru",
+      "value": "Пол Тремблей",
+      "origin": "data/awards.json#authors/Q7150797/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7609341",
+      "lang": "ru",
+      "value": "Стивен Грэм Джонс",
+      "origin": "data/awards.json#authors/Q7609341/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7926078",
+      "lang": "ru",
+      "value": "Виктор Лаваль",
+      "origin": "data/awards.json#authors/Q7926078/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q314416",
+      "lang": "ru",
+      "value": "Стивен Бакстер",
+      "origin": "data/awards.json#authors/Q314416/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q515421",
+      "lang": "ru",
+      "value": "Джо Аберкромби",
+      "origin": "data/awards.json#authors/Q515421/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q708581",
+      "lang": "ru",
+      "value": "Томас М. Диш",
+      "origin": "data/awards.json#authors/Q708581/2",
+      "recorded_at": "2026-11-02T23:29:46.553Z"
+    }
+  ]
+}

@@ -4,11 +4,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadResearch } from './lib/research.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const d = JSON.parse(readFileSync(join(root, 'data', 'awards.json'), 'utf8'));
 const src = readFileSync(join(root, 'src', 'index.html'), 'utf8');
 const READ = new Function(src.slice(src.indexOf('const READ = {'), src.indexOf('const CHANGELOG')) + '; return READ;')();
+const research = loadResearch(join(root, 'data/research'));
 
 const FORM = { N: 'novel', SF: 'novel', FN: 'novel', HN: 'novel', FT: 'novel', A: 'novella', E: 'novelette', S: 'short story' };
 const RANK = ['novel', 'novella', 'novelette', 'short story'];
@@ -34,16 +36,17 @@ function availability(q) {
 }
 // title_pl, title_ru, title_es: the title of a known translation (Wikidata works[q][1], [2]; the t_<lang> maps,
 // which merge-found.mjs fills from what the search finds), empty when none is known
-const titleIn = (q, l) => (l === 'pl' && d.works[q][1]) || (l === 'ru' && d.works[q][2]) || (d['t_' + l] || {})[q] || '';
+const titleIn = (q, l) => (l === 'pl' && d.works[q][1]) || (l === 'ru' && d.works[q][2]) || (d['t_' + l] || {})[q] || research.aliases.titles.find(a => a.qid === q && a.lang === l)?.value || '';
 const TLANGS = LANGS.filter(l => l !== 'en');
-const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS, 'audio', ...TLANGS.map(l => 'title_' + l)]];
+const rows = [['qid', 'title', 'authors', 'form', 'awards', 'latest', 'pages', ...LANGS, 'audio', ...TLANGS.map(l => 'title_' + l), ...LANGS.map(l => 'audio_' + l)]];
 const tally = {};
 for (const w of Object.values(works).sort((a, b) => b.last - a.last)) {
   const raw = d.works[w.q]; if (!raw) continue;
   const a = availability(w.q);
   const authors = raw[3].map(x => (d.authors[x] || [])[0] || x).join('; ');
   const audio = READ[w.q] && READ[w.q].links.some(l => l.kind === 'audio') ? 'yes' : ''; // a free reading by a person (podcast)
-  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none'), audio, ...TLANGS.map(l => titleIn(w.q, l))]);
+  const audioByLang = LANGS.map(lang => READ[w.q]?.links.some(l => l.kind === 'audio' && (l.lang || 'en') === lang) ? 'yes' : '');
+  rows.push([w.q, raw[0], authors, w.form, w.awards.join(', '), w.last, ((d.gb || {})[w.q] || {}).n || '', ...LANGS.map(l => a[l] || 'none'), audio, ...TLANGS.map(l => titleIn(w.q, l)), ...audioByLang]);
   for (const l of LANGS) { const k = `${w.form}|${l}|${a[l] || 'none'}`; tally[k] = (tally[k] || 0) + 1; }
 }
 const csv = rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : v).join(',')).join('\n');

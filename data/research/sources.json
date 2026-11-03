@@ -1,0 +1,260 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "gutenberg",
+      "name": "Project Gutenberg",
+      "mode": "auto",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "full"
+      ],
+      "url": "https://www.gutenberg.org/ebooks/",
+      "next_action": "Match title and author in the official catalog; verify the edition, language, complete text and rights statement."
+    },
+    {
+      "id": "librivox",
+      "name": "LibriVox",
+      "mode": "auto",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "audio"
+      ],
+      "url": "https://librivox.org/",
+      "next_action": "Find a complete human reading of this work in the target language and verify its rights."
+    },
+    {
+      "id": "google",
+      "name": "Google Books",
+      "mode": "auto",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "fragment"
+      ],
+      "url": "https://books.google.com/",
+      "next_action": "Open visible preview pages of the matching edition and locate the target story; record country restrictions."
+    },
+    {
+      "id": "clarkesworld",
+      "name": "Clarkesworld",
+      "mode": "auto",
+      "languages": [
+        "en"
+      ],
+      "kinds": [
+        "full",
+        "audio"
+      ],
+      "url": "https://clarkesworldmagazine.com/",
+      "next_action": "Verify the exact story, author credit, complete text or human recording and free access."
+    },
+    {
+      "id": "escapepod",
+      "name": "Escape Pod",
+      "mode": "auto",
+      "languages": [
+        "en"
+      ],
+      "kinds": [
+        "full",
+        "audio"
+      ],
+      "url": "https://escapepod.org/",
+      "next_action": "Check episode credits and media; distinguish a complete transcript from a short sample."
+    },
+    {
+      "id": "podcastle",
+      "name": "PodCastle",
+      "mode": "auto",
+      "languages": [
+        "en"
+      ],
+      "kinds": [
+        "full",
+        "audio"
+      ],
+      "url": "https://podcastle.org/",
+      "next_action": "Verify story identity, text completeness or the full human recording."
+    },
+    {
+      "id": "pseudopod",
+      "name": "PseudoPod",
+      "mode": "auto",
+      "languages": [
+        "en"
+      ],
+      "kinds": [
+        "full",
+        "audio"
+      ],
+      "url": "https://pseudopod.org/",
+      "next_action": "Verify story identity, text completeness or the full human recording."
+    },
+    {
+      "id": "legimi",
+      "name": "Legimi",
+      "mode": "manual",
+      "languages": [
+        "pl"
+      ],
+      "kinds": [
+        "fragment"
+      ],
+      "url": "https://www.legimi.pl/",
+      "next_action": "Find the Polish edition and open Czytaj fragment; for a collection verify that the target work is present in the sample."
+    },
+    {
+      "id": "litres",
+      "name": "ЛитРес",
+      "mode": "manual",
+      "languages": [
+        "ru"
+      ],
+      "kinds": [
+        "fragment"
+      ],
+      "url": "https://www.litres.ru/",
+      "next_action": "Find the Russian edition and open its reading sample without login; distinguish human audio from synthetic narration."
+    },
+    {
+      "id": "casadellibro",
+      "name": "Casa del Libro",
+      "mode": "manual",
+      "languages": [
+        "es"
+      ],
+      "kinds": [
+        "fragment"
+      ],
+      "url": "https://www.casadellibro.com/",
+      "next_action": "Find the Spanish edition and verify Leer primeras páginas; record the publisher-supplied extract URL and the included work."
+    },
+    {
+      "id": "planeta",
+      "name": "Planeta de Libros",
+      "mode": "manual",
+      "languages": [
+        "es"
+      ],
+      "kinds": [
+        "fragment"
+      ],
+      "url": "https://www.planetadelibros.com/",
+      "next_action": "Find the matching edition and an accessible Leer primer capítulo; verify the excerpt's actual contents."
+    },
+    {
+      "id": "fantlab",
+      "name": "FantLab bibliography",
+      "mode": "manual",
+      "languages": [
+        "ru"
+      ],
+      "kinds": [
+        "title",
+        "full",
+        "audio",
+        "fragment"
+      ],
+      "url": "https://fantlab.ru/",
+      "next_action": "Use the work record to identify translation titles, translators and publications, then locate an authorized publisher or author source."
+    },
+    {
+      "id": "isfdb",
+      "name": "ISFDB bibliography",
+      "mode": "manual",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "title",
+        "full",
+        "audio",
+        "fragment"
+      ],
+      "url": "https://www.isfdb.org/",
+      "next_action": "Inspect titles and publication contents; distinguish the work from its edition, then check the original publisher's legal access."
+    },
+    {
+      "id": "lecturalia",
+      "name": "Lecturalia bibliography",
+      "mode": "manual",
+      "languages": [
+        "es"
+      ],
+      "kinds": [
+        "title"
+      ],
+      "url": "https://www.lecturalia.com/",
+      "next_action": "Identify the published Spanish title and edition; verify it against publisher metadata before adding an alias."
+    },
+    {
+      "id": "publisher",
+      "name": "Original publisher or magazine",
+      "mode": "manual",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "title",
+        "full",
+        "audio",
+        "fragment"
+      ],
+      "next_action": "Follow the cited publication or table of contents to the publisher; verify the exact work, language, accessible content and permission."
+    },
+    {
+      "id": "author",
+      "name": "Author's own bibliography or site",
+      "mode": "manual",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "title",
+        "full",
+        "audio",
+        "fragment"
+      ],
+      "next_action": "Check the author's bibliography, authorized reprints and translation titles; follow only intentional author or publisher releases."
+    },
+    {
+      "id": "legacy",
+      "name": "Preserved research note",
+      "mode": "manual",
+      "languages": [
+        "en",
+        "pl",
+        "ru",
+        "es"
+      ],
+      "kinds": [
+        "any"
+      ],
+      "next_action": "Read the preserved evidence, identify the specific publication or source, and record a scoped follow-up. This note is not a global negative."
+    }
+  ]
+}

@@ -22,7 +22,7 @@ on:
         description: Optional comma-separated QIDs
         default: ''
       retry_searched:
-        description: Include historical kind=none rows
+        description: Repeat completed source checks (legacy option name)
         type: boolean
         default: false
 permissions:
@@ -60,15 +60,23 @@ jobs:
         shell: bash
         run: |
           args=(run --lang "$SEARCH_LANG" --kind "$SEARCH_KIND" --limit "$SEARCH_LIMIT" --providers "$SEARCH_PROVIDERS")
-          if [[ -n "$SEARCH_QIDS" ]]; then args+=(--qid "$SEARCH_QIDS"); fi
+          plan=(plan --lang "$SEARCH_LANG" --kind "$SEARCH_KIND" --limit "$SEARCH_LIMIT" --out .cache/search/plan.json)
+          if [[ -n "$SEARCH_QIDS" ]]; then args+=(--qid "$SEARCH_QIDS"); plan+=(--qid "$SEARCH_QIDS"); fi
           if [[ "$SEARCH_RETRY" == "true" ]]; then args+=(--retry-searched); fi
+          npm run research -- "${plan[@]}"
           npm run search -- "${args[@]}"
       - name: Save review queue and checkpoint (no story bodies)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: search-review-${{ github.run_id }}
-          path: .cache/search/state.json
+          path: |
+            .cache/search/state.json
+            .cache/search/plan.json
+            data/research/aliases.json
+            data/research/sources.json
+            data/research/leads.jsonl
+            data/research/checks.jsonl
           if-no-files-found: warn
           retention-days: 30
       - name: Preserve progress for the next run, including partial failures

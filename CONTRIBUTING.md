@@ -35,6 +35,8 @@ The direct way, as a pull request:
 
 **Automated discovery.** See [the search pipeline](docs/search-pipeline.md) for cached, resumable candidate searches and explicit review before CSV export. The importer also adds new links to existing works and handles each language separately.
 
+**Research without a confirmed link.** Keep possible editions, translation titles, source checks and uncertainties in the [research registry](docs/research.md). Notes may have a publication reference without a URL. Commit the registry changes too: an unsuccessful search can still provide useful evidence for the next contributor.
+
 ## Covers
 
 Novels and novellas show a cover from `covers/`; everything else gets a typographic cover drawn by the page. Covers come from Open Library by the cover ID in `data/awards.json` (`ol.<QID>.c`). When `data/awards.json` changes on `main`, the “Covers” workflow downloads what is missing and redeploys the site. To fix a wrong cover, change or remove its `c` in `ol` and delete the two files in `covers/s` and `covers/m`.
