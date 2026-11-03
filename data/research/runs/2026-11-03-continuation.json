@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "status": "completed",
+  "started_at": "2026-11-03T17:37:58.219Z",
+  "languages": [
+    "en",
+    "pl",
+    "ru",
+    "es"
+  ],
+  "kind": "all",
+  "limit": 50,
+  "providers": [
+    "clarkesworld",
+    "escapepod",
+    "podcastle",
+    "pseudopod",
+    "google"
+  ],
+  "by_language": {
+    "en": {
+      "works": 13,
+      "checked": 52,
+      "resumed": 0,
+      "candidates": 0,
+      "errors": 0,
+      "configuration_required": 0,
+      "needs_title": 0
+    },
+    "pl": {
+      "works": 13,
+      "checked": 13,
+      "resumed": 2,
+      "candidates": 2,
+      "errors": 0,
+      "configuration_required": 0,
+      "needs_title": 0
+    },
+    "ru": {
+      "works": 12,
+      "checked": 12,
+      "resumed": 2,
+      "candidates": 1,
+      "errors": 0,
+      "configuration_required": 0,
+      "needs_title": 0
+    },
+    "es": {
+      "works": 12,
+      "checked": 12,
+      "resumed": 2,
+      "candidates": 4,
+      "errors": 0,
+      "configuration_required": 0,
+      "needs_title": 0
+    }
+  },
+  "paused_sources": [],
+  "summary": {
+    "works": 50,
+    "checked": 89,
+    "resumed": 6,
+    "candidates": 7,
+    "errors": 0,
+    "configuration_required": 0,
+    "needs_title": 0
+  },
+  "restored_candidate_ids": [
+    "6a8f0a508698b7a7c99a"
+  ],
+  "new_candidate_ids": [
+    "f653850782794ce40629",
+    "730823153e9615b2eed5",
+    "ec508dc5219dc8fb7468",
+    "dbafb9ae2ebc8ca01945",
+    "d70c8571a492f6471fb8",
+    "6302d8cb742021e3ac69",
+    "cad8c35fe67c7c407c86"
+  ],
+  "pending_candidate_ids": [
+    "6a8f0a508698b7a7c99a",
+    "f653850782794ce40629",
+    "730823153e9615b2eed5",
+    "ec508dc5219dc8fb7468",
+    "dbafb9ae2ebc8ca01945",
+    "d70c8571a492f6471fb8",
+    "6302d8cb742021e3ac69",
+    "cad8c35fe67c7c407c86"
+  ],
+  "outcomes": {
+    "not_found": 82,
+    "candidates": 7
+  },
+  "follow_up_tasks": 719,
+  "finished_at": "2026-11-03T17:41:13.565Z",
+  "verified_additions": {
+    "pl": {
+      "fragment": 3
+    },
+    "es": {
+      "fragment": 1
+    }
+  },
+  "verified_csv": "data/found/2026-11-03-publisher-samples.csv",
+  "review_note": "Three Google previews were set aside in favor of independently verified publisher/Legimi samples. Five API candidates remain unapproved; specific publication leads remain in the registry.",
+  "run_url": "https://github.com/foteev/unoebasta/actions/runs/41686086167"
+}

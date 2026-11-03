@@ -4,6 +4,8 @@ The discovery CLI reads the versioned `awards.json`, `READ` table, previous `dat
 
 ## Collect candidates
 
+For one command that plans follow-ups, continues discovery across four languages and preserves results, use `npm run search:continue`. Its default budget is 50 work/language targets in total. See [continue search](continue-search.md) for the complete assistant workflow, source priorities and the difference between automatic discovery and verified additions.
+
 Install dependencies with `npm ci`, then run:
 
 ```sh

@@ -1465,6 +1465,13 @@
       "value": "Томас М. Диш",
       "origin": "data/awards.json#authors/Q708581/2",
       "recorded_at": "2026-11-02T23:29:46.553Z"
+    },
+    {
+      "qid": "Q7901282",
+      "lang": "en",
+      "value": "T. Kingfisher",
+      "origin": "https://redwombatstudio.com/about-the-author/ — author identifies Ursula Vernon as T. Kingfisher",
+      "recorded_at": "2026-11-03T17:33:59.397Z"
     }
   ]
 }

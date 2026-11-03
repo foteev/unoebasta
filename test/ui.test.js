@@ -658,7 +658,8 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("openWork('Q27903111')"); await sleep(60);
   checks['es: The Paper Menagerie is El zoo de papel in Spanish'] = $('#sheet-work h2').textContent === 'El zoo de papel' && /The Paper Menagerie/.test($('#sheet-work .alt').textContent);
   w.eval('closeSheets()');
-  checks['es: coverage counts Spanish fragments'] = /ES 0/.test($('#about-cov').textContent) && /Qué puedes leer hoy/.test($('#about-cov').textContent);
+  const nEsFragments = w.eval("Object.keys(WORKS).filter(q => availability(q).es === 'part').length");
+  checks['es: coverage counts Spanish fragments'] = new RegExp('ES ' + nEsFragments + '\\b').test($('#about-cov').textContent) && /Qué puedes leer hoy/.test($('#about-cov').textContent);
   const sel = $('#lang-sel'); sel.value = 'ru'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(80);
   checks['language picker on phones: the native list switches the language'] = $('#tab-catalog').textContent.trim() === 'Читать' && $('#lang-cur').textContent === 'RU' && $('#lang-sel').getAttribute('aria-label') === 'Язык';
   sel.value = 'es'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(80);
