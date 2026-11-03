@@ -1159,7 +1159,7 @@ const fmtDate = ms => new Date(ms).toLocaleDateString(locale(), { day: 'numeric'
 function fmtBytes(b) { if (b == null) return '—'; const u = ['B', 'KB', 'MB', 'GB']; let i = 0; while (b >= 1024 && i < 3) { b /= 1024; i++; } return (i ? b.toFixed(1) : b) + ' ' + u[i]; }
 function hash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
 function toast(msg, act) { const el = $('#toast'); el.innerHTML = esc(msg) + (act ? `<button class="toast-act" data-${act.k}="${esc(act.v)}">${esc(act.label)}</button>` : ''); el.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { el.hidden = true; }, act ? 6000 : 3200); }
-const MOTTO = 'You’re the grown-up now. Say yes.'; // the motto stays in English in every language, like the name
+const MOTTO = '20 minute adventure'; // the motto stays in English in every language, like the name
 const awardName = a => t('aw_' + a);
 const catName = c => t('cat_' + c);
 const authorName = q => { const a = AUTHORS[q]; return a ? (a.name[LANG] || a.name.en) : ''; };
