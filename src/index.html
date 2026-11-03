@@ -195,6 +195,7 @@ table.board { border-collapse: separate; border-spacing: 0; width: 100%; font-si
 .cell .ca { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cell .cm { display: flex; gap: 4px; font-size: 12px; margin-top: 2px; }
 .cell .cm:empty { display: none; }
+.cell .award-meta { display: block; margin-bottom: 4px; color: var(--accent); font-size: 12px; line-height: 1.4; }
 .cell.has-text { background: var(--accent-soft); }
 .cell.mine { border-style: dashed; border-color: var(--accent); }
 /* author awards */
@@ -1906,9 +1907,9 @@ function workRow(meta, q) {
   const w = work(q); const dn = isDone(q);
   return `<div class="wrow${dn ? ' is-done' : ''}"><button class="wbtn" data-work="${q}"><span class="wmeta">${esc(meta)}</span><span class="yt">${esc(titleOf(w))}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
 }
-function cellHtml(q) {
+function cellHtml(q, tag) {
   const w = work(q); const cls = ['cell']; if (hasText(q)) cls.push('has-text'); if (isMine(q)) cls.push('mine'); if (isDone(q)) cls.push('is-done');
-  return `<button class="${cls.join(' ')}" data-work="${q}"><span class="ct">${esc(titleOf(w))}</span><span class="ca">${isDone(q) ? doneTag() : ''}${esc(authorsLine(w))}</span><span class="cm">${marksHtml(q)}</span></button>`;
+  return `<button class="${cls.join(' ')}" data-work="${q}">${tag ? `<span class="award-meta">${esc(tag)}</span>` : ''}<span class="ct">${esc(titleOf(w))}</span><span class="ca">${isDone(q) ? doneTag() : ''}${esc(authorsLine(w))}</span><span class="cm">${marksHtml(q)}</span></button>`;
 }
 const passText = q => !AV.onlyText || hasText(q) || isMine(q);
 function matchQ(q) {
@@ -1925,8 +1926,7 @@ function renderAwards(onlyBody) {
   const v = $('#view-awards');
   const wide = WIDE();
   if (AV.mode === 'list') AV.mode = 'years';
-  if (AV.mode === 'table' && !wide) AV.mode = 'cats';
-  if (AV.award === 'all' && AV.mode === 'table' && !AV.year) AV.award = 'h'; // the board is one award at a time
+  const mode = AV.mode === 'table' && !wide ? 'cats' : AV.mode; // a phone layout does not erase the chosen desktop view
   const aw = AV.award === 'all' ? 'h' : AV.award;
   // "All": novels of every kind (Locus: SF, fantasy, horror, first novel) count as Novel
   const GROUP = { N: ['N', 'SF', 'FN', 'HN', 'FT'], A: ['A'], E: ['E'], S: ['S'] };
@@ -1934,15 +1934,25 @@ function renderAwards(onlyBody) {
   const catsOf = a => ALL ? Object.keys(GROUP) : CATS[a].filter(c => DATA.aw.some(x => x[0] === a && x[1] === c));
   if (!AV.cat || !catsOf(aw).includes(AV.cat)) AV.cat = catsOf(aw).includes('S') ? 'S' : catsOf(aw)[0];
   const awList = AV.award === 'all' ? AWARDS : [AV.award];
-  const awOpts = (AV.mode === 'table' && !AV.year) ? AWARDS : ['all', ...AWARDS];
+  const awOpts = ['all', ...AWARDS];
   const awSeg = `<div class="seg full" role="group" aria-label="${esc(t('col_award'))}">${awOpts.map(a => `<button data-av-award="${a}" aria-pressed="${AV.award === a}">${esc(a === 'all' ? t('aw_all_short') : awardName(a))}</button>`).join('')}</div>`;
   const modes = ['cats', 'years'].concat(wide ? ['table'] : []);
-  const modeSeg = `<div class="seg full" role="group">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${AV.mode === m}">${esc(t('v_' + m))}</button>`).join('')}</div>`;
+  const modeSeg = `<div class="seg full" role="group">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${mode === m}">${esc(t('v_' + m))}</button>`).join('')}</div>`;
   const tools = `<div class="scroller"><button class="chip" data-av-sort="toggle">${AV.sort === 'desc' ? '↓ ' + esc(t('sort_desc')) : '↑ ' + esc(t('sort_asc'))}</button><button class="chip" data-av-text="1" aria-pressed="${AV.onlyText}">${mk('text')} ${esc(t('only_text'))}</button></div>`;
   const search = '';
   const LG = { '▶': 'text', '¶': 'ex', '◌': 'mine', '♪': 'audio', '★': 'star' };
   const legend = `<p class="footnote legend">${t('legend_short').split(' · ').map(x => { const g = x[0], rest = esc(x.slice(2)); return LG[g] ? `<span>${mk(LG[g])} ${rest}</span>` : g === '●' ? `<span><span class="nd"></span> ${rest}</span>` : `<span>${esc(x)}</span>`; }).join(' ')}</p>`;
   const sortY = ys => ys.sort((a, b) => AV.sort === 'desc' ? b - a : a - b);
+  // The same work/year/category is one entry, with every award and Locus novel subtype retained.
+  const winners = (y, cat) => {
+    const by = new Map();
+    for (const a of awList) for (const c of (ALL ? GROUP[cat] : [cat])) for (const q of ((BOARD[a] || {})[y] || {})[c] || []) if (passText(q) && matchQ(q)) {
+      if (!by.has(q)) by.set(q, []);
+      const label = awardName(a) + (ALL && c !== cat ? ' · ' + catName(c) : '');
+      if (!by.get(q).includes(label)) by.get(q).push(label);
+    }
+    return by;
+  };
   let head = '', body = '';
   if (AV.year) {
     const y = AV.year;
@@ -1951,23 +1961,22 @@ function renderAwards(onlyBody) {
     const secs = awList.map(a => { const row = (BOARD[a] || {})[y]; if (!row) return ''; const rows = CATS[a].flatMap(c => (row[c] || []).filter(passText).map(q => workRow(catName(c), q))).join(''); return rows ? `<section class="yearsec"><h3>${esc(awardName(a))}</h3><div class="ylist">${rows}</div></section>` : ''; }).join('');
     head = `<div class="yearbar"><button class="btn btn-ghost" data-av-clear="1">← ${esc(t('crumb_all'))}</button><div class="yearnav"><button class="btn" data-av-year="${allYears[i - 1] || ''}" ${i > 0 ? '' : 'disabled'} aria-label="${esc(t('prev_year'))}">‹</button><strong>${y}</strong><button class="btn" data-av-year="${allYears[i + 1] || ''}" ${i < allYears.length - 1 ? '' : 'disabled'} aria-label="${esc(t('next_year'))}">›</button></div></div>${awSeg}`;
     body = secs || `<p class="empty">${esc(t('nothing_found'))}</p>`;
-  } else if (AV.mode === 'cats') {
+  } else if (mode === 'cats') {
     const ys = sortY([...new Set(awList.flatMap(a => Object.keys(BOARD[a] || {}).map(Number)))]);
     const shown = []; let rows = '', lastDec = null, count = 0;
     for (const y of ys) {
-      const by = new Map(); // a work that won several awards that year is one row, with every award named
-      for (const a of awList) for (const c of (ALL ? GROUP[AV.cat] : [AV.cat])) for (const q of ((BOARD[a] || {})[y] || {})[c] || []) if (passText(q) && matchQ(q)) { if (!by.has(q)) by.set(q, []); const n = awardName(a) + (ALL && c !== AV.cat ? ' · ' + catName(c) : ''); if (!by.get(q).includes(n)) by.get(q).push(n); }
+      const by = winners(y, AV.cat);
       const qs = [...by.keys()];
       qs.forEach((q, k) => { const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec; const ns = by.get(q); rows += yearRow(y, q, k === 0, mark, ALL ? ns.join(ns.some(n => n.includes(' · ')) ? '; ' : ', ') : ''); count++; });
       if (qs.length) shown.push(y);
     }
     head = `${awSeg}${modeSeg}<div class="scroller" role="group" aria-label="${esc(t('col_cat'))}">${catsOf(aw).map(c => `<button class="chip" data-av-cat="${c}" aria-pressed="${AV.cat === c}">${esc(catName(c))}</button>`).join('')}</div>${tools}${search}${decadeChips(shown)}`;
     body = `<p class="count-line">${esc(ALL ? t('aw_all_short') : awardName(aw))} · ${esc(catName(AV.cat))} · ${esc(t('found', { n: fmtNum(count) }))}</p>${count ? `<div class="ylist">${rows}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
-  } else if (AV.mode === 'years') {
+  } else if (mode === 'years') {
     const ys = sortY([...new Set(DATA.aw.filter(x => awList.includes(x[0])).map(x => x[2]))]);
     let count = 0; const shown = []; let lastDec = null;
     const secs = ys.map(y => {
-      const rows = awList.flatMap(a => { const row = (BOARD[a] || {})[y]; if (!row) return []; return CATS[a].flatMap(c => (row[c] || []).filter(q => passText(q) && matchQ(q)).map(q => workRow((AV.award === 'all' ? awardName(a) + ' · ' : '') + catName(c), q))); });
+      const rows = catsOf(aw).flatMap(c => [...winners(y, c)].map(([q, names]) => workRow(catName(c) + (ALL ? ' · ' + names.join('; ') : ''), q)));
       if (!rows.length) return '';
       count += rows.length; shown.push(y);
       const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec;
@@ -1978,10 +1987,15 @@ function renderAwards(onlyBody) {
   } else {
     // wide screens only: the full board
     const cats = catsOf(aw);
-    const ys = sortY(Object.keys(BOARD[aw] || {}).map(Number));
-    const rows = ys.map(y => { const row = BOARD[aw][y]; const cells = cats.map(c => `<td>${(row[c] || []).filter(q => passText(q) && matchQ(q)).map(cellHtml).join('')}</td>`); if ((AV.onlyText || AV.q) && !cells.some(c => c !== '<td></td>')) return ''; return `<tr><th scope="row"><button data-av-year="${y}">${y}</button></th>${cells.join('')}</tr>`; }).join('');
-    head = `${awSeg}${modeSeg}${tools}${search}`;
-    body = `<div class="board-wrap"><table class="board"><thead><tr><th></th>${cats.map(c => `<th scope="col"><button data-av-cat-go="${c}">${esc(catName(c))}</button></th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${cats.length + 1}"><p class="empty" style="padding:10px">${esc(t('nothing_found'))}</p></td></tr>`}</tbody></table></div>${legend}`;
+    const ys = sortY([...new Set(awList.flatMap(a => Object.keys(BOARD[a] || {}).map(Number)))]), shown = []; let lastDec = null;
+    const rows = ys.map(y => {
+      const cells = cats.map(c => [...winners(y, c)].map(([q, names]) => cellHtml(q, ALL ? names.join('; ') : '')).join(''));
+      if (!cells.some(Boolean)) return '';
+      shown.push(y); const dec = decadeOf(y), mark = dec !== lastDec ? dec : null; lastDec = dec;
+      return `<tr data-year="${y}"${mark ? ` data-dec="${mark}"` : ''}><th scope="row"><button data-av-year="${y}">${y}</button></th>${cells.map((c, i) => `<td data-category="${cats[i]}">${c}</td>`).join('')}</tr>`;
+    }).join('');
+    head = `${awSeg}${modeSeg}${tools}${search}${decadeChips(shown)}`;
+    body = `<p class="count-line">${esc(ALL ? t('aw_all') : awardName(aw))} · ${esc(t('col_year'))} × ${esc(t('col_cat'))}</p><div class="board-wrap"><table class="board"><caption class="sr">${esc(ALL ? t('aw_all') : awardName(aw))}</caption><thead><tr><th scope="col"><span class="sr">${esc(t('col_year'))}</span></th>${cats.map(c => `<th scope="col"><button data-av-cat-go="${c}">${esc(catName(c))}</button></th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${cats.length + 1}"><p class="empty" style="padding:10px">${esc(t('nothing_found'))}</p></td></tr>`}</tbody></table></div>${legend}`;
   }
   if (AV.q) { const found = searchWorks(AV.q); head = ''; body = `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>${found.length ? searchRows(found) : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`; }
   if (onlyBody && $('#av-body')) { $('#av-head').innerHTML = head; $('#av-body').innerHTML = body; return chipIntoView(); }
@@ -1995,7 +2009,7 @@ function chipIntoView() {
   const r = c.getBoundingClientRect(), R = sc.getBoundingClientRect();
   if (r.right > R.right || r.left < R.left) sc.scrollLeft += r.left - R.left - 16;
 }
-function goAwards(patch) { Object.assign(AV, { year: null }, patch.cat ? { mode: 'cats' } : {}, patch); if (!AV.cat) AV.cat = 'S'; if (AV.mode === 'table' && !WIDE()) AV.mode = 'cats'; saveAV(); closeSheets(); setView('awards'); }
+function goAwards(patch) { Object.assign(AV, { year: null }, patch.cat ? { mode: 'cats' } : {}, patch); if (!AV.cat) AV.cat = 'S'; saveAV(); closeSheets(); setView('awards'); }
 
 /* ---------- view: Shelf ---------- */
 let shelfLangDraft = null, shelfLangDirty = false, shelfDeleted = null;

@@ -1,10 +1,10 @@
 name: Mobile shelf
 on:
   pull_request:
-    paths: [src/index.html, test/mobile-shelf.test.cjs, .github/workflows/mobile-shelf.yml]
+    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, .github/workflows/mobile-shelf.yml]
   push:
     branches: [main]
-    paths: [src/index.html, test/mobile-shelf.test.cjs, .github/workflows/mobile-shelf.yml]
+    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, .github/workflows/mobile-shelf.yml]
 permissions:
   contents: read
 jobs:
@@ -22,6 +22,7 @@ jobs:
       - run: npx playwright install chromium --with-deps --only-shell
       - run: npm run build
       - run: node test/mobile-shelf.test.cjs
+      - run: node test/awards-views.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

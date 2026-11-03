@@ -56,6 +56,6 @@ Check each item at 360 × 740 and 390 × 844, in light and dark theme:
 
 ## 7. Project patterns (unoebasta)
 
-- Award structure (years × categories): phone = award segmented control + category chip scroller + list of years (year | title, author | marks) with decade jump chips. Wide screens may add the full board as an extra view.
+- Award structure (years × categories): phone = award segmented control + category chip scroller + list of years (year | title, author | marks) with decade jump chips. Wide screens add the full board as an extra view. All awards is available in Board, By year and By category. Combined views merge a work only within the same year and category, retaining all award names and Locus novel subcategories. Switching to a phone layout must not erase the selected desktop Board view or award scope.
 - Author awards: list rows "2024 · Hugo · Novelette" + title, sortable by year with one toggle; counters per award as large tappable tiles.
 - Navigation: bottom bar Read · Awards · Shelf · About on phones; top tabs from 720 px.
