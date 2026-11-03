@@ -73,6 +73,7 @@ const assert = require('node:assert/strict');
       const layout = await page.evaluate(() => ({ width: innerWidth, scroll: document.documentElement.scrollWidth,
         summaryMin: Math.min(...[...document.querySelectorAll('#view-shelf summary')].map(el => el.getBoundingClientRect().height)) }));
       assert.ok(layout.scroll <= layout.width + 1, `No horizontal overflow at ${width}px (${theme})`);
+      assert.ok(await page.evaluate(() => getComputedStyle(document.getElementById('shelf-danger')).borderTopColor !== getComputedStyle(document.getElementById('shelf-data')).borderTopColor), 'Global danger border is distinct from ordinary panels');
       assert.ok(layout.summaryMin >= 44, 'Summary touch targets are at least 44px'); layouts.push({ theme, ...layout });
       await page.screenshot({ path: join(out, `shelf-${width}-${theme}.png`), fullPage: true, animations: 'disabled' });
     }

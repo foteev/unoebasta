@@ -297,7 +297,7 @@ table.board { border-collapse: separate; border-spacing: 0; width: 100%; font-si
 .shelf-body { display: grid; gap: 12px; padding-top: 12px; }
 .shelf-section:not([open]) > .shelf-body { display: none; }
 .shelf-clear { justify-self: start; }
-.shelf-danger-zone { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 16px; margin-top: 8px; border: 1px solid #d88680; border-radius: 12px; background: #fff0ee; color: #9b231b; }
+#view-shelf .shelf-danger-zone { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding: 16px; margin-top: 8px; border: 1px solid #d88680; border-radius: 12px; background: #fff0ee; color: #9b231b; }
 .shelf-danger-copy { flex: 1 1 180px; min-width: 0; }
 .shelf-danger-copy strong { display: block; font-weight: 600; }
 .shelf-danger-copy .small { display: block; margin-top: 5px; color: inherit; }
@@ -308,7 +308,7 @@ table.board { border-collapse: separate; border-spacing: 0; width: 100%; font-si
 .shelf-danger-zone svg { flex: 0 0 18px; }
 #view-shelf .shelf-global-danger { margin-top: 12px; border-width: 2px; }
 #view-shelf .shelf-global-danger h4 { color: inherit; opacity: 1; font-weight: 600; }
-[data-theme="dark"] .shelf-danger-zone { background: #301b22; border-color: #b5646b; color: #ffb4ad; }
+[data-theme="dark"] #view-shelf .shelf-danger-zone { background: #301b22; border-color: #b5646b; color: #ffb4ad; }
 [data-theme="dark"] .shelf-danger-zone .btn-danger-strong { background: #ffb4ad; border-color: #ffb4ad; color: #4d0c11; }
 .shelf-section > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 /* reader: calm bar, settings strip, focus */
