@@ -2,14 +2,14 @@
 
 _You’re the grown-up now. Say yes._
 
-**unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a single web page for reading the winners of the Hugo, Nebula and Locus awards that are free and legal online. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
+**unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a single web page for reading the winners of the Hugo, Nebula and Locus awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
 
 **Open it:** https://foteev.github.io/unoebasta/ · Русский: [README.ru.md](README.ru.md)
 
 ## Principles
 
 - **Pure reading.** One static page. No app, no server, no accounts, no subscriptions, no ads, no analytics.
-- **Legal texts only.** The page links to the magazine or publisher that posted a story, to Creative Commons releases and to public domain archives. It never copies a text.
+- **Sources stay identifiable.** Publisher, author, CC and public-domain links keep their provenance. External recordings and community sources can be added with permission marked unverified. Story texts and recordings are not copied into this repository.
 - **Your data stays in your browser.** Places, notes, finished marks, bookmarks and your own files live in IndexedDB on the device. Sync between your devices needs no account: a secret key, carried once by a link or QR code, encrypts the shelf on the device, and public Nostr relays keep only the ciphertext. A one-time move link (`#move=…`) works too.
 - **No keys, no personal data in this repository.** The page needs no API keys. CI rejects anything that looks like one.
 
@@ -17,7 +17,7 @@ _You’re the grown-up now. Say yes._
 
 Everyone is welcome, no programming needed for most of it:
 
-- **Know a free, legal full text of a winner?** [Suggest a text](https://github.com/foteev/unoebasta/issues/new?template=add-text.yml).
+- **Know a text or recording of a winner?** [Suggest a text](https://github.com/foteev/unoebasta/issues/new?template=add-text.yml).
 - **A link is broken?** [Report it](https://github.com/foteev/unoebasta/issues/new?template=broken-link.yml).
 - **Something is wrong on your phone?** [Report a bug](https://github.com/foteev/unoebasta/issues/new?template=bug.yml).
 - **Translations** (English, Spanish, Polish, Russian today), **code** and **design**: see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -63,3 +63,5 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 - **Fonts:** [Jost](https://fonts.google.com/specimen/Jost) and [Literata](https://fonts.google.com/specimen/Literata), SIL Open Font License. **Icons:** [Lucide](https://lucide.dev/), ISC License.
 
 unoebasta is a non-commercial project and is not affiliated with the Hugo, Nebula or Locus awards.
+
+**Multilingual audio research.** `search audio` requests a supervised GPT Luna discovery batch; `npm run audio:plan` prepares a four-language queue. See [the audio workflow](docs/audio-search.md). The CLI prepares tasks; it does not launch or bill an AI agent.

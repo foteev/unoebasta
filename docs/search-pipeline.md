@@ -60,3 +60,7 @@ The importer validates the whole CSV before writing. It adds links to existing w
 ## GitHub Actions
 
 Run **Search candidates** manually in Actions. It restores the previous search cache/checkpoint when available, builds a source plan and uploads `search-review-<run id>` with `state.json`, `plan.json` and all four research registry files, even when some providers fail. The plan includes manual source tasks; only the selected automatic providers execute. Download it, import its state into the current registry, then use `--state <downloaded state.json>` with `list`, `approve` and `export`. Commit the merged research changes through a PR. Cache availability is best effort; artifacts expire after 30 days. The workflow has read-only repository permissions and never imports or publishes candidates automatically. Existing Links, CI and Pages workflows keep their separate roles.
+
+## Reviewed external sources
+
+A matching external full/audio link can be approved with `--tier external`. This preserves unknown permission and audio metadata or inspected-page verification on the link, along with evidence and check date. Do not use `t2` or a CC license for an upload without supporting provenance. The work can retain a publisher text while its new audio has a different source status. The work card shows all recordings and their languages, and Listen prioritizes the saved reading-language order. See [the supervised audio workflow](audio-search.md).

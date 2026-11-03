@@ -50,7 +50,8 @@ export function validateFound(r) {
   if (r.kind === 'none') { if (r.url) fail('none must have no URL'); return; }
   if (!r.title || !r.site || !r.url) fail('title, site and URL required');
   cleanUrl(r.url);
-  if (r.kind === 'fragment' ? r.tier !== 'frag' : !['t1', 't2', 't2us'].includes(r.tier)) fail('invalid tier for kind');
+  if (r.kind === 'fragment' ? r.tier !== 'frag' : !['t1', 't2', 't2us', 'external'].includes(r.tier)) fail('invalid tier for kind');
+  if (r.tier === 'external' && r.license) fail('external sources have unverified permission; do not assign a license');
   if (r.words && (r.kind !== 'full' || !/^[1-9]\d*$/.test(r.words))) fail('words must be a positive integer for full text only');
   if (r.part && (!/^[1-9]\d*$/.test(r.part) || +r.part > 100)) fail('part must be 1..100');
   if (r.archive && r.archive !== 'yes') fail('archive must be yes or empty');

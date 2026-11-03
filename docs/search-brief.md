@@ -1,6 +1,6 @@
-# Task: find legal free texts, audio and fragments for unoebasta
+# Task: find text, audio, translation and publication links for unoebasta
 
-You are helping **unoebasta** (https://foteev.github.io/unoebasta/, code and data: https://github.com/foteev/unoebasta), a non-commercial page for reading the winners of the Hugo, Nebula and Locus awards in prose. Readers are busy people and readers with ADHD: they open a story, read it and close the page. Your job is to find **where each winning work can be read or heard for free and legally**, and report it in the exact format below. You do not edit the site. The maintainer merges your results.
+You are helping **unoebasta** (https://foteev.github.io/unoebasta/, code and data: https://github.com/foteev/unoebasta), a non-commercial page for reading the winners of the Hugo, Nebula and Locus awards in prose. Readers are busy people and readers with ADHD: they open a story, read it and close the page. Your job is to find **where each winning work can be read or heard, keeping access and permission status separate**, and report it in the exact format below. You do not edit the site. The maintainer merges your results.
 
 ## 1. What already exists (snapshot of 2 November 2026)
 
@@ -13,7 +13,7 @@ You are helping **unoebasta** (https://foteev.github.io/unoebasta/, code and dat
 | Novelette | 142 | 50 | 6 | – | – | 24 | 81 |
 | Short story | 147 | 60 | 1 | – | – | 32 | 79 |
 
-There are 115 full texts and 58 works with audio. All of them are in English, because translations are under copyright.
+There are 115 full texts and 58 works with audio. All of them are in English, under the earlier official-only search scope. External recordings are now tracked separately.
 
 **Spanish is new** and has nothing on the page yet. A Spanish translation is known for 149 of 236 novels, 43 of 131 novellas, 31 of 142 novelettes and 47 of 147 short stories (`title_es`).
 
@@ -43,24 +43,13 @@ There are 115 full texts and 58 works with audio. All of them are in English, be
 
 **Existing links** are in `const READ = {` (full texts and audio) in https://github.com/foteev/unoebasta/blob/main/src/index.html, and in `ex` / `gb` (fragments) in `awards.json`. Do not report them again.
 
-## 2. The rules: legal only
+## 2. Discovery and source status
 
-**Allowed sources:**
-- the magazine or publisher that published the work, on its own site;
-- the author's own site, if the text is posted there on purpose;
-- Creative Commons releases;
-- public domain:
-  - worldwide;
-  - US-only, for example 1950s magazine stories whose copyright was not renewed (Project Gutenberg, Faded Page);
-- official podcasts of magazines: Escape Pod, PodCastle, Pseudopod, Clarkesworld, Uncanny, Lightspeed, StarShipSofa and others;
-- LibriVox, for public-domain texts only;
-- free samples that a publisher or shop shows itself: Reactor/Tor.com excerpts, publisher "read an excerpt" pages, Google Books previews, LitRes "читать онлайн" fragments, Legimi book pages (they show a fragment), Woblink/Empik "fragment" files.
+Search publisher, author, CC and public-domain sources first, plus public external portals and audio/video platforms such as YouTube, Akniga and Flibusta. Missing permission evidence does not discard a useful bibliographic lead or matching public link. Never infer permission from availability, popularity or the platform name.
 
-**Never:**
-- Flibusta, LibGen, Z-Library, Anna's Archive, any "read free online" aggregator, Scribd uploads, Telegram, VK, fan translations, PDFs on random hosts;
-- Internet Archive lending of in-copyright books;
-- Hugo voter packets;
-- any site that clearly reposts someone else's text.
+Publish reviewed external full-text/audio links with `tier=external`; the importer records `rights=unknown` and `verification=metadata` for audio (`page` for an inspected full-text page). These links are labelled separately from publisher/CC/public-domain links. Record title, all authors, language, edition/story identity, narrator, duration, whole story versus sample, access restrictions and exactly what was checked. A metadata match is not a claim of end-to-end playback or independently verified completeness. Paid anthology listings, search results, unverified URLs and synopsis-only pages remain research leads and do not count as free full text/audio.
+
+Store links and metadata only; never copy/rehost story texts, video, audio or access credentials. Unknown rights is distinct from known authorization and from a known denial. Do not bypass login or payment controls.
 
 **Wayback Machine:** use a snapshot only when the original page was free on the publisher's own site (for example SCIFICTION at scifi.com), and mark it `archive=yes`. The maintainer decides.
 
@@ -150,6 +139,7 @@ qid,title,form,lang,kind,site,url,tier,license,words,pub,part,archive,evidence,c
   - `t1`: Creative Commons, or public domain everywhere;
   - `t2`: free at the rights holder;
   - `t2us`: public domain in the US only;
+  - `external`: matching external full text/audio, permission unverified and completeness reviewed at metadata level;
   - `frag`: for fragments.
 - `license`: for CC, the exact license (for example `CC BY-NC-SA 4.0`); otherwise empty.
 - `words`: approximate words in the story body on that page (for reading time). Count or estimate from the page; empty for fragments and audio.

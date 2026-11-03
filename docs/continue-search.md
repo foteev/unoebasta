@@ -14,7 +14,7 @@ Use this order:
 2. For English short fiction, follow the magazine, author and ISFDB publication references. Inspect the contents of a collection when the story has no separate page. For PL/RU/ES books, search publisher and legitimate retailer samples using the published title and author aliases. Google Books is a fallback; a negative Google result does not close those tasks.
 3. Resolve unknown translation titles and author pseudonyms from primary or authoritative bibliographic sources. Add a sourced alias before searching under it. Do not guess translated names or URLs.
 4. Use the automatic command for another bounded batch. Its default sources are publisher magazines and Google Books; Gutenberg and LibriVox remain available explicitly for suitable older works. Their rights status still needs review.
-5. Open promising URLs and verify the work, all authors, language, scope and legal source under the search brief. A retailer synopsis, a book listing, an MP3 tag or API `PARTIAL` flag alone is insufficient. Prefer a publisher-hosted readable sample over a country-dependent preview when both exist. Record anthology/edition/translator clues even without a confirmed URL.
+5. Open promising URLs and verify the work, all authors, language, scope and source status under the search brief. A retailer synopsis, a book listing, an MP3 tag or API `PARTIAL` flag alone is insufficient. Prefer a publisher-hosted readable sample over a country-dependent preview when both exist. Record anthology/edition/translator clues even without a confirmed URL.
 6. Approve verified candidates with evidence, export a new CSV, import it and regenerate coverage. Preserve scoped negatives, doubts and follow-up actions in the registry. Import checkpoint artifacts before making decisions so notes and results persist beyond cache expiry.
 7. Run the secret check, build and tests; update the GitHub project and publish within the session's authorization. Report the actual outcome and remaining uncertainty. Do not stop to ask whether to continue each routine stage. If a real blocker prevents publication, retain the complete reviewable work and identify the blocker.
 
@@ -48,3 +48,5 @@ gh workflow run search.yml --ref main -f lang=all -f limit=50
 ```
 
 Actions reads the repository secret, restores the checkpoint when available and uploads the report, queue, plan and registry. Download/import the artifact and commit the results; the workflow has read-only repository permissions. This is a one-time invocation, not a schedule. The command itself never approves candidates or publishes unverified links. See [the research registry](research.md) and [review/import commands](search-pipeline.md).
+
+For a multilingual audio batch, follow [audio-search.md](audio-search.md). External sources may be recorded with permission unverified; publisher-only filtering must not silently discard them.
