@@ -5,19 +5,19 @@ on:
       lang:
         description: Text language
         type: choice
-        options: [en, pl, ru, es]
-        default: en
+        options: [all, en, pl, ru, es]
+        default: all
       kind:
         description: Missing coverage to search
         type: choice
         options: [all, full, audio, fragment]
         default: all
       limit:
-        description: Maximum works (1–500)
+        description: Maximum work/language targets in total (1–500)
         default: '50'
       providers:
         description: Comma-separated providers
-        default: clarkesworld,escapepod,podcastle,pseudopod,gutenberg,librivox,google
+        default: clarkesworld,escapepod,podcastle,pseudopod,google
       qids:
         description: Optional comma-separated QIDs
         default: ''
@@ -59,12 +59,16 @@ jobs:
           SEARCH_RETRY: ${{ inputs.retry_searched }}
         shell: bash
         run: |
-          args=(run --lang "$SEARCH_LANG" --kind "$SEARCH_KIND" --limit "$SEARCH_LIMIT" --providers "$SEARCH_PROVIDERS")
-          plan=(plan --lang "$SEARCH_LANG" --kind "$SEARCH_KIND" --limit "$SEARCH_LIMIT" --out .cache/search/plan.json)
-          if [[ -n "$SEARCH_QIDS" ]]; then args+=(--qid "$SEARCH_QIDS"); plan+=(--qid "$SEARCH_QIDS"); fi
+          args=(--lang "$SEARCH_LANG" --kind "$SEARCH_KIND" --limit "$SEARCH_LIMIT" --providers "$SEARCH_PROVIDERS")
+          if [[ -n "$SEARCH_QIDS" ]]; then args+=(--qid "$SEARCH_QIDS"); fi
           if [[ "$SEARCH_RETRY" == "true" ]]; then args+=(--retry-searched); fi
-          npm run research -- "${plan[@]}"
-          npm run search -- "${args[@]}"
+          npm run search:continue -- "${args[@]}"
+      - name: Show continuation report
+        if: always() && hashFiles('.cache/search/report.json') != ''
+        run: |
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat .cache/search/report.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
       - name: Save review queue and checkpoint (no story bodies)
         if: always()
         uses: actions/upload-artifact@v4
@@ -73,6 +77,7 @@ jobs:
           path: |
             .cache/search/state.json
             .cache/search/plan.json
+            .cache/search/report.json
             data/research/aliases.json
             data/research/sources.json
             data/research/leads.jsonl

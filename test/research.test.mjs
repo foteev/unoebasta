@@ -10,6 +10,7 @@ import { runSearch, loadState, reviewCandidate, approvedRows, knownLink } from '
 import { PROVIDERS } from '../scripts/lib/providers.mjs';
 import { queryVariants, allAuthors } from '../scripts/lib/matching.mjs';
 import { parseCsv } from '../scripts/lib/csv.mjs';
+import { continueSearch } from '../scripts/lib/continue-search.mjs';
 
 const NOW = '2026-11-03T10:00:00Z';
 const LATER = '2026-11-03T11:00:00Z';
@@ -172,4 +173,56 @@ test('versioned registry has legacy provenance, missing titles and language-spec
   const csv = parseCsv(readFileSync(join(root, 'data/coverage.csv'), 'utf8'));
   for (const lang of ['en', 'pl', 'ru', 'es']) assert.ok('audio_' + lang in csv[0]);
   assert.equal(csv.filter(r => r.audio === 'yes').length, csv.filter(r => ['en', 'pl', 'ru', 'es'].some(l => r['audio_' + l] === 'yes')).length);
+});
+
+const multilingual = q => {
+  const w = work(q); w.titles = Object.fromEntries(['en', 'pl', 'ru', 'es'].map(l => [l, `${w.title} ${q} ${l}`])); return w;
+};
+test('continuation shares one budget across languages and advances the next batch', async t => {
+  const calls = [], o = options(t, { catalog: catalog(['Q1', 'Q2', 'Q3', 'Q4'].map(multilingual)), kind: 'fragment', limit: 8, providers: ['google'],
+    registry: { google: { kinds: ['fragment'], languages: ['en', 'pl', 'ru', 'es'], search: async (w, lang) => {
+      calls.push([w.qid, lang]); return { candidates: [candidate(w, { lang, proposed_kind: 'fragment' })], scope: 'Exact source query' };
+    } } } });
+  const first = await continueSearch(o); assert.equal(first.summary.works, 8); assert.equal(first.summary.checked, 8);
+  assert.deepEqual(Object.keys(first.by_language), ['en', 'pl', 'ru', 'es']); assert.equal(first.new_candidate_ids.length, 8);
+  const lead = o.research.leads.find(l => l.target.url); noteLead(o.research, lead.id, 'Curator note survives continuation', NOW);
+  const second = await continueSearch(o); assert.equal(second.summary.works, 8); assert.equal(second.new_candidate_ids.length, 8);
+  assert.equal(new Set(calls.map(c => JSON.stringify(c))).size, 16); assert.equal(Object.keys(o.state.candidates).length, 16);
+  assert.ok(lead.notes.some(n => n.text === 'Curator note survives continuation'));
+  assert.ok(Object.values(o.state.candidates).every(c => c.review.status === 'pending'));
+});
+
+test('tiny continuation budgets rotate languages instead of starving translations', async t => {
+  const calls = [], o = options(t, { catalog: catalog([multilingual('Q1')]), kind: 'full', limit: 1,
+    registry: registry(async (w, lang) => { calls.push(lang); return { candidates: [], scope: 'Exact query' }; }) });
+  for (let i = 0; i < 4; i++) assert.equal((await continueSearch(o)).summary.works, 1);
+  assert.deepEqual(calls, ['en', 'pl', 'ru', 'es']);
+});
+
+test('continuation pauses a failed source while other sources and languages advance', async t => {
+  let bad = 0, good = 0;
+  const o = options(t, { catalog: catalog([multilingual('Q1')]), kind: 'all', limit: 4, providers: ['gutenberg', 'google'], registry: {
+    gutenberg: { kinds: ['full'], languages: ['en', 'pl', 'ru', 'es'], search: async () => { bad++; throw Object.assign(Error('HTTP 403'), { status: 403 }); } },
+    google: { kinds: ['fragment'], languages: ['en', 'pl', 'ru', 'es'], search: async () => { good++; return { candidates: [], scope: 'Exact preview query' }; } }
+  } });
+  const report = await continueSearch(o); assert.equal(report.status, 'completed_with_issues'); assert.equal(bad, 1); assert.equal(good, 4);
+  assert.equal(report.paused_sources.length, 1); assert.equal(o.research.checks.filter(c => c.provider === 'gutenberg').length, 1);
+  assert.equal(o.research.checks.filter(c => c.provider === 'google' && c.status === 'not_found').length, 4);
+  o.registry.gutenberg.search = async () => { bad++; return { candidates: [], scope: 'Source recovered' }; };
+  assert.equal((await continueSearch(o)).status, 'completed'); assert.equal(bad, 5);
+});
+
+test('continuation restores pending URLs and publications from the registry after cache loss', async t => {
+  let calls = 0;
+  const dir = temp(t), o = options(t, { catalog: catalog([multilingual('Q1')]), langs: ['en'], kind: 'full', limit: 1, researchDir: dir,
+    registry: registry(async w => { calls++; return { candidates: [candidate(w, { pub: 'Magazine issue 100' })], scope: 'Exact publisher query' }; }) });
+  await continueSearch(o); const lead = o.research.leads.find(l => l.target.url);
+  noteLead(o.research, lead.id, 'Check the final page before approval', NOW); saveResearch(dir, o.research);
+  const updated = lead.updated_at;
+  o.state = { version: 1, checks: {}, candidates: {} }; o.research = loadResearch(dir);
+  const report = await continueSearch(o), item = Object.values(o.state.candidates)[0];
+  assert.equal(calls, 1); assert.equal(report.restored_candidate_ids.length, 1); assert.equal(report.new_candidate_ids.length, 0);
+  assert.equal(item.pub, 'Magazine issue 100'); assert.equal(item.review.status, 'pending');
+  assert.equal(o.research.leads.find(l => l.id === lead.id).updated_at, updated);
+  assert.ok(o.research.leads.find(l => l.id === lead.id).notes.some(n => n.text.includes('final page')));
 });

@@ -8,9 +8,13 @@ import { PROVIDERS } from './lib/providers.mjs';
 import { loadState, runSearch, reviewCandidate, approvedRows } from './lib/search.mjs';
 import { toCsv } from './lib/csv.mjs';
 import { loadResearch, saveResearch, mergeResearch, addLead } from './lib/research.mjs';
+import { continueSearch, CONTINUE_PROVIDERS } from './lib/continue-search.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const HELP = `Usage: npm run search -- <run|list|approve|reject|export> [options]
+const HELP = `Usage: npm run search -- <continue|run|list|approve|reject|export> [options]
+  continue: --lang all|en|pl|ru|es --limit 50 (total across languages; default all)
+       Plan follow-ups, discover, preserve candidates/notes and write report.json. Repeat to advance.
+       npm run search:continue -- --limit 50
   run: --lang en|pl|ru|es --kind all|full|audio|fragment --limit 50
        --providers clarkesworld,escapepod,podcastle,pseudopod,gutenberg,librivox,google
        --qid Q123,Q456 --forms "short story,novelette" --lead LEAD_ID --refresh
@@ -41,7 +45,17 @@ try {
     const statePath = resolve(root, opts.state || '.cache/search/state.json'), state = loadState(statePath);
     const researchDir = resolve(root, opts['research-dir'] || 'data/research'), research = loadResearch(researchDir);
     mergeResearch(research, state.research);
-    if (command === 'run') {
+    if (command === 'continue') {
+      if (opts.lead) throw new Error('Use run --lead for a single source task');
+      const lang = opts.lang || 'all', providers = opts.providers?.split(',') || CONTINUE_PROVIDERS, forms = opts.forms?.split(',') || [];
+      if (!['all', ...LANGS].includes(lang) || forms.some(f => !FORMS.includes(f))) throw new Error('Invalid language or forms');
+      const report = await continueSearch({ catalog: loadCatalog(root, { researchDir }), state, statePath, research, researchDir,
+        langs: lang === 'all' ? LANGS : [lang], kind: opts.kind || 'all', limit: Number(opts.limit || 50), providers, forms,
+        qids: opts.qid?.split(',') || [], refresh: !!opts.refresh || !!opts['retry-searched'],
+        http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http'), googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '' }),
+        onCheck: c => console.log(`${c.qid} ${c.lang} ${c.kind} ${c.provider}: ${c.status}${c.error ? ' — ' + c.error : ''}`) });
+      console.log(JSON.stringify(report));
+    } else if (command === 'run') {
       const lead = opts.lead ? research.leads.find(l => l.id === opts.lead) : undefined;
       if (opts.lead && !lead) throw new Error('Unknown lead');
       if (lead && (lead.type !== 'search' || !PROVIDERS[lead.source])) throw new Error(`Manual task: ${lead.next_action}; use npm run research -- note/update/check to record the result`);

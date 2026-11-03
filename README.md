@@ -44,6 +44,7 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 | `scripts/fetch-covers.mjs` | Downloads covers by Open Library cover ID → `covers/s` (80×120) and `covers/m` (160×240), WebP |
 | `scripts/merge-found.mjs` | Merges a search result (`data/found/*.csv`) into the page and the data |
 | `scripts/search.mjs` | Cached discovery, review queue and approved CSV export; see [the pipeline](docs/search-pipeline.md) |
+| `npm run search:continue` | Resume a batch across four languages; see [continue search](docs/continue-search.md) |
 | `scripts/research.mjs` | Language aliases, source plans, publication leads and durable notes; see [research](docs/research.md) |
 | `scripts/check-links.mjs` | Checks every text and audio link (the “Links” workflow, weekly) |
 | `scripts/check-secrets.mjs` | Fails on keys, tokens or personal e-mail addresses |

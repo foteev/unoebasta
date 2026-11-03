@@ -96,7 +96,7 @@ export function noteLead(r, id, text, now = new Date().toISOString()) {
   if (!text?.trim()) throw new Error('Note text required');
   lead.notes ||= []; lead.notes.push({ at: now, text: text.trim() }); lead.updated_at = now; return lead;
 }
-export function candidateFromLead(r, catalog, state, id, { url, kind, title, now = new Date().toISOString() } = {}) {
+export function candidateFromLead(r, catalog, state, id, { url, kind, title, restore = false, now = new Date().toISOString() } = {}) {
   const lead = r.leads.find(l => l.id === id), w = catalog.works.find(w => w.qid === lead?.qid);
   if (!lead || !w || lead.kind === 'title') throw new Error('Choose an availability lead; translation-title tasks need a sourced alias first');
   kind ||= lead.kind;
@@ -104,12 +104,16 @@ export function candidateFromLead(r, catalog, state, id, { url, kind, title, now
   url = publicUrl(url || lead.target.url);
   const cid = hash(JSON.stringify([w.qid, lead.lang, kind, url])).slice(0, 20), existing = state.candidates[cid];
   const candidate = { qid: w.qid, lang: lead.lang, kind, title: title || w.titles[lead.lang] || w.title, form: w.form, authors: w.authors,
-    url, site: r.sources.find(s => s.id === lead.source).name, proposed_kind: kind, requested_kind: kind, source_checked_at: now,
+    url, site: r.sources.find(s => s.id === lead.source).name, proposed_kind: kind, requested_kind: kind, source_checked_at: restore ? (lead.last_checked || lead.created_at) : now,
+    metadata_url: lead.origin?.metadata_url || lead.target.url || '', pub: lead.target.publication || '',
     match: { title: 'unconfirmed', author: 'unconfirmed' }, notes: lead.hint, providers: [lead.source], review: { status: 'pending' },
     ...existing, lead_ids: [...new Set([...(existing?.lead_ids || []), lead.id])] };
   candidate.id = cid; state.candidates[cid] = candidate;
-  if (!['confirmed', 'rejected'].includes(lead.status)) lead.status = 'candidate';
-  lead.updated_at = now; return candidate;
+  if (!restore) {
+    if (!['confirmed', 'rejected'].includes(lead.status)) lead.status = 'candidate';
+    lead.updated_at = now;
+  }
+  return candidate;
 }
 export function updateLead(r, id, { status, next_action, recheck_after, evidence }, now = new Date().toISOString()) {
   const lead = r.leads.find(l => l.id === id); if (!lead) throw new Error(`Unknown lead: ${id}`);

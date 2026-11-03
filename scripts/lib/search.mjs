@@ -19,7 +19,7 @@ export const knownLink = (w, row) => w.knownLinks ? w.knownLinks.some(l => l.kin
 
 export async function runSearch({ catalog, state, statePath, http, lang = 'en', kind = 'all', providers = Object.keys(PROVIDERS),
   qids = [], forms = [], limit = 50, refresh = false, maxAge = 7 * 86400000, research = catalog.research || emptyResearch(), researchDir,
-  now = () => new Date().toISOString(), onCheck = () => {}, registry = PROVIDERS }) {
+  now = () => new Date().toISOString(), onCheck = () => {}, registry = PROVIDERS, pausedProviders = new Set(), onProviderError = () => {} }) {
   for (const id of providers) {
     if (!registry[id]) throw new Error(`Unknown provider: ${id}`);
     if (!research.sources.some(s => s.id === id)) research.sources.push({ id, name: id, mode: 'auto', languages: registry[id].languages, kinds: registry[id].kinds, next_action: 'Review the matched work and legal access.' });
@@ -41,6 +41,7 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
     }
     const jobs = [];
     for (const id of providers) {
+      if (pausedProviders.has(id)) continue;
       const provider = registry[id]; if (!provider.languages.includes(lang)) continue;
       const goals = missingKinds(w, lang, kind).filter(k => provider.kinds.includes(k));
       for (const goal of goals) {
@@ -59,7 +60,7 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
       try {
         result = await registry[id].search(w, lang, { googleBooksConfigured: http?.googleBooksConfigured, get: url => { requested.add(url); return http.get(url); } });
         if (!Array.isArray(result.candidates) || !result.scope) throw new Error('Invalid provider result');
-      } catch (e) { failure = e; for (const url of requested) http?.invalidate?.(url); }
+      } catch (e) { failure = e; for (const url of requested) http?.invalidate?.(url); onProviderError(id, e); }
       for (const { goal, key, lead } of pending) {
         touchedLeads.add(lead.id);
         const check = { qid: w.qid, lang, kind: goal, goals: [goal], provider: id, check_key: key, query: searchQuery(w, lang, id, goal), checked_at: now() };

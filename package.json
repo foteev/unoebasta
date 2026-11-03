@@ -21,6 +21,7 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "coverage": "node scripts/coverage.mjs",
     "search": "node scripts/search.mjs",
+    "search:continue": "node scripts/search.mjs continue",
     "research": "node scripts/research.mjs"
   },
   "devDependencies": {
