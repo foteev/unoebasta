@@ -532,6 +532,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.location.hash = '#sync=' + key; await sleep(200);
   checks['sync: the key link asks first'] = !$('#move-dialog').hidden && /Подключить это устройство/.test($('#move-dialog').textContent) && !w.location.hash;
   click($('#move-dialog [data-sygo]')); await sleep(500);
+  await waitFor(() => w.eval("isDone('Q130213759')") && /Устройство подключено/.test($('#toast').textContent));
   checks['sync: … then the shelf arrives from the relays'] = w.eval("isDone('Q130213759')") && w.eval('syncState().key') === key && /Устройство подключено/.test($('#toast').textContent);
   const before2 = relay.length; await w.eval('syncPush()');
   checks['sync: nothing new → nothing published'] = relay.length === before2;
@@ -677,6 +678,16 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['es: plural and numbers'] = w.eval("plural(1, t('works')) + ' ' + plural(5, t('works'))") === 'obra obras';
   click($('#lang-pl')); await sleep(80);
   checks['pl strings'] = /Czytaj/.test($('#tab-catalog').textContent);
+  checks['translations: every interface has matching keys and placeholders'] = w.eval(`(() => { const keys = Object.keys(I18N.en), ph = v => JSON.stringify((JSON.stringify(v).match(/\\{[\\w:-]+\\}/g) || []).sort()); return ['en','es','pl','ru'].every(l => Object.keys(I18N[l]).length === keys.length && keys.every(k => k in I18N[l] && ph(I18N[l][k]) === ph(I18N.en[k]))); })()`);
+  await w.eval(`Store.put('suggestions', {id:'i18n-original',kind:'feedback',workId:'Q190192',comment:'Исходный комментарий: не изменять.',sent:Date.now(),at:Date.now()})`);
+  let commentLanguagesOK = true;
+  for (const lang of ['en', 'es', 'pl', 'ru']) {
+    w.eval(`LANG = '${lang}'`); await w.eval('renderShelf()');
+    const row = $$('#shelf-sugg .sugg').find(el => /Исходный комментарий/.test(el.textContent));
+    commentLanguagesOK = commentLanguagesOK && !!row && row.querySelector('.snip').textContent === 'Исходный комментарий: не изменять.' && row.querySelector('strong').textContent.includes(w.eval("titleOf(work('Q190192'))")) && $('#sugg-clear-all').textContent.trim() === w.eval("t('shelf_delete_all')");
+  }
+  checks['translations: saved comments remain original while labels and work titles switch'] = commentLanguagesOK;
+  checks['translations: file hints list DOCX and ODT in every interface'] = w.eval("['en','es','pl','ru'].every(l => /DOCX/.test(I18N[l].empty_files) && /ODT/.test(I18N[l].empty_files))");
   // Shelf deletion is scoped to a section and leaves sync deletion marks; Undo never rewrites file bodies.
   await w.eval(`(async () => { await Store.replaceAll({
     files: [{ id: 'shelf-file', title: 'Long test title', byline: 'Author', format: 'txt', words: 100, size: 45, html: '<p>Keep this file body exactly.</p>', at: 1 }],
@@ -685,7 +696,9 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
     links: [{ id: 'Q190192', url: 'https://example.org/my-link', note: 'Keep this link', at: 1 }], suggestions: [{ id: 'shelf-suggestion', kind: 'feedback', text: 'Test private draft', at: 1 }]
   }); await loadLocal(); })()`);
   click($('#tab-shelf')); await sleep(100);
-  checks['shelf: every saved-item section has Delete all and rows have Delete'] = ['bm', 'done', 'files', 'links', 'data'].every(s => !!$(`#shelf-${s} [data-shelfclear]`)) && !!$('#reading-clear') && !!$('#sugg-clear-all') && !!$('#shelf-bm [data-shelfdel="bm"]') && !!$('#shelf-links [data-shelfdel="links"]') && !!$('#shelf-files [data-delfile]') && !!$('#shelf-sugg [data-sgdel]');
+  checks['shelf: every saved-item section has Delete all and rows have Delete'] = ['bm', 'done', 'files', 'links', 'danger'].every(s => !!$(`#shelf-${s} [data-shelfclear]`)) && !!$('#reading-clear') && !!$('#sugg-clear-all') && !!$('#shelf-bm [data-shelfdel="bm"]') && !!$('#shelf-links [data-shelfdel="links"]') && !!$('#shelf-files [data-delfile]') && !!$('#shelf-sugg [data-sgdel]');
+  checks['shelf: every saved-item list has a distinct danger zone'] = ['reading','bm','done','files','links','sugg'].every(s => !!$(`#shelf-${s} .shelf-danger-zone .btn-danger-strong`) && !!$(`#shelf-${s} .shelf-danger-zone svg`));
+  checks['shelf: global danger zone is last and outside collapsed panels'] = $('#view-shelf').lastElementChild.id === 'shelf-danger' && !$('#shelf-danger').closest('details') && !$('#shelf-data [data-shelfclear]');
   click($('#shelf-links [data-shelfdel="links"]')); await sleep(100);
   checks['shelf: individual own-link Delete leaves other sections alone'] = (await w.eval("Store.all('links')")).length === 0 && (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('bookmarks')")).length === 4;
   click($('#toast [data-shelfundo]')); await sleep(100);
@@ -704,10 +717,10 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#toast [data-shelfundo]')); await sleep(100);
   checks['shelf: Undo restores the exact file body and related notes'] = (await w.eval("Store.get('files', 'shelf-file')")).html === '<p>Keep this file body exactly.</p>' && (await w.eval("Store.all('bookmarks')")).some(b => b.note === 'Keep my note');
   w.confirm = () => false;
-  click($('#shelf-data [data-shelfclear]')); await sleep(50);
+  click($('#shelf-danger [data-shelfclear]')); await sleep(50);
   checks['shelf: cancelling Delete all saved items preserves the data'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1;
   w.confirm = () => true;
-  click($('#shelf-data [data-shelfclear]')); await sleep(100);
+  click($('#shelf-danger [data-shelfclear]')); await sleep(100);
   checks['shelf: Delete all saved items clears personal records and retains deletion marks'] = (await Promise.all(['files', 'positions', 'bookmarks', 'links', 'suggestions'].map(s => w.eval(`Store.all('${s}')`)))).every(a => a.length === 0) && (await w.eval("Store.all('tombs')")).length > 0;
   click($('#toast [data-shelfundo]')); await sleep(100);
   checks['shelf: Undo all restores each saved-item section'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1 && (await w.eval("Store.all('suggestions')")).length === 1 && (await w.eval("Store.all('positions')")).length === 2;

@@ -39,6 +39,8 @@ Steps so far: **2→3** every record gets `at` and a book label `book: { title, 
 
 My shelf panels are collapsed initially and retain their open state during a page visit. Item lists offer individual deletion and Delete all. Bulk file removal and clearing all saved items ask first. Deletions use `Store.del`, including related positions/notes when removing a file. Undo restores only the removed records with modification times newer than their deletion marks; file HTML stays byte-for-byte unchanged. Preferences and the sync connection are not erased by Delete all saved items.
 
+Each saved-item list groups bulk deletion in a red bordered area with its item count. The global Danger zone is always visible at the bottom of My shelf, outside the collapsed panels. Interface language changes update labels and known work titles; readers' comments, notes and file contents remain in their original language.
+
 Reading-language chips are a draft until **Save languages**. Save persists `prefs.langs`, schedules normal settings sync and updates Read immediately; no page reload is required. Explicit saved reading languages strictly filter new full-text picks, even when fewer than three match. If no full text matches the selected duration, Read shows that limitation and available excerpts in those languages. Reset returns to the page/phone language defaults. The interface language and reading-language choices remain separate.
 
 **What travels:** `positions`, `bookmarks` (without cached `about` descriptions), `links`, deletion marks from the last 400 days, and the settings `listen`, `ttsRate`, `askNote`, `pickLen`, `focus` (with their own time `prefsMt`). Language, theme and font size stay per device. Book titles and authors do not travel: the catalog rebuilds them.
