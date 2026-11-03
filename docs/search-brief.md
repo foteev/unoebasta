@@ -19,8 +19,8 @@ There are 115 full texts and 58 works with audio. All of them are in English, be
 
 **The worklist.** Download https://raw.githubusercontent.com/foteev/unoebasta/main/data/coverage.csv. It has one row per work:
 
-- columns: `qid, title, authors, form, awards, latest, pages, en, pl, ru, es, audio, title_pl, title_ru, title_es`;
-- `audio` is `yes` when a free reading by a person is already on the page;
+- columns: `qid, title, authors, form, awards, latest, pages, en, pl, ru, es, audio, title_pl, title_ru, title_es, audio_en, audio_pl, audio_ru, audio_es`;
+- `audio` is `yes` when a free reading by a person is already on the page; `audio_en`, `audio_pl`, `audio_ru`, `audio_es` record that separately for each language;
 - `en`, `pl`, `ru` and `es` are each `full`, `part` or `none`;
 - `title_pl`, `title_ru`, `title_es` are the titles of known translations (from Wikidata, ISFDB, Lecturalia and earlier searches); empty means none is known (a translation may still exist);
 - a work is a target for a language when that column is `none`, or when it is `part` and you are looking for a full text.
@@ -39,7 +39,7 @@ There are 115 full texts and 58 works with audio. All of them are in English, be
 - **ISFDB** (`https://www.isfdb.org/cgi-bin/title.cgi?<id>`) shows where a story first appeared: magazine, issue and anthology. That is the fastest way to the magazine's own page.
 - **FantLab** (`https://fantlab.ru/work<id>`) lists Russian translations and where they were published, including web publications.
 
-**Already searched:** every file in https://github.com/foteev/unoebasta/tree/main/data/found has `kind=none` rows saying where nothing was found. Skip those works for that language, or search other places.
+**Already searched:** files in https://github.com/foteev/unoebasta/tree/main/data/found contain `kind=none` notes describing earlier searches. Read their scope; they do not prove absence in a whole language or format. These notes are preserved in `data/research/leads.jsonl`. New outcomes in `data/research/checks.jsonl` distinguish work, language, format, source and title/name variants, so another source or newly identified translation remains searchable. See [the research registry](research.md) for unknown titles, publication leads and follow-up notes.
 
 **Existing links** are in `const READ = {` (full texts and audio) in https://github.com/foteev/unoebasta/blob/main/src/index.html, and in `ex` / `gb` (fragments) in `awards.json`. Do not report them again.
 
@@ -162,7 +162,7 @@ qid,title,form,lang,kind,site,url,tier,license,words,pub,part,archive,evidence,c
   - "Gutenberg #12345, non-renewed 1958 Galaxy story".
 - `checked_at`: UTC date and time you opened the URL, ISO 8601.
 
-**Also add a row with `kind=none`** for each work you searched and found nothing for. Leave `url` empty and put where you looked in `evidence`. That way nobody searches the same places twice.
+**Record unsuccessful checks too.** Prefer a scoped check in the [research registry](research.md), naming the source, language, format, query/edition and date. If returning only a CSV, a `kind=none` row is still supported: leave `url` empty and describe exactly where you looked in `evidence`. It becomes a historical note, not a blanket reason to skip the work. Preserve possible publications and uncertainties as leads even without a URL.
 
 **Example rows (the first three are already on the site; they only show the format):**
 

@@ -191,10 +191,10 @@ test('review/export requires explicit evidence, kind, rights tier and word count
   reviewCandidate(state, 'abc', { reject: true, evidence: 'Actually an excerpt' }); assert.deepEqual(approvedRows(state, catalog()), []);
 });
 
-test('work selection skips historical negatives, uses translated titles and permits other goals', () => {
+test('legacy negatives do not block new sources; unknown translation titles remain actionable', () => {
   const c = catalog(); c.history.push(row({ kind: 'none', url: '' }));
-  assert.equal(selectWorks(c).length, 0); assert.equal(selectWorks(c, { retrySearched: true }).length, 1);
-  assert.equal(selectWorks(c, { lang: 'es' }).length, 0);
+  assert.equal(selectWorks(c).length, 1); assert.equal(selectWorks(c, { retrySearched: true }).length, 1);
+  assert.equal(selectWorks(c, { lang: 'es' }).length, 1);
   c.history = []; c.works[0].availability.en.full = true;
   assert.equal(selectWorks(c, { kind: 'audio' }).length, 1); assert.equal(selectWorks(c, { kind: 'full' }).length, 0);
 });
