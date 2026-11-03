@@ -155,9 +155,22 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#view-awards [data-author="Q314553"]')); await sleep(30);
   checks['authors: name opens biography and award history'] = !$('#sheet-author').hidden && /Силверберг/.test($('#sheet-author h2').textContent) && $$('#sheet-author .wrow').length > 3;
   w.eval('closeSheets()');
+  const setAuthorSort = value => { const el = $('#av-author-sort'); el.value = value; el.dispatchEvent(new w.Event('change', { bubbles: true })); };
+  setAuthorSort('az');
+  const azNames = $$('#av-body .author-open > span:first-child').map(x => x.textContent.replace(/ ↗$/, ''));
+  checks['authors: A–Z sorts displayed names in the interface language'] = azNames.length > 100 && azNames.every((x, i) => !i || azNames[i - 1].localeCompare(x, 'ru') <= 0);
+  setAuthorSort('awards');
+  const awardIds = $$('#av-body .author-open').map(x => x.dataset.author);
+  const expectedAwardCounts = w.eval(`Object.fromEntries(Object.keys(AUTHORS).map(a => [a, new Set(DATA.aw.filter(x => WORKS[x[3]].authors.includes(a)).map(x => x.join('|'))).size]))`);
+  checks['authors: most awards counts wins, not books, and persists the choice'] = awardIds.every((a, i) => !i || expectedAwardCounts[awardIds[i - 1]] >= expectedAwardCounts[a]) && expectedAwardCounts[awardIds[0]] > $$('#av-body .authorsec:first-of-type .wrow').length && JSON.parse(w.localStorage.getItem('fantastic-prefs')).av.authorSort === 'awards' && /Премий:/.test($('#av-body .author-counts').textContent);
+
   click($('#view-awards [data-av-award="n"]')); click($('#view-awards [data-av-cat="S"]')); click($('#view-awards [data-av-text]')); await sleep(40);
   const authorWorks=$$('#view-awards .authorsec [data-work]');
   checks['authors: award, category and text filters apply together'] = authorWorks.length > 0 && authorWorks.every(el=>w.eval(`WORKS['${el.dataset.work}'].awards.some(a=>a[0]==='n'&&a[1]==='S') && (hasText('${el.dataset.work}')||isMine('${el.dataset.work}'))`));
+
+  const filteredAwardIds = $$('#av-body .author-open').map(x => x.dataset.author);
+  const filteredCounts = w.eval(`Object.fromEntries(Object.keys(AUTHORS).map(a => [a, new Set(DATA.aw.filter(x => x[0] === 'n' && x[1] === 'S' && WORKS[x[3]].authors.includes(a) && (hasText(x[3]) || isMine(x[3]))).map(x => x.join('|'))).size]))`);
+  checks['authors: award ranking follows the active filters'] = filteredAwardIds.every((a, i) => filteredCounts[a] > 0 && (!i || filteredCounts[filteredAwardIds[i - 1]] >= filteredCounts[a]));
   w.eval("Object.assign(AV,{award:'h',cat:'S',mode:'cats',onlyText:false,q:''}); renderAwards()");
   // work card for a catalog-only work (Dune)
   const dune = Object.values(w.eval('WORKS')).find(x => x.title === 'Dune');
@@ -588,6 +601,22 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#tab-about')); await sleep(40);
   const covSum = $('#about-cov .cov-sum td:last-child');
   checks['about: what you can read today, counted from the data, with a way to help'] = !!covSum && +covSum.textContent.replace(/\D/g, '') === w.eval('Object.keys(WORKS).length') && $$('#about-cov tbody tr').length === 5 && !!$('#about-cov [data-form="feedback"]') && !!$('#about-cov a[href$="docs/search-brief.md"]');
+
+  const covStats = w.eval('coverageStats()');
+  checks['coverage: totals count unique works across forms and source kinds'] = covStats.total.all === w.eval('Object.keys(WORKS).length') && covStats.total.full === w.eval("Object.keys(WORKS).filter(q => READ[q]?.links.some(l => l.kind === 'full')).length") && covStats.total.audio === w.eval("Object.keys(WORKS).filter(q => READ[q]?.links.some(l => l.kind === 'audio')).length") && covStats.total.covered < covStats.total.full + covStats.total.frag + covStats.total.audio;
+  click($('#about-cov [data-cov-view="languages"]'));
+  checks['coverage: four-language table includes Russian texts and audio with a deduplicated total'] = $$('#about-cov tbody tr').length === 5 && +$('#about-cov [data-cov-row="ru"] [data-cov-kind="full"]').textContent === covStats.languages.ru.full && covStats.languages.ru.full > 0 && covStats.languages.ru.audio > 0 && +$('#about-cov [data-cov-row="total"] [data-cov-kind="missing"]').textContent === covStats.total.all - covStats.total.covered && covStats.total.full < Object.values(covStats.languages).reduce((n, x) => n + x.full, 0);
+  checks['coverage: duplicates and coexisting full text, fragment and audio are independent'] = w.eval(`(() => {
+    const q = 'Q19947428', links = READ[q].links, ex = WORKS[q].ex, before = coverageStats();
+    try {
+      READ[q].links = [...links, ...Array.from({length: 2}, () => ({kind:'full', lang:'es', url:'https://example.test/full'})), ...Array.from({length: 2}, () => ({kind:'audio', lang:'es', url:'https://example.test/audio'}))];
+      WORKS[q].ex = {...ex, o:[...(ex?.o || []), {u:'https://example.test/fragment',s:'Test',l:'es'}]};
+      const after = coverageStats();
+      return after.languages.es.full === before.languages.es.full + 1 && after.languages.es.audio === before.languages.es.audio + 1 && after.languages.es.frag === before.languages.es.frag + 1 && after.total.full === before.total.full && after.total.covered === before.total.covered;
+    } finally { READ[q].links = links; WORKS[q].ex = ex; }
+  })()`);
+  checks['about: one shared contribution block, two distinct actions and one instructions link'] = $$('#view-about [data-form="feedback"]').length === 1 && $$('#view-about [data-agent-task="batch"]').length === 1 && $$('#view-about a[href$="docs/search-brief.md"]').length === 1 && $('#about-contribute').parentElement.id === 'about-cov';
+  click($('#about-cov [data-cov-view="forms"]'));
   checks['about: how to sync, in three steps with a link to the shelf'] = $$('#about-sync ol li').length === 3 && !!$('#about-sync [data-goshelf="shelf-sync"]');
   // writing to the project: one comment field and Send; anonymous when the project's inbox key is set
   checks['feedback: the page ships with the project’s public inbox key (an npub, never a secret)'] = /^npub1[02-9ac-hj-np-z]{58}$/.test(w.eval('INBOX_NPUB'));
@@ -714,8 +743,10 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("openWork('Q27903111')"); await sleep(60);
   checks['es: The Paper Menagerie is El zoo de papel in Spanish'] = $('#sheet-work h2').textContent === 'El zoo de papel' && /The Paper Menagerie/.test($('#sheet-work .alt').textContent);
   w.eval('closeSheets()');
-  const nEsFragments = w.eval("Object.keys(WORKS).filter(q => availability(q).es === 'part').length");
-  checks['es: coverage counts Spanish fragments'] = new RegExp('ES ' + nEsFragments + '\\b').test($('#about-cov').textContent) && /Qué puedes leer hoy/.test($('#about-cov').textContent);
+  click($('#about-cov [data-cov-view="languages"]'));
+  const nEsFragments = w.eval("coverageStats().languages.es.frag");
+  checks['es: coverage counts Spanish fragments'] = +$('#about-cov [data-cov-row="es"] [data-cov-kind="frag"]').textContent === nEsFragments && /Qué puedes leer hoy/.test($('#about-cov').textContent);
+  click($('#about-cov [data-cov-view="forms"]'));
   const sel = $('#lang-sel'); sel.value = 'ru'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(80);
   checks['language picker on phones: the native list switches the language'] = $('#tab-catalog').textContent.trim() === 'Читать' && $('#lang-cur').textContent === 'RU' && $('#lang-sel').getAttribute('aria-label') === 'Язык';
   sel.value = 'es'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await sleep(80);
@@ -772,7 +803,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const singleTask=w.eval("buildSearchTask('Q19947428')"), batchTask=w.eval("buildSearchTask('batch')");
   w.__savedSuggestions=privateSugg;w.eval('local.suggestions=window.__savedSuggestions');
   const payload=task=>JSON.parse(task.split('PUBLIC CATALOG SNAPSHOT (refresh main before submitting):\n')[1]);
-  checks['agent task: one work with four-language scope, current URLs and canonical rules'] = payload(singleTask).length===1 && payload(singleTask)[0].qid==='Q19947428' && singleTask.includes('coverage.csv') && singleTask.includes('Change **only the new CSV') && payload(singleTask)[0].existing_links.some(x=>x.url.includes('det3gpWwLWI'));
+  checks['agent task: one work with four-language scope, current URLs and canonical rules'] = payload(singleTask).length===1 && payload(singleTask)[0].qid==='Q19947428' && singleTask.includes('coverage.csv') && singleTask.includes('**only the new CSV and optional note**') && singleTask.includes('contributor\'s own account') && payload(singleTask)[0].existing_links.some(x=>x.url.includes('det3gpWwLWI'));
   checks['agent task: random batch has five distinct public works and no shelf data'] = payload(batchTask).length===5 && new Set(payload(batchTask).map(x=>x.qid)).size===5 && !singleTask.includes('PRIVATE-READER-NOTE-12345') && !batchTask.includes('PRIVATE-READER-NOTE-12345');
   w.eval("copyAgentTask('Q19947428')"); await sleep(30);
   checks['agent task: clipboard receives a ready task'] = w.__clip && w.__clip.includes('Assigned QIDs: Q19947428');

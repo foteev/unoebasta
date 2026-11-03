@@ -1,6 +1,6 @@
 # Contributing to unoebasta
 
-Thank you for helping. Most help needs no code: a link to a free text, a broken link, a translation fix. Issues and pull requests in English, Polish or Russian are all fine.
+Thank you for helping. Most help needs no code: a link to a free text, a broken link, a translation fix. Issues and pull requests in English, Polish, Russian or Spanish are all fine.
 
 ## Ground rules
 
@@ -26,7 +26,7 @@ The easy way: open an issue with the [“Suggest a text”](https://github.com/f
 The direct way, as a pull request:
 
 1. Find the work’s Wikidata ID (for example `Q25349436`). Every winner is already in `data/awards.json`; the catalog on the page shows the same works.
-2. Check that the **full** text is free and legal at that address (see rule 1).
+2. Check that the address exposes the assigned full text or recording; record author, language, access limits and permission evidence separately. Use `external` with no license when permission is unknown (see rule 1).
 3. Add an entry to the `READ` table in `src/index.html`:
 
    ```js
@@ -36,7 +36,7 @@ The direct way, as a pull request:
    ```
 
    - `w`: number of words (the reading time is computed from it).
-   - `tier`: `t1` Creative Commons, `t2` free at the publisher, `t2us` US public domain.
+   - `tier`: `t1` Creative Commons, `t2` free at the publisher, `t2us` US public domain, `external` permission unverified. External links carry their own `tier`, `rights: 'unknown'`, `verification`, `evidence` and `checked_at`; use the CSV importer to populate these fields consistently.
    - `added`: the current time in UTC; the page shows it in “New since your last visit”.
    - `links`: `kind` is `full` or `audio`; `site` is the name readers see.
 4. `npm run build && npm test`.
@@ -53,7 +53,7 @@ Novels and novellas show a cover from `covers/`; everything else gets a typograp
 
 ## Translations
 
-All strings are in the `I18N` object in `src/index.html`, with one block per language (`en`, `pl`, `ru`). Every key must exist in every language. Keep the tone short and plain; the motto stays in English everywhere. A new language means a new block and a button in the header; open an issue first.
+All strings are in the `I18N` object in `src/index.html`, with one block per language (`en`, `pl`, `ru`, `es`). Every key must exist in every language. Keep the tone short and plain; the motto stays in English everywhere. A new language means a new block and a button in the header; open an issue first.
 
 ## Code
 

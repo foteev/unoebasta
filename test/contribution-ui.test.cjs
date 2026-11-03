@@ -1,4 +1,4 @@
-// Real-browser coverage for the same award scope in Board, By year and By category.
+// Real-browser coverage for contribution tasks, multilingual coverage and author browsing.
 const { chromium } = require('playwright');
 const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
@@ -69,8 +69,47 @@ const assert = require('node:assert/strict');
     for(const lang of ['en','es','pl','ru']){
       await page.locator('#lang-sel').selectOption(lang);assert.ok(await page.locator('#about-contribute [data-agent-task]').textContent());
     }
+    await page.evaluate(()=>{document.querySelector('#toast').hidden=true;});
+    await page.locator('#lang-sel').selectOption('en');
+    await page.setViewportSize({width:1280,height:1100});
+    await page.locator('[data-cov-view="languages"]').click();
+    assert.equal(await page.locator('#about-cov tbody tr').count(),5);
+    const coverage=await page.evaluate(()=>coverageStats());
+    assert.equal(Number(await page.locator('[data-cov-row="ru"] [data-cov-kind="full"]').textContent()),coverage.languages.ru.full);
+    assert.ok(coverage.languages.ru.full>0 && coverage.languages.ru.audio>0);
+    assert.equal(await page.locator('#view-about [data-form="feedback"]').count(),1);
+    assert.equal(await page.locator('#view-about a[href$="docs/search-brief.md"]').count(),1);
+    await page.locator('#about-cov').screenshot({path:join(out,'coverage-languages-desktop.png'),animations:'disabled'});
+    const coverageLayouts=[];
+    for(const width of [360,390]) for(const theme of ['light','dark']) {
+      await page.setViewportSize({width,height:width===360?740:844});
+      await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
+      await page.locator('#lang-sel').selectOption(width===360?'pl':'ru');
+      for(const view of ['forms','languages']) {
+        await page.locator(`[data-cov-view="${view}"]`).click();
+        const layout=await page.locator('#about-cov').evaluate(el=>({width:innerWidth,scroll:document.documentElement.scrollWidth,table:el.querySelector('.cov').getBoundingClientRect().width,min:Math.min(...[...el.querySelectorAll('button,a')].map(b=>b.getBoundingClientRect().height)),cards:getComputedStyle(el.querySelector('.cov tbody tr')).display,statsTop:[...el.querySelectorAll('.cov-overview dd')].slice(1).map(x=>x.getBoundingClientRect().top)}));
+        assert.ok(layout.scroll<=width+1);assert.ok(layout.min>=44);assert.equal(layout.cards,'grid');assert.ok(Math.abs(layout.statsTop[0]-layout.statsTop[1])<=1);coverageLayouts.push({...layout,theme,view});
+        await page.locator('#about-cov').screenshot({path:join(out,`coverage-${view}-${width}-${theme}.png`),animations:'disabled'});
+      }
+    }
+    await page.setViewportSize({width:390,height:844});
+    await page.locator('#tab-awards').click();
+    await page.locator('[data-av-mode="authors"]').click();
+    await page.locator('#av-author-sort').selectOption('az');
+    const sorted=await page.locator('.author-open > span:first-child').allTextContents();
+    assert.ok(sorted.every((name,i)=>!i||sorted[i-1].localeCompare(name,'ru')<=0));
+    await page.locator('#av-author-sort').selectOption('awards');
+    const ranked=await page.locator('.author-counts').allTextContents();
+    const counts=ranked.map(text=>Number(text.match(/(\d+)$/)[1]));
+    assert.ok(counts.every((n,i)=>!i||counts[i-1]>=n));
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.locator('#tab-awards').click();assert.equal(await page.locator('#av-author-sort').inputValue(),'awards');
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.screenshot({path:join(out,'authors-most-awards-390-dark.png'),animations:'disabled'});
+    assert.ok(await page.locator('#av-author-sort').evaluate(el=>el.getBoundingClientRect().height>=44));
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
     assert.deepEqual(errors,[]);
-    const report={batch_copy:true,one_work_copy:true,clipboard_fallback:true,all_categories:total,author_cards:true,layouts,errors};
+    const report={batch_copy:true,one_work_copy:true,clipboard_fallback:true,all_categories:total,author_cards:true,author_sort:true,coverage,coverageLayouts,layouts,errors};
     writeFileSync(join(out,'community-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
   } finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exit(1)});
