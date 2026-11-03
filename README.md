@@ -65,3 +65,5 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 unoebasta is a non-commercial project and is not affiliated with the Hugo, Nebula or Locus awards.
 
 **Multilingual audio research.** `search audio` requests a supervised GPT Luna discovery batch; `npm run audio:plan` prepares a four-language queue. See [the audio workflow](docs/audio-search.md). The CLI prepares tasks; it does not launch or bill an AI agent.
+
+**Bring your own agent.** Copy a search task from About or a work card, then give it to any capable agent. The [task contract](docs/search-brief.md) limits it to a few works and a findings-only PR. Readers can also send a link and description through the existing Nostr form.

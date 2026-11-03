@@ -198,6 +198,8 @@ table.board { border-collapse: separate; border-spacing: 0; width: 100%; font-si
 .cell .ca { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cell .cm { display: flex; gap: 4px; font-size: 12px; margin-top: 2px; }
 .cell .cm:empty { display: none; }
+.authorsec h3 .author-open { min-height: 44px; font-size: 17px; font-weight: 600; color: var(--accent); padding: 8px 0; }
+#agent-dialog textarea { width: 100%; min-height: 240px; max-height: 50vh; resize: vertical; font-size: 16px; }
 .cell .award-meta { display: block; margin-bottom: 4px; color: var(--accent); font-size: 12px; line-height: 1.4; }
 .cell.has-text { background: var(--accent-soft); }
 .cell.mine { border-style: dashed; border-color: var(--accent); }
@@ -659,6 +661,7 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 <div id="eleven-dialog" class="modal" hidden></div>
 <div id="recall-dialog" class="modal" hidden></div>
 <div id="listen-dialog" class="modal" hidden></div>
+<div id="agent-dialog" class="modal" hidden></div>
 <div id="move-dialog" class="modal" hidden></div>
 <div id="sheet-gb" class="sheet sheet-gb" hidden></div>
 <div id="exit-dialog" class="modal" hidden></div>
@@ -666,6 +669,7 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 
 <!-- Award data: Wikidata (CC0) and Wikipedia extracts (CC BY-SA 4.0); filled in by scripts/build-*.mjs from data/awards.json -->
 <script type="application/json" id="awards-data">__AWARDS_JSON__</script>
+<script type="application/json" id="search-brief">__SEARCH_BRIEF_JSON__</script>
 <!-- Libraries: Readability (text extraction), DOMPurify (sanitizing), JSZip (EPUB, FB2.ZIP, DOCX, ODT). -->
 <script src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.6.0/Readability.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
@@ -854,6 +858,7 @@ const OLD_IDS = { 'in-my-country': 'Q139732068', 'never-eaten-vegetables': 'Q139
 /* ---------- interface strings ---------- */
 const I18N = {
   en: {
+    v_authors: "By author", authors_count: "Authors: {n}", authors_hint: "Open an author’s name for their biography and all award-winning works.", agent_h: "Help fill the catalog", agent_hint: "Copy a small search task for your agent. It checks four languages and returns findings for review.", agent_copy: "Copy task for my agent", agent_work: "Copy this work’s search task", agent_copied: "Task copied. Paste it into your agent.", agent_brief: "Search instructions", agent_fallback: "Copy this task and paste it into your agent.",
     shelf_danger_section: "Delete items in this section", shelf_danger_count: "Saved items: {n}", shelf_danger_h: "Danger zone", shelf_danger_all_note: "Delete files, reading progress, notes, bookmarks, links and feedback. Preferences stay.",
     shelf_delete_files_confirm: "Delete all files on this device and their reading records?", shelf_delete_data_confirm: "Delete all saved shelf items, including files? Synced items will also be removed from your other devices.",
     shelf_delete_all: "Delete all", shelf_delete_data: "Delete all saved items", shelf_deleted: "Deleted {n} items.", langs_save: "Save languages", langs_saved: "Saved. Read now uses your reading languages.", langs_save_hint: "Save to apply this choice to Read and keep it for your next visit.", langs_change: "Change", picks_languages: "Reading languages: {l}", picks_none_lang: "No full text is available in {l} for this length yet.", picks_excerpts: "Excerpts in your languages", picks_excerpt_open: "Read excerpt",
@@ -933,6 +938,7 @@ const I18N = {
     ],
   },
   pl: {
+    v_authors: "Według autorów", authors_count: "Autorzy: {n}", authors_hint: "Otwórz nazwisko autora, aby zobaczyć biografię i wszystkie nagrodzone utwory.", agent_h: "Pomóż uzupełnić katalog", agent_hint: "Skopiuj małe zadanie dla swojego agenta. Sprawdzi cztery języki i przygotuje wyniki do weryfikacji.", agent_copy: "Kopiuj zadanie dla agenta", agent_work: "Kopiuj zadanie dla tego utworu", agent_copied: "Zadanie skopiowane. Wklej je swojemu agentowi.", agent_brief: "Instrukcja wyszukiwania", agent_fallback: "Skopiuj zadanie i wklej je swojemu agentowi.",
     shelf_danger_section: "Usuń elementy z tej sekcji", shelf_danger_count: "Zapisane elementy: {n}", shelf_danger_h: "Strefa usuwania", shelf_danger_all_note: "Usuń pliki, postęp czytania, notatki, zakładki, linki i zgłoszenia. Ustawienia pozostaną.",
     shelf_delete_files_confirm: "Usunąć wszystkie pliki na tym urządzeniu i ich zapisane miejsca w lekturze?", shelf_delete_data_confirm: "Usunąć wszystkie zapisane elementy półki, w tym pliki? Zsynchronizowane elementy znikną też z pozostałych urządzeń.",
     shelf_delete_all: "Usuń wszystko", shelf_delete_data: "Usuń wszystkie zapisane elementy", shelf_deleted: "Usunięto elementów: {n}.", langs_save: "Zapisz języki", langs_saved: "Zapisano. Czytaj korzysta teraz z wybranych języków.", langs_save_hint: "Zapisz, aby zastosować wybór w Czytaj i zachować go na następną wizytę.", langs_change: "Zmień", picks_languages: "Języki lektury: {l}", picks_none_lang: "Nie ma jeszcze pełnego tekstu o tej długości w językach: {l}.", picks_excerpts: "Fragmenty w twoich językach", picks_excerpt_open: "Czytaj fragment",
@@ -1012,6 +1018,7 @@ const I18N = {
     ],
   },
   ru: {
+    v_authors: "По авторам", authors_count: "Авторов: {n}", authors_hint: "Нажмите на имя писателя, чтобы открыть биографию и все его произведения с премиями.", agent_h: "Помочь пополнить каталог", agent_hint: "Скопируйте небольшое задание своему агенту. Он проверит четыре языка и подготовит находки для проверки.", agent_copy: "Скопировать задание моему агенту", agent_work: "Скопировать задание по этой книге", agent_copied: "Задание скопировано. Вставьте его своему агенту.", agent_brief: "Инструкция поиска", agent_fallback: "Скопируйте задание и вставьте его своему агенту.",
     shelf_danger_section: "Удаление записей этого раздела", shelf_danger_count: "Сохранённых записей: {n}", shelf_danger_h: "Опасная зона", shelf_danger_all_note: "Удалить файлы, места чтения, заметки, закладки, ссылки и сообщения. Настройки останутся.",
     shelf_delete_files_confirm: "Удалить все файлы на этом устройстве и связанные записи чтения?", shelf_delete_data_confirm: "Удалить все сохранённые записи полки, включая файлы? Синхронизируемые записи удалятся и с других устройств.",
     shelf_delete_all: "Удалить всё", shelf_delete_data: "Удалить все сохранённые записи", shelf_deleted: "Удалено записей: {n}.", langs_save: "Сохранить языки", langs_saved: "Сохранено. Раздел «Читать» учитывает выбранные языки.", langs_save_hint: "Сохраните выбор, чтобы применить его в разделе «Читать» и оставить для следующего визита.", langs_change: "Изменить", picks_languages: "Языки чтения: {l}", picks_none_lang: "Полного текста такой длины на выбранных языках пока нет: {l}.", picks_excerpts: "Фрагменты на ваших языках", picks_excerpt_open: "Читать фрагмент",
@@ -1091,6 +1098,7 @@ const I18N = {
     ],
   },
   es: {
+    v_authors: "Por autor", authors_count: "Autores: {n}", authors_hint: "Pulsa el nombre del autor para ver su biografía y todas sus obras premiadas.", agent_h: "Ayuda a completar el catálogo", agent_hint: "Copia una pequeña tarea para tu agente. Revisará cuatro idiomas y preparará hallazgos para comprobar.", agent_copy: "Copiar tarea para mi agente", agent_work: "Copiar tarea de esta obra", agent_copied: "Tarea copiada. Pégala en tu agente.", agent_brief: "Instrucciones de búsqueda", agent_fallback: "Copia esta tarea y pégala en tu agente.",
     shelf_danger_section: "Borrar elementos de esta sección", shelf_danger_count: "Elementos guardados: {n}", shelf_danger_h: "Zona de peligro", shelf_danger_all_note: "Borra archivos, progreso de lectura, notas, marcadores, enlaces y comentarios. Las preferencias se conservan.",
     shelf_delete_files_confirm: "¿Borrar todos los archivos de este dispositivo y sus registros de lectura?", shelf_delete_data_confirm: "¿Borrar todos los elementos guardados del estante, incluidos los archivos? Los elementos sincronizados también se borrarán de tus otros dispositivos.",
     shelf_delete_all: "Borrar todo", shelf_delete_data: "Borrar todos los elementos guardados", shelf_deleted: "Elementos borrados: {n}.", langs_save: "Guardar idiomas", langs_saved: "Guardado. Leer usa ahora tus idiomas de lectura.", langs_save_hint: "Guarda para aplicar tu elección en Leer y conservarla para la próxima visita.", langs_change: "Cambiar", picks_languages: "Idiomas de lectura: {l}", picks_none_lang: "Todavía no hay un texto completo de esta duración en: {l}.", picks_excerpts: "Fragmentos en tus idiomas", picks_excerpt_open: "Leer fragmento",
@@ -1942,12 +1950,14 @@ function renderAwards(onlyBody) {
   const GROUP = { N: ['N', 'SF', 'FN', 'HN', 'FT'], A: ['A'], E: ['E'], S: ['S'] };
   const ALL = AV.award === 'all';
   const catsOf = a => ALL ? Object.keys(GROUP) : CATS[a].filter(c => DATA.aw.some(x => x[0] === a && x[1] === c));
-  if (!AV.cat || !catsOf(aw).includes(AV.cat)) AV.cat = catsOf(aw).includes('S') ? 'S' : catsOf(aw)[0];
+  if (!AV.cat || (AV.cat !== 'all' && !catsOf(aw).includes(AV.cat))) AV.cat = catsOf(aw).includes('S') ? 'S' : catsOf(aw)[0];
   const awList = AV.award === 'all' ? AWARDS : [AV.award];
   const awOpts = ['all', ...AWARDS];
   const awSeg = `<div class="seg full" role="group" aria-label="${esc(t('col_award'))}">${awOpts.map(a => `<button data-av-award="${a}" aria-pressed="${AV.award === a}">${esc(a === 'all' ? t('aw_all_short') : awardName(a))}</button>`).join('')}</div>`;
-  const modes = ['cats', 'years'].concat(wide ? ['table'] : []);
+  const modes = ['cats', 'years', 'authors'].concat(wide ? ['table'] : []);
   const modeSeg = `<div class="seg full" role="group">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${mode === m}">${esc(t('v_' + m))}</button>`).join('')}</div>`;
+  const catLabel = c => c === 'all' ? t('aw_all_short') : catName(c);
+  const catSeg = `<div class="scroller" role="group" aria-label="${esc(t('col_cat'))}">${['all', ...catsOf(aw)].map(c => `<button class="chip" data-av-cat="${c}" aria-pressed="${AV.cat === c}">${esc(catLabel(c))}</button>`).join('')}</div>`;
   const tools = `<div class="scroller"><button class="chip" data-av-sort="toggle">${AV.sort === 'desc' ? '↓ ' + esc(t('sort_desc')) : '↑ ' + esc(t('sort_asc'))}</button><button class="chip" data-av-text="1" aria-pressed="${AV.onlyText}">${mk('text')} ${esc(t('only_text'))}</button></div>`;
   const search = '';
   const LG = { '▶': 'text', '¶': 'ex', '◌': 'mine', '♪': 'audio', '★': 'star' };
@@ -1956,9 +1966,9 @@ function renderAwards(onlyBody) {
   // The same work/year/category is one entry, with every award and Locus novel subtype retained.
   const winners = (y, cat) => {
     const by = new Map();
-    for (const a of awList) for (const c of (ALL ? GROUP[cat] : [cat])) for (const q of ((BOARD[a] || {})[y] || {})[c] || []) if (passText(q) && matchQ(q)) {
+    for (const a of awList) for (const c of (cat === 'all' ? CATS[a] : ALL ? GROUP[cat] : [cat])) for (const q of ((BOARD[a] || {})[y] || {})[c] || []) if (passText(q) && matchQ(q)) {
       if (!by.has(q)) by.set(q, []);
-      const label = awardName(a) + (ALL && c !== cat ? ' · ' + catName(c) : '');
+      const label = awardName(a) + (cat === 'all' || (ALL && c !== cat) ? ' · ' + catName(c) : '');
       if (!by.get(q).includes(label)) by.get(q).push(label);
     }
     return by;
@@ -1977,11 +1987,22 @@ function renderAwards(onlyBody) {
     for (const y of ys) {
       const by = winners(y, AV.cat);
       const qs = [...by.keys()];
-      qs.forEach((q, k) => { const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec; const ns = by.get(q); rows += yearRow(y, q, k === 0, mark, ALL ? ns.join(ns.some(n => n.includes(' · ')) ? '; ' : ', ') : ''); count++; });
+      qs.forEach((q, k) => { const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec; const ns = by.get(q); rows += yearRow(y, q, k === 0, mark, ALL || AV.cat === 'all' ? ns.join(ns.some(n => n.includes(' · ')) ? '; ' : ', ') : ''); count++; });
       if (qs.length) shown.push(y);
     }
-    head = `${awSeg}${modeSeg}<div class="scroller" role="group" aria-label="${esc(t('col_cat'))}">${catsOf(aw).map(c => `<button class="chip" data-av-cat="${c}" aria-pressed="${AV.cat === c}">${esc(catName(c))}</button>`).join('')}</div>${tools}${search}${decadeChips(shown)}`;
-    body = `<p class="count-line">${esc(ALL ? t('aw_all_short') : awardName(aw))} · ${esc(catName(AV.cat))} · ${esc(t('found', { n: fmtNum(count) }))}</p>${count ? `<div class="ylist">${rows}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
+    head = `${awSeg}${modeSeg}${catSeg}${tools}${search}${decadeChips(shown)}`;
+    body = `<p class="count-line">${esc(ALL ? t('aw_all_short') : awardName(aw))} · ${esc(catLabel(AV.cat))} · ${esc(t('found', { n: fmtNum(count) }))}</p>${count ? `<div class="ylist">${rows}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
+  } else if (mode === 'authors') {
+    const authors = new Map(), matches = AV.q ? new Set(searchWorks(AV.q)) : null;
+    for (const w of Object.values(WORKS)) {
+      const awards = w.awards.filter(([a, c]) => awList.includes(a) && (AV.cat === 'all' || (ALL ? GROUP[AV.cat].includes(c) : c === AV.cat)));
+      if (!awards.length || !passText(w.id) || (matches && !matches.has(w.id))) continue;
+      for (const aid of w.authors) { if (!authors.has(aid)) authors.set(aid, []); authors.get(aid).push({ w, awards }); }
+    }
+    const latest = entries => Math.max(...entries.flatMap(x => x.awards.map(a => a[2])));
+    const entries = [...authors].sort((a, b) => (AV.sort === 'desc' ? latest(b[1]) - latest(a[1]) : latest(a[1]) - latest(b[1])) || authorName(a[0]).localeCompare(authorName(b[0]), LANG));
+    head = `${awSeg}${modeSeg}${catSeg}${tools}`;
+    body = `<p class="count-line">${esc(t('authors_count', { n: entries.length }))}${AV.q ? ' · ' + clearBtn() : ''}</p><p class="footnote">${esc(t('authors_hint'))}</p>${entries.map(([aid, works]) => `<section class="yearsec authorsec"><h3><button class="btn btn-ghost author-open" data-author="${aid}">${esc(authorName(aid))} · ${esc(t('author_works_n', { n: works.length }))} ↗</button></h3><div class="ylist">${works.sort((a, b) => AV.sort === 'desc' ? latest([b]) - latest([a]) : latest([a]) - latest([b])).map(({w, awards}) => workRow(awards.map(([a,c,y]) => `${awardName(a)} ${y} · ${catName(c)}`).join('; '), w.id)).join('')}</div></section>`).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
   } else if (mode === 'years') {
     const ys = sortY([...new Set(DATA.aw.filter(x => awList.includes(x[0])).map(x => x[2]))]);
     let count = 0; const shown = []; let lastDec = null;
@@ -2007,7 +2028,7 @@ function renderAwards(onlyBody) {
     head = `${awSeg}${modeSeg}${tools}${search}${decadeChips(shown)}`;
     body = `<p class="count-line">${esc(ALL ? t('aw_all') : awardName(aw))} · ${esc(t('col_year'))} × ${esc(t('col_cat'))}</p><div class="board-wrap"><table class="board"><caption class="sr">${esc(ALL ? t('aw_all') : awardName(aw))}</caption><thead><tr><th scope="col"><span class="sr">${esc(t('col_year'))}</span></th>${cats.map(c => `<th scope="col"><button data-av-cat-go="${c}">${esc(catName(c))}</button></th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${cats.length + 1}"><p class="empty" style="padding:10px">${esc(t('nothing_found'))}</p></td></tr>`}</tbody></table></div>${legend}`;
   }
-  if (AV.q) { const found = searchWorks(AV.q); head = ''; body = `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>${found.length ? searchRows(found) : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`; }
+  if (AV.q && mode !== 'authors') { const found = searchWorks(AV.q); head = ''; body = `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>${found.length ? searchRows(found) : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`; }
   if (onlyBody && $('#av-body')) { $('#av-head').innerHTML = head; $('#av-body').innerHTML = body; return chipIntoView(); }
   v.innerHTML = `<div class="intro"><h2>${esc(t('aw_h2'))}</h2><p>${esc(t('aw_p'))}</p></div><div class="controls">${searchForm('av-q', AV.q)}<div id="av-head" class="controls">${head}</div></div><div id="av-body">${body}</div>
     <p class="footnote">${esc(t('aw_note'))}</p><p class="footnote">${esc(t('aw_src'))}</p>`;
@@ -2174,6 +2195,7 @@ function renderAbout() {
     <section class="panel" id="about-data"><h4>${esc(t('about_data_h'))}</h4><p class="bio">${linkify(t('about_data'))}</p></section>
     <section class="panel" id="about-sync"><h4>${esc(t('sy_h'))}</h4><ol class="about-list">${t('about_sync').map(x => `<li>${linkify(x)}</li>`).join('')}</ol><p class="bio small">${esc(t('about_sync_note'))}</p></section>
     ${coverageHtml()}
+    <section class="panel" id="about-contribute"><h4>${esc(t('agent_h'))}</h4><p>${esc(t('agent_hint'))}</p><div class="row"><button class="btn btn-primary" data-agent-task="batch">${esc(t('agent_copy'))}</button><a href="${REPO_URL}/blob/main/docs/search-brief.md" target="_blank" rel="noopener">${esc(t('agent_brief'))} ↗</a></div></section>
     <section class="panel" id="about-src"><h4>${esc(t('about_src_h'))}</h4><p class="bio">${linkify(t('about_src'))}</p><p class="bio"><button class="btn" data-form="feedback" data-wid="">${esc(t('fb_title'))}</button></p><p class="bio" id="about-code">${esc(t('about_code'))} <a href="${REPO_URL}" target="_blank" rel="noopener">github.com/foteev/unoebasta ↗</a></p></section>
     <div class="row"><button class="btn btn-primary" id="open-demo">${esc(t('demo_btn'))}</button></div>`;
 }
@@ -2235,7 +2257,7 @@ async function openWork(q) {
         <li><a href="https://www.wikidata.org/wiki/${q}" target="_blank" rel="noopener">${esc(t('wikidata_t'))} ↗</a></li>
       </ul>
     </section>
-    <div class="row"><button class="btn" data-form="feedback" data-wid="${q}">${esc(t('fb_title'))}</button></div>
+    <div class="row"><button class="btn" data-form="feedback" data-wid="${q}">${esc(t('fb_title'))}</button><button class="btn" data-agent-task="${q}">${esc(t('agent_work'))}</button></div>
   </div>`;
   el.hidden = false; el.scrollTop = 0;
   if (!ab) fetchWikiAbout(q).then(ok => { const slot = $('#about-slot'); const sv = $('#own-link-save'); if (!ok || !slot || el.hidden || !sv || sv.dataset.wid !== q) return; const a2 = aboutFor(null, q); if (a2) slot.innerHTML = aboutPanel(a2, 'w'); });
@@ -2284,6 +2306,44 @@ function openAuthor(q) {
   </div>`;
   el.hidden = false; el.scrollTop = 0;
 }
+
+/* ---------- public search tasks, copied to a reader's own agent ---------- */
+const SEARCH_BRIEF = JSON.parse(document.getElementById('search-brief').textContent);
+function searchTaskWorks(q) {
+  if (WORKS[q]) return [WORKS[q]];
+  const pool = Object.values(WORKS).filter(w => ['en','pl','ru','es'].some(l => availability(w.id)[l] !== 'full' || !workLangs(w.id).audio.has(l)));
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i],pool[j]] = [pool[j],pool[i]]; }
+  return pool.slice(0, 5);
+}
+function buildSearchTask(q) {
+  const works = searchTaskWorks(q).map(w => ({ qid: w.id, title: w.title, titles: w.titles,
+    authors: w.authors.map(id => ({ qid: id, names: AUTHORS[id]?.name })), form: formOf(w.id) === 'short' ? 'short story' : formOf(w.id), year: w.pub,
+    bibliography: { isfdb: w.isfdb ? `https://www.isfdb.org/cgi-bin/title.cgi?${w.isfdb}` : null, fantlab: w.fantlab ? `https://fantlab.ru/work${w.fantlab}` : null },
+    text_coverage: availability(w.id), audio_languages: [...workLangs(w.id).audio],
+    existing_links: [...(READ[w.id]?.links || []).map(l => ({kind:l.kind,lang:l.lang || 'en',url:l.url})), ...excerptLinks(w.id).map(l => ({kind:'fragment',lang:l.lang.toLowerCase(),url:l.url}))] }));
+  return `unoebasta contribution task v1
+Generated: ${new Date().toISOString()}
+Assigned QIDs: ${works.map(w=>w.qid).join(', ')}
+Languages: EN, PL, RU, ES
+Reply notes in: ${LANG}
+
+${SEARCH_BRIEF}
+
+PUBLIC CATALOG SNAPSHOT (refresh main before submitting):
+${JSON.stringify(works,null,2)}`;
+}
+let agentTaskText = '', agentFrom = null;
+function closeAgentTask() { const m = $('#agent-dialog'); m.hidden = true; m.innerHTML = ''; if (agentFrom && document.contains(agentFrom)) agentFrom.focus(); }
+async function copyAgentTask(q) {
+  agentTaskText = buildSearchTask(q); agentFrom = document.activeElement;
+  try { await navigator.clipboard.writeText(agentTaskText); toast(t('agent_copied')); }
+  catch {
+    const m = $('#agent-dialog');
+    m.innerHTML = `<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="agent-title"><h3 id="agent-title">${esc(t('agent_h'))}</h3><p>${esc(t('agent_fallback'))}</p><textarea id="agent-task-text" readonly aria-label="${esc(t('agent_h'))}">${esc(agentTaskText)}</textarea><div class="row"><button class="btn" data-agent-recopy="1">${esc(t('copy'))}</button><button class="btn btn-ghost" data-agent-close="1">${esc(t('back'))}</button></div></div>`;
+    m.hidden = false; $('#agent-task-text').focus(); $('#agent-task-text').select();
+  }
+}
+$('#agent-dialog').addEventListener('click', e => { if (e.target.id === 'agent-dialog') closeAgentTask(); });
 
 /* ---------- suggestions and reports (stored locally until moderation exists) ---------- */
 function suggestionText(s) {
@@ -3294,6 +3354,9 @@ async function refreshAll() {
 document.addEventListener('click', async e => {
   const b = e.target.closest('button, [data-close]'); if (!b || b.closest('#reader')) return;
   const d = b.dataset;
+  if (d.agentTask) return copyAgentTask(d.agentTask);
+  if (d.agentClose) return closeAgentTask();
+  if (d.agentRecopy) { const ta = $('#agent-task-text'); try { await navigator.clipboard.writeText(ta.value); toast(t('agent_copied')); } catch { ta.focus(); ta.select(); } return; }
   if (d.lang) { LANG = d.lang; prefs.lang = LANG; savePrefs(); applyTheme(); return refreshAll(); }
   if (d.view) { closeSheets(); return setView(d.view); }
   if (d.goshelf) { closeSheets(); setView('shelf'); await renderShelf(); const el = document.getElementById(d.goshelf); if (el) { const panel = el.closest('details.shelf-section'); if (panel) panel.open = true; el.scrollIntoView ? el.scrollIntoView({ block: 'start' }) : 0; el.classList.add('hit'); setTimeout(() => el.classList.remove('hit'), 1800); } return; }
@@ -3447,6 +3510,7 @@ document.addEventListener('submit', e => {
   inp.blur(); // close the phone keyboard so the results are visible
 });
 function closeTopLayer() {
+  if (!$('#agent-dialog').hidden) return closeAgentTask();
   if (!$('#move-dialog').hidden) return closeMove();
   if (!$('#listen-dialog').hidden) return closeListen();
   if (!$('#eleven-dialog').hidden) return closeEleven();

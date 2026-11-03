@@ -1,10 +1,10 @@
 name: Mobile shelf
 on:
   pull_request:
-    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, .github/workflows/mobile-shelf.yml]
+    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, test/contribution-ui.test.cjs, docs/search-brief.md, scripts/build-web.mjs, .github/workflows/mobile-shelf.yml]
   push:
     branches: [main]
-    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, .github/workflows/mobile-shelf.yml]
+    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, test/contribution-ui.test.cjs, docs/search-brief.md, scripts/build-web.mjs, .github/workflows/mobile-shelf.yml]
 permissions:
   contents: read
 jobs:
@@ -24,6 +24,7 @@ jobs:
       - run: node test/mobile-shelf.test.cjs
       - run: node test/awards-views.test.cjs
       - run: node test/audio-card.test.cjs
+      - run: node test/contribution-ui.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

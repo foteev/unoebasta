@@ -9,6 +9,16 @@ Thank you for helping. Most help needs no code: a link to a free text, a broken 
 3. **Nothing that tracks readers.** No analytics, no third-party scripts that phone home, no fonts or libraries from new hosts without a reason in the pull request.
 4. **Be kind.** We follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Reader and agent findings
+
+Use **Copy task for my agent** on About for five works, or the button on a work card for one. The copied task embeds the [canonical task contract](docs/search-brief.md) plus public catalog context. It is model-independent and contains no shelf files, notes or credentials. A findings PR adds one new CSV in `data/found/` and an optional same-stem Markdown note in `data/notes/`; code and generated-data changes are rejected. Notes-only submissions are accepted when no confirmed link was found.
+
+The Findings submission workflow checks data from the exact PR commit using trusted base code, without checking out or executing contributor code. It validates file scope, schema, QIDs/forms and duplicates, not source truth. Maintainers review and merge findings, then use the existing import commands below in a separate change. A CSV-only merge does not itself publish new links.
+
+Readers can also send a URL and description using the existing Nostr feedback form. Inbox messages remain review input.
+
+## Maintainer import
+
 ## Add a free text
 
 The easy way: open an issue with the [“Suggest a text”](https://github.com/foteev/unoebasta/issues/new?template=add-text.yml) form.
