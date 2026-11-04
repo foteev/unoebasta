@@ -4,6 +4,7 @@ const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
 const { resolve, join, extname } = require('node:path');
 const assert = require('node:assert/strict');
+const { filterOption, selectFilter } = require('./filter-helpers.cjs');
 
 (async () => {
   const root = resolve(__dirname, '../dist/web'), out = resolve(__dirname, '../.cache/mobile-shelf');
@@ -27,11 +28,11 @@ const assert = require('node:assert/strict');
     const url = `http://127.0.0.1:${server.address().port}/`;
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.locator('#tab-awards').click();
-    await page.locator('#av-language').selectOption('all');
-    await page.locator('[data-av-award="all"]').click();
+    await selectFilter(page, 'av-languages', []);
+    await selectFilter(page, 'av-awards', []);
     await page.locator('[data-av-mode="table"]').click();
     await page.waitForSelector('table.board .award-meta');
-    assert.equal(await page.locator('[data-av-award="all"]').getAttribute('aria-pressed'), 'true');
+    assert.equal(await filterOption(page, 'av-awards', 'all').isChecked(), true);
     const entries = await page.locator('table.board .cell').count();
     assert.ok(entries > 500, 'All-awards board contains the combined corpus');
     assert.ok(await page.locator('table.board .award-meta').evaluateAll(xs => ['Hugo', 'Nebula', 'Locus'].every(a => xs.some(x => x.textContent.includes(a)))));
@@ -46,10 +47,10 @@ const assert = require('node:assert/strict');
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.locator('#tab-awards').click();
     await page.waitForSelector('table.board .award-meta');
-    assert.equal(await page.locator('[data-av-award="all"]').getAttribute('aria-pressed'), 'true', 'All + Board survives reload');
+    assert.equal(await filterOption(page, 'av-awards', 'all').isChecked(), true, 'All + Board survives reload');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForFunction(() => !document.querySelector('table.board'));
-    assert.equal(await page.evaluate(() => AV.award === 'all' && AV.mode === 'table'), true, 'Phone does not discard desktop preference');
+    assert.equal(await page.evaluate(() => AV.awards.length === 0 && AV.mode === 'table'), true, 'Phone does not discard desktop preference');
     await page.setViewportSize({ width: 1280, height: 1100 });
     await page.waitForSelector('table.board .award-meta');
     assert.equal(await page.locator('table.board .cell').count(), entries, 'Returning to desktop restores all awards');
@@ -58,7 +59,7 @@ const assert = require('node:assert/strict');
     for (const lang of ['en', 'es', 'pl', 'ru']) {
       await page.locator('#lang-sel').selectOption(lang);
       await page.waitForFunction(lang => document.documentElement.lang === lang, lang);
-      assert.equal(await page.locator('[data-av-award="all"]').getAttribute('aria-pressed'), 'true');
+      assert.equal(await filterOption(page, 'av-awards', 'all').isChecked(), true);
     }
     const layouts = [];
     for (const width of [360, 390]) for (const theme of ['light', 'dark']) for (const mode of ['cats', 'years']) {
@@ -71,7 +72,7 @@ const assert = require('node:assert/strict');
       assert.ok(layout.scroll <= width + 1, 'No page overflow');
       assert.ok(layout.minTarget >= 44, 'Award/category/mode controls are touch-sized');
       assert.equal(await page.locator('table.board').count(), 0, 'Phone has a list instead of a wide table');
-      assert.equal(await page.locator('[data-av-award="all"]').getAttribute('aria-pressed'), 'true');
+      assert.equal(await filterOption(page, 'av-awards', 'all').isChecked(), true);
       layouts.push({ ...layout, theme, mode });
       await page.screenshot({ path: join(out, `awards-${mode}-${width}-${theme}.png`), animations: 'disabled' });
     }

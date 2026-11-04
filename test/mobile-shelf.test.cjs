@@ -4,6 +4,7 @@ const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
 const { resolve, join, extname } = require('node:path');
 const assert = require('node:assert/strict');
+const { filterOption, selectFilter } = require('./filter-helpers.cjs');
 
 (async () => {
   const root = resolve(__dirname, '../dist/web'), out = resolve(__dirname, '../.cache/mobile-shelf');
@@ -61,7 +62,7 @@ const assert = require('node:assert/strict');
     await page.locator('#langs-save').click();
     await page.waitForFunction(() => JSON.stringify(prefs.langs) === '["pl"]');
     await page.locator('#tab-catalog').click();
-    await page.locator('[data-picklen="eve"]').click();
+    await selectFilter(page, 'home-lengths', ['eve']);
     await page.waitForSelector('#view-catalog [data-picks=reading] .pick a[data-via="listen"]');
     assert.equal(await page.locator('#view-catalog [data-picks=reading] .pick a[data-via="read"]').count(),0);
     assert.equal(await page.locator('#view-catalog [data-picks=reading] .pick [data-eleven]').count(),0);
@@ -82,7 +83,7 @@ const assert = require('node:assert/strict');
     await page.reload({waitUntil:'domcontentloaded'});
     await page.waitForSelector('#view-catalog [data-picks=reading] .pick a[data-via="listen"]');
     assert.deepEqual(await page.evaluate(() => prefs.langs),['pl']);
-    assert.equal(await page.evaluate(() => prefs.pickLen),'eve');
+    assert.deepEqual(await page.evaluate(() => prefs.pickLengths),['eve']);
     await page.evaluate(() => {
       window.__polishRead = JSON.parse(JSON.stringify(READ));
       READ.Q6271990.links = READ.Q6271990.links.filter(l => l.lang !== 'pl');
@@ -103,7 +104,7 @@ const assert = require('node:assert/strict');
     assert.match(await page.locator('#view-catalog [data-picks=reading] .pick a[data-via="read"]').getAttribute('href'),/legimi\.pl/);
     assert.match(await page.locator('#view-catalog [data-picks=reading] .pick-t').textContent(),/^Kupiec/);
     assert.equal(await page.locator('#view-catalog [data-picks=reading] .pick a[data-via="listen"]').count(),0);
-    await page.evaluate(() => { Object.assign(READ,window.__polishRead); delete window.__polishRead; prefs.langs=['es']; prefs.pickLen='15'; savePrefs(); renderHome(); });
+    await page.evaluate(() => { Object.assign(READ,window.__polishRead); delete window.__polishRead; prefs.langs=['es']; prefs.pickLengths=['15']; savePrefs(); renderHome(); });
     await page.evaluate(async () => {
       await Store.put('files', { id: 'qa-file', title: 'Тестовая книга с длинным названием для проверки мобильной полки', byline: 'Тестовый автор', format: 'txt', words: 100, size: 42, html: '<p>QA file body.</p>', at: Date.now() });
       await Store.put('bookmarks', { id: 'w:Q25349436', type: 'work', workId: 'Q25349436', at: Date.now() });

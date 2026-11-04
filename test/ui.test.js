@@ -41,11 +41,20 @@ const w = dom.window, $ = s => w.document.querySelector(s), $$ = s => [...w.docu
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const waitFor = async predicate => { const end = Date.now() + 2000; while (!predicate() && Date.now() < end) await sleep(20); };
 const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+const filterInput = (group, value) => $(`[data-multi-filter="${group}"][value="${value}"]`);
+function selectFilter(group, values = []) {
+  const option = value => filterInput(group, value);
+  option('all').closest('details').open = true;
+  click(option('all'));
+  for (const value of values) click(option(value));
+}
+
 (async () => {
   await sleep(400);
   const checks = {};
   const nCatalog = w.eval('Object.keys(READ).filter(q => WORKS[q]).length'); // grows with every batch of found texts
   checks['catalog tab: every work with a text or audio'] = nCatalog >= 100 && $$('#view-library .slip').length === nCatalog;
+  checks['filters: returning legacy preferences open every group at All'] = $$('.multi-filter').every(el=>el.querySelector('input').value==='all' && el.querySelector('input').checked);
   const news = $('#view-library .news');
   checks['news panel for returning user'] = !!news && /прошлого визита/.test(news.textContent);
   const nNews = w.eval('newsItems().length');
@@ -60,31 +69,33 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['star toggles'] = $('#view-library [data-star="Q25349436"]').getAttribute('aria-pressed') === 'true';
   // awards tab — phone layout (no matchMedia in jsdom = narrow screen)
   click($('#tab-awards')); await sleep(50);
+  selectFilter('av-awards',['h']); selectFilter('av-categories',['S']);
   checks['phone: no table'] = !$('#view-awards table.board');
-  checks['phone: category picker'] = $$('#view-awards [data-av-cat]').length === 5;
+  checks['phone: category picker'] = $$('#view-awards [data-multi-filter="av-categories"]').length === 9;
   const ss = $$('#view-awards .yrow');
   checks['hugo short story list ~71'] = ss.length >= 68 && ss.length <= 74;
   checks['decade jump chips'] = $$('#view-awards [data-jump]').length >= 7;
   checks['text marks in rows'] = $$('#view-awards .yrow .tm').length >= 8;
   click($('#view-awards [data-av-year="2024"]')); await sleep(50);
   const yearText = $('#view-awards').textContent;
-  checks['year 2024 view shows Kritzer twice'] = (yearText.match(/Kritzer|Критцер/g) || []).length >= 2;
+  checks['year drilldown respects the selected award and short-story category'] = /Kritzer|Критцер/.test(yearText) && $$('#av-body .yearsec h3').length === 1;
   click($('#view-awards [data-av-clear]')); await sleep(50);
-  click($('#view-awards [data-av-cat="N"]')); await sleep(50);
+  selectFilter('av-categories', ['N']); await sleep(50);
   checks['novel list ~75'] = $$('#view-awards .yrow').length >= 72;
   click($('#view-awards [data-av-sort]')); await sleep(50);
   checks['sort toggle → 1953 first'] = /1953/.test($('#view-awards .yrow').textContent);
-  click($('#view-awards [data-av-award="l"]')); await sleep(50);
-  checks['locus 8 category chips'] = $$('#view-awards [data-av-cat]').length === 9;
+  selectFilter('av-awards', ['l']); await sleep(50);
+  checks['locus 8 category chips'] = $$('#view-awards [data-multi-filter="av-categories"]').length === 9;
   // "All" by category: every award at once, one row per work, the awards named on it
-  click($('#view-awards [data-av-award="all"]')); await sleep(50);
-  click($('#view-awards [data-av-cat="S"]')); await sleep(50);
+  selectFilter('av-awards', []); await sleep(50);
+  selectFilter('av-categories', ['S']); await sleep(50);
   const allRows = $$('#view-awards .yrow'), hugoS = w.eval("DATA.aw.filter(x => x[0] === 'h' && x[1] === 'S').length");
-  checks['awards “All” by category: more than one award, no duplicates, awards named'] = $$('#view-awards [data-av-cat]').length === 5 && allRows.length > hugoS && allRows.length < w.eval("DATA.aw.filter(x => x[1] === 'S').length") && allRows.some(r => /,/.test((r.querySelector('.wmeta') || {}).textContent || '')) && /^Все/.test($('#view-awards .count-line').textContent);
-  click($('#view-awards [data-av-cat="N"]')); await sleep(50);
+  checks['awards “All” by category: more than one award, no duplicates, awards named'] = $$('#view-awards [data-multi-filter="av-categories"]').length === 9 && allRows.length > hugoS && allRows.length < w.eval("DATA.aw.filter(x => x[1] === 'S').length") && allRows.some(r => /;/.test((r.querySelector('.wmeta') || {}).textContent || '')) && /^Все/.test($('#view-awards .count-line').textContent);
+  selectFilter('av-categories', ['N']); await sleep(50);
   checks['awards “All” novels include Locus fantasy novels'] = $$('#view-awards .wmeta').some(m => /Локус · /.test(m.textContent));
   click($('#view-awards [data-av-mode="years"]')); await sleep(30);
-  click($('#view-awards [data-av-award="all"]')); await sleep(50);
+  selectFilter('av-awards', []); await sleep(50);
+  selectFilter('av-categories',[]);
   const inp = $('#av-q'); inp.value = 'Le Guin'; inp.dispatchEvent(new w.Event('input', { bubbles: true })); await sleep(400);
   const found = $('#view-awards .count-line').textContent;
   checks['search Le Guin finds several'] = +found.match(/\d+/)[0] >= 8;
@@ -95,7 +106,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['search: Awards searches every category, by a Russian author name, with a button'] = !!$('#view-awards form[data-sform] button[type="submit"]') && +$('#view-awards .count-line').textContent.match(/\d+/)[0] >= 8 && /Левая рука тьмы/.test($('#view-awards').textContent) && /Обделённые|Dispossessed/.test($('#view-awards').textContent);
   checks['search: the box stays while results change'] = $('#av-q') === aq && aq.value === 'ле гуин';
   click($('#view-awards [data-sclear]')); await sleep(60);
-  checks['search: clear brings the board back'] = $('#av-q').value === '' && !!$('#view-awards [data-av-cat]');
+  checks['search: clear brings the board back'] = $('#av-q').value === '' && !!$('#view-awards [data-multi-filter="av-categories"]');
   const S = qs => w.eval(`searchWorks(${JSON.stringify(qs)})`);
   checks['search: Polish and Russian titles'] = S('Diuna').includes('Q190192') && S('дюна').includes('Q190192');
   checks['search: Spanish titles of known translations'] = S('La mano izquierda de la oscuridad').includes('Q2008211') && S('el zoo de papel').includes('Q27903111');
@@ -119,37 +130,38 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['author stats Hugo/Nebula/Locus'] = $$('#sheet-author .stat').length === 3;
   checks['author bio shown'] = /Kritzer/.test($('#sheet-author .bio').textContent);
   click($('#sheet-author [data-goaw^="n||"]')); await sleep(50);
-  checks['author → awards view'] = !$('#view-awards').hidden && $('#view-awards [data-av-award="n"]').getAttribute('aria-pressed') === 'true';
+  checks['author → awards view'] = !$('#view-awards').hidden && $('#view-awards [data-multi-filter="av-awards"][value="n"]').checked;
   // wide screen: the board appears as an extra view
   w.matchMedia = q => ({ matches: /min-width: 900px/.test(q), addEventListener() {}, removeEventListener() {} });
-  w.eval("AV.mode = 'table'; AV.award = 'h'; renderAwards()"); await sleep(30);
+  w.eval("AV.mode = 'table'; AV.awards = ['h']; AV.cats = []; renderAwards()"); await sleep(30);
   checks['wide: board with 4 categories'] = $$('#view-awards table.board thead th button').length === 4 && $$('#view-awards table.board tbody tr').length >= 70;
-  click($('#view-awards [data-av-award="all"]')); await sleep(30);
+  selectFilter('av-awards', []); await sleep(30);
   const boardRows = $$('#view-awards table.board tbody tr[data-year]');
   const boardEntries = boardRows.flatMap(row => [...row.querySelectorAll('td')].flatMap(td => [...td.querySelectorAll('[data-work]')].map(b => `${row.dataset.year}|${td.dataset.category}|${b.dataset.work}`)));
   const expectedEntries = [...new Set(w.eval("DATA.aw.map(([a,c,y,q]) => y + '|' + (['SF','FN','HN','FT'].includes(c) ? 'N' : c) + '|' + q)"))];
   checks['all-awards board: every award record represented, no duplicate work/year/category'] = boardEntries.length === expectedEntries.length && new Set(boardEntries).size === boardEntries.length && expectedEntries.every(x => boardEntries.includes(x));
-  checks['all-awards board: All stays selected and every entry names its awards'] = w.eval("AV.award === 'all'") && $('#view-awards [data-av-award="all"]').getAttribute('aria-pressed') === 'true' && $$('#view-awards table.board .award-meta').length === boardEntries.length && $$('#view-awards table.board .award-meta').some(x => /Хьюго; Небьюла/.test(x.textContent));
+  checks['all-awards board: All stays selected and every entry names its awards'] = w.eval("AV.awards.length === 0") && $('#view-awards [data-multi-filter="av-awards"][value="all"]').checked && $$('#view-awards table.board .award-meta').length === boardEntries.length && $$('#view-awards table.board .award-meta').some(x => /Хьюго.*; Небьюла/.test(x.textContent));
   checks['all-awards board: Locus novel subcategories and tied winners remain visible'] = $$('#view-awards table.board [data-category="N"] .award-meta').some(x => /Локус · Фэнтези-роман/.test(x.textContent)) && expectedEntries.filter(x => x.startsWith('1966|N|')).every(x => boardEntries.includes(x));
   click($('#view-awards [data-av-mode="years"]')); await sleep(30);
-  checks['all-awards by year: same winners as board, grouped by category with award labels'] = $$('#view-awards .yearsec .wrow').length === boardEntries.length && w.eval("AV.award === 'all'") && $$('#view-awards .yearsec .wmeta').every(x => /Хьюго|Небьюла|Локус/.test(x.textContent));
+  checks['all-awards by year: same winners as board, grouped by category with award labels'] = $$('#view-awards .yearsec .wrow').length === boardEntries.length && w.eval("AV.awards.length === 0") && $$('#view-awards .yearsec .wmeta').every(x => /Хьюго|Небьюла|Локус/.test(x.textContent));
   click($('#view-awards [data-av-mode="table"]')); await sleep(30);
   click($('#view-awards [data-av-cat-go="N"]')); await sleep(30);
-  checks['all-awards board → category: All remains selected and no novel winners lost'] = w.eval("AV.award === 'all' && AV.cat === 'N' && AV.mode === 'cats'") && $$('#view-awards .yrow').length === boardEntries.filter(x => x.split('|')[1] === 'N').length;
+  checks['all-awards board → category: All remains selected and no novel winners lost'] = w.eval("AV.awards.length === 0 && AV.cats.join() === 'N' && AV.mode === 'cats'") && $$('#view-awards .yrow').length === boardEntries.filter(x => x.split('|')[1] === 'N').length;
   click($('#view-awards [data-av-mode="table"]')); await sleep(30);
-  click($('#view-awards [data-av-text]')); await sleep(30);
+  click(filterInput('av-formats', 'full')); await sleep(30);
   checks['all-awards board: text filter applies to every award and leaves no empty years'] = $$('#view-awards table.board .cell').length > 0 && $$('#view-awards table.board .cell').every(x => w.eval(`hasText('${x.dataset.work}') || isMine('${x.dataset.work}')`)) && $$('#view-awards table.board tbody tr').every(x => !!x.querySelector('.cell'));
-  click($('#view-awards [data-av-text]')); await sleep(30);
+  click(filterInput('av-formats', 'full')); await sleep(30);
+  selectFilter('av-categories',[]);
   click($('#view-awards [data-av-year="2024"]')); await sleep(30);
-  checks['all-awards board → year: every award and return to board'] = $$('#view-awards .yearsec h3').length === 3 && w.eval("AV.award === 'all' && AV.mode === 'table'");
+  checks['all-awards board → year: every award and return to board'] = $$('#view-awards .yearsec h3').length === 3 && w.eval("AV.awards.length === 0 && AV.mode === 'table'");
   click($('#view-awards [data-av-clear]')); await sleep(30);
   w.matchMedia = undefined; w.eval("renderAwards()");
-  checks['back to phone: all awards without a table; desktop choice preserved'] = !$('#view-awards table.board') && w.eval("AV.award === 'all' && AV.mode === 'table'") && $('#view-awards [data-av-mode="cats"]').getAttribute('aria-pressed') === 'true';
+  checks['back to phone: all awards without a table; desktop choice preserved'] = !$('#view-awards table.board') && w.eval("AV.awards.length === 0 && AV.mode === 'table'") && $('#view-awards [data-av-mode="cats"]').getAttribute('aria-pressed') === 'true';
   w.matchMedia = q => ({ matches: /min-width: 900px/.test(q) }); w.eval('renderAwards()');
-  checks['back to desktop: all-awards board restored'] = !!$('#view-awards table.board') && $('#view-awards [data-av-award="all"]').getAttribute('aria-pressed') === 'true';
+  checks['back to desktop: all-awards board restored'] = !!$('#view-awards table.board') && $('#view-awards [data-multi-filter="av-awards"][value="all"]').checked;
   w.matchMedia = undefined; w.eval('renderAwards()');
-  w.eval("Object.assign(AV,{award:'all',cat:'all',mode:'cats',onlyText:false,year:null,q:''}); renderAwards()");
-  checks['all categories: every work/year once, categories and prizes labelled'] = $$('#view-awards .yrow').length === w.eval("new Set(DATA.aw.map(x=>x[2]+'|'+x[3])).size") && $$('#view-awards .wmeta').every(x=>x.textContent.includes(' · ')) && $('#view-awards [data-av-cat="all"]').getAttribute('aria-pressed') === 'true';
+  w.eval("Object.assign(AV,{awards:[],cats:[],mode:'cats',formats:[],year:null,q:''}); renderAwards()");
+  checks['all categories: every work/year once, categories and prizes labelled'] = $$('#view-awards .yrow').length === w.eval("new Set(DATA.aw.map(x=>x[2]+'|'+x[3])).size") && $$('#view-awards .wmeta').every(x=>x.textContent.includes(' · ')) && $('#view-awards [data-multi-filter="av-categories"][value="all"]').checked;
   click($('#view-awards [data-av-mode="authors"]')); await sleep(40);
   checks['authors: direct author cards and winning works are discoverable'] = $$('#view-awards .author-open').length > 100 && !!$('#view-awards [data-author="Q314553"]') && $$('#view-awards .authorsec .wrow').length > 500;
   click($('#view-awards [data-author="Q314553"]')); await sleep(30);
@@ -164,14 +176,14 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const expectedAwardCounts = w.eval(`Object.fromEntries(Object.keys(AUTHORS).map(a => [a, new Set(DATA.aw.filter(x => WORKS[x[3]].authors.includes(a)).map(x => x.join('|'))).size]))`);
   checks['authors: most awards counts wins, not books, and persists the choice'] = awardIds.every((a, i) => !i || expectedAwardCounts[awardIds[i - 1]] >= expectedAwardCounts[a]) && expectedAwardCounts[awardIds[0]] > $$('#av-body .authorsec:first-of-type .wrow').length && JSON.parse(w.localStorage.getItem('fantastic-prefs')).av.authorSort === 'awards' && /Премий:/.test($('#av-body .author-counts').textContent);
 
-  click($('#view-awards [data-av-award="n"]')); click($('#view-awards [data-av-cat="S"]')); click($('#view-awards [data-av-text]')); await sleep(40);
+  selectFilter('av-awards', ['n']); selectFilter('av-categories', ['S']); click(filterInput('av-formats', 'full')); await sleep(40);
   const authorWorks=$$('#view-awards .authorsec [data-work]');
   checks['authors: award, category and text filters apply together'] = authorWorks.length > 0 && authorWorks.every(el=>w.eval(`WORKS['${el.dataset.work}'].awards.some(a=>a[0]==='n'&&a[1]==='S') && (hasText('${el.dataset.work}')||isMine('${el.dataset.work}'))`));
 
   const filteredAwardIds = $$('#av-body .author-open').map(x => x.dataset.author);
   const filteredCounts = w.eval(`Object.fromEntries(Object.keys(AUTHORS).map(a => [a, new Set(DATA.aw.filter(x => x[0] === 'n' && x[1] === 'S' && WORKS[x[3]].authors.includes(a) && (hasText(x[3]) || isMine(x[3]))).map(x => x.join('|'))).size]))`);
   checks['authors: award ranking follows the active filters'] = filteredAwardIds.every((a, i) => filteredCounts[a] > 0 && (!i || filteredCounts[filteredAwardIds[i - 1]] >= filteredCounts[a]));
-  w.eval("Object.assign(AV,{award:'h',cat:'S',mode:'cats',onlyText:false,q:''}); renderAwards()");
+  w.eval("Object.assign(AV,{awards:['h'],cats:['S'],mode:'cats',formats:[],q:''}); renderAwards()");
   // work card for a catalog-only work (Dune)
   const dune = Object.values(w.eval('WORKS')).find(x => x.title === 'Dune');
   w.eval(`openWork('${dune.id}')`); await sleep(50);
@@ -312,19 +324,19 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   } else checks['google: data present'] = false;
   // ADHD mode: home picks, time, listen next to read, theme, reader bar and focus
   click($('#tab-catalog')); await sleep(30);
-  w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(20);
+  w.eval("prefs.pickLengths = ['15']; renderHome()"); await sleep(20);
   const picks = $$('#view-catalog [data-picks=reading] .pick');
-  checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && (($('#pk-h').textContent === 'Есть несколько минут?' && $('#pk-h').classList.contains('sr')) || $('#pk-h').textContent === 'Или что-то новое') && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
+  checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && (($('#pk-h').textContent === 'Есть несколько минут?' && $('#pk-h').classList.contains('sr')) || $('#pk-h').textContent === 'Или что-то новое') && $('#view-catalog [data-multi-filter="home-lengths"][value="15"]').parentElement.textContent === 'Несколько минут';
   checks['home: cards show cover, title and author, and label audio-only options'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').children.length === 2 && pk.querySelector('.pick-open').firstElementChild.classList.contains('cover') && pk.querySelector('.pick-t') && pk.querySelector('.pick-a') && (pk.querySelector('a[data-via="read"]') ? pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать') : /аудио/.test(pk.querySelector('.pick-txt .small').textContent)));
   checks['home: read and listen actions match the available formats'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === (pk.querySelector('a[data-via="read"]') ? 2 : 1)) && !!$('#view-catalog .pick-more');
   checks['home: listening names its source, with an icon beside text or a labelled audio action'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l ? l.querySelector('svg') && /^Слушать · \S.*$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore') : /^Слушать/.test(pk.querySelector('.pick-actions').textContent) && !!pk.querySelector('a[data-via="listen"]'); });
-  click($('#view-catalog [data-picklen="eve"]')); await sleep(20);
-  checks['home: more-than-an-hour picks are long'] = $$('#view-catalog [data-picks=reading] .pick').length > 0 && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-picklen="eve"]').textContent === 'Больше часа';
+  selectFilter('home-lengths', ['eve']); await sleep(20);
+  checks['home: more-than-an-hour picks are long'] = $$('#view-catalog [data-picks=reading] .pick').length > 0 && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-multi-filter="home-lengths"][value="eve"]').parentElement.textContent === 'Больше часа';
   const before = $$('#view-catalog [data-picks=reading] .pick .pick-t').map(x => x.textContent).join('|');
   click($('#view-catalog [data-pickmore]')); await sleep(20);
   checks['home: three others'] = $$('#view-catalog [data-picks=reading] .pick .pick-t').map(x => x.textContent).join('|') !== before || w.eval("pickList('eve').length") <= 3;
   // ✓ Read: off the start screen and random picks, onto the shelf, muted in award lists, Undo in the toast
-  w.eval("prefs.pickLen = '40'; renderHome()"); await sleep(10);
+  w.eval("prefs.pickLengths = ['40']; renderHome()"); await sleep(10);
   const pk0 = $$('#view-catalog [data-picks=reading] .pick'); const dq = pk0[0].querySelector('.pick-done').dataset.done; const keep = pk0[1].querySelector('.pick-done').dataset.done;
   checks['done: on the start screen it says “Уже читал(а)”, under Read'] = pk0.every(pk => pk.querySelector('.pick-done').textContent.trim() === 'Уже читал(а)' && pk.querySelector('.pick-actions').nextElementSibling === pk.querySelector('.pick-done') && /уйдёт с первого экрана/.test(pk.querySelector('.pick-done').title));
   click(pk0[0].querySelector('.pick-done')); await sleep(40);
@@ -345,9 +357,9 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($(`#shelf-done [data-done="${dq}"]`)); await sleep(60);
   checks['done: removed from the shelf'] = !$(`#shelf-done [data-work="${dq}"]`) && !w.eval(`isDone('${dq}')`) && /Пока пусто/.test($('#shelf-done').textContent);
   click($('#tab-catalog')); await sleep(20);
-  click($('#view-library [data-flen="15"]')); await sleep(20);
+  selectFilter('lib-lengths', ['15']); await sleep(20);
   checks['catalog: time filter, a few minutes'] = $$('#view-library .slip').length > 0 && w.eval("[...document.querySelectorAll('#view-library .slip-open')].length") === $$('#view-library .slip').length && $$('#view-library .slip-time').every(x => x.textContent === 'несколько минут');
-  click($('#view-library [data-flen="any"]')); await sleep(20);
+  selectFilter('lib-lengths', []); await sleep(20);
   checks['time: novels without Google Books use Open Library pages'] = w.eval("Object.values(WORKS).filter(x => !(x.gb && x.gb.n) && x.ol && x.ol.n).length") > 100 && w.eval("(() => { const x = Object.values(WORKS).find(x => !(x.gb && x.gb.n) && x.ol && x.ol.n && !READ[x.id]); return wordsOf(x.id) === x.ol.n * 280; })()");
   checks['time: neutral words, no exact minutes'] = w.eval("fmtDur(minutesOf('Q190192'))") === 'больше часа' && w.eval("[fmtDur(5), fmtDur(25), fmtDur(26), fmtDur(60), fmtDur(61), fmtDur(600)].join('|')") === 'несколько минут|несколько минут|около часа|около часа|больше часа|больше часа' && !/≈|\d+ мин/.test($('#view-library').textContent.replace(/\d+ стр\./g, ''));
   click($('#theme-btn')); await sleep(10);
@@ -504,7 +516,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // what you open elsewhere becomes your reading history and status; Hide is a ✕ in the card's corner
   click($('#tab-catalog')); await sleep(30);
   let trk = $('#view-catalog [data-picks=reading] .pick a[data-via=read]');
-  for(let n=0; !trk && n<20; n++) { w.eval("pickNext(prefs.pickLen || '15');renderHome()"); trk=$('#view-catalog [data-picks=reading] .pick a[data-via=read]'); }
+  for(let n=0; !trk && n<20; n++) { w.eval("pickNext(homeLengths());renderHome()"); trk=$('#view-catalog [data-picks=reading] .pick a[data-via=read]'); }
   const tq = trk.dataset.track; const tTitle = w.eval(`titleOf(work('${tq}'))`);
   click(trk); await sleep(80);
   const rcard = $('#view-catalog .recall');
@@ -519,10 +531,10 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   await w.eval(`(async () => { await Store.del('positions', 'ext:${tq}'); for (const r of recallsFor('ext:${tq}')) await Store.del('bookmarks', r.id); await loadLocal(); renderCatalog(); })()`);
   // Three others: no repeats until every book of that length has been shown
   click($('#tab-catalog')); await sleep(20);
-  w.eval("prefs.pickLen = '40'; renderHome()"); await sleep(10);
+  w.eval("prefs.pickLengths = ['40']; renderHome()"); await sleep(10);
   const seen40 = []; for (let i = 0; i < 3; i++) { seen40.push(...$$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
   checks['picks: Three others never repeats within the list'] = seen40.length === 9 && new Set(seen40).size === 9;
-  w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(10);
+  w.eval("prefs.pickLengths = ['15']; renderHome()"); await sleep(10);
   const n15 = w.eval("pickList('15').length"); const s15 = [];
   for (let i = 0; i < Math.ceil(n15 / 3); i++) { s15.push(...$$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
   checks['picks: every short story shows before any repeats, then a note'] = new Set(s15).size === n15 && /дальше по кругу/.test($('#view-catalog .picks').textContent);
@@ -705,22 +717,22 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval('closeSheets()');
   w.eval("READ.Q190192 = { w: 3000, tier: 't2', added: '2026-10-01T00:00:00Z', pub: 'Test', links: [{ kind: 'full', url: 'https://x.test/diuna-pl', site: 'Test', lang: 'pl' }] }; renderLibrary();"); await sleep(60);
   checks['languages: a Polish text comes first for a Polish reader'] = $('#view-library .slip [data-work]').dataset.work === 'Q190192' && $('#view-library .slip .flag-lang').textContent === 'PL' && !$('#view-library .slip .flag-lang').classList.contains('far');
-  w.eval("prefs.pickLen = '15'; READ.Q190192.links.unshift({kind:'full',url:'https://x.test/dune-en',site:'English fixture'}); renderHome()");
+  w.eval("prefs.pickLengths = ['15']; READ.Q190192.links.unshift({kind:'full',url:'https://x.test/dune-en',site:'English fixture'}); renderHome()");
   checks['languages: one matching full text is shown without filling with other languages'] = $$('#view-catalog [data-picks=reading] .pick').length === 1 && $('#view-catalog [data-picks=reading] .pick [data-work]').dataset.work === 'Q190192';
   checks['languages: Read opens the matching language even when English is listed first'] = $('#view-catalog [data-picks=reading] .pick a[data-track]').href === 'https://x.test/diuna-pl';
-  $('#lib-language').value='mine'; $('#lib-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(60);
+  selectFilter('lib-languages', ['pl']); await sleep(60);
   checks['languages: “In my languages” keeps what can be read or heard in them'] = $$('#view-library .slip').every(sl => w.eval(`langScore('${sl.querySelector('[data-work]').dataset.work}')`) > 0) && $$('#view-library .slip').length >= 1;
-  $('#lib-language').value='all'; $('#lib-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(30);
+  selectFilter('lib-languages', []); await sleep(30);
   w.eval("for (const q of Object.keys(READ)) delete READ[q]; Object.assign(READ, window.__languageReadSnapshot); delete window.__languageReadSnapshot;"); click($('#tab-shelf')); await sleep(60); click($('#langs-reset')); await sleep(60);
   checks['languages: back to the phone’s languages'] = w.eval('prefs.langs') === undefined && JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
   // Regression: one Polish reading language, including an audio-only work and empty duration buckets.
   w.eval(`window.__readingRegression = { prefs: {...prefs}, read: JSON.parse(JSON.stringify(READ)), bookmarks: local.bookmarks };
-    local.bookmarks = local.bookmarks.filter(b => b.type !== 'done'); prefs.langs = ['pl']; prefs.listen = 'eleven'; prefs.pickLen = 'eve'; renderHome();`);
+    local.bookmarks = local.bookmarks.filter(b => b.type !== 'done'); prefs.langs = ['pl']; prefs.listen = 'eleven'; prefs.pickLengths = ['eve']; renderHome();`);
   checks['languages: Polish audio-only Sandkings appears at its recorded duration, without an English text or TTS fallback'] = w.eval("pickList('eve').includes('Q6271990') && readingMinutes('Q6271990') === 106 && !pickList('40').includes('Q6271990')") && !!$('#view-catalog [data-picks=reading] .pick a[data-via="listen"][href^="https://podcasts.apple.com/"]') && !$('#view-catalog [data-picks=reading] .pick a[data-via="read"]') && !$('#view-catalog [data-picks=reading] .pick [data-eleven]');
   w.eval("READ.Q6271990.links.push({kind:'full',url:'https://example.test/sandkings-en',site:'English fixture'}); renderHome()");
   checks['languages: a saved TTS preference cannot open a foreign text beside matching Polish audio'] = !$('#view-catalog [data-picks=reading] .pick a[data-via="read"]') && !$('#view-catalog [data-picks=reading] .pick [data-eleven]') && !!$('#view-catalog [data-picks=reading] .pick a[data-via="listen"]');
   w.eval("READ.Q6271990.links = READ.Q6271990.links.filter(l => l.url !== 'https://example.test/sandkings-en'); READ.Q6271990.links = READ.Q6271990.links.filter(l => l.lang !== 'pl'); renderHome()");
-  checks['languages: an empty Polish duration offers matching durations without silently switching languages or time'] = !$('#view-catalog [data-picks=reading] .pick') && !!$('#view-catalog [data-pickavailable="15"]') && !!$('#view-catalog [data-pickavailable="40"]') && w.eval("prefs.pickLen === 'eve' && JSON.stringify(myLangs()) === '[\"pl\"]'");
+  checks['languages: an empty Polish duration offers matching durations without silently switching languages or time'] = !$('#view-catalog [data-picks=reading] .pick') && !!$('#view-catalog [data-pickavailable="15"]') && !!$('#view-catalog [data-pickavailable="40"]') && w.eval("prefs.pickLengths.join() === 'eve' && JSON.stringify(myLangs()) === '[\"pl\"]'");
   const excerptIds = () => $$('#view-catalog [data-excerpt]').map(el => el.dataset.excerpt);
   const initialFragments = excerptIds();
   click($('#view-catalog [data-pickmore="excerpt"]')); await sleep(20);
@@ -733,9 +745,9 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['languages: shuffle history has independent scopes for each reading-language selection'] = plScope !== w.eval("pickScope('eve','excerpt')") && w.eval("Object.keys(pickSeen).includes(" + JSON.stringify(plScope) + ")");
   w.eval("prefs.langs = ['pl']; renderHome()");
   click($('#view-catalog [data-pickavailable="40"]')); await sleep(20);
-  checks['languages: another-duration action opens the Polish full text without adding English options'] = w.eval("prefs.pickLen === '40'") && !!$('#view-catalog [data-picks=reading] .pick a[data-via="read"][href^="https://www.legimi.pl/"]') && !$('#view-catalog [data-picks=reading] .pick a[data-via="listen"][href^="https://akniga.org/"]');
+  checks['languages: another-duration action opens the Polish full text without adding English options'] = w.eval("prefs.pickLengths.join() === '40'") && !!$('#view-catalog [data-picks=reading] .pick a[data-via="read"][href^="https://www.legimi.pl/"]') && !$('#view-catalog [data-picks=reading] .pick a[data-via="listen"][href^="https://akniga.org/"]');
   checks['languages: all home actions including Choose for me stay within the selected reading language'] = w.eval(`(() => {
-    prefs.langs=['ru'];prefs.pickLen='eve';
+    prefs.langs=['ru'];prefs.pickLengths = ['eve'];
     for(let i=0;i<5;i++) { renderHome();
       if(![...document.querySelectorAll('#view-catalog [data-picks=reading] a[data-track], #view-catalog .picks > .pick-more a[data-track]')].every(a=>READ[a.dataset.track].links.some(l=>l.url===a.href && (l.lang||'en')==='ru' && l.kind===(a.dataset.via==='listen'?'audio':'full')))) return false;
       pickNext('eve');
@@ -854,7 +866,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['agent task: clipboard denial provides a selectable fallback'] = !$('#agent-dialog').hidden && $('#agent-task-text').readOnly && payload($('#agent-task-text').value)[0].qid==='Q19947428';
   w.eval('closeAgentTask()');w.navigator.clipboard.writeText=clipboardWrite;
   // Independent source-language filters and explicitly labelled English fallback.
-  w.eval("LANG='ru'; applyLang(); prefs.langs=['pl']; prefs.pickLen='eve'; renderHome();");
+  w.eval("LANG='ru'; applyLang(); prefs.langs=['pl']; prefs.pickLengths = ['eve']; renderHome();");
   checks['fallback: sparse Polish picks retain Polish audio and add a separate English-text section'] = !!$('#view-catalog [data-picks=reading] a[data-via=listen]') && $$('#view-catalog [data-picks=other] .pick').length === 3 && $$('#view-catalog [data-picks=other] .pick').every(el => el.dataset.readingLang === 'en' && el.querySelector('a[data-via=read]')) && /Больше произведений/.test($('#view-catalog [data-picks=other]').textContent) && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'");
   const otherFirst = $$('#view-catalog [data-picks=other] [data-done]').map(el=>el.dataset.done);
   click($('#view-catalog [data-pickmore=other]')); await sleep(20);
@@ -862,33 +874,73 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("window.__plRecording=READ.Q6271990.links; READ.Q6271990.links=READ.Q6271990.links.filter(l=>l.lang!=='pl');renderHome()");
   checks['fallback: an empty selected-language bucket explicitly explains the other-language books'] = !$('#view-catalog [data-picks=reading] .pick') && /Произведений такой длительности/.test($('#view-catalog [data-picks=other]').textContent) && $$('#view-catalog [data-picks=other] .pick').every(el=>el.dataset.readingLang==='en');
   w.eval("READ.Q6271990.links=window.__plRecording;delete window.__plRecording;");
-  w.eval("filter.lang='mine'; filter.q=''; filter.readable=false; filter.audio=false; filter.award='all'; filter.starred=false; filter.fresh=false; filter.len='any'; renderLibrary();");
-  checks['language filters: reader languages are first, All is available, and the combined mine chip is removed'] = $('#lib-language').options[0].value === 'mine' && $('#lib-language').options[1].value === 'all' && $('#lib-language').value === 'mine' && !$('#f-mine');
+  w.eval("Object.assign(filter,{langs:['pl'],q:'',formats:[],awards:[],statuses:[],lengths:[]}); renderLibrary();");
+  checks['language filters: reader languages are first, All is available, and the combined mine chip is removed'] = $$('[data-multi-filter=lib-languages]')[0].value === 'all' && $$('[data-multi-filter=lib-languages]')[1].value === 'pl' && filterInput('lib-languages','pl').checked && !$('#f-mine');
   checks['language filters: Catalog selects Polish texts, audio and scoped fragments'] = !!$('#view-library .slip-open[data-work="Q467388"]') && !!$('#view-library .slip-open[data-work="Q6271990"]') && !$('#view-library .slip-open[data-work="Q25349436"]') && !$('#view-library .slip-open[data-work="Q4102150"]').closest('.slip').querySelector('a[data-via=read]') && !$('#view-library .slip-open[data-work="Q4102150"]').closest('.slip').querySelector('a[data-via=listen]');
-  click($('#f-readable')); await sleep(20);
+  click(filterInput('lib-formats','full')); await sleep(20);
   checks['language filters: full-text and audio toggles apply to the selected language'] = $$('#view-library .slip').length === 2 && !$('#view-library .slip-open[data-work="Q6271990"]') && !!$('#view-library .slip-open[data-work="Q467388"]');
-  click($('#f-audio')); await sleep(20);
+  click(filterInput('lib-formats','audio')); await sleep(20);
   w.eval("READ.Q6271990.links.push({kind:'full',site:'English fixture',url:'https://example.test/filter-en'});renderLibrary()");
-  checks['language filters: Polish text plus audio does not match an English text with Polish audio'] = $$('#view-library .slip').length === 0;
+  checks['language filters: Polish full text OR audio yields both kinds without counting the English fixture'] = $$('#view-library .slip').length === 3 && !!$('#view-library .slip-open[data-work="Q6271990"]');
   w.eval("READ.Q6271990.links=READ.Q6271990.links.filter(l=>l.url!=='https://example.test/filter-en')");
-  click($('#f-readable')); await sleep(20);
+  click(filterInput('lib-formats','full')); await sleep(20);
   checks['language filters: Polish audio returns Sandkings alone'] = $$('#view-library .slip').length === 1 && !!$('#view-library .slip-open[data-work="Q6271990"]');
-  click($('#f-audio')); await sleep(20);
-  $('#lib-language').value='all'; $('#lib-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(20);
-  checks['language filters: All restores the catalog and persists independently of reading preferences'] = $$('#view-library .slip').length === w.eval('Object.keys(READ).filter(q=>WORKS[q]).length') && JSON.parse(w.localStorage.getItem('fantastic-prefs')).catalogLang === 'all' && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'");
-  w.eval("Object.assign(AV,{lang:'pl',award:'all',cat:'all',year:null,mode:'cats',onlyText:false,q:''});renderAwards();");
-  checks['language filters: Awards categories retain Polish fragments and exclude English-only sources'] = !!$('#av-body [data-work="Q190192"]') && !$('#av-body [data-work="Q25349436"]') && $('#av-language').options[0].value === 'mine';
-  w.eval("AV.onlyText=true;renderAwards()");
+  click(filterInput('lib-formats','audio')); await sleep(20);
+  selectFilter('lib-languages', []); await sleep(20);
+  checks['language filters: All restores the catalog and persists independently of reading preferences'] = $$('#view-library .slip').length === w.eval('Object.keys(READ).filter(q=>WORKS[q]).length') && JSON.parse(w.localStorage.getItem('fantastic-prefs')).filters.catalog.langs.length === 0 && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'");
+  w.eval("Object.assign(AV,{langs:['pl'],awards:[],cats:[],year:null,mode:'cats',formats:[],q:''});renderAwards();");
+  checks['language filters: Awards categories retain Polish fragments and exclude English-only sources'] = !!$('#av-body [data-work="Q190192"]') && !$('#av-body [data-work="Q25349436"]') && $$('[data-multi-filter=av-languages]')[0].value === 'all';
+  w.eval("AV.formats=['full'];renderAwards()");
   checks['language filters: Awards full-text toggle excludes an English full text when only its Polish fragment exists'] = !$('#av-body [data-work="Q16747517"]') && !!$('#av-body [data-work="Q467388"]');
   w.eval("window.matchMedia=()=>({matches:true})");
   for(const mode of ['cats','years','authors','table']) {
-    w.eval(`AV.mode=${JSON.stringify(mode)};AV.onlyText=false;renderAwards()`);
+    w.eval(`AV.mode=${JSON.stringify(mode)};AV.formats=[];renderAwards()`);
     checks['language filters: Awards '+mode+' keeps only matching source languages'] = $$('#av-body [data-work]').length > 0 && $$('#av-body [data-work]').every(b=>w.eval(`matchesSourceLanguage('${b.dataset.work}','pl')`));
   }
   w.eval("AV.q='Cat Pictures Please';renderAwards()");
-  checks['language filters: search retains the Awards language selection'] = !$('#av-body [data-work="Q25349436"]') && $('#av-language').value === 'pl';
-  $('#av-language').value='all'; $('#av-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(20);
-  checks['language filters: All restores search results and is saved for Awards'] = !!$('#av-body [data-work="Q25349436"]') && JSON.parse(w.localStorage.getItem('fantastic-prefs')).av.lang === 'all';
+  checks['language filters: search retains the Awards language selection'] = !$('#av-body [data-work="Q25349436"]') && filterInput('av-languages','pl').checked;
+  selectFilter('av-languages', []); await sleep(20);
+  checks['language filters: All restores search results and is saved for Awards'] = !!$('#av-body [data-work="Q25349436"]') && JSON.parse(w.localStorage.getItem('fantastic-prefs')).filters.awards.langs.length === 0;
+  // Standard behavior across every filter, including real interactions and scoped queries.
+  w.eval("Object.assign(filter,{langs:[],awards:[],formats:[],lengths:[],statuses:[],q:''});renderLibrary();Object.assign(AV,{langs:[],awards:[],cats:[],formats:[],q:'',year:null,mode:'cats'});renderAwards();prefs.pickLengths=[];renderHome();");
+  checks['filters: all ten groups begin with checked All'] = $$('.multi-filter').length===10 && $$('.multi-filter').every(el=>el.querySelector('input').value==='all' && el.querySelector('input').checked);
+  const catalogIds=()=>$$('#lib-body .slip-open').map(el=>el.dataset.work);
+  const awardIdsNow=()=>[...new Set($$('#av-body [data-work]').map(el=>el.dataset.work))];
+  const sameSet=(a,b)=>a.length===new Set(b).size && a.every(x=>b.includes(x));
+  selectFilter('lib-languages',['pl']);const plIds=catalogIds();
+  selectFilter('lib-languages',['en']);const enIds=catalogIds();
+  selectFilter('lib-languages',['en','pl']);
+  checks['multiselect: language union and exclusive All'] = sameSet(catalogIds(),[...plIds,...enIds]) && filterInput('lib-languages','en').checked && filterInput('lib-languages','pl').checked && !filterInput('lib-languages','all').checked;
+  click(filterInput('lib-languages','en'));click(filterInput('lib-languages','pl'));
+  checks['multiselect: clearing the final choice restores All and the whole catalog'] = filterInput('lib-languages','all').checked && catalogIds().length===nCatalog;
+  selectFilter('lib-languages',['pl']);selectFilter('lib-formats',['full','audio']);
+  checks['multiselect: OR inside formats, AND with Polish language'] = catalogIds().length===3 && catalogIds().includes('Q6271990') && catalogIds().includes('Q467388') && !catalogIds().includes('Q16747517');
+  selectFilter('lib-formats',[]);selectFilter('lib-languages',[]);
+  selectFilter('lib-lengths',['15','eve']);
+  checks['multiselect: disjoint duration buckets exclude the middle bucket'] = catalogIds().length>10 && catalogIds().every(q=>w.eval(`readingMinutes('${q}',null)<=25||readingMinutes('${q}',null)>60`));
+  selectFilter('lib-lengths',[]);selectFilter('lib-statuses',['starred','fresh']);
+  checks['multiselect: status choices form a union'] = catalogIds().length>0 && catalogIds().every(q=>w.eval(`isStarred('${q}')||isNew('${q}')`));
+  selectFilter('lib-statuses',[]);selectFilter('lib-awards',['h','n']);
+  checks['multiselect: multiple catalog awards apply to every result'] = catalogIds().length>10 && catalogIds().every(q=>w.eval(`WORKS['${q}'].awards.some(a=>['h','n'].includes(a[0]))`));
+  selectFilter('lib-awards',[]);
+  selectFilter('av-awards',['h']);selectFilter('av-categories',['S','E']);const hIds=awardIdsNow();
+  selectFilter('av-awards',['n']);const nIds=awardIdsNow();
+  selectFilter('av-awards',['h','n']);
+  checks['multiselect: awards and category unions preserve every winning work'] = sameSet(awardIdsNow(),[...hIds,...nIds]) && awardIdsNow().length>hIds.length;
+  w.eval("AV.q='Dune';renderAwards()");
+  checks['multiselect: search respects selected categories'] = !$('#av-body [data-work="Q190192"]');
+  selectFilter('av-categories',[]);
+  checks['multiselect: All category restores the matching novel in search'] = !!$('#av-body [data-work="Q190192"]');
+  selectFilter('av-awards',[]);w.eval("AV.q='';renderAwards()");
+  selectFilter('home-lengths',['15','eve']);
+  checks['multiselect: home duration choices share the same union behavior'] = w.eval("JSON.stringify(homeLengths())==='[\"15\",\"eve\"]' && pickList(homeLengths()).every(q=>readingMinutes(q)<=25||readingMinutes(q)>60)");
+  const stored=JSON.parse(w.localStorage.getItem('fantastic-prefs'));
+  checks['multiselect: arrays persist separately from the reading profile'] = stored.filters.v===1 && stored.pickLengths.join()==='15,eve' && stored.langs.join()==='pl' && Array.isArray(stored.filters.catalog.formats) && Array.isArray(stored.filters.awards.cats);
+  checks['multiselect: duration arrays travel with existing settings sync'] = w.eval("SYNC_PREFS.includes('pickLengths')") && (await w.eval('syncPack()')).p.pickLengths.join()==='15,eve';
+  const focused=filterInput('home-lengths','15');focused.focus();click(focused);
+  checks['multiselect: selection retains the open group and keyboard focus'] = w.document.activeElement===filterInput('home-lengths','15') && filterInput('home-lengths','15').closest('details').open;
+  w.document.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+  checks['multiselect: Escape closes the group and returns focus to its summary'] = !filterInput('home-lengths','15').closest('details').open && w.document.activeElement===filterInput('home-lengths','15').closest('details').querySelector('summary');
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);
