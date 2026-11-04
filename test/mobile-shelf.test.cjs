@@ -42,7 +42,7 @@ const assert = require('node:assert/strict');
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.querySelector('#picks-languages'));
     assert.deepEqual(await page.evaluate(() => prefs.langs), ['es'], 'Saved choice survives a real reload');
-    assert.ok(await page.evaluate(() => [...document.querySelectorAll('#view-catalog .pick a[data-track]')].every(a =>
+    assert.ok(await page.evaluate(() => [...document.querySelectorAll('#view-catalog .pick a[data-via="read"]')].every(a =>
       READ[a.dataset.track].links.some(l => l.kind === 'full' && (l.lang || 'en') === 'es' && l.url === a.href))), 'Every suggested full text is in Spanish');
     await page.screenshot({ path: join(out, 'read-390-spanish.png'), fullPage: true, animations: 'disabled' });
     await page.evaluate(() => {
