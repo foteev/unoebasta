@@ -1,0 +1,1386 @@
+{
+  "v": 1,
+  "reviewed_at": "2026-11-04T23:11:13Z",
+  "report": "docs/link-audit-2026-11-04.md",
+  "policy": "Observed scope only. Restricted clients and timeout/429 responses are review limits, not proof of paid or dead content. Re-enable an excluded source only after a maintainer records new evidence.",
+  "sources": [
+    {
+      "qid": "Q467388",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-wydech-ted-chiang,b610123.html",
+      "allowed_kinds": [
+        "full",
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "Free sample contains the complete Merchant story through its ending and translator credit, then the beginning of Exhalation. No free audiobook was established."
+    },
+    {
+      "qid": "Q100324066",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/teodora-goss/strannaya-istoriya-docheri-alhimika-26722992/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:28Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q107583553",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-psalm-dla-zbudowanych-w-dziczy-becky-chambers,b1177159.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q111915309",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-wladca-dzinnow-p-djeli-clark,b949447.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q113317364",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-modlitwa-za-niesmiale-korony-drzew-becky-chambers,b1182713.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q122452567",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-gora-pod-morzem-ray-nayler,b1197458.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q125198708",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-swiety-od-papuzich-drzwi-vajra-chandrasekera,b1553027.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q133842917",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-zatruty-kielich-robert-jackson-bennett,b1588593.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q20992497",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-wybrana-naomi-novik,b132590.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2292400",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/vernor-vindzh/glubina-v-nebe-9800240/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:34Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q30030695",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/ken-lu-8970493/korolevskie-milosti-21991501/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:26Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q30004969",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-kazde-serce-to-wrota-patyki-i-kosci-seanan-mcguire,b1110403.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q607511",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-koniec-smierci-liu-cixin,b224368.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q82566838",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-pamiec-zwana-imperium-arkady-martine,b707044.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q96755535",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-gra-srodkowa-seanan-mcguire,b995598.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q10594892",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/erin-morgenshtern/nochnoy-cirk-8954714/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:44Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q10594892",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-cyrk-nocy-erin-morgenstern,b54133.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q108030514",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/li-fonda/nefritovoe-nasledie-67313457/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:01Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q1168659",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-ksiega-cmentarna-neil-gaiman,b185934.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q132062",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/ursula-kreber-le-guin/rezec-nebesnyy-124497/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:11Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q132062",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-jestesmy-snem-ursula-k-leguin,b1006201.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q1416458",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/dzhon-branner/vsem-stoyat-na-zanzibare-154946/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:53Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q1416458",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-wszyscy-na-zanzibarze-john-brunner,b113241.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q14548336",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/nil-geyman/okean-v-konce-dorogi-6379535/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:15Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q14548336",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-ocean-na-koncu-drogi-neil-gaiman,b61086.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q1474920",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/suzanna-klark/dzhonatan-strendzh-i-mister-norrell-140659/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:54Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q1474920",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-jonathan-strange-i-pan-norrell-susanna-clarke,b1141838.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q16056012",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/dzhordzh-r-r-martin-45006/letyaschie-skvoz-noch-125420/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:46Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q16961640",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/dzheff-vandermeer/annigilyaciya-8981462/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:32Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q17000766",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-wrota-abaddona-james-s-a-corey,b1171233.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q17026037",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/dzhordzh-r-r-martin-45006/pesn-o-lii-125422/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:10Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q17625679",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/yen-makdonald/doroga-zapusteniya-49526711/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:29Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q17625679",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-droga-bez-znaczenia-ekspres-ares-ian-mcdonald,b970297.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q1751870",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-gra-o-tron-george-r-r-martin,b128333.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q190192",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-diuna-frank-herbert,b620057.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2300209",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/charlz-stross/achchelerando-63140118/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:19Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2301398",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/robert-uilson/spin-67774526/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:20Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2363504",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/devid-brin/zvezdnyy-priliv-22608612/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:45Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2447776",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/ursula-kreber-le-guin/slovo-dlya-lesa-i-mira-odno-124637/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:40Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2469019",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-swiat-finansjery-terry-pratchett,b644619.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2521688",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-triumf-endymiona-dan-simmons,b234822.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q25217632",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/n-k-dzhemisin/pyatoe-vremya-goda-41926901/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:21Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2623688",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/ursula-kreber-le-guin/tolkovateli-150044/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:32Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2725656",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-ilion-dan-simmons,b956987.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2811112",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-lawinia-ursula-k-le-guin,b1130179.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q28306",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-taniec-ze-smokami-cz-1-george-r-r-martin,b128438.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q29994238",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/dzhordzh-r-r-martin-45006/shtorm-v-gavani-vetrov-6598848/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:49Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2901129",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/robert-silverberg/nochnye-krylya-70320316/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:27Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2901129",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-skrzydla-nocy-robert-silverberg,b180354.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q300370",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-starcie-krolow-george-r-r-martin,b128209.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q302960",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-worek-kosci-stephen-king,b651256.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q30337352",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/n-k-dzhemisin/vrata-obeliska-64507522/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:48Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q3221827",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/dzho-hill/korobka-v-forme-serdca-68566005/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:55Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q3221827",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-pudelko-w-ksztalcie-serca-joe-hill,b649401.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q3226889",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/barbara-hembli/te-kto-ohotitsya-v-nochi-127975/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:17Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q3231338",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/n-k-dzhemisin/sto-tysyach-korolevstv-6562275/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:12Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q3294967",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/kim-robinson/goluboy-mars-22879242/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:25Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q3294970",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/kim-robinson/zelenyy-mars-22150793/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:51Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q3400801",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/ursula-kreber-le-guin/prozrenie-177716/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:14Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q39058554",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/n-k-dzhemisin/kamennye-nebesa-65536052/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:35Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q389750",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-rowni-bogom-isaac-asimov,b991197.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q431927",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-nawalnica-mieczy-george-r-r-martin,b128201.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q430514",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/nil-geyman/amerikanskie-bogi-429152/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:41Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q430514",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-amerykanscy-bogowie-wersja-autorska-neil-gaiman,b54496.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q467720",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/ursula-kreber-le-guin/obdelennye-169730/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:47Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q475125",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/nil-geyman/koralina-442785/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:18Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q475125",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-koralina-neil-gaiman,b180352.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q492207",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/robert-haynlayn/zvezdnyy-desant-69304117/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:09Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q534975",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/nil-stivenson/kriptonomikon-122851/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:30Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q603645",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/maykl-sheybon/souz-evreyskih-polismenov-41042539/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:23Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q58221164",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/vernor-vindzh/plamya-nad-bezdnoy-8507597/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:36Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q58221164",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-ogien-nad-otchlania-vernor-vinge,b1587686.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q607112",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-problem-trzech-cial-liu-cixin,b173281.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q605697",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-mgly-avalonu-marion-zimmer-bradley,b230019.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q610680",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/tim-pauers/poslednyaya-stavka-28506508/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:22Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q729783",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/dzhek-makdevit/iskatel-8483098/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:50Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q741013",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/karl-sagan/kontakt-135995/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:43Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q741013",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-kontakt-carl-sagan,b982939.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q749783",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-czlowiek-z-wysokiego-zamku-philip-k-dick,b124250.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q816016",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/orson-skott-kard/igra-endera-122405/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:37Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "62116876e6c1b032ef049e7da540f23ca05005a7",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q816016",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-gra-endera-orson-scott-card,b1234403.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q79762",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-silmarillion-j-r-r-tolkien,b950090.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q837934",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-kwiaty-dla-algernona-daniel-keyes,b349639.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q932592",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-fundacja-agent-fundacji-isaac-asimov,b124575.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q100540380",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-pamietniki-mordbota-efekt-sieci-martha-wells,b1272341.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2360806",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/nil-geyman/synovya-anansi-8613701/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:42Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "750e3253b871b59f21090521802f281246c32137",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q2360806",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-chlopaki-anansiego-neil-gaiman,b54502.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q543562",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/nil-stivenson/almaznyy-vek-120016/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:38Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "750e3253b871b59f21090521802f281246c32137",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q356107",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/kerolayn-cherri/saytin-izmena-158417/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:16Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "750e3253b871b59f21090521802f281246c32137",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q929821",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/robert-haynlayn/chuzhak-v-strane-chuzhoy-27095720/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:13Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "750e3253b871b59f21090521802f281246c32137",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q929821",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-obcy-w-obcym-kraju-robert-a-heinlein,b643036.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q734976",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-pan-swiatla-roger-zelazny,b610267.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q1659714",
+      "lang": "ru",
+      "url": "https://www.litres.ru/book/uolter-miller-mladshiy/gimn-leybovicu-126780/chitat-onlayn/",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-04T23:02:39Z",
+      "reason": "Guest reader displays an error and the edition is no longer on sale; no story prose is available. HTTP 200/title metadata is insufficient.",
+      "introduced": {
+        "commit": "750e3253b871b59f21090521802f281246c32137",
+        "pr": null
+      }
+    },
+    {
+      "qid": "Q105722561",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-pustkowie-zwane-pokojem-arkady-martine,b1152076.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q95075560",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-miasto-ktorym-sie-stalismy-n-k-jemisin,b923310.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q76548367",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-odmieniec-victor-lavalle,b838976.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q92630",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-nakrecana-dziewczyna-pompa-numer-szesc-paolo-bacigalupi,b931003.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q3520291",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-miasto-i-miasto-china-mieville,b1032602.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2334904",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-strzala-kusziela-jacqueline-carey,b1052660.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q913576",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-desperacja-stephen-king,b705545.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2258329",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-godzina-czarownic-tom-1-anne-rice,b1022955.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q467225",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-listonosz-david-brin,b1558359.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q1010653",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-hiob-komedia-sprawiedliwosci-robert-a-heinlein,b364752.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q782075",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-krolowa-zimy-joan-d-vinge,b1619882.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q3135306",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-gdzie-dawniej-spiewal-ptak-kate-wilhelm,b623298.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q5406934",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-wieczna-wojna-joe-haldeman,b457403.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q741222",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-spotkanie-z-rama-artur-c-clarke,b1020016.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q1410482",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-luna-to-surowa-pani-robert-a-heinlein,b1196988.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q2350912",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-ostatni-zamek-jack-vance,b884807.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q133842905",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-zaglada-puka-do-drzwi-kingfisher-t,b1362826.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q122238085",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-pokrzywa-i-kosc-t-kingfisher,b1015014.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q124338899",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-co-porusza-martwych-t-kingfisher,b1287371.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q16747517",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-wydech-ted-chiang,b610123.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q4102150",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-historia-twojego-zycia-ted-chiang,b154967.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q125718857",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-co-zeruje-noca-kingfisher-t,b1470367.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q124381961",
+      "lang": "pl",
+      "url": "https://www.legimi.pl/ebook-ciern-t-kingfisher,b1181923.html",
+      "allowed_kinds": [
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-04T22:48:30Z",
+      "reason": "An anonymous text sample exists in #sample_section. A commercial ebook/audiobook listing does not establish free full text or full audio."
+    },
+    {
+      "qid": "Q16386142",
+      "lang": "en",
+      "url": "https://www.neilgaiman.com/Cool_Stuff/Short_Stories/How_To_Talk_To_Girls_At_Parties/How_To_Talk_To_Girls_At_Parties_%28Audio%29",
+      "excluded_kinds": [
+        "audio"
+      ],
+      "status": "broken_player",
+      "checked_at": "2026-11-04T23:11:13Z",
+      "reason": "The page links http://web3.streamhoster.com/idstaff/excerpt/Fragile_Things.mp3; the actual player resource returns HTTP 404. A surviving author page is not proof of playable audio."
+    }
+  ]
+}

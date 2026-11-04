@@ -2,15 +2,16 @@
 import { readFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { FOUND_FIELDS, parseCsv, validateFound, cleanUrl } from './lib/csv.mjs';
+import { FOUND_FIELDS, parseCsv, validateFound, sourceUrlKey } from './lib/csv.mjs';
 import { loadCatalog } from './lib/catalog.mjs';
 import { mergeFound } from './lib/merge-found.mjs';
+import { assertSourceScope } from './lib/source-reviews.mjs';
 
 const PATH = /^data\/(found|notes)\/(\d{4}-\d{2}-\d{2}-[a-z0-9][a-z0-9-]{0,79})\.(csv|md)$/;
 const CSV_BYTES = 200_000, NOTES_BYTES = 60_000;
 const fileLimit = filename => filename.endsWith('.csv') ? CSV_BYTES : NOTES_BYTES;
 const researchPath = path => path.startsWith('data/found/') || path.startsWith('data/notes/');
-const linkKey = r => JSON.stringify([r.qid, r.lang || 'en', r.kind, +r.part || '', cleanUrl(r.url)]);
+const linkKey = r => JSON.stringify([r.qid, r.lang || 'en', r.kind, +r.part || '', sourceUrlKey(r.url)]);
 export function validateSubmission(files, catalog, source, { labelled = false } = {}) {
   if (!labelled && !files.some(f => researchPath(f.filename))) return { skipped: true, reason: 'No research submission files' };
   if (!files.length || files.length > 2) throw new Error('Submit only one new findings CSV and optional matching note, or one notes-only file');
@@ -34,6 +35,7 @@ export function validateSubmission(files, catalog, source, { labelled = false } 
   const rows = parseCsv(csv.content);
   if (!rows.length || rows.length > 500) throw new Error('CSV must contain 1–500 findings');
   if (Object.keys(rows[0]).join(',') !== FOUND_FIELDS.join(',')) throw new Error('CSV header must match the task contract exactly');
+  assertSourceScope(rows);
   const works = new Map(catalog.works.map(w => [w.qid, w])), seen = new Set();
   for (const r of rows) {
     validateFound(r);
