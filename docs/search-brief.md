@@ -1,6 +1,6 @@
 # Contribute findings to unoebasta — task contract v1
 
-Find public text, excerpt and human-audio links for the assigned Hugo, Nebula and Locus winning works. Work on **only the supplied QIDs**, by default 30 works, at most 30. Check EN, PL, RU and ES independently. Deliver reviewed findings and short unresolved notes. Do not implement product features or run a whole-catalog crawl.
+Find public text, excerpt and human-audio links for the assigned Hugo, Nebula and Locus winning works. Work on **only the supplied QIDs**; the default task assigns 30 works. A larger explicitly assigned batch is allowed within the file and row limits below. Check EN, PL, RU and ES independently. Deliver reviewed findings and short unresolved notes. Do not implement product features or run a whole-catalog crawl.
 
 This is a model- and tool-independent task. Use the reader's chosen agent and available search tools; no particular provider, paid API or source-domain whitelist is required. The source names below are examples, not a closed list. Return all distinct reviewed sources for the assigned works; a preferred publisher source does not make other matching links ineligible. Unknown permission stays unknown.
 
@@ -28,7 +28,7 @@ Refresh main and coverage before searching and again before submitting. Supplied
 
 ## Deliver exactly these files
 
-Add **one new CSV** at `data/found/YYYY-MM-DD-unique-batch-name.csv`. Optionally add **one new Markdown note** with the same stem at `data/notes/YYYY-MM-DD-unique-batch-name.md`. Never overwrite earlier submissions. CSV maximum: 200 KB, 500 rows. Notes maximum: 60 KB (room for 30 works × four independent language checks).
+Add **one new CSV** at `data/found/YYYY-MM-DD-unique-batch-name.csv`. Optionally add **one new Markdown note** with the same stem at `data/notes/YYYY-MM-DD-unique-batch-name.md`. Never overwrite earlier submissions. CSV maximum: 200 KB, 500 rows. Notes maximum: 60 KB. These resource limits apply to every batch; there is no separate work-count limit.
 
 CSV is UTF-8, comma-separated, with this exact header and column order:
 

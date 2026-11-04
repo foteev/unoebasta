@@ -114,6 +114,33 @@ test('fragment and archive handling does not mutate data on a no-op', () => {
   assert.throws(() => mergeFound(source({}), data(), [row({ lang: 'xx' })]), /language/);
 });
 
+test('merged findings from PRs 20 and 22 are all published and repeat imports change nothing', () => {
+  const root = new URL('..', import.meta.url), actualSource = readFileSync(new URL('src/index.html', root), 'utf8');
+  const actualData = JSON.parse(readFileSync(new URL('data/awards.json', root), 'utf8')), read = readTable(actualSource);
+  const rows = ['2026-11-04-pr-flow-five-works.csv', '2026-11-04-thirty-work-search.csv']
+    .flatMap(file => parseCsv(readFileSync(new URL('data/found/' + file, root), 'utf8')));
+  for (const r of rows) {
+    if (r.kind === 'fragment') {
+      const x = actualData.ex[r.qid] || {};
+      const urls = [...(x.o || []).filter(o => (o.l || 'en') === r.lang).map(o => o.u)];
+      for (const [field, lang, host] of [['r', 'en', 'reactormag.com'], ['lr', 'ru', 'www.litres.ru'], ['lg', 'pl', 'www.legimi.pl']]) {
+        if (x[field] && lang === r.lang) urls.push(new URL(x[field], 'https://' + host).href);
+      }
+      assert.ok(urls.includes(r.url), `${r.qid}: missing ${r.lang} fragment`);
+    } else {
+      const link = read[r.qid]?.links.find(l => l.url === r.url && l.kind === r.kind && (l.lang || 'en') === r.lang);
+      assert.ok(link, `${r.qid}: missing ${r.lang} ${r.kind}`);
+      if (r.tier === 'external') {
+        assert.equal(link.rights, 'unknown'); assert.equal(link.evidence, r.evidence); assert.equal(link.checked_at, r.checked_at);
+        assert.equal(link.verification, r.kind === 'audio' ? 'metadata' : 'page');
+      }
+    }
+  }
+  const again = mergeFound(actualSource, actualData, rows, { now: '2027-01-01T00:00:00Z' });
+  assert.equal(again.source, actualSource); assert.deepEqual(again.data, actualData);
+  assert.equal(again.stats.links, 0); assert.equal(again.stats.fragments, 0); assert.equal(again.stats.titles, 0);
+});
+
 test('HTTP success cache works offline, errors are not cached, corrupted cache is recoverable', async t => {
   const dir = temp(t); let calls = 0;
   const http = new CachedHttp({ dir, pause: async () => {}, fetchImpl: async () => { calls++; return new Response('metadata'); } });

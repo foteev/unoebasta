@@ -7,7 +7,7 @@ import { loadCatalog } from './lib/catalog.mjs';
 import { mergeFound } from './lib/merge-found.mjs';
 
 const PATH = /^data\/(found|notes)\/(\d{4}-\d{2}-\d{2}-[a-z0-9][a-z0-9-]{0,79})\.(csv|md)$/;
-const MAX_WORKS = 30, CSV_BYTES = 200_000, NOTES_BYTES = 60_000;
+const CSV_BYTES = 200_000, NOTES_BYTES = 60_000;
 const fileLimit = filename => filename.endsWith('.csv') ? CSV_BYTES : NOTES_BYTES;
 const researchPath = path => path.startsWith('data/found/') || path.startsWith('data/notes/');
 const linkKey = r => JSON.stringify([r.qid, r.lang || 'en', r.kind, +r.part || '', cleanUrl(r.url)]);
@@ -33,7 +33,6 @@ export function validateSubmission(files, catalog, source, { labelled = false } 
   if (!csv) return { notes_only: true, rows: 0 };
   const rows = parseCsv(csv.content);
   if (!rows.length || rows.length > 500) throw new Error('CSV must contain 1–500 findings');
-  if (new Set(rows.map(r => r.qid)).size > MAX_WORKS) throw new Error(`One task may cover at most ${MAX_WORKS} works`);
   if (Object.keys(rows[0]).join(',') !== FOUND_FIELDS.join(',')) throw new Error('CSV header must match the task contract exactly');
   const works = new Map(catalog.works.map(w => [w.qid, w])), seen = new Set();
   for (const r of rows) {

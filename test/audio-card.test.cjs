@@ -51,6 +51,20 @@ const assert = require('node:assert/strict');
     assert.ok(recordings.length>=6); assert.ok(recordings.every(l=>l.rights==='unknown'&&l.verification==='metadata'));
     await page.evaluate(()=>openWork('Q41793715'));
     await page.waitForFunction(()=>document.querySelector('#sheet-work .tier')?.textContent.includes('Внешний источник'));
+    await page.evaluate(()=>openWork('Q467388'));
+    await page.waitForSelector('#sheet-work .excerpt-sources');
+    assert.equal(await page.locator('#sheet-work .text-source').count(),2);
+    assert.equal(await page.locator('#sheet-work .text-source a[href^="https://www.legimi.pl/"]').count(),1);
+    assert.match(await page.locator('#sheet-work .text-source').filter({has:page.locator('a[href^="https://lecturia.org/"]')}).textContent(),/разрешение не подтверждено/);
+    assert.equal(await page.locator('#sheet-work .audio-source a[href^="https://akniga.org/"]').count(),1);
+    assert.equal(await page.locator('#sheet-work .excerpt-sources a[href^="https://libcat.ru/"]').count(),1);
+    for(const width of [360,390]) for(const theme of ['light','dark']) {
+      await page.setViewportSize({width,height:width===360?740:844});
+      await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
+      await page.locator('#sheet-work .text-source').first().scrollIntoViewIfNeeded();
+      assert.ok(await page.locator('#sheet-work').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
+      await page.screenshot({path:join(out,`mixed-sources-${width}-${theme}.png`),animations:'disabled'});
+    }
     assert.deepEqual(errors,[]);
     const report={external_recordings:recordings.length,sourced_summary:true,language_audio_badge:true,layouts,errors};
     writeFileSync(join(out,'audio-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
