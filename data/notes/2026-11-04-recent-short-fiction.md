@@ -4,7 +4,7 @@ Baseline: latest `main` coverage and catalog loaded before discovery. The 30 QID
 
 For every listed work, EN, PL, RU and ES were queried separately for text/excerpt and for audio using the original title and catalog author, plus the language-specific terms `story read excerpt` / `audiobook story podcast narrator`, `opowiadanie tekst fragment` / `audiobook lektor opowiadanie`, `рассказ читать перевод` / `аудиокнига слушать рассказ`, and `relato leer traducción` / `audiolibro cuento narrado`. For sourced translations below, targeted additional searches used the translated title. Search indexing combines results; unpromising snippets were not treated as verified source pages. A scoped result does not prove no translation or recording exists.
 
-CSV entries were opened and narrative or publisher metadata inspected. Fragment means partial access; rights are recorded separately and no open license is inferred. The Spanish publisher PDF required visual inspection because text extraction is incomplete. Escape Pod two-part narration is based on publisher page and narrator credits only; no audio was sampled or listened through, and runtime includes episode material. No story or audio bodies are stored here.
+CSV entries were opened and narrative or publisher metadata inspected. Fragment means partial access; rights are recorded separately and no open license is inferred. The Spanish publisher PDF required visual inspection because text extraction is incomplete. Escape Pod two-part narration is based on publisher page and narrator credits. Both players were started and their timers advanced, but audio content was not listened to or checked end to end; runtime includes episode material. No story or audio bodies are stored here.
 
 ## Q134503445 — The River Has Roots
 
@@ -100,7 +100,7 @@ Author: Premee Mohamed; catalog form: novelette; latest award year: 2025.
 
 Author: A. W. Prihandita; catalog form: novelette; latest award year: 2025.
 
-- **EN** — Escape Pod reprint has two English text parts and two audio episode pages in CSV. Narrator Tatiana Grey; 35:17 and 42:10 include hosts. Pages/transcripts inspected; audio not sampled or listened end-to-end. Original Clarkesworld remains covered.
+- **EN** — Escape Pod reprint has two English text parts and two audio episode pages in CSV. Narrator Tatiana Grey; the publisher lists 35:17 and 42:10 including hosts. Both players started and advanced; the second player reported approximately 41:39 instead of the listed 42:10. Sound content and completeness were not listened through. Original Clarkesworld remains covered.
 - **PL** — Original-title and PL language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
 - **RU** — Original-title and RU language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
 - **ES** — Original-title and ES language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
@@ -278,6 +278,16 @@ Author: John Wiswell; catalog form: novelette; latest award year: 2022.
 
 ## Follow-up
 
-- Recheck the source pages and links in a normal browser before import, especially multipart podcast playback and Spanish PDF accessibility. Search-service rendering can differ from direct readers' access.
+- Recheck Macmillan's four publisher pages in a normal reader environment; Cloudflare blocked this cloud browser. Verify Escape Pod audio content end to end if listening-certified completeness is needed.
 - The exact published translation and editions for unresolved languages remain open; do not turn keyword searches into blanket claims.
 - A findings-only merge does not itself publish these links: run the maintainer import, regenerate coverage and verify the site in a separate change.
+
+## Link quality recheck — 2026-11-04
+
+- Inspected all 16 unique URLs underlying the 18 CSV rows. Twelve opened directly in the cloud browser: Cosmopolitan, the Obscura PDF, FantLab PDF, both Legimi previews, Fantasy-Hive, The Portalist, BookBrowse, WBUR, Yandex Books and both Escape Pod episodes. Access results reflect this browser and are not a guarantee for every region or device.
+- The four Macmillan pages triggered Cloudflare security verification in this browser. Search-service copies show matching narratives, but current direct access cannot be verified here. They remain flagged in the CSV; no claim that the sites are generally unavailable.
+- The two Escape Pod players were started; each browser timer advanced past three seconds. The page credits actor Tatiana Grey. Part 2's player reported about 41:39 while the page lists 42:10. We did not listen to the sound or verify the recordings end to end.
+- The complete-story text is split across the two Escape Pod pages: opening, continuation marker, continuation and ending were checked. Individual pages are parts, not self-contained complete stories. The word counts are those reported by the publisher and may include non-story material.
+- Four distinct English *Thornhedge* sites substantially overlap in chapter 1. They are alternate access routes, not four different extracts or works. BookBrowse splits its extract into multiple pages. Its page asserts publication permission and restricts copying.
+- Cosmopolitan explicitly states its excerpt is used with TorDotCom Publishing's permission. No broader reuse right is inferred. WBUR's audio on its page is a separate interview; its story material is text only.
+- The Obscura and FantLab links are partial book previews in PDFs (22 and 15 PDF pages respectively), not complete works. Legimi and Yandex narrative previews appeared without sign-in; paid access is required or may be required beyond the preview.
