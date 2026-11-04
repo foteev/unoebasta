@@ -292,7 +292,12 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("openWork('Q28015722')"); await sleep(60);
   checks['found batch 3: Rachel in Love labels the archived text and retains audio'] = !!$('#sheet-work a[href^="https://web.archive.org/web/"]') && /архив/.test($('#sheet-work a[href^="https://web.archive.org/web/"]').textContent) && w.eval("READ.Q28015722.links.some(x => x.kind === 'audio' && /ep447-rachel-love/.test(x.url))");
   w.eval("openWork('Q20737828')"); await sleep(60);
-  checks['found batch 3: Bloodchild is an excerpt with all three pages, not a full text'] = /EN фрагмент/.test($('#sheet-work .avail').textContent) && !$('#sheet-work .av-full') && $$('#sheet-work a[href^="https://www.bookbrowse.com/excerpts/"]').length === 3;
+  checks['reviewed findings: Bloodchild retains all English excerpt pages alongside its new Spanish full text'] = /EN фрагмент/.test($('#sheet-work .avail').textContent) && /ES полный текст/.test($('#sheet-work .avail').textContent) && $$('#sheet-work .excerpt-sources a[href^="https://www.bookbrowse.com/excerpts/"]').length === 3 && !!$('#sheet-work .text-source a[href^="https://sindominio.net/"]');
+  w.eval("openWork('Q467388')"); await sleep(60);
+  checks['reviewed findings: Merchant offers Polish and Spanish full texts with Russian audio and fragment'] = /PL полный текст/.test($('#sheet-work .avail').textContent) && /ES полный текст/.test($('#sheet-work .avail').textContent) && /RU фрагмент · аудио/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work .excerpt-sources a[href^="https://libcat.ru/"]') && !!$('#sheet-work .audio-source a[href^="https://akniga.org/"]');
+  checks['reviewed findings: external full text has its own permission label beside the retailer source'] = /разрешение не подтверждено/.test($$('#sheet-work .text-source').find(el=>el.querySelector('a[href^="https://lecturia.org/"]')).textContent) && !/разрешение не подтверждено/.test($$('#sheet-work .text-source').find(el=>el.querySelector('a[href^="https://www.legimi.pl/"]')).textContent);
+  w.eval("openWork('Q4102150')"); await sleep(60);
+  checks['reviewed findings: an audio-only work still shows its text fragment'] = !!$('#sheet-work .audio-source') && !!$('#sheet-work .excerpt-sources a[href^="https://www.legimi.pl/"]') && !$('#sheet-work .text-source');
   w.eval('closeSheets()');
   // Google Books: preview opens inside the app (embedded viewer), pages in the card
   const gq = w.eval("Object.keys(WORKS).find(q => WORKS[q].gb && WORKS[q].gb.en && WORKS[q].gb.n && !READ[q] && !(WORKS[q].ex && WORKS[q].ex.r))");
@@ -675,6 +680,9 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   const oldDoc = await parse([0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0, 0, 0], 'stary.doc');
   checks['files: a binary file or an old .doc gets a clear message, not a page of symbols'] = /не текст/.test(junk.error || '') && /\.doc/.test(oldDoc.error || '');
   // the reader's languages: by default the page's and the phone's; what they can read in them comes first
+  // Isolate the no-Polish-full-text scenario from the growing live catalog, restoring it below.
+  w.eval(`window.__languageReadSnapshot = JSON.parse(JSON.stringify(READ));
+    for (const [q, r] of Object.entries(READ)) { r.links = r.links.filter(l => l.kind === 'full' && (l.lang || 'en') === 'en'); if (!r.links.length) delete READ[q]; }`);
   checks['languages: by default the page language and the phone’s'] = JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
   click($('#tab-shelf')); await sleep(80);
   click($('#shelf-langs [data-mylang="en"]')); await sleep(80);
@@ -701,7 +709,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#f-mine')); await sleep(60);
   checks['languages: “In my languages” keeps what can be read or heard in them'] = $$('#view-library .slip').every(sl => w.eval(`langScore('${sl.querySelector('[data-work]').dataset.work}')`) > 0) && $$('#view-library .slip').length >= 1;
   click($('#f-mine')); await sleep(30);
-  w.eval("delete READ.Q190192"); click($('#tab-shelf')); await sleep(60); click($('#langs-reset')); await sleep(60);
+  w.eval("for (const q of Object.keys(READ)) delete READ[q]; Object.assign(READ, window.__languageReadSnapshot); delete window.__languageReadSnapshot;"); click($('#tab-shelf')); await sleep(60); click($('#langs-reset')); await sleep(60);
   checks['languages: back to the phone’s languages'] = w.eval('prefs.langs') === undefined && JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
   // Reading now: clear the whole list at once, with Undo
   await w.eval(`(async () => { const now = Date.now();
@@ -726,8 +734,10 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // languages
 
 
-  w.eval("openWork('Q27903111')"); await sleep(60);
-  checks['titles: in Russian, a work with no Russian title shows the original only, never another language'] = $('#sheet-work h2').textContent === 'The Paper Menagerie' && !$('#sheet-work .alt') && !/El zoo de papel|Испанск/.test($('#sheet-work').textContent);
+  const paperRu = w.eval("WORKS.Q27903111.titles.ru");
+  w.eval("WORKS.Q27903111.titles.ru = ''; openWork('Q27903111')"); await sleep(60);
+  checks['titles: in Russian, a work with no Russian title keeps the original heading when a Spanish source exists'] = $('#sheet-work h2').textContent === 'The Paper Menagerie' && !$('#sheet-work .alt');
+  w.__paperRu = paperRu; w.eval("WORKS.Q27903111.titles.ru = window.__paperRu; delete window.__paperRu;");
   w.eval('closeSheets()');
   const qRu = w.eval("Object.keys(READ).find(q => WORKS[q] && WORKS[q].titles.ru && WORKS[q].titles.ru !== WORKS[q].title)");
   click($('#tab-library')); await sleep(80);

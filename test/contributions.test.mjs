@@ -24,13 +24,13 @@ test('findings validate identities, schema, formats, dates and bounded text',()=
  assert.throws(()=>validateSubmission([{...file([row()]),content:toCsv([row()],FOUND_FIELDS.slice().reverse())}],catalog,source),/header/);
  assert.throws(()=>validateSubmission([{...note,content:'x'.repeat(60001)}],catalog,source),/size/);
  assert.throws(()=>validateSubmission([{...note,content:'\0'}],catalog,source),/UTF-8/);
- assert.throws(()=>validateSubmission([file(Array.from({length:31},(_,i)=>row({qid:'Q'+(i+1)})))],catalog,source),/at most 30/);
 });
-test('thirty-work batches are accepted with bounded notes, while the next work and oversized UTF-8 notes fail',()=>{
- const rows=Array.from({length:30},(_,i)=>row({qid:'Q'+(i+1),url:'https://example.org/story-'+i}));
+test('larger assigned batches are bounded by rows and UTF-8 file sizes, not a work count',()=>{
+ const rows=Array.from({length:500},(_,i)=>row({qid:'Q'+(i+1),url:'https://example.org/story-'+i}));
  const many={works:rows.map(r=>({qid:r.qid,form:r.form,knownLinks:[]})),data:{works:Object.fromEntries(rows.map(r=>[r.qid,['Story',0,0,['Q9'],0,0,2000]])),authors:{Q9:['Author']},ex:{}}};
- assert.equal(validateSubmission([file(rows),{...note,content:'x'.repeat(60000)}],many,source).works,30);
- assert.throws(()=>validateSubmission([file([...rows,row({qid:'Q31'})])],many,source),/at most 30/);
+ for(const count of [30,31,500]) assert.equal(validateSubmission([file(rows.slice(0,count)),{...note,content:'x'.repeat(60000)}],many,source).works,count);
+ assert.throws(()=>validateSubmission([file([...rows,row({qid:'Q501'})])],many,source),/1–500/);
+ assert.throws(()=>validateSubmission([{...file([row()]),content:'x'.repeat(200001)}],many,source),/size/);
  assert.throws(()=>validateSubmission([{...note,content:'ą'.repeat(30001)}],many,source),/size/);
 });
 test('findings reject duplicates, credential/local URLs and incomplete multipart sources',()=>{
