@@ -39,6 +39,7 @@ const assert = require('node:assert/strict');
     assert.equal(snapshot(single).length,1);assert.equal(snapshot(single)[0].qid,'Q19947428');
     await page.evaluate(()=>closeSheets());
     await page.locator('#tab-awards').click();
+    await page.locator('#av-language').selectOption('all');
     await page.locator('[data-av-award="all"]').click();
     await page.locator('[data-av-cat="all"]').click();
     const total=await page.locator('#av-body .yrow').count();assert.ok(total>500);
@@ -108,8 +109,70 @@ const assert = require('node:assert/strict');
     await page.screenshot({path:join(out,'authors-most-awards-390-dark.png'),animations:'disabled'});
     assert.ok(await page.locator('#av-author-sort').evaluate(el=>el.getBoundingClientRect().height>=44));
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+    // Reader languages are the default in both independent source-language filters.
+    await page.evaluate(()=>{prefs.langs=['pl'];delete prefs.catalogLang;delete prefs.av;savePrefs();});
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.locator('#tab-library').click();
+    assert.equal(await page.locator('#lib-language').inputValue(),'mine');
+    assert.equal(await page.locator('#lib-language option').first().getAttribute('value'),'mine');
+    assert.equal(await page.locator('#lib-language option').nth(1).getAttribute('value'),'all');
+    assert.equal(await page.locator('#view-library .slip-open[data-work="Q25349436"]').count(),0);
+    assert.equal(await page.locator('#view-library .slip-open[data-work="Q467388"]').count(),1);
+    await page.locator('#lib-language').selectOption('all');
+    const allCatalog=await page.locator('#view-library .slip').count();assert.ok(allCatalog>100);
+    await page.locator('#lib-language').selectOption('pl');
+    assert.ok(await page.locator('#view-library .slip').count()<allCatalog);
+    await page.locator('#f-readable').click();assert.equal(await page.locator('#view-library .slip').count(),2);
+    await page.locator('#f-readable').click();
+    await page.locator('#lib-q').fill('Cat Pictures Please');await page.locator('#view-library [type="submit"]').click();
+    assert.equal(await page.locator('#view-library .slip-open[data-work="Q25349436"]').count(),0);
+    await page.locator('#lib-language').selectOption('all');
+    assert.equal(await page.locator('#lib-q').inputValue(),'Cat Pictures Please');
+    assert.equal(await page.locator('#view-library .slip-open[data-work="Q25349436"]').count(),1);
+    await page.locator('#view-library [data-sclear]').click();await page.locator('#lib-language').selectOption('pl');
+    await page.locator('#tab-awards').click();assert.equal(await page.locator('#av-language').inputValue(),'mine');
+    await page.locator('[data-av-award="all"]').click();await page.locator('[data-av-cat="all"]').click();
+    await page.locator('#av-language').selectOption('pl');
+    assert.equal(await page.locator('#av-body [data-work="Q25349436"]').count(),0);
+    assert.ok(await page.locator('#av-body [data-work="Q190192"]').count()>0);
+    await page.setViewportSize({width:1280,height:1100});
+    for(const mode of ['cats','years','authors','table']) {
+      await page.locator(`[data-av-mode="${mode}"]`).click();
+      const ids=await page.locator('#av-body [data-work]').evaluateAll(els=>els.map(el=>el.dataset.work));
+      assert.ok(ids.length>0);assert.ok(await page.evaluate(ids=>ids.every(q=>matchesSourceLanguage(q,'pl')),ids));
+    }
+    await page.locator('[data-av-mode="cats"]').click();
+    await page.locator('[data-av-text]').click();
+    assert.equal(await page.locator('#av-body [data-work="Q16747517"]').count(),0);
+    assert.ok(await page.locator('#av-body [data-work="Q467388"]').count()>0);
+    await page.locator('[data-av-text]').click();
+    await page.locator('#av-body [data-av-year]').first().click();
+    assert.equal(await page.locator('#av-language').inputValue(),'pl');
+    await page.locator('[data-av-clear]').click();
+    await page.locator('#av-q').fill('Cat Pictures Please');await page.locator('#view-awards [type="submit"]').click();
+    assert.equal(await page.locator('#av-body [data-work="Q25349436"]').count(),0);
+    await page.locator('#av-language').selectOption('all');
+    assert.ok(await page.locator('#av-body [data-work="Q25349436"]').count()>0);
+    await page.locator('#view-awards [data-sclear]').click();
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.locator('#tab-library').click();assert.equal(await page.locator('#lib-language').inputValue(),'pl');
+    await page.locator('#tab-awards').click();assert.equal(await page.locator('#av-language').inputValue(),'all');
+    assert.deepEqual(await page.evaluate(()=>myLangs()),['pl']);
+    await page.locator('#av-language').selectOption('pl');
+    for(const width of [360,390]) for(const theme of ['light','dark']) {
+      await page.setViewportSize({width,height:width===360?740:844});
+      await page.locator('#lang-sel').selectOption(width===360?'pl':'ru');
+      await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
+      for(const view of ['library','awards']) {
+        await page.locator('#tab-'+view).click();await page.evaluate(()=>window.scrollTo(0,0));
+        const select=page.locator(view==='library'?'#lib-language':'#av-language');
+        assert.ok(await select.evaluate(el=>el.getBoundingClientRect().height>=44));
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+        await page.screenshot({path:join(out,`source-language-${view}-${width}-${theme}.png`),animations:'disabled'});
+      }
+    }
     assert.deepEqual(errors,[]);
-    const report={batch_copy:true,one_work_copy:true,clipboard_fallback:true,all_categories:total,author_cards:true,author_sort:true,coverage,coverageLayouts,layouts,errors};
+    const report={batch_copy:true,one_work_copy:true,clipboard_fallback:true,all_categories:total,author_cards:true,author_sort:true,source_language_filters:true,language_defaults_and_persistence:true,language_scoped_search:true,coverage,coverageLayouts,layouts,errors};
     writeFileSync(join(out,'community-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
   } finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exit(1)});

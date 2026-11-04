@@ -8,7 +8,7 @@ const errors = [];
 const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</body></html>', {
   url: 'https://example.test/', runScripts: 'dangerously', pretendToBeVisual: true,
   beforeParse(w) {
-    w.localStorage.setItem('fantastic-prefs', JSON.stringify({ lang: 'ru' })); // returning user from 21.10
+    w.localStorage.setItem('fantastic-prefs', JSON.stringify({ lang: 'ru', catalogLang: 'all', av: { lang: 'all' } })); // returning user from 21.10
     w.scrollTo = () => {};
     if (!w.TextEncoder) { const u = require('util'); w.TextEncoder = u.TextEncoder; w.TextDecoder = u.TextDecoder; }
     w.CompressionStream = CompressionStream; w.DecompressionStream = DecompressionStream; // as in browsers
@@ -313,27 +313,27 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // ADHD mode: home picks, time, listen next to read, theme, reader bar and focus
   click($('#tab-catalog')); await sleep(30);
   w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(20);
-  const picks = $$('#view-catalog .pick');
+  const picks = $$('#view-catalog [data-picks=reading] .pick');
   checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && (($('#pk-h').textContent === 'Есть несколько минут?' && $('#pk-h').classList.contains('sr')) || $('#pk-h').textContent === 'Или что-то новое') && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
   checks['home: cards show cover, title and author, and label audio-only options'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').children.length === 2 && pk.querySelector('.pick-open').firstElementChild.classList.contains('cover') && pk.querySelector('.pick-t') && pk.querySelector('.pick-a') && (pk.querySelector('a[data-via="read"]') ? pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать') : /аудио/.test(pk.querySelector('.pick-txt .small').textContent)));
   checks['home: read and listen actions match the available formats'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === (pk.querySelector('a[data-via="read"]') ? 2 : 1)) && !!$('#view-catalog .pick-more');
   checks['home: listening names its source, with an icon beside text or a labelled audio action'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l ? l.querySelector('svg') && /^Слушать · \S.*$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore') : /^Слушать/.test(pk.querySelector('.pick-actions').textContent) && !!pk.querySelector('a[data-via="listen"]'); });
   click($('#view-catalog [data-picklen="eve"]')); await sleep(20);
-  checks['home: more-than-an-hour picks are long'] = $$('#view-catalog .pick').length > 0 && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-picklen="eve"]').textContent === 'Больше часа';
-  const before = $$('#view-catalog .pick .pick-t').map(x => x.textContent).join('|');
+  checks['home: more-than-an-hour picks are long'] = $$('#view-catalog [data-picks=reading] .pick').length > 0 && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-picklen="eve"]').textContent === 'Больше часа';
+  const before = $$('#view-catalog [data-picks=reading] .pick .pick-t').map(x => x.textContent).join('|');
   click($('#view-catalog [data-pickmore]')); await sleep(20);
-  checks['home: three others'] = $$('#view-catalog .pick .pick-t').map(x => x.textContent).join('|') !== before || w.eval("pickList('eve').length") <= 3;
+  checks['home: three others'] = $$('#view-catalog [data-picks=reading] .pick .pick-t').map(x => x.textContent).join('|') !== before || w.eval("pickList('eve').length") <= 3;
   // ✓ Read: off the start screen and random picks, onto the shelf, muted in award lists, Undo in the toast
   w.eval("prefs.pickLen = '40'; renderHome()"); await sleep(10);
-  const pk0 = $$('#view-catalog .pick'); const dq = pk0[0].querySelector('.pick-done').dataset.done; const keep = pk0[1].querySelector('.pick-done').dataset.done;
+  const pk0 = $$('#view-catalog [data-picks=reading] .pick'); const dq = pk0[0].querySelector('.pick-done').dataset.done; const keep = pk0[1].querySelector('.pick-done').dataset.done;
   checks['done: on the start screen it says “Уже читал(а)”, under Read'] = pk0.every(pk => pk.querySelector('.pick-done').textContent.trim() === 'Уже читал(а)' && pk.querySelector('.pick-actions').nextElementSibling === pk.querySelector('.pick-done') && /уйдёт с первого экрана/.test(pk.querySelector('.pick-done').title));
   click(pk0[0].querySelector('.pick-done')); await sleep(40);
-  const pk1 = $$('#view-catalog .pick .pick-done').map(b => b.dataset.done);
+  const pk1 = $$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done);
   checks['done: leaves the home picks, others stay'] = !pk1.includes(dq) && pk1.includes(keep) && pk1.length === 3 && w.eval(`isDone('${dq}')`);
   checks['done: never in random picks'] = ['15', '40', 'eve'].every(k => !w.eval(`pickList('${k}')`).includes(dq));
   checks['done: toast with Undo'] = !$('#toast').hidden && !!$('#toast [data-undone]');
   click($('#toast [data-undone]')); await sleep(40);
-  checks['done: Undo brings it back'] = !w.eval(`isDone('${dq}')`) && $$('#view-catalog .pick .pick-done').map(b => b.dataset.done).includes(dq);
+  checks['done: Undo brings it back'] = !w.eval(`isDone('${dq}')`) && $$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done).includes(dq);
   w.eval(`openWork('${dq}')`); await sleep(40);
   click($(`#sheet-work [data-done="${dq}"]`)); await sleep(60);
   checks['done: full card button pressed + date'] = $(`#sheet-work [data-done="${dq}"]`).getAttribute('aria-pressed') === 'true' && $(`#sheet-work [data-done="${dq}"]`).textContent.trim() === 'Прочитано' && /прочитано \d+/.test($('#sheet-work').textContent);
@@ -503,7 +503,9 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['back: … and a work card'] = $('#sheet-work').hidden;
   // what you open elsewhere becomes your reading history and status; Hide is a ✕ in the card's corner
   click($('#tab-catalog')); await sleep(30);
-  const trk = $('#view-catalog .pick a[data-track]'); const tq = trk.dataset.track; const tTitle = w.eval(`titleOf(work('${tq}'))`);
+  let trk = $('#view-catalog [data-picks=reading] .pick a[data-via=read]');
+  for(let n=0; !trk && n<20; n++) { w.eval("pickNext(prefs.pickLen || '15');renderHome()"); trk=$('#view-catalog [data-picks=reading] .pick a[data-via=read]'); }
+  const tq = trk.dataset.track; const tTitle = w.eval(`titleOf(work('${tq}'))`);
   click(trk); await sleep(80);
   const rcard = $('#view-catalog .recall');
   checks['track: Read ↗ puts the story first in You were reading'] = !!rcard && rcard.querySelector('h3').textContent.trim() === tTitle && /Открыто на/.test(rcard.textContent) && !!rcard.querySelector('a[data-track]');
@@ -518,11 +520,11 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   // Three others: no repeats until every book of that length has been shown
   click($('#tab-catalog')); await sleep(20);
   w.eval("prefs.pickLen = '40'; renderHome()"); await sleep(10);
-  const seen40 = []; for (let i = 0; i < 3; i++) { seen40.push(...$$('#view-catalog .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
+  const seen40 = []; for (let i = 0; i < 3; i++) { seen40.push(...$$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
   checks['picks: Three others never repeats within the list'] = seen40.length === 9 && new Set(seen40).size === 9;
   w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(10);
   const n15 = w.eval("pickList('15').length"); const s15 = [];
-  for (let i = 0; i < Math.ceil(n15 / 3); i++) { s15.push(...$$('#view-catalog .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
+  for (let i = 0; i < Math.ceil(n15 / 3); i++) { s15.push(...$$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
   checks['picks: every short story shows before any repeats, then a note'] = new Set(s15).size === n15 && /дальше по кругу/.test($('#view-catalog .picks').textContent);
   // covers: an image when the build found one, otherwise a typographic cover
   click($('#tab-library')); await sleep(30);
@@ -695,7 +697,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#shelf-langs [data-mylang="pl"]')); await sleep(80);
   checks['languages: at least one stays'] = JSON.stringify(w.eval('prefs.langs')) === JSON.stringify(['pl']) && /хотя бы один/.test($('#toast').textContent);
   w.eval("renderCatalog()"); await sleep(60);
-  checks['languages: saved Polish choice does not silently suggest English texts'] = !$('#view-catalog .pick') && /Полного текста/.test($('#view-catalog').textContent) && !!$('#view-catalog [data-goshelf="shelf-langs"]') && !!$('#view-catalog .home-excerpts a');
+  checks['languages: saved Polish choice does not silently suggest English texts'] = !$('#view-catalog [data-picks=reading] .pick') && !!$('#view-catalog [data-picks=other] .pick') && /На других языках/.test($('#view-catalog').textContent) && !!$('#view-catalog [data-goshelf="shelf-langs"]') && !!$('#view-catalog .home-excerpts a');
   click($('#tab-library')); await sleep(60);
   checks['languages: the text language on each card, dimmed when unknown'] = !!$('#view-library .slip .flag-lang.far') && /^EN$/.test($('#view-library .slip .flag-lang').textContent);
   const wid = $('#view-library .slip [data-work]').dataset.work; w.eval(`openWork('${wid}')`); await sleep(80);
@@ -704,21 +706,21 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("READ.Q190192 = { w: 3000, tier: 't2', added: '2026-10-01T00:00:00Z', pub: 'Test', links: [{ kind: 'full', url: 'https://x.test/diuna-pl', site: 'Test', lang: 'pl' }] }; renderLibrary();"); await sleep(60);
   checks['languages: a Polish text comes first for a Polish reader'] = $('#view-library .slip [data-work]').dataset.work === 'Q190192' && $('#view-library .slip .flag-lang').textContent === 'PL' && !$('#view-library .slip .flag-lang').classList.contains('far');
   w.eval("prefs.pickLen = '15'; READ.Q190192.links.unshift({kind:'full',url:'https://x.test/dune-en',site:'English fixture'}); renderHome()");
-  checks['languages: one matching full text is shown without filling with other languages'] = $$('#view-catalog .pick').length === 1 && $('#view-catalog .pick [data-work]').dataset.work === 'Q190192';
-  checks['languages: Read opens the matching language even when English is listed first'] = $('#view-catalog .pick a[data-track]').href === 'https://x.test/diuna-pl';
-  click($('#f-mine')); await sleep(60);
+  checks['languages: one matching full text is shown without filling with other languages'] = $$('#view-catalog [data-picks=reading] .pick').length === 1 && $('#view-catalog [data-picks=reading] .pick [data-work]').dataset.work === 'Q190192';
+  checks['languages: Read opens the matching language even when English is listed first'] = $('#view-catalog [data-picks=reading] .pick a[data-track]').href === 'https://x.test/diuna-pl';
+  $('#lib-language').value='mine'; $('#lib-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(60);
   checks['languages: “In my languages” keeps what can be read or heard in them'] = $$('#view-library .slip').every(sl => w.eval(`langScore('${sl.querySelector('[data-work]').dataset.work}')`) > 0) && $$('#view-library .slip').length >= 1;
-  click($('#f-mine')); await sleep(30);
+  $('#lib-language').value='all'; $('#lib-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(30);
   w.eval("for (const q of Object.keys(READ)) delete READ[q]; Object.assign(READ, window.__languageReadSnapshot); delete window.__languageReadSnapshot;"); click($('#tab-shelf')); await sleep(60); click($('#langs-reset')); await sleep(60);
   checks['languages: back to the phone’s languages'] = w.eval('prefs.langs') === undefined && JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
   // Regression: one Polish reading language, including an audio-only work and empty duration buckets.
   w.eval(`window.__readingRegression = { prefs: {...prefs}, read: JSON.parse(JSON.stringify(READ)), bookmarks: local.bookmarks };
     local.bookmarks = local.bookmarks.filter(b => b.type !== 'done'); prefs.langs = ['pl']; prefs.listen = 'eleven'; prefs.pickLen = 'eve'; renderHome();`);
-  checks['languages: Polish audio-only Sandkings appears at its recorded duration, without an English text or TTS fallback'] = w.eval("pickList('eve').includes('Q6271990') && readingMinutes('Q6271990') === 106 && !pickList('40').includes('Q6271990')") && !!$('#view-catalog .pick a[data-via="listen"][href^="https://podcasts.apple.com/"]') && !$('#view-catalog .pick a[data-via="read"]') && !$('#view-catalog .pick [data-eleven]');
+  checks['languages: Polish audio-only Sandkings appears at its recorded duration, without an English text or TTS fallback'] = w.eval("pickList('eve').includes('Q6271990') && readingMinutes('Q6271990') === 106 && !pickList('40').includes('Q6271990')") && !!$('#view-catalog [data-picks=reading] .pick a[data-via="listen"][href^="https://podcasts.apple.com/"]') && !$('#view-catalog [data-picks=reading] .pick a[data-via="read"]') && !$('#view-catalog [data-picks=reading] .pick [data-eleven]');
   w.eval("READ.Q6271990.links.push({kind:'full',url:'https://example.test/sandkings-en',site:'English fixture'}); renderHome()");
-  checks['languages: a saved TTS preference cannot open a foreign text beside matching Polish audio'] = !$('#view-catalog .pick a[data-via="read"]') && !$('#view-catalog .pick [data-eleven]') && !!$('#view-catalog .pick a[data-via="listen"]');
+  checks['languages: a saved TTS preference cannot open a foreign text beside matching Polish audio'] = !$('#view-catalog [data-picks=reading] .pick a[data-via="read"]') && !$('#view-catalog [data-picks=reading] .pick [data-eleven]') && !!$('#view-catalog [data-picks=reading] .pick a[data-via="listen"]');
   w.eval("READ.Q6271990.links = READ.Q6271990.links.filter(l => l.url !== 'https://example.test/sandkings-en'); READ.Q6271990.links = READ.Q6271990.links.filter(l => l.lang !== 'pl'); renderHome()");
-  checks['languages: an empty Polish duration offers matching durations without silently switching languages or time'] = !$('#view-catalog .pick') && !!$('#view-catalog [data-pickavailable="15"]') && !!$('#view-catalog [data-pickavailable="40"]') && w.eval("prefs.pickLen === 'eve' && JSON.stringify(myLangs()) === '[\"pl\"]'");
+  checks['languages: an empty Polish duration offers matching durations without silently switching languages or time'] = !$('#view-catalog [data-picks=reading] .pick') && !!$('#view-catalog [data-pickavailable="15"]') && !!$('#view-catalog [data-pickavailable="40"]') && w.eval("prefs.pickLen === 'eve' && JSON.stringify(myLangs()) === '[\"pl\"]'");
   const excerptIds = () => $$('#view-catalog [data-excerpt]').map(el => el.dataset.excerpt);
   const initialFragments = excerptIds();
   click($('#view-catalog [data-pickmore="excerpt"]')); await sleep(20);
@@ -731,11 +733,11 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   checks['languages: shuffle history has independent scopes for each reading-language selection'] = plScope !== w.eval("pickScope('eve','excerpt')") && w.eval("Object.keys(pickSeen).includes(" + JSON.stringify(plScope) + ")");
   w.eval("prefs.langs = ['pl']; renderHome()");
   click($('#view-catalog [data-pickavailable="40"]')); await sleep(20);
-  checks['languages: another-duration action opens the Polish full text without adding English options'] = w.eval("prefs.pickLen === '40'") && !!$('#view-catalog .pick a[data-via="read"][href^="https://www.legimi.pl/"]') && !$('#view-catalog .pick a[data-via="listen"][href^="https://akniga.org/"]');
+  checks['languages: another-duration action opens the Polish full text without adding English options'] = w.eval("prefs.pickLen === '40'") && !!$('#view-catalog [data-picks=reading] .pick a[data-via="read"][href^="https://www.legimi.pl/"]') && !$('#view-catalog [data-picks=reading] .pick a[data-via="listen"][href^="https://akniga.org/"]');
   checks['languages: all home actions including Choose for me stay within the selected reading language'] = w.eval(`(() => {
     prefs.langs=['ru'];prefs.pickLen='eve';
     for(let i=0;i<5;i++) { renderHome();
-      if(![...document.querySelectorAll('#view-catalog .picks a[data-track]')].every(a=>READ[a.dataset.track].links.some(l=>l.url===a.href && (l.lang||'en')==='ru' && l.kind===(a.dataset.via==='listen'?'audio':'full')))) return false;
+      if(![...document.querySelectorAll('#view-catalog [data-picks=reading] a[data-track], #view-catalog .picks > .pick-more a[data-track]')].every(a=>READ[a.dataset.track].links.some(l=>l.url===a.href && (l.lang||'en')==='ru' && l.kind===(a.dataset.via==='listen'?'audio':'full')))) return false;
       pickNext('eve');
     } return true;
   })()`);
@@ -851,6 +853,42 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("copyAgentTask('Q19947428')"); await sleep(30);
   checks['agent task: clipboard denial provides a selectable fallback'] = !$('#agent-dialog').hidden && $('#agent-task-text').readOnly && payload($('#agent-task-text').value)[0].qid==='Q19947428';
   w.eval('closeAgentTask()');w.navigator.clipboard.writeText=clipboardWrite;
+  // Independent source-language filters and explicitly labelled English fallback.
+  w.eval("LANG='ru'; applyLang(); prefs.langs=['pl']; prefs.pickLen='eve'; renderHome();");
+  checks['fallback: sparse Polish picks retain Polish audio and add a separate English-text section'] = !!$('#view-catalog [data-picks=reading] a[data-via=listen]') && $$('#view-catalog [data-picks=other] .pick').length === 3 && $$('#view-catalog [data-picks=other] .pick').every(el => el.dataset.readingLang === 'en' && el.querySelector('a[data-via=read]')) && /Больше произведений/.test($('#view-catalog [data-picks=other]').textContent) && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'");
+  const otherFirst = $$('#view-catalog [data-picks=other] [data-done]').map(el=>el.dataset.done);
+  click($('#view-catalog [data-pickmore=other]')); await sleep(20);
+  checks['fallback: English suggestions rotate and keep English targets without changing the reading setting'] = $$('#view-catalog [data-picks=other] [data-done]').every(el=>!otherFirst.includes(el.dataset.done)) && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'") && $$('#view-catalog [data-picks=other] a[data-via=read]').every(a=>w.eval(`READ['${a.dataset.track}'].links.some(l=>l.kind==='full'&&(l.lang||'en')==='en'&&l.url===${JSON.stringify(a.href)})`));
+  w.eval("window.__plRecording=READ.Q6271990.links; READ.Q6271990.links=READ.Q6271990.links.filter(l=>l.lang!=='pl');renderHome()");
+  checks['fallback: an empty selected-language bucket explicitly explains the other-language books'] = !$('#view-catalog [data-picks=reading] .pick') && /Произведений такой длительности/.test($('#view-catalog [data-picks=other]').textContent) && $$('#view-catalog [data-picks=other] .pick').every(el=>el.dataset.readingLang==='en');
+  w.eval("READ.Q6271990.links=window.__plRecording;delete window.__plRecording;");
+  w.eval("filter.lang='mine'; filter.q=''; filter.readable=false; filter.audio=false; filter.award='all'; filter.starred=false; filter.fresh=false; filter.len='any'; renderLibrary();");
+  checks['language filters: reader languages are first, All is available, and the combined mine chip is removed'] = $('#lib-language').options[0].value === 'mine' && $('#lib-language').options[1].value === 'all' && $('#lib-language').value === 'mine' && !$('#f-mine');
+  checks['language filters: Catalog selects Polish texts, audio and scoped fragments'] = !!$('#view-library .slip-open[data-work="Q467388"]') && !!$('#view-library .slip-open[data-work="Q6271990"]') && !$('#view-library .slip-open[data-work="Q25349436"]') && !$('#view-library .slip-open[data-work="Q4102150"]').closest('.slip').querySelector('a[data-via=read]') && !$('#view-library .slip-open[data-work="Q4102150"]').closest('.slip').querySelector('a[data-via=listen]');
+  click($('#f-readable')); await sleep(20);
+  checks['language filters: full-text and audio toggles apply to the selected language'] = $$('#view-library .slip').length === 2 && !$('#view-library .slip-open[data-work="Q6271990"]') && !!$('#view-library .slip-open[data-work="Q467388"]');
+  click($('#f-audio')); await sleep(20);
+  w.eval("READ.Q6271990.links.push({kind:'full',site:'English fixture',url:'https://example.test/filter-en'});renderLibrary()");
+  checks['language filters: Polish text plus audio does not match an English text with Polish audio'] = $$('#view-library .slip').length === 0;
+  w.eval("READ.Q6271990.links=READ.Q6271990.links.filter(l=>l.url!=='https://example.test/filter-en')");
+  click($('#f-readable')); await sleep(20);
+  checks['language filters: Polish audio returns Sandkings alone'] = $$('#view-library .slip').length === 1 && !!$('#view-library .slip-open[data-work="Q6271990"]');
+  click($('#f-audio')); await sleep(20);
+  $('#lib-language').value='all'; $('#lib-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(20);
+  checks['language filters: All restores the catalog and persists independently of reading preferences'] = $$('#view-library .slip').length === w.eval('Object.keys(READ).filter(q=>WORKS[q]).length') && JSON.parse(w.localStorage.getItem('fantastic-prefs')).catalogLang === 'all' && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'");
+  w.eval("Object.assign(AV,{lang:'pl',award:'all',cat:'all',year:null,mode:'cats',onlyText:false,q:''});renderAwards();");
+  checks['language filters: Awards categories retain Polish fragments and exclude English-only sources'] = !!$('#av-body [data-work="Q190192"]') && !$('#av-body [data-work="Q25349436"]') && $('#av-language').options[0].value === 'mine';
+  w.eval("AV.onlyText=true;renderAwards()");
+  checks['language filters: Awards full-text toggle excludes an English full text when only its Polish fragment exists'] = !$('#av-body [data-work="Q16747517"]') && !!$('#av-body [data-work="Q467388"]');
+  w.eval("window.matchMedia=()=>({matches:true})");
+  for(const mode of ['cats','years','authors','table']) {
+    w.eval(`AV.mode=${JSON.stringify(mode)};AV.onlyText=false;renderAwards()`);
+    checks['language filters: Awards '+mode+' keeps only matching source languages'] = $$('#av-body [data-work]').length > 0 && $$('#av-body [data-work]').every(b=>w.eval(`matchesSourceLanguage('${b.dataset.work}','pl')`));
+  }
+  w.eval("AV.q='Cat Pictures Please';renderAwards()");
+  checks['language filters: search retains the Awards language selection'] = !$('#av-body [data-work="Q25349436"]') && $('#av-language').value === 'pl';
+  $('#av-language').value='all'; $('#av-language').dispatchEvent(new w.Event('change',{bubbles:true})); await sleep(20);
+  checks['language filters: All restores search results and is saved for Awards'] = !!$('#av-body [data-work="Q25349436"]') && JSON.parse(w.localStorage.getItem('fantastic-prefs')).av.lang === 'all';
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);
