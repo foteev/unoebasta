@@ -2383,7 +2383,7 @@ function searchTaskWorks(q) {
   if (WORKS[q]) return [WORKS[q]];
   const pool = Object.values(WORKS).filter(w => ['en','pl','ru','es'].some(l => availability(w.id)[l] !== 'full' || !workLangs(w.id).audio.has(l)));
   for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i],pool[j]] = [pool[j],pool[i]]; }
-  return pool.slice(0, 5);
+  return pool.slice(0, 30);
 }
 function buildSearchTask(q) {
   const works = searchTaskWorks(q).map(w => ({ qid: w.id, title: w.title, titles: w.titles,

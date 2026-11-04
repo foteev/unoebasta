@@ -22,9 +22,16 @@ test('findings cannot edit code, earlier submissions, symlinks or unrelated note
 test('findings validate identities, schema, formats, dates and bounded text',()=>{
  for(const patch of [{qid:'Q999'},{form:'novel'},{kind:'none',url:''},{kind:'full',words:''},{checked_at:'2999-01-01T00:00:00Z'}]) assert.throws(()=>validateSubmission([file([row(patch)])],catalog,source));
  assert.throws(()=>validateSubmission([{...file([row()]),content:toCsv([row()],FOUND_FIELDS.slice().reverse())}],catalog,source),/header/);
- assert.throws(()=>validateSubmission([{...note,content:'x'.repeat(20001)}],catalog,source),/size/);
+ assert.throws(()=>validateSubmission([{...note,content:'x'.repeat(60001)}],catalog,source),/size/);
  assert.throws(()=>validateSubmission([{...note,content:'\0'}],catalog,source),/UTF-8/);
- assert.throws(()=>validateSubmission([file(Array.from({length:11},(_,i)=>row({qid:'Q'+(i+1)})))],catalog,source),/at most 10/);
+ assert.throws(()=>validateSubmission([file(Array.from({length:31},(_,i)=>row({qid:'Q'+(i+1)})))],catalog,source),/at most 30/);
+});
+test('thirty-work batches are accepted with bounded notes, while the next work and oversized UTF-8 notes fail',()=>{
+ const rows=Array.from({length:30},(_,i)=>row({qid:'Q'+(i+1),url:'https://example.org/story-'+i}));
+ const many={works:rows.map(r=>({qid:r.qid,form:r.form,knownLinks:[]})),data:{works:Object.fromEntries(rows.map(r=>[r.qid,['Story',0,0,['Q9'],0,0,2000]])),authors:{Q9:['Author']},ex:{}}};
+ assert.equal(validateSubmission([file(rows),{...note,content:'x'.repeat(60000)}],many,source).works,30);
+ assert.throws(()=>validateSubmission([file([...rows,row({qid:'Q31'})])],many,source),/at most 30/);
+ assert.throws(()=>validateSubmission([{...note,content:'ą'.repeat(30001)}],many,source),/size/);
 });
 test('findings reject duplicates, credential/local URLs and incomplete multipart sources',()=>{
  assert.throws(()=>validateSubmission([file([row(),row()])],catalog,source),/Duplicate/);

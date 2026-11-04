@@ -804,7 +804,7 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.__savedSuggestions=privateSugg;w.eval('local.suggestions=window.__savedSuggestions');
   const payload=task=>JSON.parse(task.split('PUBLIC CATALOG SNAPSHOT (refresh main before submitting):\n')[1]);
   checks['agent task: one work with four-language scope, current URLs and canonical rules'] = payload(singleTask).length===1 && payload(singleTask)[0].qid==='Q19947428' && singleTask.includes('coverage.csv') && singleTask.includes('**only the new CSV and optional note**') && singleTask.includes('contributor\'s own account') && payload(singleTask)[0].existing_links.some(x=>x.url.includes('det3gpWwLWI'));
-  checks['agent task: random batch has five distinct public works and no shelf data'] = payload(batchTask).length===5 && new Set(payload(batchTask).map(x=>x.qid)).size===5 && !singleTask.includes('PRIVATE-READER-NOTE-12345') && !batchTask.includes('PRIVATE-READER-NOTE-12345');
+  checks['agent task: random batch has thirty distinct public works and no shelf data'] = payload(batchTask).length===30 && new Set(payload(batchTask).map(x=>x.qid)).size===30 && !singleTask.includes('PRIVATE-READER-NOTE-12345') && !batchTask.includes('PRIVATE-READER-NOTE-12345');
   w.eval("copyAgentTask('Q19947428')"); await sleep(30);
   checks['agent task: clipboard receives a ready task'] = w.__clip && w.__clip.includes('Assigned QIDs: Q19947428');
   const clipboardWrite=w.navigator.clipboard.writeText;w.navigator.clipboard.writeText=async()=>{throw Error('denied')};

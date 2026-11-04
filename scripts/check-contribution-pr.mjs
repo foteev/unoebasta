@@ -7,6 +7,8 @@ import { loadCatalog } from './lib/catalog.mjs';
 import { mergeFound } from './lib/merge-found.mjs';
 
 const PATH = /^data\/(found|notes)\/(\d{4}-\d{2}-\d{2}-[a-z0-9][a-z0-9-]{0,79})\.(csv|md)$/;
+const MAX_WORKS = 30, CSV_BYTES = 200_000, NOTES_BYTES = 60_000;
+const fileLimit = filename => filename.endsWith('.csv') ? CSV_BYTES : NOTES_BYTES;
 const researchPath = path => path.startsWith('data/found/') || path.startsWith('data/notes/');
 const linkKey = r => JSON.stringify([r.qid, r.lang || 'en', r.kind, +r.part || '', cleanUrl(r.url)]);
 export function validateSubmission(files, catalog, source, { labelled = false } = {}) {
@@ -22,7 +24,7 @@ export function validateSubmission(files, catalog, source, { labelled = false } 
     if (!Number.isFinite(stamp) || new Date(stamp).toISOString().slice(0, 10) !== date) throw new Error('Invalid date in submission filename');
     stems.add(match[2]);
     if (typeof f.content !== 'string' || f.content.includes('\0')) throw new Error('Expected UTF-8 text');
-    const cap = match[1] === 'found' ? 200_000 : 20_000;
+    const cap = match[1] === 'found' ? CSV_BYTES : NOTES_BYTES;
     if (Buffer.byteLength(f.content) > cap) throw new Error('Submission file exceeds size limit');
     if (match[1] === 'found') csv = f; else note = f;
   }
@@ -31,7 +33,7 @@ export function validateSubmission(files, catalog, source, { labelled = false } 
   if (!csv) return { notes_only: true, rows: 0 };
   const rows = parseCsv(csv.content);
   if (!rows.length || rows.length > 500) throw new Error('CSV must contain 1–500 findings');
-  if (new Set(rows.map(r => r.qid)).size > 10) throw new Error('One task may cover at most 10 works');
+  if (new Set(rows.map(r => r.qid)).size > MAX_WORKS) throw new Error(`One task may cover at most ${MAX_WORKS} works`);
   if (Object.keys(rows[0]).join(',') !== FOUND_FIELDS.join(',')) throw new Error('CSV header must match the task contract exactly');
   const works = new Map(catalog.works.map(w => [w.qid, w])), seen = new Set();
   for (const r of rows) {
@@ -80,9 +82,9 @@ export async function inspectPullRequest({ repository, number, headSha, baseSha,
   for (const f of files) {
     const entry = tree.tree.find(e => e.path === f.filename);
     if (!entry || entry.type !== 'blob' || entry.mode !== '100644' || entry.sha !== f.sha) throw new Error('Expected a regular file from the exact PR commit');
-    if (entry.size > (f.filename.endsWith('.csv') ? 200_000 : 20_000)) throw new Error('Submission file exceeds size limit');
+    if (entry.size > fileLimit(f.filename)) throw new Error('Submission file exceeds size limit');
     const blob = await api(`/repos/${repository}/git/blobs/${entry.sha}`, token);
-    if (blob.encoding !== 'base64' || blob.size > (f.filename.endsWith('.csv') ? 200_000 : 20_000)) throw new Error('Unexpected submission blob');
+    if (blob.encoding !== 'base64' || blob.size > fileLimit(f.filename)) throw new Error('Unexpected submission blob');
     f.mode = entry.mode; f.content = new TextDecoder('utf-8', { fatal: true }).decode(Buffer.from(blob.content, 'base64'));
   }
   const current = await api(`/repos/${repository}/pulls/${number}`, token);
