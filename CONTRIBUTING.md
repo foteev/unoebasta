@@ -11,7 +11,7 @@ Thank you for helping. Most help needs no code: a link to a free text, a broken 
 
 ## Reader and agent findings
 
-Use **Copy task for my agent** on About for five works, or the button on a work card for one. The copied task embeds the [canonical task contract](docs/search-brief.md) plus public catalog context. It is model-independent and contains no shelf files, notes or credentials. A findings PR adds one new CSV in `data/found/` and an optional same-stem Markdown note in `data/notes/`; code and generated-data changes are rejected. Notes-only submissions are accepted when no confirmed link was found.
+Use **Copy task for my agent** on About for 30 works, or the button on a work card for one. The copied task embeds the [canonical task contract](docs/search-brief.md) plus public catalog context. It is model-independent and contains no shelf files, notes or credentials. A findings PR adds one new CSV in `data/found/` and an optional same-stem Markdown note in `data/notes/`; code and generated-data changes are rejected. Notes-only submissions are accepted when no confirmed link was found.
 
 The Findings submission workflow checks data from the exact PR commit using trusted base code, without checking out or executing contributor code. It validates file scope, schema, QIDs/forms and duplicates, not source truth. Maintainers review and merge findings, then use the existing import commands below in a separate change. A CSV-only merge does not itself publish new links.
 
