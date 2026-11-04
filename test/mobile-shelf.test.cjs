@@ -42,9 +42,17 @@ const assert = require('node:assert/strict');
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => document.querySelector('#picks-languages'));
     assert.deepEqual(await page.evaluate(() => prefs.langs), ['es'], 'Saved choice survives a real reload');
-    assert.equal(await page.locator('#view-catalog .pick').count(), 0, 'No English fallback after choosing Spanish');
-    assert.ok(await page.locator('#view-catalog .home-excerpts a').count(), 'Spanish excerpt is offered');
+    assert.ok(await page.evaluate(() => [...document.querySelectorAll('#view-catalog .pick a[data-track]')].every(a =>
+      READ[a.dataset.track].links.some(l => l.kind === 'full' && (l.lang || 'en') === 'es' && l.url === a.href))), 'Every suggested full text is in Spanish');
     await page.screenshot({ path: join(out, 'read-390-spanish.png'), fullPage: true, animations: 'disabled' });
+    await page.evaluate(() => {
+      window.__readBeforeFallback = JSON.parse(JSON.stringify(READ));
+      for (const r of Object.values(READ)) r.links = r.links.filter(l => l.kind !== 'full' || l.lang !== 'es');
+      renderHome();
+    });
+    assert.equal(await page.locator('#view-catalog .pick').count(), 0, 'No English fallback when Spanish full texts are unavailable');
+    assert.ok(await page.locator('#view-catalog .home-excerpts a').count(), 'Spanish excerpt is offered');
+    await page.evaluate(() => { Object.assign(READ, window.__readBeforeFallback); delete window.__readBeforeFallback; renderHome(); });
     await page.evaluate(async () => {
       await Store.put('files', { id: 'qa-file', title: 'Тестовая книга с длинным названием для проверки мобильной полки', byline: 'Тестовый автор', format: 'txt', words: 100, size: 42, html: '<p>QA file body.</p>', at: Date.now() });
       await Store.put('bookmarks', { id: 'w:Q25349436', type: 'work', workId: 'Q25349436', at: Date.now() });
