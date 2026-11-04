@@ -27,6 +27,7 @@ const assert = require('node:assert/strict');
     const url = `http://127.0.0.1:${server.address().port}/`;
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.locator('#tab-awards').click();
+    await page.locator('#av-language').selectOption('all');
     await page.locator('[data-av-award="all"]').click();
     await page.locator('[data-av-mode="table"]').click();
     await page.waitForSelector('table.board .award-meta');
