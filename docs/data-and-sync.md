@@ -43,7 +43,7 @@ Each saved-item list groups bulk deletion in a red bordered area with its item c
 
 Reading-language chips are a draft until **Save languages**. Save persists `prefs.langs`, schedules normal settings sync and updates Read immediately; no page reload is required. Explicit saved reading languages strictly filter new full-text picks, even when fewer than three match. If no full text matches the selected duration, Read shows that limitation and available excerpts in those languages. Reset returns to the page/phone language defaults. The interface language and reading-language choices remain separate.
 
-**What travels:** `positions`, `bookmarks` (without cached `about` descriptions), `links`, deletion marks from the last 400 days, and the settings `listen`, `ttsRate`, `askNote`, `pickLen`, `focus` (with their own time `prefsMt`). Language, theme and font size stay per device. Book titles and authors do not travel: the catalog rebuilds them.
+**What travels:** `positions`, `bookmarks` (without cached `about` descriptions), `links`, deletion marks from the last 400 days, and the settings `listen`, `ttsRate`, `askNote`, `pickLengths`, `langs`, `focus` (with their own time `prefsMt`). Interface language, theme and font size stay per device. `pickLen` remains readable for cached older pages; current pages use the additive `pickLengths` array (empty means all durations). Book titles and authors do not travel: the catalog rebuilds them.
 
 **Own files** never travel. A place in one travels by a fingerprint of the text (`ff:<hash>`) and lands when the same file is on the other device.
 
@@ -61,3 +61,5 @@ Reading-language chips are a draft until **Save languages**. Save persists `pref
 - **Library.** nostr-tools 2.25.2 from jsDelivr, loaded only when sync is on.
 - **Safety.** Relays see ciphertext, the author key (random), the label and times. The main copy stays in the browser: a relay that forgets the event only delays the next sync. Losing every device and the key link loses the copy on the relays too.
 - **Checked** in tests with an in-memory relay, and against the real relays from a browser: all six accept and return a ~40 KB kind-30078 event and keep only the newest.
+
+Catalog and Awards filters use `prefs.filters` version 1, with arrays for each group. Every group starts at All (an empty array); choices within a group are OR, groups are AND. These browsing filters stay per device and do not change the saved reading languages. Legacy scalar filter restrictions reset to All on upgrade; saved view modes, author sorting and personal shelf data are preserved.
