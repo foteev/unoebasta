@@ -867,11 +867,14 @@ function selectFilter(group, values = []) {
   w.eval('closeAgentTask()');w.navigator.clipboard.writeText=clipboardWrite;
   // Independent source-language filters and explicitly labelled English fallback.
   w.eval("LANG='ru'; applyLang(); prefs.langs=['pl']; prefs.pickLengths = ['eve']; renderHome();");
+  checks['home actions: a single Polish recording retains its chooser and visibly disables only reshuffling'] = !!$('#view-catalog [data-pick-actions=full] a[data-via=listen]') && $('#view-catalog [data-pick-actions=full] [data-pickmore]').disabled && /Выбери за меня/.test($('#view-catalog [data-pick-actions=full]').textContent);
+  checks['home actions: English fallback offers both controls above its cards with a matching English text target'] = !!$('#view-catalog [data-pick-actions=other] a[data-via=read]') && !$('#view-catalog [data-pick-actions=other] [data-pickmore]').disabled && $('#view-catalog [data-picks=other] .picklist').previousElementSibling.dataset.pickActions==='other' && w.eval(`READ['${$('#view-catalog [data-pick-actions=other] a').dataset.track}'].links.some(l=>l.kind==='full'&&(l.lang||'en')==='en'&&l.url===${JSON.stringify($('#view-catalog [data-pick-actions=other] a').href)})`);
   checks['fallback: sparse Polish picks retain Polish audio and add a separate English-text section'] = !!$('#view-catalog [data-picks=reading] a[data-via=listen]') && $$('#view-catalog [data-picks=other] .pick').length === 3 && $$('#view-catalog [data-picks=other] .pick').every(el => el.dataset.readingLang === 'en' && el.querySelector('a[data-via=read]')) && /Больше произведений/.test($('#view-catalog [data-picks=other]').textContent) && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'");
   const otherFirst = $$('#view-catalog [data-picks=other] [data-done]').map(el=>el.dataset.done);
   click($('#view-catalog [data-pickmore=other]')); await sleep(20);
   checks['fallback: English suggestions rotate and keep English targets without changing the reading setting'] = $$('#view-catalog [data-picks=other] [data-done]').every(el=>!otherFirst.includes(el.dataset.done)) && w.eval("JSON.stringify(prefs.langs)==='[\"pl\"]'") && $$('#view-catalog [data-picks=other] a[data-via=read]').every(a=>w.eval(`READ['${a.dataset.track}'].links.some(l=>l.kind==='full'&&(l.lang||'en')==='en'&&l.url===${JSON.stringify(a.href)})`));
   w.eval("window.__plRecording=READ.Q6271990.links; READ.Q6271990.links=READ.Q6271990.links.filter(l=>l.lang!=='pl');renderHome()");
+  checks['home actions: empty reader-language picks still offer an active chooser in the labelled fallback'] = !$('#view-catalog [data-pick-actions=full]') && !!$('#view-catalog [data-picks=other] [data-pick-actions=other] a') && !$('#view-catalog [data-picks=other] [data-pickmore]').disabled;
   checks['fallback: an empty selected-language bucket explicitly explains the other-language books'] = !$('#view-catalog [data-picks=reading] .pick') && /Произведений такой длительности/.test($('#view-catalog [data-picks=other]').textContent) && $$('#view-catalog [data-picks=other] .pick').every(el=>el.dataset.readingLang==='en');
   w.eval("READ.Q6271990.links=window.__plRecording;delete window.__plRecording;");
   w.eval("Object.assign(filter,{langs:['pl'],q:'',formats:[],awards:[],statuses:[],lengths:[]}); renderLibrary();");
@@ -901,6 +904,20 @@ function selectFilter(group, values = []) {
   checks['language filters: search retains the Awards language selection'] = !$('#av-body [data-work="Q25349436"]') && filterInput('av-languages','pl').checked;
   selectFilter('av-languages', []); await sleep(20);
   checks['language filters: All restores search results and is saved for Awards'] = !!$('#av-body [data-work="Q25349436"]') && JSON.parse(w.localStorage.getItem('fantastic-prefs')).filters.awards.langs.length === 0;
+  // Regression: actions must remain available with exactly three, two or one matching work.
+  w.eval(`window.__smallPicks = {read:JSON.parse(JSON.stringify(READ)),prefs:{...prefs},bookmarks:local.bookmarks,positions:local.positions};
+    for(const q of Object.keys(READ))if(!['Q2634534','Q467388','Q6271990'].includes(q))delete READ[q];
+    local.bookmarks=[];local.positions=[];prefs.langs=['pl'];prefs.pickLengths=[];renderHome();`);
+  const readingIds=()=>$$('#view-catalog [data-picks=reading] [data-done]').map(el=>el.dataset.done);
+  checks['home actions: exactly three Polish matches keep both controls above the cards'] = readingIds().length===3 && !!$('#view-catalog [data-pick-actions=full] a') && !$('#view-catalog [data-pick-actions=full] button').disabled && $('#view-catalog [data-picks=reading]').previousElementSibling.dataset.pickActions==='full' && /Ещё рандомные три/.test($('#view-catalog [data-pick-actions=full]').textContent);
+  let smallShuffle=true;
+  for(let i=0;i<8;i++){const before=readingIds();click($('#view-catalog [data-pick-actions=full] button'));const after=readingIds();smallShuffle=smallShuffle&&before.join()!==after.join()&&before.every(q=>after.includes(q));}
+  checks['home actions: reshuffling three matches changes their order without losing works'] = smallShuffle;
+  w.eval("delete READ.Q6271990;renderHome()");const beforeTwo=readingIds();click($('#view-catalog [data-pick-actions=full] button'));
+  checks['home actions: two matches reshuffle and the chooser stays within the available texts'] = beforeTwo.length===2 && readingIds().join()!==beforeTwo.join() && beforeTwo.includes($('#view-catalog [data-pick-actions=full] a').dataset.track);
+  w.eval("delete READ.Q467388;renderHome()");
+  checks['home actions: one text remains selectable and only shuffle is disabled'] = readingIds().length===1 && $('#view-catalog [data-pick-actions=full] a').dataset.track==='Q2634534' && $('#view-catalog [data-pick-actions=full] button').disabled;
+  w.eval(`for(const q of Object.keys(READ))delete READ[q];Object.assign(READ,window.__smallPicks.read);Object.assign(prefs,window.__smallPicks.prefs);local.bookmarks=window.__smallPicks.bookmarks;local.positions=window.__smallPicks.positions;delete window.__smallPicks;renderHome();`);
   // Standard behavior across every filter, including real interactions and scoped queries.
   w.eval("Object.assign(filter,{langs:[],awards:[],formats:[],lengths:[],statuses:[],q:''});renderLibrary();Object.assign(AV,{langs:[],awards:[],cats:[],formats:[],q:'',year:null,mode:'cats'});renderAwards();prefs.pickLengths=[];renderHome();");
   checks['filters: all ten groups begin with checked All'] = $$('.multi-filter').length===10 && $$('.multi-filter').every(el=>el.querySelector('input').value==='all' && el.querySelector('input').checked);

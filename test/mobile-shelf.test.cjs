@@ -62,14 +62,41 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     await page.locator('#langs-save').click();
     await page.waitForFunction(() => JSON.stringify(prefs.langs) === '["pl"]');
     await page.locator('#tab-catalog').click();
+    await selectFilter(page, 'home-lengths', []);
+    const primaryActions=page.locator('[data-pick-actions="full"]');
+    assert.equal(await page.locator('[data-picks="reading"] .pick').count(),3);
+    assert.equal(await primaryActions.locator('a').count(),1);
+    assert.equal(await primaryActions.locator('button').isEnabled(),true);
+    const pickIds=()=>page.locator('[data-picks="reading"] [data-done]').evaluateAll(els=>els.map(el=>el.dataset.done));
+    const beforeThree=await pickIds();await primaryActions.locator('button').click();
+    assert.notDeepEqual(await pickIds(),beforeThree);
+    assert.deepEqual((await pickIds()).sort(),beforeThree.sort());
+    assert.ok(await page.evaluate(()=>document.querySelector('[data-pick-actions="full"]').getBoundingClientRect().top<document.querySelector('[data-picks="reading"]').getBoundingClientRect().top));
+    for(const width of [360,390]) for(const theme of ['light','dark']) {
+      await page.setViewportSize({width,height:width===360?740:844});
+      await page.locator('#lang-sel').selectOption('ru');
+      await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();window.scrollTo(0,0);},theme);
+      assert.ok(await primaryActions.locator('.btn').evaluateAll(els=>els.every(el=>el.getBoundingClientRect().height>=44)));
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+      await primaryActions.locator('button').focus();await page.keyboard.press('Enter');
+      await page.evaluate(()=>window.scrollTo(0,0));
+      await page.screenshot({path:join(out,`home-actions-${width}-${theme}.png`),animations:'disabled'});
+    }
     await selectFilter(page, 'home-lengths', ['eve']);
     await page.waitForSelector('#view-catalog [data-picks=reading] .pick a[data-via="listen"]');
     assert.equal(await page.locator('#view-catalog [data-picks=reading] .pick a[data-via="read"]').count(),0);
     assert.equal(await page.locator('#view-catalog [data-picks=reading] .pick [data-eleven]').count(),0);
     assert.equal(await page.locator('#view-catalog [data-picks=other] .pick[data-reading-lang="en"]').count(),3);
-    assert.equal(await page.locator('#view-catalog [data-picks=other] a[data-via="read"]').count(),3);
+    assert.equal(await page.locator('#view-catalog [data-picks=other] .pick a[data-via="read"]').count(),3);
     assert.match(await page.locator('#view-catalog [data-picks=reading] .pick a[data-via="listen"]').getAttribute('href'),/podcasts\.apple\.com/);
     assert.equal(await page.evaluate(() => readingMinutes('Q6271990')),106);
+    assert.equal(await primaryActions.locator('button').isDisabled(),true);
+    assert.match(await primaryActions.locator('a').getAttribute('href'),/podcasts\.apple\.com/);
+    const fallbackActions=page.locator('[data-pick-actions="other"]');
+    assert.equal(await fallbackActions.locator('button').isEnabled(),true);
+    const fallbackChoice=await fallbackActions.locator('a').getAttribute('href');
+    assert.ok(await fallbackActions.locator('a').evaluate((el,href)=>READ[el.dataset.track].links.some(l=>l.kind==='full'&&(l.lang||'en')==='en'&&l.url===href),fallbackChoice));
+
     for(const width of [360,390]) for(const theme of ['light','dark']) {
       await page.setViewportSize({width,height:width===360?740:844});
       const lang = width === 360 ? 'pl' : 'es';
@@ -149,7 +176,7 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     await page.locator('#toast [data-shelfundo]').click(); await page.waitForFunction(() => local.files.length === 1);
     assert.equal(await page.evaluate(() => local.files[0].html), '<p>QA file body.</p>', 'Undo preserves file contents');
     assert.deepEqual(errors, [], 'No browser runtime errors');
-    const report = { language_save_and_reload: true, no_english_fallback: true, polish_audio_and_duration: true, interface_language_independent: true, rotating_excerpts: true, available_duration_action: true, collapse_keyboard: true, deletion_and_undo: true, layouts, errors };
+    const report = { language_save_and_reload: true, no_english_fallback: true, polish_audio_and_duration: true, interface_language_independent: true, rotating_excerpts: true, home_random_actions: true, small_pool_shuffle: true, available_duration_action: true, collapse_keyboard: true, deletion_and_undo: true, layouts, errors };
     writeFileSync(join(out, 'report.json'), JSON.stringify(report, null, 2)); console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); await new Promise(r => server.close(r)); }
 })().catch(e => { console.error(e); process.exit(1); });
