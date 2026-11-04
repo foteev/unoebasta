@@ -9,7 +9,7 @@ For each work, searches were made separately in EN, PL, RU and ES for text or ex
 20 links for 16 works: 5 full-text source links, 11 text fragments, and 4 audio episode pages. Language: EN 16, ES 2, PL 1, RU 1. Existing links were excluded as duplicates; alternate sources are identified as such. A result is a link, not a newly discovered work. No narratives or media files are copied into the repository.
 
 - Publisher provenance supports `t2` for the full texts and credited podcasts; it does not assert an open license. Fragment tier describes access scope, not copyright. Word counts are publisher-reported or approximate estimates as specified in evidence.
-- Audio links show credited narrators and recording metadata or an MP3 link. **No playback sampling, independent voice assessment, or end-to-end listen was performed**; episode runtime can include introductions. The Apple podcast page was readable, while its publisher-page link was restricted in the search tool. Verify playback before importing.
+- On 2026-11-04 the reader confirmed that all four submitted audio links are accessible and correct. The agent inspected narrator credits and episode metadata but did not independently listen; the reader's feedback does not establish an end-to-end listen, exact completeness, or redistribution rights. Runtime can include introductions. The Apple episode page was readable, while its linked publisher page was restricted in the search tool.
 - FantLab/АСТ and Nowa Fantastyka PDFs contain actual story prose but only excerpts; anthology/title metadata alone was not counted. Penguin's Spanish excerpt stops at a subscription prompt. Macmillan was reviewed through the indexed page because this browser previously encountered Cloudflare; this is a browser-specific limitation.
 - Findings-only PR: trusted-base local validation and importer dry run are used; generated catalog, site, workflows, and registry are not edited. Merging findings alone is not equivalent to publishing the links.
 
@@ -295,7 +295,7 @@ Author(s): Amal El-Mohtar. Form: short story.
 - **RU** — No new reviewed row.
 - **ES** — No new reviewed row.
 
-Macmillan's collection page advertises a Listen to Excerpt control alongside the text excerpt. The sample may be another piece from the collection; no audio row is claimed. The browser's Cloudflare challenge affects this browser and is not proof the page is unavailable to readers.
+Macmillan's collection page advertises a Listen to Excerpt control alongside the text excerpt. On 2026-11-04 the reader reported this audio excerpt as the exception to the successful audio checks; the specific problem was not stated, so no audio row is claimed and it remains an unresolved lead. This feedback concerned audio, not the separately visible text excerpt. The browser's Cloudflare challenge affects this browser and is not proof the page is unavailable to readers.
 
 ### 31. Q36450235 — The Tomato Thief
 
