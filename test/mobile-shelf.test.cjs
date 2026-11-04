@@ -47,12 +47,60 @@ const assert = require('node:assert/strict');
     await page.screenshot({ path: join(out, 'read-390-spanish.png'), fullPage: true, animations: 'disabled' });
     await page.evaluate(() => {
       window.__readBeforeFallback = JSON.parse(JSON.stringify(READ));
-      for (const r of Object.values(READ)) r.links = r.links.filter(l => l.kind !== 'full' || l.lang !== 'es');
+      for (const r of Object.values(READ)) r.links = r.links.filter(l => l.lang !== 'es');
       renderHome();
     });
     assert.equal(await page.locator('#view-catalog .pick').count(), 0, 'No English fallback when Spanish full texts are unavailable');
     assert.ok(await page.locator('#view-catalog .home-excerpts a').count(), 'Spanish excerpt is offered');
     await page.evaluate(() => { Object.assign(READ, window.__readBeforeFallback); delete window.__readBeforeFallback; renderHome(); });
+    // Reported phone case: Polish alone, then a Spanish interface, with the long-duration bucket selected.
+    await page.locator('#tab-shelf').click();
+    await page.locator('#shelf-langs summary').click();
+    await page.locator('[data-mylang="pl"]').click();
+    await page.locator('[data-mylang="es"]').click();
+    await page.locator('#langs-save').click();
+    await page.waitForFunction(() => JSON.stringify(prefs.langs) === '["pl"]');
+    await page.locator('#tab-catalog').click();
+    await page.locator('[data-picklen="eve"]').click();
+    await page.waitForSelector('#view-catalog .pick a[data-via="listen"]');
+    assert.equal(await page.locator('#view-catalog .pick a[data-via="read"]').count(),0);
+    assert.equal(await page.locator('#view-catalog .pick [data-eleven]').count(),0);
+    assert.match(await page.locator('#view-catalog .pick a[data-via="listen"]').getAttribute('href'),/podcasts\.apple\.com/);
+    assert.equal(await page.evaluate(() => readingMinutes('Q6271990')),106);
+    for(const width of [360,390]) for(const theme of ['light','dark']) {
+      await page.setViewportSize({width,height:width===360?740:844});
+      const lang = width === 360 ? 'pl' : 'es';
+      await page.locator('#lang-sel').selectOption(lang);
+      await page.waitForFunction(lang => document.documentElement.lang === lang && document.querySelector('#view-catalog .pick-t')?.textContent === 'Piaseczniki', lang);
+      await page.evaluate(theme => { prefs.theme=theme; savePrefs(); applyTheme(); },theme);
+      assert.deepEqual(await page.evaluate(() => myLangs()),['pl']);
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+      await page.screenshot({path:join(out,`reading-pl-${lang}-${width}-${theme}.png`),fullPage:true,animations:'disabled'});
+    }
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForSelector('#view-catalog .pick a[data-via="listen"]');
+    assert.deepEqual(await page.evaluate(() => prefs.langs),['pl']);
+    assert.equal(await page.evaluate(() => prefs.pickLen),'eve');
+    await page.evaluate(() => {
+      window.__polishRead = JSON.parse(JSON.stringify(READ));
+      READ.Q6271990.links = READ.Q6271990.links.filter(l => l.lang !== 'pl');
+      renderHome();
+    });
+    assert.equal(await page.locator('#view-catalog .pick').count(),0);
+    assert.equal(await page.locator('[data-pickavailable="15"]').count(),1);
+    assert.equal(await page.locator('[data-pickavailable="40"]').count(),1);
+    const firstExcerpts = await page.locator('[data-excerpt]').evaluateAll(els => els.map(el => el.dataset.excerpt));
+    await page.locator('[data-pickmore="excerpt"]').click();
+    const nextExcerpts = await page.locator('[data-excerpt]').evaluateAll(els => els.map(el => el.dataset.excerpt));
+    assert.equal(nextExcerpts.length,3); assert.ok(nextExcerpts.every(q => !firstExcerpts.includes(q)));
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await page.screenshot({path:join(out,'reading-pl-fallback-390-dark.png'),fullPage:true,animations:'disabled'});
+    await page.locator('[data-pickavailable="40"]').click();
+    await page.waitForSelector('#view-catalog .pick a[data-via="read"]');
+    assert.match(await page.locator('#view-catalog .pick a[data-via="read"]').getAttribute('href'),/legimi\.pl/);
+    assert.match(await page.locator('#view-catalog .pick-t').textContent(),/^Kupiec/);
+    assert.equal(await page.locator('#view-catalog .pick a[data-via="listen"]').count(),0);
+    await page.evaluate(() => { Object.assign(READ,window.__polishRead); delete window.__polishRead; prefs.langs=['es']; prefs.pickLen='15'; savePrefs(); renderHome(); });
     await page.evaluate(async () => {
       await Store.put('files', { id: 'qa-file', title: 'Тестовая книга с длинным названием для проверки мобильной полки', byline: 'Тестовый автор', format: 'txt', words: 100, size: 42, html: '<p>QA file body.</p>', at: Date.now() });
       await Store.put('bookmarks', { id: 'w:Q25349436', type: 'work', workId: 'Q25349436', at: Date.now() });
@@ -97,7 +145,7 @@ const assert = require('node:assert/strict');
     await page.locator('#toast [data-shelfundo]').click(); await page.waitForFunction(() => local.files.length === 1);
     assert.equal(await page.evaluate(() => local.files[0].html), '<p>QA file body.</p>', 'Undo preserves file contents');
     assert.deepEqual(errors, [], 'No browser runtime errors');
-    const report = { language_save_and_reload: true, no_english_fallback: true, collapse_keyboard: true, deletion_and_undo: true, layouts, errors };
+    const report = { language_save_and_reload: true, no_english_fallback: true, polish_audio_and_duration: true, interface_language_independent: true, rotating_excerpts: true, available_duration_action: true, collapse_keyboard: true, deletion_and_undo: true, layouts, errors };
     writeFileSync(join(out, 'report.json'), JSON.stringify(report, null, 2)); console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); await new Promise(r => server.close(r)); }
 })().catch(e => { console.error(e); process.exit(1); });

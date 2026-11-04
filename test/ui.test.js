@@ -315,9 +315,9 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   w.eval("prefs.pickLen = '15'; renderHome()"); await sleep(20);
   const picks = $$('#view-catalog .pick');
   checks['home: three picks for a few minutes'] = picks.length === 3 && picks.every(pk => w.eval(`minutesOf('${pk.querySelector('.pick-done').dataset.done}')`) <= 25) && (($('#pk-h').textContent === 'Есть несколько минут?' && $('#pk-h').classList.contains('sr')) || $('#pk-h').textContent === 'Или что-то новое') && $('#view-catalog [data-picklen="15"]').textContent === 'Несколько минут';
-  checks['home: a card is only cover, title and author, then Read'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').children.length === 2 && pk.querySelector('.pick-open').firstElementChild.classList.contains('cover') && [...pk.querySelector('.pick-txt').children].map(el => el.className).join(',') === 'pick-t,pick-a' && pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать'));
-  checks['home: read and listen side by side'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === 2) && !!$('#view-catalog .pick-more');
-  checks['home: listen is a headphones button that still names the source'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l && l.querySelector('svg') && /^Слушать · \S.*$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore'); });
+  checks['home: cards show cover, title and author, and label audio-only options'] = picks.every(pk => !pk.querySelector('.pick-meta') && pk.querySelector('.pick-open').children.length === 2 && pk.querySelector('.pick-open').firstElementChild.classList.contains('cover') && pk.querySelector('.pick-t') && pk.querySelector('.pick-a') && (pk.querySelector('a[data-via="read"]') ? pk.querySelector('.pick-actions .btn-primary').textContent.trim().startsWith('Читать') : /аудио/.test(pk.querySelector('.pick-txt .small').textContent)));
+  checks['home: read and listen actions match the available formats'] = picks.every(pk => pk.querySelector('.pick-actions a[target="_blank"]') && pk.querySelectorAll('.pick-actions > *').length === (pk.querySelector('a[data-via="read"]') ? 2 : 1)) && !!$('#view-catalog .pick-more');
+  checks['home: listening names its source, with an icon beside text or a labelled audio action'] = picks.every(pk => { const l = pk.querySelector('.pick-actions .btn-icon'); return l ? l.querySelector('svg') && /^Слушать · \S.*$/.test(l.querySelector('.sr').textContent) && !pk.querySelector('.lmore') : /^Слушать/.test(pk.querySelector('.pick-actions').textContent) && !!pk.querySelector('a[data-via="listen"]'); });
   click($('#view-catalog [data-picklen="eve"]')); await sleep(20);
   checks['home: more-than-an-hour picks are long'] = $$('#view-catalog .pick').length > 0 && w.eval("pickList('eve').every(q => minutesOf(q) > 60)") && $('#view-catalog [data-picklen="eve"]').textContent === 'Больше часа';
   const before = $$('#view-catalog .pick .pick-t').map(x => x.textContent).join('|');
@@ -711,6 +711,36 @@ const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }
   click($('#f-mine')); await sleep(30);
   w.eval("for (const q of Object.keys(READ)) delete READ[q]; Object.assign(READ, window.__languageReadSnapshot); delete window.__languageReadSnapshot;"); click($('#tab-shelf')); await sleep(60); click($('#langs-reset')); await sleep(60);
   checks['languages: back to the phone’s languages'] = w.eval('prefs.langs') === undefined && JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
+  // Regression: one Polish reading language, including an audio-only work and empty duration buckets.
+  w.eval(`window.__readingRegression = { prefs: {...prefs}, read: JSON.parse(JSON.stringify(READ)), bookmarks: local.bookmarks };
+    local.bookmarks = local.bookmarks.filter(b => b.type !== 'done'); prefs.langs = ['pl']; prefs.listen = 'eleven'; prefs.pickLen = 'eve'; renderHome();`);
+  checks['languages: Polish audio-only Sandkings appears at its recorded duration, without an English text or TTS fallback'] = w.eval("pickList('eve').includes('Q6271990') && readingMinutes('Q6271990') === 106 && !pickList('40').includes('Q6271990')") && !!$('#view-catalog .pick a[data-via="listen"][href^="https://podcasts.apple.com/"]') && !$('#view-catalog .pick a[data-via="read"]') && !$('#view-catalog .pick [data-eleven]');
+  w.eval("READ.Q6271990.links.push({kind:'full',url:'https://example.test/sandkings-en',site:'English fixture'}); renderHome()");
+  checks['languages: a saved TTS preference cannot open a foreign text beside matching Polish audio'] = !$('#view-catalog .pick a[data-via="read"]') && !$('#view-catalog .pick [data-eleven]') && !!$('#view-catalog .pick a[data-via="listen"]');
+  w.eval("READ.Q6271990.links = READ.Q6271990.links.filter(l => l.url !== 'https://example.test/sandkings-en'); READ.Q6271990.links = READ.Q6271990.links.filter(l => l.lang !== 'pl'); renderHome()");
+  checks['languages: an empty Polish duration offers matching durations without silently switching languages or time'] = !$('#view-catalog .pick') && !!$('#view-catalog [data-pickavailable="15"]') && !!$('#view-catalog [data-pickavailable="40"]') && w.eval("prefs.pickLen === 'eve' && JSON.stringify(myLangs()) === '[\"pl\"]'");
+  const excerptIds = () => $$('#view-catalog [data-excerpt]').map(el => el.dataset.excerpt);
+  const initialFragments = excerptIds();
+  click($('#view-catalog [data-pickmore="excerpt"]')); await sleep(20);
+  checks['languages: fallback fragments rotate without immediately repeating the first three'] = initialFragments.length === 3 && excerptIds().length === 3 && excerptIds().every(q => !initialFragments.includes(q));
+  const markedFragment = excerptIds()[0];
+  w.__fragment = markedFragment; w.eval("local.bookmarks.push({id:'d:'+window.__fragment,type:'done',workId:window.__fragment}); renderHome()");
+  checks['languages: completed works leave the excerpt fallback too'] = !excerptIds().includes(markedFragment);
+  const plScope = w.eval("pickScope('eve','excerpt')");
+  w.eval("prefs.langs = ['es']; renderHome()");
+  checks['languages: shuffle history has independent scopes for each reading-language selection'] = plScope !== w.eval("pickScope('eve','excerpt')") && w.eval("Object.keys(pickSeen).includes(" + JSON.stringify(plScope) + ")");
+  w.eval("prefs.langs = ['pl']; renderHome()");
+  click($('#view-catalog [data-pickavailable="40"]')); await sleep(20);
+  checks['languages: another-duration action opens the Polish full text without adding English options'] = w.eval("prefs.pickLen === '40'") && !!$('#view-catalog .pick a[data-via="read"][href^="https://www.legimi.pl/"]') && !$('#view-catalog .pick a[data-via="listen"][href^="https://akniga.org/"]');
+  checks['languages: all home actions including Choose for me stay within the selected reading language'] = w.eval(`(() => {
+    prefs.langs=['ru'];prefs.pickLen='eve';
+    for(let i=0;i<5;i++) { renderHome();
+      if(![...document.querySelectorAll('#view-catalog .picks a[data-track]')].every(a=>READ[a.dataset.track].links.some(l=>l.url===a.href && (l.lang||'en')==='ru' && l.kind===(a.dataset.via==='listen'?'audio':'full')))) return false;
+      pickNext('eve');
+    } return true;
+  })()`);
+  w.eval(`Object.assign(prefs, window.__readingRegression.prefs); for(const k of ['langs','listen']) if(!(k in window.__readingRegression.prefs)) delete prefs[k];
+    for(const q of Object.keys(READ)) delete READ[q]; Object.assign(READ, window.__readingRegression.read); local.bookmarks = window.__readingRegression.bookmarks; delete window.__readingRegression; delete window.__fragment; renderHome();`);
   // Reading now: clear the whole list at once, with Undo
   await w.eval(`(async () => { const now = Date.now();
     await Store.put('positions', { id: 'ext:Q25349436', ext: true, workId: 'Q25349436', title: 'A', source: 'X', sourceUrl: 'https://x.test/a', at: now - 1000 });
