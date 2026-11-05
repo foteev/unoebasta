@@ -13,7 +13,9 @@ data.covers = existsSync(join(cdir, 'm')) ? readdirSync(join(cdir, 'm')).filter(
 const dataText = JSON.stringify(data).replace(/</g, '\\u003c');
 const src = readFileSync(join(root, 'src', 'index.html'), 'utf8');
 if (!src.includes('__AWARDS_JSON__')) throw new Error('placeholder __AWARDS_JSON__ missing in src/index.html');
-const page = src.replace('__AWARDS_JSON__', () => dataText);
+const brief = JSON.stringify(readFileSync(join(root, 'docs', 'search-brief.md'), 'utf8')).replace(/</g, '\\u003c');
+if (!src.includes('__SEARCH_BRIEF_JSON__')) throw new Error('placeholder __SEARCH_BRIEF_JSON__ missing');
+const page = src.replace('__AWARDS_JSON__', () => dataText).replace('__SEARCH_BRIEF_JSON__', () => brief);
 mkdirSync(join(root, 'dist', 'web'), { recursive: true });
 writeFileSync(join(root, 'dist', 'web', 'index.html'), page);
 if (data.covers.length) cpSync(cdir, join(root, 'dist', 'web', 'covers'), { recursive: true });

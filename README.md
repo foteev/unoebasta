@@ -1,6 +1,6 @@
 # unoebasta
 
-_You’re the grown-up now. Say yes._
+_20 minute adventure_
 
 **unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a single web page for reading the winners of the Hugo, Nebula and Locus awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
 
@@ -24,7 +24,7 @@ Everyone is welcome, no programming needed for most of it:
 
 ## Develop
 
-You need Node.js 20 or newer.
+Use Node.js 22.22.2 or later in the 22.x line, 24.15.0 or later in the 24.x line, or Node.js 26 or newer. CI uses Node.js 22.
 
 ```sh
 npm ci              # tools for tests and candidate discovery: the page itself has no build dependencies
@@ -65,3 +65,5 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 unoebasta is a non-commercial project and is not affiliated with the Hugo, Nebula or Locus awards.
 
 **Multilingual audio research.** `search audio` requests a supervised GPT Luna discovery batch; `npm run audio:plan` prepares a four-language queue. See [the audio workflow](docs/audio-search.md). The CLI prepares tasks; it does not launch or bill an AI agent.
+
+**Bring your own agent.** Copy a search task from About or a work card, then give it to any capable agent. The [task contract](docs/search-brief.md) limits it to a few works and a findings-only PR. Readers can also send a link and description through the existing Nostr form.

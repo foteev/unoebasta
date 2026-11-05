@@ -1,13 +1,15 @@
-import { cleanUrl, validateFound } from './csv.mjs';
+import { cleanUrl, sourceUrlKey, validateFound } from './csv.mjs';
 import { readTable } from './catalog.mjs';
+import { assertSourceScope } from './source-reviews.mjs';
 
 const RANK = ['Clarkesworld', 'Lightspeed', 'Uncanny', 'Apex', 'Asimov', 'Analog', 'Strange Horizons', 'Reactor', 'GigaNotoSaurus', 'Escape Pod', 'WIRED', 'Baen'];
 const rank = s => { const i = RANK.findIndex(r => s.includes(r)); return i < 0 ? RANK.length : i; };
 const siteName = s => s.replace(/\s*\(Wayback\)\s*$/i, '');
-const key = r => JSON.stringify([r.kind, r.lang || 'en', +r.part || '', cleanUrl(r.url)]);
+const key = r => JSON.stringify([r.kind, r.lang || 'en', +r.part || '', sourceUrlKey(r.url)]);
 const groups = (rows, getKey) => { const m = new Map(); for (const r of rows) { const k = getKey(r); if (!m.has(k)) m.set(k, []); m.get(k).push(r); } return m; };
 
 export function mergeFound(source, originalData, rows, { archive = false, now = new Date().toISOString() } = {}) {
+  assertSourceScope(rows);
   rows.forEach(validateFound); // Validate everything before changing either file.
   const data = structuredClone(originalData), read = readTable(source), changed = new Map();
   const stats = { added: 0, updated: 0, links: 0, fragments: 0, titles: 0, none: 0, skipped: [] };
@@ -25,19 +27,21 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
       const x = (data.ex ||= {})[qid] ||= {}, u = cleanUrl(r.url), parsed = new URL(u);
       const shorthand = [['reactormag.com', 'en', 'r'], ['litres.ru', 'ru', 'lr'], ['legimi.pl', 'pl', 'lg']]
         .find(([host, lang]) => (parsed.hostname === host || parsed.hostname.endsWith('.' + host)) && lang === r.lang);
-      if (shorthand && !x[shorthand[2]]) { x[shorthand[2]] = parsed.pathname + parsed.search; stats.fragments++; }
-      else if (!(shorthand && new URL(x[shorthand[2]], parsed.origin).href === u)) {
+      if (shorthand && !x[shorthand[2]]) { x[shorthand[2]] = parsed.pathname + parsed.search + parsed.hash; stats.fragments++; }
+      else if (!(shorthand && sourceUrlKey(new URL(x[shorthand[2]], parsed.origin).href) === sourceUrlKey(u))) {
         const list = x.o ||= [];
-        if (!list.some(o => cleanUrl(o.u) === u && (o.l || 'en') === r.lang)) { list.push({ u, s: r.site, l: r.lang }); stats.fragments++; }
+        if (!list.some(o => sourceUrlKey(o.u) === sourceUrlKey(u) && (o.l || 'en') === r.lang)) { list.push({ u, s: r.site, l: r.lang }); stats.fragments++; }
       }
     }
     const entry = structuredClone(read[qid] || { links: [] }), before = entry.links.length;
     const hadFull = entry.links.some(l => l.kind === 'full');
     const selected = [];
-    for (const rs of groups(ok.filter(r => ['full', 'audio'].includes(r.kind)), r => `${r.lang}|${r.kind}`).values()) {
-      // Keep all existing sources; select one new source per language and kind, including every part.
-      const site = [...new Set(rs.map(r => r.site))].sort((a, b) => rank(a) - rank(b))[0];
-      const chosen = rs.filter(r => r.site === site).sort((a, b) => (+a.part || 0) - (+b.part || 0));
+    const candidates = ok.filter(r => ['full', 'audio'].includes(r.kind))
+      .sort((a, b) => (a.tier === 'external') - (b.tier === 'external') || rank(a.site) - rank(b.site));
+    for (const rs of groups(candidates, r => `${r.lang}|${r.kind}|${siteName(r.site)}`).values()) {
+      // Keep every reviewed site, with multipart validation scoped to that site/language/kind.
+      const site = rs[0].site;
+      const chosen = rs.slice().sort((a, b) => (+a.part || 0) - (+b.part || 0));
       const combined = [...entry.links.filter(l => l.kind === chosen[0].kind && (l.lang || 'en') === chosen[0].lang && l.site === siteName(site)), ...chosen];
       if (combined.some(r => r.part)) {
         if (combined.some(r => !r.part)) throw new Error(`${qid}: cannot mix numbered and unnumbered parts for ${site}`);
@@ -64,7 +68,7 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
     if (entry.links.length === before) continue;
     const texts = selected.filter(r => r.kind === 'full'), main = texts.find(r => r.lang === 'en') || texts[0] || selected[0];
     if (!read[qid] || (!hadFull && texts.length)) {
-      const words = texts.filter(r => r.lang === main.lang).reduce((n, r) => n + (+r.words || 0), 0);
+      const words = main.part ? texts.filter(r => r.lang === main.lang && siteName(r.site) === siteName(main.site) && r.part).reduce((n, r) => n + (+r.words || 0), 0) : +main.words || 0;
       if (words) entry.w = words;
       entry.tier = main.tier; entry.pub = main.pub.split(';')[0].trim();
       if (main.license) entry.license = main.license; else delete entry.license;

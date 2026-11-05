@@ -13,11 +13,11 @@
     "url": "https://github.com/foteev/unoebasta/issues"
   },
   "engines": {
-    "node": ">=20"
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
   },
   "scripts": {
     "build": "node scripts/build-web.mjs",
-    "test": "node --test test/pipeline.test.mjs test/research.test.mjs && node test/ui.test.js",
+    "test": "node --test test/pipeline.test.mjs test/research.test.mjs test/contributions.test.mjs && node test/ui.test.js",
     "check:secrets": "node scripts/check-secrets.mjs",
     "coverage": "node scripts/coverage.mjs",
     "search": "node scripts/search.mjs",

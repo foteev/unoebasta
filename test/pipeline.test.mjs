@@ -3,9 +3,11 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { FOUND_FIELDS, parseCsv, toCsv, validateFound } from '../scripts/lib/csv.mjs';
+import { FOUND_FIELDS, parseCsv, toCsv, validateFound, sourceUrlKey } from '../scripts/lib/csv.mjs';
 import { readTable, loadCatalog } from '../scripts/lib/catalog.mjs';
 import { mergeFound } from '../scripts/lib/merge-found.mjs';
+import { pageAccessIssue } from '../scripts/lib/link-access.mjs';
+import { assertSourceScope, SOURCE_REVIEWS } from '../scripts/lib/source-reviews.mjs';
 import { CachedHttp, HttpError, hash } from '../scripts/lib/http.mjs';
 import { PROVIDERS, titleMatch, authorMatch } from '../scripts/lib/providers.mjs';
 import { loadState, runSearch, reviewCandidate, approvedRows, selectWorks } from '../scripts/lib/search.mjs';
@@ -66,6 +68,34 @@ test('external recordings preserve unknown permission and do not relabel existin
   assert.equal(onlyAudio.tier, 'external'); assert.equal(onlyAudio.links[0].rights, 'unknown');
 });
 
+test('universal import keeps publisher and multiple external sites without adding alternative word counts', () => {
+  const rows = [
+    row({site:'Community',tier:'external',url:'https://community.example/story',words:'1600',evidence:'Opened matching story; permission unknown'}),
+    row({site:'Clarkesworld',url:'https://clarkesworldmagazine.com/story',words:'1000'}),
+    row({site:'Narrator One',kind:'audio',tier:'external',words:'',url:'https://www.youtube.com/watch?v=one',evidence:'Matching metadata only; permission unknown'}),
+    row({site:'Narrator Two',kind:'audio',tier:'external',words:'',url:'https://audio.example/story',evidence:'Matching player sampled; permission unknown'})
+  ];
+  const first=mergeFound(source({}),data(),parseCsv(toCsv(rows))), entry=readTable(first.source).Q1;
+  assert.equal(entry.links.length,4);assert.equal(entry.w,1000);assert.equal(entry.tier,'t2');
+  assert.equal(entry.links[0].site,'Clarkesworld');
+  for(const link of entry.links.slice(1)){assert.equal(link.rights,'unknown');assert.equal(link.checked_at,instant);assert.ok(link.evidence);assert.equal(link.verification,link.kind==='audio'?'metadata':'page');}
+  assert.equal(mergeFound(first.source,first.data,rows).source,first.source);
+  const parts=[row({site:'One',part:'1',url:'https://one.example/1',words:'400'}),row({site:'One',part:'2',url:'https://one.example/2',words:'600'}),row({site:'Other',url:'https://other.example/story',words:'1800'})];
+  assert.equal(readTable(mergeFound(source({}),data(),parts).source).Q1.w,1000);
+  assert.throws(()=>mergeFound(source({}),data(),[...parts,row({site:'Broken',part:'2',url:'https://broken.example/2'})]),/incomplete/);
+});
+
+test('universal CSV intake imports external full texts and audio in all four languages', () => {
+  const rows=['en','pl','ru','es'].flatMap(lang=>['full','audio'].map(kind=>row({lang,kind,tier:'external',site:'Unlisted public portal',url:`https://public.example/${lang}/${kind}`,words:kind==='full'?'1200':'',evidence:'Opened author/title/language; accessible page; permission unknown; audio metadata only'})));
+  const first=mergeFound(source({}),data(),parseCsv(toCsv(rows))),entry=readTable(first.source).Q1;
+  assert.equal(entry.links.length,8);assert.equal(entry.tier,'external');assert.equal(entry.w,1200);
+  for(const lang of ['en','pl','ru','es'])for(const kind of ['full','audio']){
+    const link=entry.links.find(l=>(l.lang||'en')===lang&&l.kind===kind);
+    assert.equal(link.rights,'unknown');assert.equal(link.verification,kind==='audio'?'metadata':'page');assert.equal(link.checked_at,instant);
+  }
+  assert.equal(mergeFound(first.source,first.data,rows).source,first.source);
+});
+
 test('multipart sets must be complete, unique and remain idempotent', () => {
   const rs = [row({ part: '1', url: 'https://example.org/1' }), row({ part: '2', url: 'https://example.org/2' })];
   assert.throws(() => mergeFound(source({}), data(), rs.slice(1)), /incomplete/);
@@ -84,6 +114,33 @@ test('fragment and archive handling does not mutate data on a no-op', () => {
   assert.equal(mergeFound(source({}), data(), [snapshot]).stats.links, 0);
   assert.equal(mergeFound(source({}), data(), [snapshot], { archive: true }).stats.links, 1);
   assert.throws(() => mergeFound(source({}), data(), [row({ lang: 'xx' })]), /language/);
+});
+
+test('merged findings from PRs 20 and 22 are all published and repeat imports change nothing', () => {
+  const root = new URL('..', import.meta.url), actualSource = readFileSync(new URL('src/index.html', root), 'utf8');
+  const actualData = JSON.parse(readFileSync(new URL('data/awards.json', root), 'utf8')), read = readTable(actualSource);
+  const rows = ['2026-11-04-pr-flow-five-works.csv', '2026-11-04-thirty-work-search.csv']
+    .flatMap(file => parseCsv(readFileSync(new URL('data/found/' + file, root), 'utf8')));
+  for (const r of rows) {
+    if (r.kind === 'fragment') {
+      const x = actualData.ex[r.qid] || {};
+      const urls = [...(x.o || []).filter(o => (o.l || 'en') === r.lang).map(o => o.u)];
+      for (const [field, lang, host] of [['r', 'en', 'reactormag.com'], ['lr', 'ru', 'www.litres.ru'], ['lg', 'pl', 'www.legimi.pl']]) {
+        if (x[field] && lang === r.lang) urls.push(new URL(x[field], 'https://' + host).href);
+      }
+      assert.ok(urls.some(u => sourceUrlKey(u) === sourceUrlKey(r.url)), `${r.qid}: missing ${r.lang} fragment`);
+    } else {
+      const link = read[r.qid]?.links.find(l => sourceUrlKey(l.url) === sourceUrlKey(r.url) && l.kind === r.kind && (l.lang || 'en') === r.lang);
+      assert.ok(link, `${r.qid}: missing ${r.lang} ${r.kind}`);
+      if (r.tier === 'external') {
+        assert.equal(link.rights, 'unknown'); assert.equal(link.evidence, r.evidence); assert.equal(link.checked_at, r.checked_at);
+        assert.equal(link.verification, r.kind === 'audio' ? 'metadata' : 'page');
+      }
+    }
+  }
+  const again = mergeFound(actualSource, actualData, rows, { now: '2027-01-01T00:00:00Z' });
+  assert.equal(again.source, actualSource); assert.deepEqual(again.data, actualData);
+  assert.equal(again.stats.links, 0); assert.equal(again.stats.fragments, 0); assert.equal(again.stats.titles, 0);
 });
 
 test('HTTP success cache works offline, errors are not cached, corrupted cache is recoverable', async t => {
@@ -217,4 +274,43 @@ test('current catalog and historical CSVs load without remote coverage.csv', () 
   const c = loadCatalog(new URL('..', import.meta.url).pathname);
   c.history.forEach(validateFound);
   assert.ok(c.works.length >= 656); assert.ok(c.history.length >= 177); assert.ok(c.works.every(w => w.authors.length));
+});
+
+
+test('source review separates a complete story inside a sample from a sample of a paid book', () => {
+  const url='https://www.legimi.pl/ebook-wydech-ted-chiang,b610123.html';
+  assert.doesNotThrow(()=>assertSourceScope([{qid:'Q467388',lang:'pl',kind:'full',url:url+'#sample_section'}]));
+  assert.doesNotThrow(()=>assertSourceScope([{qid:'Q16747517',lang:'pl',kind:'fragment',url}]));
+  assert.throws(()=>assertSourceScope([{qid:'Q16747517',lang:'pl',kind:'full',url}]),/source review excludes full/);
+  assert.throws(()=>assertSourceScope([{qid:'Q467388',lang:'pl',kind:'audio',url}]),/source review excludes audio/);
+});
+
+test('reviewed unavailable sources cannot return through old findings or a different anchor', () => {
+  const bad=SOURCE_REVIEWS.find(r=>r.status==='unavailable_reader');
+  assert.throws(()=>assertSourceScope([{...bad,kind:'fragment',url:bad.url+'#read'}]),/source review excludes fragment/);
+  const deadAudio=SOURCE_REVIEWS.find(r=>r.status==='broken_player');
+  assert.throws(()=>assertSourceScope([{...deadAudio,kind:'audio'}]),/player resource returns HTTP 404/);
+  assert.doesNotThrow(()=>assertSourceScope([{...bad,kind:'none',url:''}]));
+  const source=readFileSync(new URL('../src/index.html',import.meta.url),'utf8'),data=JSON.parse(readFileSync(new URL('../data/awards.json',import.meta.url),'utf8'));
+  const catalog=loadCatalog(new URL('..',import.meta.url).pathname);
+  for(const w of catalog.works)assert.doesNotThrow(()=>assertSourceScope(w.knownLinks.filter(l=>!catalog.history.some(h=>h.qid===w.qid&&h.url===l.url)).map(l=>({...l,qid:w.qid}))));
+  for(const r of SOURCE_REVIEWS.filter(r=>r.status==='unavailable_reader'))assert.notEqual(data.ex?.[r.qid]?.lr,new URL(r.url).pathname);
+  assert.ok(!readTable(source)[deadAudio.qid].links.some(l=>l.kind==='audio'&&sourceUrlKey(l.url)===sourceUrlKey(deadAudio.url)));
+});
+
+test('source anchors are retained for reading but do not create duplicate findings on repeat import', () => {
+  const first=mergeFound(source({}),data(),[row({kind:'fragment',tier:'frag',words:'',lang:'pl',url:'https://www.legimi.pl/ebook-example,b123.html#sample_section'})]);
+  assert.equal(first.data.ex.Q1.lg,'/ebook-example,b123.html#sample_section');
+  const again=mergeFound(first.source,first.data,[row({kind:'fragment',tier:'frag',words:'',lang:'pl',url:'https://www.legimi.pl/ebook-example,b123.html'})]);
+  assert.deepEqual(again.data,first.data);assert.equal(again.stats.fragments,0);
+});
+
+
+test('content diagnostics catch successful missing-reader pages without mistaking upsells for paywalls', () => {
+  assert.equal(pageAccessIssue('https://www.litres.ru/book/a/chitat-onlayn/','<h1>Read online</h1><div>Что-то пошло не так</div><span>Нет в продаже</span>'),'unavailable_reader');
+  assert.equal(pageAccessIssue('https://publisher.example/fiction/story','<article>Story prose</article><h2>Buy the book</h2>'),'');
+  assert.equal(pageAccessIssue('https://www.legimi.pl/ebook.html','<h1>Buy ebook and audiobook</h1><div id="sample_section">Story sample</div>'),'');
+  assert.equal(pageAccessIssue('https://www.legimi.pl/ebook.html','<h1>Buy ebook and audiobook</h1>'),'missing_sample');
+  assert.equal(pageAccessIssue('https://example.com/story','<title>Site Unavailable</title><p>Unable to access this site.</p>'),'placeholder_page');
+  assert.equal(pageAccessIssue('https://www.litres.ru/book/a/chitat-onlayn/','<script>"Что-то пошло не так Нет в продаже"</script><p>Available narrative</p>'),'');
 });

@@ -1,12 +1,12 @@
 name: Suggest a text
-description: A free, legal full text (or audio) of a Hugo, Nebula or Locus winner
+description: A text, excerpt, audio or publication lead for a Hugo, Nebula or Locus winner
 title: "Text: "
 labels: ["text"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thank you! Only links where the rights holder published the text for free, Creative Commons releases or public domain, please. No personal data here.
+        Share a matching public link from a publisher, author, archive or external portal. Describe access, what you checked, and permission evidence separately; unknown permission is welcome as unknown. Do not upload story bodies, recordings or personal data.
   - type: input
     id: work
     attributes:
@@ -17,7 +17,7 @@ body:
   - type: input
     id: url
     attributes:
-      label: Link to the full text
+      label: Link to text, excerpt, audio or publication page
       placeholder: "https://…"
     validations:
       required: true
@@ -30,6 +30,7 @@ body:
         - The author's own site
         - Creative Commons
         - Public domain
+        - External portal or narrator channel (permission unknown)
         - Not sure
     validations:
       required: true
@@ -37,7 +38,7 @@ body:
     id: lang
     attributes:
       label: Language of the text
-      options: [English, Polish, Russian, Other]
+      options: [English, Polish, Russian, Spanish, Other]
     validations:
       required: true
   - type: input
@@ -48,11 +49,17 @@ body:
   - type: textarea
     id: note
     attributes:
-      label: Anything else (optional)
+      label: What did you check?
+      description: Author, title, language, full text or fragment, player or sampled playback, and login, payment or regional restrictions. Runtime alone does not prove a complete recording.
+  - type: textarea
+    id: permission
+    attributes:
+      label: Permission or license evidence (optional)
+      description: Link to the rights-holder statement or license if known. Otherwise say unknown; do not infer permission from public access.
   - type: checkboxes
-    id: legal
+    id: verified
     attributes:
       label: Check
       options:
-        - label: The whole text is there, free, and published by its rights holder (or under CC / public domain)
+        - label: I opened the page and described what I could verify, including any uncertainty
           required: true
