@@ -38,6 +38,9 @@ export function cleanUrl(value) {
   return u.href;
 }
 
+// A fragment identifier changes the starting position, not the source identity.
+export function sourceUrlKey(value) { const u = new URL(cleanUrl(value)); u.hash = ''; return u.href; }
+
 export function validateFound(r) {
   const fail = message => { throw new Error(`${r.qid || 'row'}: ${message}`); };
   if (FOUND_FIELDS.some(k => !(k in r))) fail('missing CSV columns');

@@ -274,6 +274,27 @@ table.board { border-collapse: separate; border-spacing: 0; width: 100%; font-si
 .pick-a { font-size: 14px; color: var(--muted); }
 .pick-actions, .pick-more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pick-actions .btn, .pick-more .btn { min-height: 46px; }
+.pick-more { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pick-more .btn { min-width: 0; text-align: center; }
+.pick-more button:disabled { opacity: .5; cursor: default; }
+.pick-actions > :only-child { grid-column: 1 / -1; }
+.filter-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 8px; margin-block: 12px; }
+.picks > .filter-grid { grid-template-columns: 1fr; }
+.multi-filter { min-width: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.multi-filter summary { display: grid; gap: 3px; min-height: 58px; box-sizing: border-box; padding: 9px 12px; cursor: pointer; list-style: none; }
+.multi-filter summary::-webkit-details-marker { display: none; }
+.multi-label { color: var(--muted); font-size: 12px; }
+.multi-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.multi-value::after { content: ' ▾'; }
+.multi-filter[open] { grid-column: 1 / -1; }
+.multi-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px 8px 8px; border-top: 1px solid var(--line); }
+.multi-option { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 5px 7px; box-sizing: border-box; cursor: pointer; font-size: 14px; overflow-wrap: anywhere; border-radius: 7px; }
+.multi-option.is-selected { background: var(--accent-soft); }
+.multi-option input { flex: none; width: 18px; height: 18px; accent-color: var(--accent); }
+.multi-option span { min-width: 0; }
+@media (min-width: 720px) { .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .multi-options { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.other-language-picks { display: grid; gap: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.other-language-picks h3, .other-language-picks p { margin: 0; }
 .picks > .linkbtn { justify-self: start; min-height: 40px; font-size: 15px; }
 .slip-time { margin: 0; font: 500 13px/1.3 var(--f-mono); color: var(--muted); }
 .slip-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -762,13 +783,13 @@ const READ = {
   // added 29.10.2026
   Q25349436: { w: 3422, tier: 't2', added: '2026-10-29T21:00:00Z', pub: 'Clarkesworld #100', links: [{ kind: 'full', url: 'https://clarkesworldmagazine.com/kritzer_01_15/', site: 'Clarkesworld' }, { kind: 'audio', url: 'https://clarkesworldmagazine.com/audio_01_15b/', site: 'Clarkesworld Podcast', added: '2026-10-31T11:00:00Z' }] },
   Q129820727: { w: 10883, tier: 't2', added: '2026-10-29T21:00:00Z', pub: 'Uncanny', links: [{ kind: 'full', url: 'https://www.uncannymagazine.com/article/the-year-without-sunshine/', site: 'Uncanny Magazine' }, { kind: 'audio', url: 'https://traffic.libsyn.com/secure/uncannymagazine/uncanny55a.mp3', site: 'Uncanny Magazine Podcast', added: '2026-10-31T11:00:00Z' }] },
-  Q131308103: { w: 2608, tier: 't2', added: '2026-10-29T21:00:00Z', pub: 'Tor.com', links: [{ kind: 'full', url: 'https://reactormag.com/little-free-library-naomi-kritzer/', site: 'Reactor (Tor.com)' }] },
+  Q131308103: {"w":2608,"tier":"t2","added":"2026-10-29T21:00:00Z","pub":"Tor.com","links":[{"kind":"full","url":"https://reactormag.com/little-free-library-naomi-kritzer/","site":"Reactor (Tor.com)"},{"kind":"full","url":"https://reactormag.com/el-nido-de-libros-naomi-kritzer/","site":"Reactor","added":"2026-11-05T08:59:16.016Z","lang":"es"},{"kind":"full","url":"https://www.castofwonders.org/2021/11/cast-of-wonders-474-little-free-library/","site":"Cast of Wonders","added":"2026-11-05T08:59:16.016Z"},{"kind":"audio","url":"https://www.castofwonders.org/2021/11/cast-of-wonders-474-little-free-library/","site":"Cast of Wonders","added":"2026-11-05T08:59:16.016Z"}]},
   Q97968393: { w: 5456, tier: 't2', added: '2026-10-29T21:00:00Z', pub: 'Tor.com', links: [{ kind: 'full', url: 'https://reactormag.com/as-the-last-i-may-know-s-l-huang/', site: 'Reactor (Tor.com)' }] },
   Q110217500: { w: 12005, tier: 't2', added: '2026-10-29T21:00:00Z', pub: 'Tor.com', links: [{ kind: 'full', url: 'https://reactormag.com/two-truths-and-a-lie-sarah-pinsker/', site: 'Reactor (Tor.com)' }] },
   Q110217357: { w: 7220, tier: 't2', added: '2026-10-29T21:00:00Z', pub: 'Uncanny', links: [{ kind: 'full', url: 'https://www.uncannymagazine.com/article/metal-like-blood-in-the-dark/', site: 'Uncanny Magazine' }, { kind: 'audio', url: 'https://traffic.libsyn.com/secure/uncannymagazine/uncanny36a.mp3', site: 'Uncanny Magazine Podcast', added: '2026-10-31T11:00:00Z' }] },
   Q111913901: { w: 6763, tier: 't2', added: '2026-10-29T21:00:00Z', pub: 'Uncanny', links: [{ kind: 'full', url: 'https://www.uncannymagazine.com/article/where-oaken-hearts-do-gather/', site: 'Uncanny Magazine' }] },
   // added 30.10.2026 — checked in Chrome: page answers 200 and holds the story text
-  Q134705997: { w: 8668, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Clarkesworld #218', links: [{ kind: 'full', url: 'https://clarkesworldmagazine.com/prihandita_11_24/', site: 'Clarkesworld' }, { kind: 'audio', url: 'https://clarkesworldmagazine.com/audio_11_24c/', site: 'Clarkesworld Podcast' }] },
+  Q134705997: {"w":8668,"tier":"t2","added":"2026-10-30T17:00:00Z","pub":"Clarkesworld #218","links":[{"kind":"full","url":"https://clarkesworldmagazine.com/prihandita_11_24/","site":"Clarkesworld"},{"kind":"audio","url":"https://clarkesworldmagazine.com/audio_11_24c/","site":"Clarkesworld Podcast"},{"kind":"audio","url":"https://escapepod.org/2026/10/08/escape-pod-1066-negative-scholarship-on-the-fifth-state-of-being-part-1/","site":"Escape Pod","added":"2026-11-05T08:59:15.753Z","part":1},{"kind":"audio","url":"https://escapepod.org/2026/10/15/escape-pod-1067-negative-scholarship-on-the-fifth-state-of-being-part-2-of-2/","site":"Escape Pod","added":"2026-11-05T08:59:15.753Z","part":2},{"kind":"full","url":"https://escapepod.org/2026/10/08/escape-pod-1066-negative-scholarship-on-the-fifth-state-of-being-part-1/","site":"Escape Pod","added":"2026-11-05T08:59:15.753Z","part":1},{"kind":"full","url":"https://escapepod.org/2026/10/15/escape-pod-1067-negative-scholarship-on-the-fifth-state-of-being-part-2-of-2/","site":"Escape Pod","added":"2026-11-05T08:59:15.753Z","part":2}]},
   Q140180110: { w: 9252, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Clarkesworld #221', links: [{ kind: 'full', url: 'https://clarkesworldmagazine.com/ihezue_02_25/', site: 'Clarkesworld' }, { kind: 'audio', url: 'https://clarkesworldmagazine.com/audio_02_25b/', site: 'Clarkesworld Podcast' }] },
   Q133843346: { w: 8265, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Strange Horizons', links: [{ kind: 'full', url: 'https://strangehorizons.com/wordpress/fiction/by-salt-by-sea-by-light-of-stars/', site: 'Strange Horizons' }, { kind: 'audio', url: 'https://podcast.strangehorizons.com/episodes/by-salt-by-sea-by-light-of-stars-by-premee-mohamed-read-by-kat-kourbeti', site: 'Strange Horizons Podcast' }] },
   Q131314620: { w: 6902, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Uncanny', links: [{ kind: 'full', url: 'https://www.uncannymagazine.com/article/tantie-merle-and-the-farmhand-4200/', site: 'Uncanny Magazine' }] },
@@ -777,11 +798,11 @@ const READ = {
   Q131257839: { w: 9050, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Uncanny', links: [{ kind: 'full', url: 'https://www.uncannymagazine.com/article/that-story-isnt-the-story/', site: 'Uncanny Magazine' }] },
   Q123527997: { w: 11014, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Clarkesworld #177', links: [{ kind: 'full', url: 'https://clarkesworldmagazine.com/palmer_06_21/', site: 'Clarkesworld' }, { kind: 'audio', url: 'https://clarkesworldmagazine.com/audio_06_21b/', site: 'Clarkesworld Podcast', added: '2026-10-31T11:00:00Z' }] },
   Q131308104: { w: 3294, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Diabolical Plots #64', links: [{ kind: 'full', url: 'https://www.diabolicalplots.com/dp-fiction-64a-open-house-on-haunted-hill-by-john-wiswell/', site: 'Diabolical Plots' }] },
-  Q105101562: { w: 5343, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Clarkesworld #149', links: [{ kind: 'full', url: 'https://clarkesworldmagazine.com/greenblatt_02_19/', site: 'Clarkesworld' }, { kind: 'audio', url: 'https://clarkesworldmagazine.com/audio_02_19c/', site: 'Clarkesworld Podcast', added: '2026-10-31T11:00:00Z' }] },
+  Q105101562: {"w":5343,"tier":"t2","added":"2026-10-30T17:00:00Z","pub":"Clarkesworld #149","links":[{"kind":"full","url":"https://clarkesworldmagazine.com/greenblatt_02_19/","site":"Clarkesworld"},{"kind":"audio","url":"https://clarkesworldmagazine.com/audio_02_19c/","site":"Clarkesworld Podcast","added":"2026-10-31T11:00:00Z"},{"kind":"full","url":"https://escapepod.org/2020/12/10/escape-pod-762-give-the-family-my-love/","site":"Escape Pod","added":"2026-11-05T08:59:16.016Z"},{"kind":"audio","url":"https://escapepod.org/2020/12/10/escape-pod-762-give-the-family-my-love/","site":"Escape Pod","added":"2026-11-05T08:59:16.016Z"}]},
   Q65062497: { w: 3688, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Fireside', links: [{ kind: 'full', url: 'https://firesidefiction.com/the-secret-lives-of-the-nine-negro-teeth-of-george-washington', site: 'Fireside' }] },
   Q61268740: { w: 9813, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Tor.com', links: [{ kind: 'full', url: 'https://reactormag.com/a-human-stain/', site: 'Reactor (Tor.com)' }] },
   Q61054553: { w: 5962, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Tor.com', links: [{ kind: 'full', url: 'https://reactormag.com/the-martian-obelisk/', site: 'Reactor (Tor.com)' }] },
-  Q56216444: { w: 8989, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Clarkesworld #132', links: [{ kind: 'full', url: 'https://clarkesworldmagazine.com/palmer_09_17/', site: 'Clarkesworld' }, { kind: 'audio', url: 'https://clarkesworldmagazine.com/audio_09_17b/', site: 'Clarkesworld Podcast', added: '2026-10-31T11:00:00Z' }] },
+  Q56216444: {"w":8989,"tier":"t2","added":"2026-10-30T17:00:00Z","pub":"Clarkesworld #132","links":[{"kind":"full","url":"https://clarkesworldmagazine.com/palmer_09_17/","site":"Clarkesworld"},{"kind":"audio","url":"https://clarkesworldmagazine.com/audio_09_17b/","site":"Clarkesworld Podcast","added":"2026-10-31T11:00:00Z"},{"kind":"full","url":"https://www.baen.com/Chapters/9781481483322/9781481483322___3.htm","site":"Baen","added":"2026-11-05T08:59:16.016Z","downloads":true}]},
   Q30005036: { w: 5733, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'The Starlit Wood', links: [{ kind: 'full', url: 'https://www.uncannymagazine.com/article/seasons-glass-iron/', site: 'Uncanny Magazine' }] },
   Q131244282: { w: 10226, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Uncanny', links: [{ kind: 'full', url: 'https://www.uncannymagazine.com/article/youll-surely-drown-stay/', site: 'Uncanny Magazine' }] },
   Q29956215: { w: 6719, tier: 't2', added: '2026-10-30T17:00:00Z', pub: 'Nightmare', links: [{ kind: 'full', url: 'https://www.nightmare-magazine.com/fiction/hungry-daughters-of-starving-mothers/', site: 'Nightmare Magazine' }] },
@@ -820,7 +841,7 @@ const READ = {
   Q7773900: {"w":7512,"tier":"t2","added":"2026-10-31T19:15:00Z","pub":"Lightspeed #25","links":[{"kind":"full","url":"https://www.lightspeedmagazine.com/fiction/the-way-of-cross-and-dragon/","site":"Lightspeed"},{"kind":"audio","url":"https://www.podtrac.com/pts/redirect.mp3/pdst.fm/e/chrt.fm/track/FGADCC/traffic.megaphone.fm/SBP8269676814.mp3","site":"Lightspeed Podcast"},{"kind":"audio","url":"https://akniga.org/martin-dzhordzh-put-kresta-i-drakona-1","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened public Russian story/player page; author and title matched. Credited narration: Александр Степной; stated 48 min; 1979 story, standalone. Metadata/player inspection only; no sampled playback or end-to-end listen, completeness and human voice not independently confirmed. Permission unverified.","checked_at":"2026-11-04T12:10:26.823Z","added":"2026-11-04T13:39:48.206Z","lang":"ru"},{"kind":"full","url":"https://lecturia.org/cuentos-y-relatos/george-r-r-martin-el-camino-de-la-cruz-y-el-dragon/4201/","site":"Lecturia","tier":"external","rights":"unknown","verification":"page","evidence":"Spanish story and FIN inspected; original title The Way of Cross and Dragon shown. Public external copy; permission for this host unverified. Approximate word count, not an exact edition count. No story body retained.","checked_at":"2026-11-04T12:16:06.755Z","added":"2026-11-04T13:39:48.206Z","lang":"es"}]},
   Q47009539: { w: 4409, tier: 't2', added: '2026-10-31T19:15:00Z', pub: 'Lightspeed #41', links: [{ kind: 'full', url: 'https://www.lightspeedmagazine.com/fiction/an-invocation-of-incuriosity/', site: 'Lightspeed' }] },
   Q4287396: { w: 4701, tier: 't2', added: '2026-10-31T19:15:00Z', pub: 'Lightspeed #44', links: [{ kind: 'full', url: 'https://www.lightspeedmagazine.com/fiction/bears-discover-fire/', site: 'Lightspeed' }, { kind: 'audio', url: 'https://www.podtrac.com/pts/redirect.mp3/pdst.fm/e/chrt.fm/track/FGADCC/traffic.megaphone.fm/SBP3971375707.mp3', site: 'Lightspeed Podcast' }] },
-  Q96793141: { w: 7300, tier: 't2', added: '2026-10-31T19:15:00Z', pub: 'Reactor (Tor.com), 2021', links: [{ kind: 'full', url: 'https://reactormag.com/the-bookstore-at-the-end-of-america-charlie-jane-anders/', site: 'Reactor (Tor.com)' }] },
+  Q96793141: {"w":7300,"tier":"t2","added":"2026-10-31T19:15:00Z","pub":"Reactor (Tor.com), 2021","links":[{"kind":"full","url":"https://reactormag.com/the-bookstore-at-the-end-of-america-charlie-jane-anders/","site":"Reactor (Tor.com)"},{"kind":"full","url":"https://www.castofwonders.org/2024/07/cast-of-wonders-593-the-bookstore-at-the-end-of-america/","site":"Cast of Wonders","added":"2026-11-05T08:59:16.016Z"},{"kind":"audio","url":"https://www.castofwonders.org/2024/07/cast-of-wonders-593-the-bookstore-at-the-end-of-america/","site":"Cast of Wonders","added":"2026-11-05T08:59:16.016Z"}]},
   Q30002252: { w: 4200, tier: 't2', added: '2026-10-31T19:15:00Z', pub: 'Strange Horizons', links: [{ kind: 'full', url: 'https://strangehorizons.com/fiction/the-truth-about-owls/', site: 'Strange Horizons' }, { kind: 'audio', url: 'https://podcastle.org/2015/09/01/podcastle-379-the-truth-about-owls/', site: 'PodCastle' }] },
   Q75153500: { w: 3100, tier: 't2', added: '2026-10-31T19:15:00Z', pub: 'Nightmare', links: [{ kind: 'full', url: 'https://www.nightmare-magazine.com/fiction/graves/', site: 'Nightmare Magazine' }] },
   Q131308062: { w: 6000, tier: 't2', added: '2026-10-31T19:15:00Z', pub: 'Baen Books', links: [{ kind: 'full', url: 'https://baen.com/Chapters/9781625791511/9781625791511___2.htm', site: 'Baen Books' }] },
@@ -846,7 +867,7 @@ const READ = {
   Q7800850: { tier: 't2', added: '2026-11-01T23:51:49Z', pub: 'StarShipSofa / Aural Delights #39, August 2008', links: [{ kind: 'audio', url: 'https://shows.acast.com/starshipsofa/episodes/aural-delights-no-39-elizabeth-bear', site: 'StarShipSofa' }] },
   Q16847524: { w: 6500, tier: 't2', added: '2026-11-01T23:51:49Z', pub: 'Other Worlds Than These, Night Shade Books, 2012', links: [{ kind: 'full', url: 'https://www.wired.com/2012/07/impossible-dreams/', site: 'WIRED' }, { kind: 'audio', url: 'https://escapepod.org/2007/05/10/ep105-impossible-dreams/', site: 'Escape Pod' }] },
   Q27968885: { tier: 't2', added: '2026-11-01T23:51:49Z', pub: 'StarShipSofa #485, May 2017', links: [{ kind: 'audio', url: 'https://shows.acast.com/starshipsofa/episodes/starshipsofano485ianmcdonald', site: 'StarShipSofa' }] },
-  Q16386142: { w: 5050, tier: 't2', added: '2026-11-01T23:51:49Z', pub: 'Fragile Things, 2006', links: [{ kind: 'full', url: 'https://www.neilgaiman.com/Cool_Stuff/Short_Stories/How_To_Talk_To_Girls_At_Parties/How_To_Talk_To_Girls_At_Parties_%28Text%29', site: 'Neil Gaiman' }, { kind: 'audio', url: 'https://www.neilgaiman.com/Cool_Stuff/Short_Stories/How_To_Talk_To_Girls_At_Parties/How_To_Talk_To_Girls_At_Parties_%28Audio%29', site: 'Neil Gaiman' }] },
+  Q16386142: {"w":5050,"tier":"t2","added":"2026-11-01T23:51:49Z","pub":"Fragile Things, 2006","links":[{"kind":"full","url":"https://www.neilgaiman.com/Cool_Stuff/Short_Stories/How_To_Talk_To_Girls_At_Parties/How_To_Talk_To_Girls_At_Parties_%28Text%29","site":"Neil Gaiman"}]},
   Q7810658: { tier: 't2', added: '2026-11-01T23:51:49Z', pub: 'Escape Pod #54, May 2006', links: [{ kind: 'audio', url: 'https://escapepod.org/2006/05/18/ep054-tktktk/', site: 'Escape Pod' }] },
   Q7733078: { w: 8076, tier: 't2', added: '2026-11-01T23:51:49Z', pub: 'Apex Magazine #83, April 2016', links: [{ kind: 'full', url: 'https://www.apexbookcompany.com/blogs/apex-magazine/the-faery-handbag', site: 'Apex Magazine' }] },
   Q7836111: { tier: 't2', added: '2026-11-01T23:51:49Z', pub: 'Escape Pod #82, November 2006', links: [{ kind: 'audio', url: 'https://escapepod.org/2006/11/30/ep082-travels-with-my-cats/', site: 'Escape Pod' }] },
@@ -887,8 +908,8 @@ const READ = {
   Q7755107: {"links":[{"kind":"full","url":"https://lecturia.org/en/short-stories/ursula-k-le-guin-the-ones-who-walk-away-from-omelas/8460/","site":"Lecturia","tier":"external","rights":"unknown","verification":"page","evidence":"Opened reader-visible English story headed by Ursula K. Le Guin, including narrative ending; matches assigned short story, not a discussion. Approximate word count. Permission unknown. Web-reader content inspected; direct automated HTTP returned 403, so browser/region access is not guaranteed.","checked_at":"2026-11-04T11:26:33Z"},{"kind":"audio","url":"https://akniga.org/le-guin-ursula-uhodyaschie-iz-omelosa","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened matching Ursula Le Guin page and player/chapter list. Credits Konstantin Ermikhin; author introduction 04:52 plus story track 23:57 (about 28:49 total). Russian metadata and assigned story matched. Public player visible; playback, voice and end-to-end completeness not verified. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"ru"},{"kind":"audio","url":"https://www.ivoox.com/en/que-se-alejan-omelas-ursula-audios-mp3_rf_125515619_1.html","site":"iVoox / Audiolibros Por qué leer","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened specific Spanish episode and public Play control, description and transcript. Credits Ursula K. Le Guin and human narration; transcript introduces Ceci Bona and the assigned 1973 story. Listed duration 26:44. No exclusive-preview banner observed. Metadata/text inspection only; no audio playback or completeness claim. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"es"}],"w":2800,"tier":"external","pub":"New Dimensions 3 (1973)","added":"2026-11-04T13:39:48.067Z"},
   Q2307397: {"links":[{"kind":"full","url":"https://xpressenglish.com/our-stories/i-must-scream/","site":"shortsonline","tier":"external","rights":"unknown","verification":"page","evidence":"Opened English original-text page headed Harlan Ellison and inspected the narrative through the closing paragraphs. Matches the 1967 story, not the game or a collection. Approx. 5800 words stated on linked information page. No login wall in retrieved text. Reproduction permission unknown.","checked_at":"2026-11-04T11:26:33Z"},{"kind":"audio","url":"https://akniga.org/ellison-harlan-u-menya-net-rta-no-ya-dolzhen-krichat","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened specific Harlan Ellison story page; narrator credited as Обнимающий читатель, duration 46 minutes. Russian title/author and story synopsis match assigned QID; not a game soundtrack. Page/player metadata only; stream playback, human voice and full completeness not independently verified. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"ru"},{"kind":"audio","url":"https://www.ivoox.com/en/no-tengo-boca-debo-gritar-harlan-audios-mp3_rf_24791806_1.html","site":"iVoox / Noviembre Nocturno","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened Spanish episode naming Harlan Ellison and public Play control. By Láudano, Noviembre Nocturno; listed duration 01:05:44. Specific story presentation, not a game soundtrack; no exclusive-preview banner observed. Metadata inspection only; playback and end-to-end completeness not verified. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"es"}],"w":5800,"tier":"external","pub":"Original story, 1967","added":"2026-11-04T13:39:48.067Z"},
   Q2634534: {"links":[{"kind":"full","url":"https://lecturia.org/en/short-stories/arthur-c-clarke-the-star/17702/","site":"Lecturia","tier":"external","rights":"unknown","verification":"page","evidence":"Opened English complete-story section naming Arthur C. Clarke, original 1955 publication and Jesuit-astrophysicist narrative; inspected the concluding paragraph and THE END. Approximate word count. Permission unknown. Web-reader content available; direct automated HTTP returned 403, so browser/region access remains unverified.","checked_at":"2026-11-04T11:26:33Z"},{"kind":"full","url":"https://pdf-x.pl/doc/Clarke-Arthur-C-Gwiazda/5ab3c5321b52ec798f72e88c","site":"PDF-X.PL","tier":"external","rights":"unknown","verification":"page","evidence":"Opened visible 20-page OCR preview of the 1989 Polish collection. The assigned Clarke story is complete within that preview: its opening, concluding Bethlehem paragraph and transition to the next story Halo, kto mówi are visible (through printed page 11). Approximate target-story word count, not whole collection. OCR errors present; translation attribution needs reconciliation. No login wall in inspected preview; host permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"pl"},{"kind":"audio","url":"https://akniga.org/klark-artur-zvezda-2","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened specific Arthur Clarke story page and public player, showing 00:00 / 16:46 and narrator Гарри Стил. Russian title, author and supernova/Jesuit synopsis match assigned 1955 short story. Metadata inspection only; playback, voice and completeness not independently checked. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"ru"},{"kind":"full","url":"https://lecturia.org/cuentos-y-relatos/arthur-c-clarke-la-estrella/3911/","site":"Lecturia","tier":"external","rights":"unknown","verification":"page","evidence":"Opened Cuento completo section naming Arthur C. Clarke and original title The Star. Antonio-Prometeo Moya translation credited; inspected concluding paragraph and FIN. Approximate word count. Permission unknown. Reader-visible HTML checked; direct automated HTTP returned 403, so browser/region access remains unverified.","checked_at":"2026-11-04T11:26:33Z","lang":"es"},{"kind":"audio","url":"https://www.ivoox.com/en/302-la-estrella-arthur-c-clarke-audios-mp3_rf_130048509_1.html","site":"iVoox / Cuentos de la Casa de la Bruja","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened episode 302, public Play control and Spanish transcript naming Arthur C. Clarke and narrator Juan Carlos Albarracín. Duration 22:29; no exclusive-preview banner observed. Author/title/Jesuit-story identity matched. Metadata/transcript inspection only, not audio playback or proof of full completeness. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"es"}],"w":2400,"tier":"external","pub":"Infinity Science Fiction, November 1955","added":"2026-11-04T13:39:48.067Z"},
-  Q6271990: {"links":[{"kind":"audio","url":"https://podcasts.apple.com/us/podcast/george-r-r-martin-piaseczniki/id1742441860?i=1000653119561","site":"Apple Podcasts / Rysław Czyta","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened specific Rysław Czyta episode. Ryszard Chojnowski identifies Sandkings by George R. R. Martin and Darosław Jerzy Toruń translation, Fantastyka July 1986. Apple API and creator RSS identify same episode, 01:45:25. Public enclosure returned HTTP 206 audio/mpeg for a 32-byte range check; no full download or listening. Human narration credited by creator, not aurally verified; completeness and permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"pl"},{"kind":"audio","url":"https://akniga.org/martin-dzhordzh-pesochniki","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened George Martin player page, narrator Юрий Мир, showing 01:39:19. Page explicitly lists original Sandkings and aliases Песчаные короли and Мутанты; Simon Kress synopsis matches assigned story, not a collection. Metadata inspection only; playback, voice and full completeness not independently verified. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"ru"},{"kind":"audio","url":"https://www.ivoox.com/en/reyes-arena-george-r-r-audios-mp3_rf_85580544_1.html","site":"iVoox / Comisión 2022","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened specific George R. R. Martin audiocuento page, public Play control and Spanish transcript. Credits UNLP 2022 performers Matias Sánchez Bramajo, Camila Levrino, Lara López, Paula Veronesi and Camila Bordigoni. Duration 01:36:14; no exclusive-preview banner observed. Metadata/transcript inspection only; audio playback and full completeness unverified. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"es"}],"tier":"external","pub":"Ryszard Chojnowski","added":"2026-11-04T13:39:48.067Z"},
-  Q467388: {"links":[{"kind":"full","url":"https://www.legimi.pl/ebook-wydech-ted-chiang,b610123.html","site":"Legimi","lang":"pl"},{"kind":"audio","url":"https://akniga.org/chan-ted-kupec-i-volshebnye-vrata","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened public Russian story/player page; author and title matched. Credited narration: Олег Булдаков; six-track story playlist, stated 1 h 43 min; 2007 story. Metadata/player inspection only; no sampled playback or end-to-end listen, completeness and human voice not independently confirmed. Permission unverified.","checked_at":"2026-11-04T12:10:26.820Z","lang":"ru"},{"kind":"full","url":"https://lecturia.org/cuentos-y-relatos/ted-chiang-el-comerciante-y-la-puerta-del-alquimista/19545/","site":"Lecturia","tier":"external","rights":"unknown","verification":"page","evidence":"Opened Spanish story, narrative opening and FIN, with original title The Merchant and the Alchemist's Gate (2007). Direct HTML fetch 200; about 10673 tokens including editorial material. Public external copy; permission for this host unverified. Word count approximate; no story body retained.","checked_at":"2026-11-04T12:21:04.616Z","lang":"es"}],"w":7500,"tier":"t2","pub":"Wydech","added":"2026-11-04T13:39:48.206Z"},
+  Q6271990: {"links":[{"kind":"audio","url":"https://podcasts.apple.com/us/podcast/george-r-r-martin-piaseczniki/id1742441860?i=1000653119561","site":"Apple Podcasts / Rysław Czyta","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened specific Rysław Czyta episode. Ryszard Chojnowski identifies Sandkings by George R. R. Martin and Darosław Jerzy Toruń translation, Fantastyka July 1986. Apple API and creator RSS identify same episode, 01:45:25. Public enclosure returned HTTP 206 audio/mpeg for a 32-byte range check; no full download or listening. Human narration credited by creator, not aurally verified; completeness and permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"pl","seconds":6325},{"kind":"audio","url":"https://akniga.org/martin-dzhordzh-pesochniki","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened George Martin player page, narrator Юрий Мир, showing 01:39:19. Page explicitly lists original Sandkings and aliases Песчаные короли and Мутанты; Simon Kress synopsis matches assigned story, not a collection. Metadata inspection only; playback, voice and full completeness not independently verified. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"ru"},{"kind":"audio","url":"https://www.ivoox.com/en/reyes-arena-george-r-r-audios-mp3_rf_85580544_1.html","site":"iVoox / Comisión 2022","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened specific George R. R. Martin audiocuento page, public Play control and Spanish transcript. Credits UNLP 2022 performers Matias Sánchez Bramajo, Camila Levrino, Lara López, Paula Veronesi and Camila Bordigoni. Duration 01:36:14; no exclusive-preview banner observed. Metadata/transcript inspection only; audio playback and full completeness unverified. Permission unknown.","checked_at":"2026-11-04T11:26:33Z","lang":"es"}],"tier":"external","pub":"Ryszard Chojnowski","added":"2026-11-04T13:39:48.067Z"},
+  Q467388: {"links":[{"kind":"full","url":"https://www.legimi.pl/ebook-wydech-ted-chiang,b610123.html#sample_section","site":"Legimi","lang":"pl"},{"kind":"audio","url":"https://akniga.org/chan-ted-kupec-i-volshebnye-vrata","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened public Russian story/player page; author and title matched. Credited narration: Олег Булдаков; six-track story playlist, stated 1 h 43 min; 2007 story. Metadata/player inspection only; no sampled playback or end-to-end listen, completeness and human voice not independently confirmed. Permission unverified.","checked_at":"2026-11-04T12:10:26.820Z","lang":"ru"},{"kind":"full","url":"https://lecturia.org/cuentos-y-relatos/ted-chiang-el-comerciante-y-la-puerta-del-alquimista/19545/","site":"Lecturia","tier":"external","rights":"unknown","verification":"page","evidence":"Opened Spanish story, narrative opening and FIN, with original title The Merchant and the Alchemist's Gate (2007). Direct HTML fetch 200; about 10673 tokens including editorial material. Public external copy; permission for this host unverified. Word count approximate; no story body retained.","checked_at":"2026-11-04T12:21:04.616Z","lang":"es"}],"w":7500,"tier":"t2","pub":"Wydech","added":"2026-11-04T13:39:48.206Z"},
   Q7620415: {"links":[{"kind":"audio","url":"https://knigavuhe.org/book/istorija-tvoejj-zhizni/","site":"Книга в ухе","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened public Russian story/player page; author and title matched. Credited narration: Сергей Рощупкин; stated 03:23:14; standalone story, not film Arrival. Metadata/player inspection only; no sampled playback or end-to-end listen, completeness and human voice not independently confirmed. Permission unverified.","checked_at":"2026-11-04T12:10:26.821Z","lang":"ru"}],"tier":"external","pub":"","added":"2026-11-04T13:39:48.206Z"},
   Q4102150: {"links":[{"kind":"audio","url":"https://akniga.org/chan-ted-vavilonskaya-bashnya","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened public Russian story/player page; author and title matched. Credited narration: Кирилл Головин; player 01:04:28; 1990 story. Metadata/player inspection only; no sampled playback or end-to-end listen, completeness and human voice not independently confirmed. Permission unverified.","checked_at":"2026-11-04T12:10:26.821Z","lang":"ru"}],"tier":"external","pub":"","added":"2026-11-04T13:39:48.206Z"},
   Q468132: {"links":[{"kind":"audio","url":"https://akniga.org/azimov-ayzek-dvuhsotletniy-chelovek","site":"Аудиокниги Клуб","tier":"external","rights":"unknown","verification":"metadata","evidence":"Opened public Russian story/player page; author and title matched. Credited narration: Катерина Алексеенко; seven-track playlist, stated 1 h 25 min; 1976 Asimov story, not The Positronic Man. Metadata/player inspection only; no sampled playback or end-to-end listen, completeness and human voice not independently confirmed. Permission unverified.","checked_at":"2026-11-04T12:10:26.822Z","lang":"ru"},{"kind":"full","url":"https://lecturia.org/en/short-stories/isaac-asimov-the-bicentennial-man/24778/","site":"Lecturia","tier":"external","rights":"unknown","verification":"page","evidence":"English original story, numbered sections through 23 and THE END inspected; single Asimov story, not later Asimov/Silverberg novel. Public external copy; permission for this host unverified. Approximate word count, not an exact edition count. No story body retained.","checked_at":"2026-11-04T12:16:06.755Z"}],"w":13500,"tier":"external","pub":"Stellar #2 (1976)","added":"2026-11-04T13:39:48.206Z"},
@@ -907,6 +928,7 @@ const READ = {
   Q3791300: {"links":[{"kind":"full","url":"https://www.sfsfss.com/stories/The%20Cookie%20Monster%20--%20Vinge,%20Vernor.htm","site":"SFSFSS","tier":"external","rights":"unknown","verification":"page","evidence":"English novella title/year, opening and final Dixie Mae passage inspected. Direct HTTP 200, approximately 19618 whitespace tokens including headings; some character encoding corruption. Public external copy; permission for this host unverified. Approximate word count, not an exact edition count. No story body retained.","checked_at":"2026-11-04T12:16:06.755Z"}],"w":19500,"tier":"external","pub":"2003 novella","added":"2026-11-04T13:39:48.206Z"},
   Q27881786: {"links":[{"kind":"full","url":"https://zanotowane.pl/1168/7595/","site":"Zanotowane","tier":"external","rights":"unknown","verification":"page","evidence":"Opened English conversion of Gene Wolfe novella; opening and terminal Nicholas/Kenneth scene followed by end of document inspected. Distinct from The Doctor of Death Island; catalog FantLab ID is wrong (see notes). Word count estimated. Separate direct fetch timed out. Public external copy; permission for this host unverified. Approximate word count, not an exact edition count. No story body retained.","checked_at":"2026-11-04T12:16:06.755Z"}],"w":20000,"tier":"external","pub":"","added":"2026-11-04T13:39:48.206Z"},
   Q905714: {"links":[{"kind":"full","url":"https://electronicsandbooks.com/edt/manual/Old%20Pulp%20Magazines/Asimov%27s%20Science%20fiction%20magazine/Asimov%27s%20-%20June%201995.pdf","site":"Electronics & Books magazine archive","tier":"external","rights":"unknown","verification":"page","evidence":"Opened magazine PDF: title and James Patrick Kelly credit at page 12, Kamala/Michael story through concluding dialogue on page 32, then next poem/story. Distinct from TV adaptation. Full story inside issue; other issue contents not counted. Approximate word count estimated, no exact OCR count. Indexed PDF readable; separate direct fetch returned HTTP 503. Permission for external archive unverified. No story body retained.","checked_at":"2026-11-04T12:17:51.650Z"}],"w":10000,"tier":"external","pub":"Asimov's Science Fiction, June 1995, printed pages 12–32","added":"2026-11-04T13:39:48.206Z"},
+  Q29918207: {"links":[{"kind":"audio","url":"https://podcasts.apple.com/ca/podcast/tough-times-all-over-by-joe-abercrombie-audio/id288472896?i=1000532167191","site":"Apple Podcasts / Clarkesworld"}],"tier":"t2","pub":"","added":"2026-11-05T08:59:16.016Z"},
 };
 const CHANGELOG = [{ at: '2026-10-29T21:00:00Z', key: 'chg_awards' }];
 // ids used by the first version (21.10) → Wikidata ids
@@ -918,9 +940,9 @@ const I18N = {
     author_sort: "Sort authors", author_sort_az: "Name A–Z", author_sort_awards: "Most awards", author_sort_desc: "Newest award", author_sort_asc: "Oldest award", author_awards_n: "Awards: {n}",
     cov_forms: "By format", cov_languages: "By language", cov_form: "Format", cov_language: "Language", cov_available: "With a text, fragment or audio link", cov_missing: "No link yet", cov_any_language: "Any language", cov_note: "Counts are works with catalog links. A work may have a full text, a fragment and audio. Device-generated speech is not counted.",
     v_authors: "By author", authors_count: "Authors: {n}", authors_hint: "Open an author’s name for their biography and all award-winning works.", agent_h: "Help fill the catalog", agent_hint: "Copy a small search task for your agent. It checks four languages and returns findings for review.", agent_copy: "Copy task for my agent", agent_work: "Copy this work’s search task", agent_copied: "Task copied. Paste it into your agent.", agent_brief: "Search instructions", agent_fallback: "Copy this task and paste it into your agent.",
-    shelf_danger_section: "Delete items in this section", shelf_danger_count: "Saved items: {n}", shelf_danger_h: "Danger zone", shelf_danger_all_note: "Delete files, reading progress, notes, bookmarks, links and feedback. Preferences stay.",
-    shelf_delete_files_confirm: "Delete all files on this device and their reading records?", shelf_delete_data_confirm: "Delete all saved shelf items, including files? Synced items will also be removed from your other devices.",
-    shelf_delete_all: "Delete all", shelf_delete_data: "Delete all saved items", shelf_deleted: "Deleted {n} items.", langs_save: "Save languages", langs_saved: "Saved. Read now uses your reading languages.", langs_save_hint: "Save to apply this choice to Read and keep it for your next visit.", langs_change: "Change", picks_languages: "Reading languages: {l}", picks_none_lang: "No full text is available in {l} for this length yet.", picks_excerpts: "Excerpts in your languages", picks_excerpt_open: "Read excerpt",
+    shelf_danger_section: "Delete items in this section", shelf_danger_count: "Saved items: {n}", shelf_danger_h: "Danger zone", shelf_danger_all_note: "Delete files, reading progress, notes, bookmarks, links and feedback. Reset reading languages, filters and reading settings. Keep the interface language and theme.",
+    shelf_delete_files_confirm: "Delete all files on this device and their reading records?", shelf_delete_data_confirm: "Delete everything on your shelf and reset reading languages, filters and reading settings? Synced items and reading settings will also reset on your other devices.",
+    shelf_delete_all: "Delete all", shelf_delete_data: "Delete everything", shelf_reset_done: "Shelf cleared. Reading languages and settings reset.", shelf_deleted: "Deleted {n} items.", langs_save: "Save languages", langs_saved: "Saved. Read now uses your reading languages.", langs_save_hint: "Save to apply this choice to Read and keep it for your next visit.", langs_change: "Change", picks_languages: "Reading languages: {l}", picks_none_lang: "No full text or recording is available in {l} for this length yet.", picks_other_lengths: "Available at other lengths", filter_format: "Material", filter_status: "Status", filter_view: "View", picks_h_any: "Stories for you", source_language: "Text or audio language", source_reader_languages: "My reading languages: {l}", picks_other_languages: "Stories in other languages", picks_other_languages_none: "No stories of this length have been found in your reading languages yet. You can read stories in other languages.", picks_other_languages_few: "No more stories of this length have been found in your reading languages yet. You can read stories in other languages.", picks_excerpt_note: "Excerpt reading time is unknown.", picks_excerpts: "Excerpts in your languages", picks_excerpt_open: "Read excerpt",
     born: 'b. {y}', v_cats: 'By category', v_years: 'By year', aw_all_short: 'All', jump_to: 'Jump to decade', decade_suffix: 's', legend_short: '▶ free text · ¶ excerpt · ◌ your link or file · ♪ audio · ★ bookmarked · ● new', nav_catalog: 'Read', nav_awards: 'Awards', nav_shelf: 'My shelf', nav_about: 'About',
     intro_h: 'Award winners you can read today', intro_p: "Hugo, Nebula and Locus winners with links to texts and audio. Everything you save stays on this device.",
     f_all: 'All', f_readable: 'Full text', f_audio: 'Audio', f_starred: '★ Bookmarked', f_new: 'New', works: ['work', 'works'],
@@ -1000,9 +1022,9 @@ const I18N = {
     author_sort: "Sortuj autorów", author_sort_az: "Nazwa A–Z", author_sort_awards: "Najwięcej nagród", author_sort_desc: "Najnowsza nagroda", author_sort_asc: "Najstarsza nagroda", author_awards_n: "Nagrody: {n}",
     cov_forms: "Według formy", cov_languages: "Według języka", cov_form: "Forma", cov_language: "Język", cov_available: "Z linkiem do tekstu, fragmentu lub audio", cov_missing: "Jeszcze bez linku", cov_any_language: "Dowolny język", cov_note: "Liczymy utwory z linkami w katalogu. Jeden utwór może mieć pełny tekst, fragment i audio. Głos syntetyczny urządzenia nie jest liczony.",
     v_authors: "Według autorów", authors_count: "Autorzy: {n}", authors_hint: "Otwórz nazwisko autora, aby zobaczyć biografię i wszystkie nagrodzone utwory.", agent_h: "Pomóż uzupełnić katalog", agent_hint: "Skopiuj małe zadanie dla swojego agenta. Sprawdzi cztery języki i przygotuje wyniki do weryfikacji.", agent_copy: "Kopiuj zadanie dla agenta", agent_work: "Kopiuj zadanie dla tego utworu", agent_copied: "Zadanie skopiowane. Wklej je swojemu agentowi.", agent_brief: "Instrukcja wyszukiwania", agent_fallback: "Skopiuj zadanie i wklej je swojemu agentowi.",
-    shelf_danger_section: "Usuń elementy z tej sekcji", shelf_danger_count: "Zapisane elementy: {n}", shelf_danger_h: "Strefa usuwania", shelf_danger_all_note: "Usuń pliki, postęp czytania, notatki, zakładki, linki i zgłoszenia. Ustawienia pozostaną.",
-    shelf_delete_files_confirm: "Usunąć wszystkie pliki na tym urządzeniu i ich zapisane miejsca w lekturze?", shelf_delete_data_confirm: "Usunąć wszystkie zapisane elementy półki, w tym pliki? Zsynchronizowane elementy znikną też z pozostałych urządzeń.",
-    shelf_delete_all: "Usuń wszystko", shelf_delete_data: "Usuń wszystkie zapisane elementy", shelf_deleted: "Usunięto elementów: {n}.", langs_save: "Zapisz języki", langs_saved: "Zapisano. Czytaj korzysta teraz z wybranych języków.", langs_save_hint: "Zapisz, aby zastosować wybór w Czytaj i zachować go na następną wizytę.", langs_change: "Zmień", picks_languages: "Języki lektury: {l}", picks_none_lang: "Nie ma jeszcze pełnego tekstu o tej długości w językach: {l}.", picks_excerpts: "Fragmenty w twoich językach", picks_excerpt_open: "Czytaj fragment",
+    shelf_danger_section: "Usuń elementy z tej sekcji", shelf_danger_count: "Zapisane elementy: {n}", shelf_danger_h: "Strefa usuwania", shelf_danger_all_note: "Usuń pliki, postęp czytania, notatki, zakładki, linki i zgłoszenia. Przywróć domyślne języki lektury, filtry i ustawienia czytania. Zachowaj język interfejsu i motyw.",
+    shelf_delete_files_confirm: "Usunąć wszystkie pliki na tym urządzeniu i ich zapisane miejsca w lekturze?", shelf_delete_data_confirm: "Usunąć wszystko z półki i przywrócić domyślne języki lektury, filtry i ustawienia czytania? Zsynchronizowane elementy i ustawienia czytania zostaną też zresetowane na pozostałych urządzeniach.",
+    shelf_delete_all: "Usuń wszystko", shelf_delete_data: "Usuń wszystko", shelf_reset_done: "Półka wyczyszczona. Przywrócono domyślne języki lektury i ustawienia.", shelf_deleted: "Usunięto elementów: {n}.", langs_save: "Zapisz języki", langs_saved: "Zapisano. Czytaj korzysta teraz z wybranych języków.", langs_save_hint: "Zapisz, aby zastosować wybór w Czytaj i zachować go na następną wizytę.", langs_change: "Zmień", picks_languages: "Języki lektury: {l}", picks_none_lang: "Nie ma jeszcze pełnego tekstu ani nagrania o tej długości w językach: {l}.", picks_other_lengths: "Dostępne w innych przedziałach czasu", filter_format: "Materiały", filter_status: "Status", filter_view: "Widok", picks_h_any: "Historie dla ciebie", source_language: "Język tekstu lub nagrania", source_reader_languages: "Moje języki lektury: {l}", picks_other_languages: "Utwory w innych językach", picks_other_languages_none: "Nie znaleźliśmy jeszcze utworów o tej długości w wybranych językach. Możesz przeczytać utwory w innych językach.", picks_other_languages_few: "Nie znaleźliśmy jeszcze więcej utworów o tej długości w wybranych językach. Możesz przeczytać utwory w innych językach.", picks_excerpt_note: "Czas czytania fragmentów nie jest określony.", picks_excerpts: "Fragmenty w twoich językach", picks_excerpt_open: "Czytaj fragment",
     born: 'ur. {y}', v_cats: 'Według kategorii', v_years: 'Według lat', aw_all_short: 'Wszystkie', jump_to: 'Przejdź do dekady', decade_suffix: '', legend_short: '▶ darmowy tekst · ¶ fragment · ◌ twój link lub plik · ♪ audio · ★ w zakładkach · ● nowe', nav_catalog: 'Czytaj', nav_awards: 'Nagrody', nav_shelf: 'Moja półka', nav_about: 'O projekcie',
     intro_h: 'Laureaci do przeczytania od razu', intro_p: "Zwycięzcy nagród Hugo, Nebula i Locus z linkami do tekstu i audio. Wszystko, co zapiszesz, zostaje na tym urządzeniu.",
     f_all: 'Wszystkie', f_readable: 'Pełny tekst', f_audio: 'Audio', f_starred: '★ Zakładki', f_new: 'Nowe', works: ['utwór', 'utwory', 'utworów'],
@@ -1082,9 +1104,9 @@ const I18N = {
     author_sort: "Порядок авторов", author_sort_az: "Имя А–Я", author_sort_awards: "Больше всего премий", author_sort_desc: "Новая премия", author_sort_asc: "Ранняя премия", author_awards_n: "Премий: {n}",
     cov_forms: "По форме", cov_languages: "По языкам", cov_form: "Форма", cov_language: "Язык", cov_available: "Со ссылкой на текст, фрагмент или аудио", cov_missing: "Пока без ссылки", cov_any_language: "На любом языке", cov_note: "Считаем произведения со ссылками в каталоге. У одного могут быть полный текст, фрагмент и аудио. Синтез речи на устройстве не учитывается.",
     v_authors: "По авторам", authors_count: "Авторов: {n}", authors_hint: "Нажмите на имя писателя, чтобы открыть биографию и все его произведения с премиями.", agent_h: "Помочь пополнить каталог", agent_hint: "Скопируйте небольшое задание своему агенту. Он проверит четыре языка и подготовит находки для проверки.", agent_copy: "Скопировать задание моему агенту", agent_work: "Скопировать задание по этой книге", agent_copied: "Задание скопировано. Вставьте его своему агенту.", agent_brief: "Инструкция поиска", agent_fallback: "Скопируйте задание и вставьте его своему агенту.",
-    shelf_danger_section: "Удаление записей этого раздела", shelf_danger_count: "Сохранённых записей: {n}", shelf_danger_h: "Опасная зона", shelf_danger_all_note: "Удалить файлы, места чтения, заметки, закладки, ссылки и сообщения. Настройки останутся.",
-    shelf_delete_files_confirm: "Удалить все файлы на этом устройстве и связанные записи чтения?", shelf_delete_data_confirm: "Удалить все сохранённые записи полки, включая файлы? Синхронизируемые записи удалятся и с других устройств.",
-    shelf_delete_all: "Удалить всё", shelf_delete_data: "Удалить все сохранённые записи", shelf_deleted: "Удалено записей: {n}.", langs_save: "Сохранить языки", langs_saved: "Сохранено. Раздел «Читать» учитывает выбранные языки.", langs_save_hint: "Сохраните выбор, чтобы применить его в разделе «Читать» и оставить для следующего визита.", langs_change: "Изменить", picks_languages: "Языки чтения: {l}", picks_none_lang: "Полного текста такой длины на выбранных языках пока нет: {l}.", picks_excerpts: "Фрагменты на ваших языках", picks_excerpt_open: "Читать фрагмент",
+    shelf_danger_section: "Удаление записей этого раздела", shelf_danger_count: "Сохранённых записей: {n}", shelf_danger_h: "Опасная зона", shelf_danger_all_note: "Удалить файлы, места чтения, заметки, закладки, ссылки и сообщения. Сбросить языки чтения, фильтры и настройки чтения. Сохранить язык интерфейса и тему.",
+    shelf_delete_files_confirm: "Удалить все файлы на этом устройстве и связанные записи чтения?", shelf_delete_data_confirm: "Удалить всё с полки и сбросить языки чтения, фильтры и настройки чтения? Синхронизируемые записи и настройки чтения сбросятся и на других устройствах.",
+    shelf_delete_all: "Удалить всё", shelf_delete_data: "Удалить всё", shelf_reset_done: "Полка очищена. Языки и настройки чтения сброшены.", shelf_deleted: "Удалено записей: {n}.", langs_save: "Сохранить языки", langs_saved: "Сохранено. Раздел «Читать» учитывает выбранные языки.", langs_save_hint: "Сохраните выбор, чтобы применить его в разделе «Читать» и оставить для следующего визита.", langs_change: "Изменить", picks_languages: "Языки чтения: {l}", picks_none_lang: "Полного текста или записи такой длительности на выбранных языках пока нет: {l}.", picks_other_lengths: "Варианты другой длительности", filter_format: "Материалы", filter_status: "Статус", filter_view: "Вид", picks_h_any: "Что почитать", source_language: "Язык текста или аудио", source_reader_languages: "Мои языки чтения: {l}", picks_other_languages: "На других языках", picks_other_languages_none: "Произведений такой длительности на выбранных языках пока не найдено. Вы можете почитать на других языках.", picks_other_languages_few: "Больше произведений такой длительности на выбранных языках пока не найдено. Вы можете почитать на других языках.", picks_excerpt_note: "Длительность фрагментов не определена.", picks_excerpts: "Фрагменты на ваших языках", picks_excerpt_open: "Читать фрагмент",
     born: 'род. {y}', v_cats: 'По категориям', v_years: 'По годам', aw_all_short: 'Все', jump_to: 'Перейти к десятилетию', decade_suffix: '-е', legend_short: '▶ бесплатный текст · ¶ фрагмент · ◌ ваша ссылка или файл · ♪ аудио · ★ в закладках · ● новое', nav_catalog: 'Читать', nav_awards: 'Премии', nav_shelf: 'Моя полка', nav_about: 'О проекте',
     intro_h: 'Лауреаты, которых можно прочитать сегодня', intro_p: "Победители «Хьюго», «Небьюлы» и «Локуса» со ссылками на тексты и аудио. Всё, что вы сохраните, остаётся на этом устройстве.",
     f_all: 'Все', f_readable: 'Полный текст', f_audio: 'Аудио', f_starred: '★ Закладки', f_new: 'Новое', works: ['произведение', 'произведения', 'произведений'],
@@ -1098,7 +1120,7 @@ const I18N = {
     chg_awards: 'Структура премий: {n} наград «Хьюго», «Небьюлы» и «Локуса» за {from}–{to} годы, со страницами авторов', chg_open: 'Открыть',
     sec_read: 'Читать и слушать', open_original: 'Открыть на {site}', listen: 'Слушать на {site}',     web_note: 'Тексты журналов открываются на сайте журнала: браузер не даёт одному сайту загрузить страницу другого. Свой файл (EPUB, FB2, TXT) открывается здесь, в читалке.',
     no_text: "Ссылки на полный текст этого произведения здесь пока нет. Добавьте ниже свою ссылку или файл либо предложите источник.",
-    rc_kicker: 'Вы читали', rc_h: 'Где вы остановились', rc_left: '{d} до конца', rc_stopped: 'Вы остановились на этом абзаце:', rc_note: 'Ваша заметка', rc_continue: 'Продолжить чтение', rc_open_orig: 'Открыть оригинал', rc_add_note: '+ Заметка', rc_edit_note: '✎ Заметка', rc_note_label: 'Заметка на следующий раз', rc_note_ph: 'Пара слов на память: что происходит, кто где, что непонятно', rc_note_saved: 'Заметка сохранена', rc_hide: 'Скрыть', rc_opened_on: 'Открыто на {s}', rc_listened_on: 'Слушали: {s}', rc_cont_on: 'Продолжить на {s}', rc_cont_listen: 'Слушать дальше', rc_ext_hint: 'Текст на сайте журнала, поэтому место здесь не сохраняется. Оставьте себе заметку: где остановились.', flag_opened: 'Открыто {d}', rc_hidden: 'Скрыто с главного экрана. Текст остаётся на полке.', rc_others: 'Ещё читаю', rc_hist: 'История чтения ({n})', rc_from_start: 'С начала', rc_recall: 'Припомнить', rc_orig_hint: 'В веб-версии текст открывается на сайте оригинала: найдите там абзац выше.', just_now: 'только что', ab_h: 'О книге', about_more: 'Ещё', about_less: 'Свернуть', about_src_wiki: 'Википедия ({l}), CC BY-SA 4.0', about_src_file: 'Аннотация из файла', about_src_page: 'Описание со страницы', ex_title: 'Вы остановились на {p}%', ex_delta: '+{d}% за этот раз', ex_prev: 'Прошлая заметка', ex_label: 'Пара слов на следующий раз (необязательно)', ex_save: 'Сохранить и выйти', ex_skip: 'Выйти', ex_never: 'Больше не спрашивать', set_ask: 'Спрашивать заметку при выходе из текста', stop_here: 'Здесь вы остановились', listen_pod: 'Подкаст {s}: читает человек', listen_tts: 'ElevenReader: синтез речи, нужен аккаунт', done: 'Прочитано', done_btn: 'Отметить прочитанным', end_yes: 'Да, прочитано', pick_read_it: 'Уже читал(а)', done_add_t: 'Отметить прочитанным: уйдёт с первого экрана и попадёт на полку', done_del_t: 'Убрать из прочитанного', done_toast: '«{t}» — в прочитанном на полке.', done_undo: 'Вернуть', done_removed: 'Убрано из прочитанного.', shelf_done: 'Прочитанное', empty_done: 'Пока пусто. Нажмите «Отметить прочитанным» на карточке: книга уйдёт с первого экрана и появится здесь.', done_mark: 'прочитано', end_k: 'Конец текста', end_q: 'Отметить «{t}» прочитанным? Книга уйдёт с первого экрана и попадёт на полку.', end_already: 'На полке в прочитанном с {d}.', end_close: 'Закрыть текст', ex_done: 'Отметить прочитанным и выйти', done_on_date: 'прочитано {d}', done_del_short: 'Убрать', picks_done: 'Всё такой длины прочитано. Выберите другую.', picks_wrap: 'Это всё такой длины ({n}): дальше по кругу.', ls_title: 'Где слушать', ls_more: 'Выбрать, где слушать', ls_pod_sub: 'Читает человек · на сайте журнала', ls_eleven_sub: 'Синтез речи · нужен аккаунт, 10 ч в месяц бесплатно', ls_phone: 'Голос телефона', ls_phone_sub: 'Бесплатно, без аккаунта · здесь, в читалке, место сохраняется', ls_phone_sub_off: 'Бесплатно, без аккаунта · из сохранённого файла, без интернета', ls_phone_t: 'Телефон читает вслух прямо здесь, в читалке', ls_remember: 'Запомнить выбор', ls_saved: 'Запомнено: {s}. Поменять — кнопкой ▾.', ls_pod_any: 'подкаст журнала', ls_set_auto: 'Подкаст журнала, если есть, иначе ElevenReader', ls_set_hint: 'Кнопка «Слушать» открывает это. Если у рассказа такого варианта нет, берётся следующий. Кнопка ▾ рядом даёт выбрать на месте.', ls_web_note: 'Голос телефона читает ваши файлы с полки — здесь, в читалке.', say_btn: 'Слушать голосом телефона', s_play: 'Продолжить', s_pause: 'Пауза', s_prev: 'Абзац назад', s_next: 'Абзац вперёд', s_rate: 'Скорость', s_stop: 'Остановить', say_end: 'Текст закончился.', say_novoice: 'На устройстве нет голоса для языка текста. Добавьте его в настройках телефона: «Синтез речи».', say_fail: 'Голос телефона не запустился.', data_newer: 'Ваши данные здесь сохранила более новая версия unoebasta. Эта страница их показывает, но не меняет: обновите страницу, чтобы получить новую версию.', data_fail: 'Не удалось перевести ваши данные на эту версию, поэтому они оставлены ровно как были и не меняются. Ничего не потеряно.', import_newer: 'Этот файл из более новой версии unoebasta. Обновите страницу и импортируйте его снова.', nav_library: 'Каталог', news_dot: 'В каталоге есть новое', dur_few: 'несколько минут', dur_hour: 'около часа', dur_more: 'больше часа', len_label: 'Сколько есть времени', len_any: 'Любая длина', len_15: 'Несколько минут', len_40: 'Около часа', len_eve: 'Больше часа', picks_h_15: 'Есть несколько минут?', picks_h_40: 'Есть около часа?', picks_h_eve: 'Есть больше часа?', picks_h_or: 'Или что-то новое', picks_none: 'Такой длины пока ничего нет — выберите другую.', pick_me: 'Выбери за меня', pick_more: 'Другие три', read_btn: 'Читать', listen_btn: 'Слушать', r_left: 'осталось {d}', r_almost: 'почти конец', r_settings: 'Текст и тема', focus_on: 'Подсветка абзаца', theme_to_dark: 'Тёмная тема', theme_to_light: 'Светлая тема', av_h: 'Что есть на каждом языке', av_full: 'полный текст', av_part: 'фрагмент', av_none: 'пока нет', pages: '{n} стр.', ex_preview: 'Предпросмотр · {l} · {site}', ex_coll: 'В сборнике «{c}» · Google Books', gb_none: 'Google Books не показывает здесь этот предпросмотр. Откройте его на сайте Google Books.', part_n: 'Часть {n}', ex_open: 'Фрагмент · {l} · {site}', ex_audio: 'Аудиофрагмент · {l} · {site}', news_more: 'и ещё {n} — показать только новое', ex_note: "Бесплатный фрагмент или предпросмотр — обычно первые главы. По этой ссылке доступна только часть книги.", note_collection: 'Рассказ входит в сборник: ссылка ведёт на страницу бесплатной загрузки всей книги (Creative Commons).', eleven: 'Слушать в ElevenReader', ed_title: 'Слушать в ElevenReader', ed_copied: 'Ссылка на текст скопирована.', ed_copy_fail: 'Скопируйте ссылку: нажмите на неё и удерживайте, затем выберите «Копировать».', ed_copy_again: 'Скопировать ещё раз', ed_step2: 'Сейчас откроется окно импорта ElevenReader. Вставьте ссылку в поле «Paste text or URLs» и нажмите Upload.', ed_step3: 'Текст появится в вашей библиотеке ElevenReader: нажмите ▶ и слушайте.', ed_flash: 'Если на секунду мелькнёт «Failed to process your file», не обращайте внимания: окно импорта откроется следом.', ed_account: 'Нужен аккаунт ElevenReader; на бесплатном тарифе — 10 часов прослушивания в месяц.', ed_open: 'Открыть ElevenReader', eleven_open: 'Открыть ElevenReader', eleven_file_web: 'Сохранить как .html', share_fail: 'Не удалось открыть меню «Поделиться».', saved_file: 'Файл сохранён. Откройте его в ElevenReader: + → «Загрузить файл».', save_declined: 'Сохранение отменено.',
+    rc_kicker: 'Вы читали', rc_h: 'Где вы остановились', rc_left: '{d} до конца', rc_stopped: 'Вы остановились на этом абзаце:', rc_note: 'Ваша заметка', rc_continue: 'Продолжить чтение', rc_open_orig: 'Открыть оригинал', rc_add_note: '+ Заметка', rc_edit_note: '✎ Заметка', rc_note_label: 'Заметка на следующий раз', rc_note_ph: 'Пара слов на память: что происходит, кто где, что непонятно', rc_note_saved: 'Заметка сохранена', rc_hide: 'Скрыть', rc_opened_on: 'Открыто на {s}', rc_listened_on: 'Слушали: {s}', rc_cont_on: 'Продолжить на {s}', rc_cont_listen: 'Слушать дальше', rc_ext_hint: 'Текст на сайте журнала, поэтому место здесь не сохраняется. Оставьте себе заметку: где остановились.', flag_opened: 'Открыто {d}', rc_hidden: 'Скрыто с главного экрана. Текст остаётся на полке.', rc_others: 'Ещё читаю', rc_hist: 'История чтения ({n})', rc_from_start: 'С начала', rc_recall: 'Припомнить', rc_orig_hint: 'В веб-версии текст открывается на сайте оригинала: найдите там абзац выше.', just_now: 'только что', ab_h: 'О книге', about_more: 'Ещё', about_less: 'Свернуть', about_src_wiki: 'Википедия ({l}), CC BY-SA 4.0', about_src_file: 'Аннотация из файла', about_src_page: 'Описание со страницы', ex_title: 'Вы остановились на {p}%', ex_delta: '+{d}% за этот раз', ex_prev: 'Прошлая заметка', ex_label: 'Пара слов на следующий раз (необязательно)', ex_save: 'Сохранить и выйти', ex_skip: 'Выйти', ex_never: 'Больше не спрашивать', set_ask: 'Спрашивать заметку при выходе из текста', stop_here: 'Здесь вы остановились', listen_pod: 'Подкаст {s}: читает человек', listen_tts: 'ElevenReader: синтез речи, нужен аккаунт', done: 'Прочитано', done_btn: 'Отметить прочитанным', end_yes: 'Да, прочитано', pick_read_it: 'Уже читал(а)', done_add_t: 'Отметить прочитанным: уйдёт с первого экрана и попадёт на полку', done_del_t: 'Убрать из прочитанного', done_toast: '«{t}» — в прочитанном на полке.', done_undo: 'Вернуть', done_removed: 'Убрано из прочитанного.', shelf_done: 'Прочитанное', empty_done: 'Пока пусто. Нажмите «Отметить прочитанным» на карточке: книга уйдёт с первого экрана и появится здесь.', done_mark: 'прочитано', end_k: 'Конец текста', end_q: 'Отметить «{t}» прочитанным? Книга уйдёт с первого экрана и попадёт на полку.', end_already: 'На полке в прочитанном с {d}.', end_close: 'Закрыть текст', ex_done: 'Отметить прочитанным и выйти', done_on_date: 'прочитано {d}', done_del_short: 'Убрать', picks_done: 'Всё такой длины прочитано. Выберите другую.', picks_wrap: 'Это всё такой длины ({n}): дальше по кругу.', ls_title: 'Где слушать', ls_more: 'Выбрать, где слушать', ls_pod_sub: 'Читает человек · на сайте журнала', ls_eleven_sub: 'Синтез речи · нужен аккаунт, 10 ч в месяц бесплатно', ls_phone: 'Голос телефона', ls_phone_sub: 'Бесплатно, без аккаунта · здесь, в читалке, место сохраняется', ls_phone_sub_off: 'Бесплатно, без аккаунта · из сохранённого файла, без интернета', ls_phone_t: 'Телефон читает вслух прямо здесь, в читалке', ls_remember: 'Запомнить выбор', ls_saved: 'Запомнено: {s}. Поменять — кнопкой ▾.', ls_pod_any: 'подкаст журнала', ls_set_auto: 'Подкаст журнала, если есть, иначе ElevenReader', ls_set_hint: 'Кнопка «Слушать» открывает это. Если у рассказа такого варианта нет, берётся следующий. Кнопка ▾ рядом даёт выбрать на месте.', ls_web_note: 'Голос телефона читает ваши файлы с полки — здесь, в читалке.', say_btn: 'Слушать голосом телефона', s_play: 'Продолжить', s_pause: 'Пауза', s_prev: 'Абзац назад', s_next: 'Абзац вперёд', s_rate: 'Скорость', s_stop: 'Остановить', say_end: 'Текст закончился.', say_novoice: 'На устройстве нет голоса для языка текста. Добавьте его в настройках телефона: «Синтез речи».', say_fail: 'Голос телефона не запустился.', data_newer: 'Ваши данные здесь сохранила более новая версия unoebasta. Эта страница их показывает, но не меняет: обновите страницу, чтобы получить новую версию.', data_fail: 'Не удалось перевести ваши данные на эту версию, поэтому они оставлены ровно как были и не меняются. Ничего не потеряно.', import_newer: 'Этот файл из более новой версии unoebasta. Обновите страницу и импортируйте его снова.', nav_library: 'Каталог', news_dot: 'В каталоге есть новое', dur_few: 'несколько минут', dur_hour: 'около часа', dur_more: 'больше часа', len_label: 'Сколько есть времени', len_any: 'Любая длина', len_15: 'Несколько минут', len_40: 'Около часа', len_eve: 'Больше часа', picks_h_15: 'Есть несколько минут?', picks_h_40: 'Есть около часа?', picks_h_eve: 'Есть больше часа?', picks_h_or: 'Или что-то новое', picks_none: 'Такой длины пока ничего нет — выберите другую.', pick_me: 'Выбери за меня', pick_more: 'Ещё рандомные три', read_btn: 'Читать', listen_btn: 'Слушать', r_left: 'осталось {d}', r_almost: 'почти конец', r_settings: 'Текст и тема', focus_on: 'Подсветка абзаца', theme_to_dark: 'Тёмная тема', theme_to_light: 'Светлая тема', av_h: 'Что есть на каждом языке', av_full: 'полный текст', av_part: 'фрагмент', av_none: 'пока нет', pages: '{n} стр.', ex_preview: 'Предпросмотр · {l} · {site}', ex_coll: 'В сборнике «{c}» · Google Books', gb_none: 'Google Books не показывает здесь этот предпросмотр. Откройте его на сайте Google Books.', part_n: 'Часть {n}', ex_open: 'Фрагмент · {l} · {site}', ex_audio: 'Аудиофрагмент · {l} · {site}', news_more: 'и ещё {n} — показать только новое', ex_note: "Бесплатный фрагмент или предпросмотр — обычно первые главы. По этой ссылке доступна только часть книги.", note_collection: 'Рассказ входит в сборник: ссылка ведёт на страницу бесплатной загрузки всей книги (Creative Commons).', eleven: 'Слушать в ElevenReader', ed_title: 'Слушать в ElevenReader', ed_copied: 'Ссылка на текст скопирована.', ed_copy_fail: 'Скопируйте ссылку: нажмите на неё и удерживайте, затем выберите «Копировать».', ed_copy_again: 'Скопировать ещё раз', ed_step2: 'Сейчас откроется окно импорта ElevenReader. Вставьте ссылку в поле «Paste text or URLs» и нажмите Upload.', ed_step3: 'Текст появится в вашей библиотеке ElevenReader: нажмите ▶ и слушайте.', ed_flash: 'Если на секунду мелькнёт «Failed to process your file», не обращайте внимания: окно импорта откроется следом.', ed_account: 'Нужен аккаунт ElevenReader; на бесплатном тарифе — 10 часов прослушивания в месяц.', ed_open: 'Открыть ElevenReader', eleven_open: 'Открыть ElevenReader', eleven_file_web: 'Сохранить как .html', share_fail: 'Не удалось открыть меню «Поделиться».', saved_file: 'Файл сохранён. Откройте его в ElevenReader: + → «Загрузить файл».', save_declined: 'Сохранение отменено.',
     sec_mine: 'Мои материалы', own_link: 'Своя ссылка', own_link_ph: 'Вставьте адрес страницы', own_link_saved: 'Сохранено на этом устройстве', own_edit: 'Изменить', archived: 'архив', cov_h: 'Что уже можно прочитать', cov_full: 'Целиком', cov_frag: 'Фрагмент', cov_audio: 'Аудио', cov_all: 'Лауреатов', cov_total: 'Всего', cov_langs: "Одно произведение может быть на нескольких языках. Строка «На любом языке» считает каждое один раз.", cov_help: "Есть ссылка? Отправьте её в проект. Хотите поискать? Скопируйте задание своему агенту.", cov_brief: "Инструкция поиска", own_note: 'Заметка или название (необязательно)', file_note: 'Название или заметка (необязательно)', file_note_ph: 'например, русский перевод, EPUB от издателя', file_rename: 'Название', file_note_saved: 'Сохранено', own_note_ph: 'например, польский перевод, Nowa Fantastyka 2019', own_update: 'Сохранить изменения', own_link_bad: 'Введите адрес страницы, начиная с https://',
     own_file: 'Файл для чтения офлайн', own_file_hint: 'TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX или ODT. Файл хранится только на этом устройстве.', doc_no: 'Это старый файл Word (.doc). Сохраните его как DOCX или TXT и добавьте снова.', rtf_no: 'RTF здесь не открывается. Сохраните файл как DOCX или TXT и добавьте снова.', file_unknown: 'Этот файл — не текст, который знает читалка. Открываются TXT, HTML, EPUB, FB2, DOCX и ODT.', choose_file: 'Добавить файл',
     sec_more: 'Издания, переводы, библиография', isfdb_t: 'ISFDB: издания и переводы', fantlab_t: 'FantLab: русские переводы', wikidata_t: 'Wikidata',
@@ -1164,9 +1186,9 @@ const I18N = {
     author_sort: "Ordenar autores", author_sort_az: "Nombre A–Z", author_sort_awards: "Más premios", author_sort_desc: "Premio más reciente", author_sort_asc: "Premio más antiguo", author_awards_n: "Premios: {n}",
     cov_forms: "Por formato", cov_languages: "Por idioma", cov_form: "Formato", cov_language: "Idioma", cov_available: "Con enlace a texto, fragmento o audio", cov_missing: "Aún sin enlace", cov_any_language: "Cualquier idioma", cov_note: "Contamos obras con enlaces en el catálogo. Una obra puede tener texto completo, fragmento y audio. No se cuenta la voz sintética del dispositivo.",
     v_authors: "Por autor", authors_count: "Autores: {n}", authors_hint: "Pulsa el nombre del autor para ver su biografía y todas sus obras premiadas.", agent_h: "Ayuda a completar el catálogo", agent_hint: "Copia una pequeña tarea para tu agente. Revisará cuatro idiomas y preparará hallazgos para comprobar.", agent_copy: "Copiar tarea para mi agente", agent_work: "Copiar tarea de esta obra", agent_copied: "Tarea copiada. Pégala en tu agente.", agent_brief: "Instrucciones de búsqueda", agent_fallback: "Copia esta tarea y pégala en tu agente.",
-    shelf_danger_section: "Borrar elementos de esta sección", shelf_danger_count: "Elementos guardados: {n}", shelf_danger_h: "Zona de peligro", shelf_danger_all_note: "Borra archivos, progreso de lectura, notas, marcadores, enlaces y comentarios. Las preferencias se conservan.",
-    shelf_delete_files_confirm: "¿Borrar todos los archivos de este dispositivo y sus registros de lectura?", shelf_delete_data_confirm: "¿Borrar todos los elementos guardados del estante, incluidos los archivos? Los elementos sincronizados también se borrarán de tus otros dispositivos.",
-    shelf_delete_all: "Borrar todo", shelf_delete_data: "Borrar todos los elementos guardados", shelf_deleted: "Elementos borrados: {n}.", langs_save: "Guardar idiomas", langs_saved: "Guardado. Leer usa ahora tus idiomas de lectura.", langs_save_hint: "Guarda para aplicar tu elección en Leer y conservarla para la próxima visita.", langs_change: "Cambiar", picks_languages: "Idiomas de lectura: {l}", picks_none_lang: "Todavía no hay un texto completo de esta duración en: {l}.", picks_excerpts: "Fragmentos en tus idiomas", picks_excerpt_open: "Leer fragmento",
+    shelf_danger_section: "Borrar elementos de esta sección", shelf_danger_count: "Elementos guardados: {n}", shelf_danger_h: "Zona de peligro", shelf_danger_all_note: "Borra archivos, progreso de lectura, notas, marcadores, enlaces y comentarios. Restablece idiomas de lectura, filtros y ajustes de lectura. Conserva el idioma de la interfaz y el tema.",
+    shelf_delete_files_confirm: "¿Borrar todos los archivos de este dispositivo y sus registros de lectura?", shelf_delete_data_confirm: "¿Borrar todo el estante y restablecer idiomas de lectura, filtros y ajustes de lectura? Los elementos y ajustes de lectura sincronizados también se restablecerán en tus otros dispositivos.",
+    shelf_delete_all: "Borrar todo", shelf_delete_data: "Borrar todo", shelf_reset_done: "Estante borrado. Idiomas y ajustes de lectura restablecidos.", shelf_deleted: "Elementos borrados: {n}.", langs_save: "Guardar idiomas", langs_saved: "Guardado. Leer usa ahora tus idiomas de lectura.", langs_save_hint: "Guarda para aplicar tu elección en Leer y conservarla para la próxima visita.", langs_change: "Cambiar", picks_languages: "Idiomas de lectura: {l}", picks_none_lang: "Todavía no hay un texto completo ni una grabación de esta duración en: {l}.", picks_other_lengths: "Disponibles con otra duración", filter_format: "Material", filter_status: "Estado", filter_view: "Vista", picks_h_any: "Historias para ti", source_language: "Idioma del texto o audio", source_reader_languages: "Mis idiomas de lectura: {l}", picks_other_languages: "Obras en otros idiomas", picks_other_languages_none: "Aún no hemos encontrado obras de esta duración en tus idiomas de lectura. Puedes leer obras en otros idiomas.", picks_other_languages_few: "Aún no hemos encontrado más obras de esta duración en tus idiomas de lectura. Puedes leer obras en otros idiomas.", picks_excerpt_note: "La duración de los fragmentos no está determinada.", picks_excerpts: "Fragmentos en tus idiomas", picks_excerpt_open: "Leer fragmento",
     born: "n. {y}", v_cats: "Por categoría", v_years: "Por año", aw_all_short: "Todos", jump_to: "Ir a la década", decade_suffix: "", legend_short: "▶ texto gratis · ¶ fragmento · ◌ tu enlace o archivo · ♪ audio · ★ guardado · ● nuevo", nav_catalog: "Leer", nav_awards: "Premios", nav_shelf: "Mi estante", nav_about: "Acerca de", intro_h: "Obras premiadas que puedes leer hoy", intro_p: "Ganadores de los premios Hugo, Nebula y Locus con enlaces a textos y audio. Todo lo que guardas se queda en este dispositivo.", f_all: "Todas", f_readable: "Texto completo", f_audio: "Audio", f_starred: "★ Guardadas", f_new: "Nuevas", works: ["obra","obras"], aw_h: "Hugo", aw_n: "Nebula", aw_l: "Locus", aw_all: "Todos los premios", cat_N: "Novela", cat_A: "Novela corta", cat_E: "Relato largo", cat_S: "Relato corto", cat_SF: "Novela de CF", cat_FN: "Novela de fantasía",
     cat_HN: "Novela de terror", cat_FT: "Primera novela", tier_t1: "Licencia CC · se puede guardar sin conexión", tier_t2: "Gratis en línea en la editorial", tier_t2us: "Dominio público en EE. UU. · solo en línea", tier_t3: "Hay un fragmento", tier_t4: "Ficha del catálogo", tier_external: "Fuente externa · permiso sin verificar", ls_external_sub: "Grabación externa · permiso sin verificar", audio_metadata: "Grabación catalogada por la fuente; integridad no comprobada de forma independiente.", av_audio: "audio", flag_reading: "Leyendo · {p} %", flag_file: "Archivo en el dispositivo", flag_link: "Enlace propio", flag_new: "Nuevo", back: "Atrás", read: "Leer", open: "Abrir", save: "Guardar", del: "Borrar", copy: "Copiar", copied: "Copiado", cancel: "Cancelar", star_add: "Guardar", star_del: "Quitar de guardados", starred: "Guardada", unstarred: "Quitada de guardados", news_h: "Novedades desde tu última visita · {d}", news_h_first: "Añadido hace poco", news_seen: "Marcar como visto", news_work: "Texto nuevo", news_link_full: "Nuevo enlace al texto", news_link_audio: "Nuevo audio",
     news_none: "No hay nada nuevo desde tu última visita.", chg_awards: "Estructura de premios: {n} premios Hugo, Nebula y Locus de {from} a {to}, con páginas de autores", chg_open: "Abrir", sec_read: "Leer y escuchar", open_original: "Abrir en {site}", listen: "Escuchar en {site}", web_note: "Los textos de las revistas se abren en el sitio de la revista: un navegador no deja que un sitio cargue la página de otro. Tu propio archivo (EPUB, FB2, TXT) se abre aquí, en el lector.", no_text: "Todavía no hay un enlace al texto completo de esta obra. Añade tu propio enlace o archivo, o sugiere una fuente.", rc_kicker: "Estabas leyendo", rc_h: "Donde lo dejaste", rc_left: "{d} hasta el final", rc_stopped: "Te quedaste en este párrafo:", rc_note: "Tu nota", rc_continue: "Seguir leyendo", rc_open_orig: "Abrir el original", rc_add_note: "+ Nota", rc_edit_note: "✎ Nota",
@@ -1286,11 +1308,11 @@ let HAD_PREFS = false; try { HAD_PREFS = !!localStorage.getItem(PREFS_KEY); } ca
 let prefs = { lang: null, rtheme: 'page', rsize: 19, av: null };
 try { prefs = Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY) || '{}')); } catch (e) {}
 // settings that travel to another device (screen-size and language stay per device); prefsMt says when they last changed
-const SYNC_PREFS = ['listen', 'ttsRate', 'askNote', 'pickLen', 'focus', 'langs'];
+const SYNC_PREFS = ['listen', 'ttsRate', 'askNote', 'pickLen', 'pickLengths', 'focus', 'langs'];
 const prefsSig = () => JSON.stringify(SYNC_PREFS.map(k => prefs[k] === undefined ? null : prefs[k]));
 let lastPrefsSig = prefsSig();
 function savePrefs(fromSync) {
-  const sig = prefsSig(); if (!fromSync && sig !== lastPrefsSig) { prefs.prefsMt = Date.now(); try { syncSoon(); } catch (e) {} } lastPrefsSig = sig;
+  const sig = prefsSig(); if (!fromSync && sig !== lastPrefsSig) { prefs.prefsMt = Math.max(Date.now(), (prefs.prefsMt || 0) + 1); try { syncSoon(); } catch (e) {} } lastPrefsSig = sig;
   try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
 }
 
@@ -1650,7 +1672,35 @@ async function parseFb2(buf, name) {
 }
 
 /* ---------- local state ---------- */
-let filter = { award: 'all', readable: false, audio: false, starred: false, fresh: false, mine: false, len: 'any', q: '' };
+const SOURCE_LANGS = ['en', 'pl', 'ru', 'es'];
+const LENGTHS = ['15', '40', 'eve'], FORMATS = ['full', 'frag', 'audio', 'own'], STATUSES = ['starred', 'fresh'];
+const CATEGORY_GROUPS = { N: ['N', 'SF', 'FN', 'HN', 'FT'], A: ['A'], E: ['E'], S: ['S'] };
+const CATEGORY_FILTERS = ['N', 'A', 'E', 'S', 'SF', 'FN', 'HN', 'FT'];
+function filterValues(value, options) { const list = Array.isArray(value) ? value : value && !['all', 'any'].includes(value) ? [value] : []; return options.filter(x => list.includes(x)); }
+function toggleFilter(values, value, options) { const current = filterValues(values, options); return value === 'all' ? [] : filterValues(current.includes(value) ? current.filter(x => x !== value) : [...current, value], options); }
+const filterMatches = (values, value) => !values.length || values.includes(value);
+const homeLengths = () => filterValues(prefs.pickLengths, LENGTHS);
+const savedFilters = prefs.filters?.v === 1 ? prefs.filters : {};
+let filter = { awards: filterValues(savedFilters.catalog?.awards, AWARDS), langs: filterValues(savedFilters.catalog?.langs, SOURCE_LANGS), formats: filterValues(savedFilters.catalog?.formats, FORMATS), statuses: filterValues(savedFilters.catalog?.statuses, STATUSES), lengths: filterValues(savedFilters.catalog?.lengths, LENGTHS), q: '' };
+function saveFilters() {
+  prefs.filters = { v: 1, catalog: { awards: filter.awards, langs: filter.langs, formats: filter.formats, statuses: filter.statuses, lengths: filter.lengths }, awards: { awards: AV.awards, cats: AV.cats, langs: AV.langs, formats: AV.formats } };
+  savePrefs();
+}
+function multiFilter(id, label, values, options) {
+  const selected = values || [], summary = selected.length ? options.filter(([v]) => selected.includes(v)).map(([, name]) => name).join(', ') : t('f_all');
+  return `<details class="multi-filter" data-multi="${id}"><summary><span class="multi-label">${esc(label)}</span><span class="multi-value" title="${esc(summary)}">${esc(summary)}</span></summary><div class="multi-options" role="group" aria-label="${esc(label)}">${[['all', t('f_all')], ...options].map(([value, name]) => { const checked = value === 'all' ? !selected.length : selected.includes(value); return `<label class="multi-option${checked ? ' is-selected' : ''}"><input type="checkbox" data-multi-filter="${id}" value="${value}"${checked ? ' checked' : ''}><span>${esc(name)}</span></label>`; }).join('')}</div></details>`;
+}
+function replaceFilterView(view, html) {
+  const opened = [...view.querySelectorAll('.multi-filter[open]')].map(el => el.dataset.multi), active = document.activeElement;
+  const focused = active?.dataset.multiFilter ? { group: active.dataset.multiFilter, value: active.value } : null;
+  view.innerHTML = html;
+  for (const id of opened) { const el = view.querySelector(`[data-multi="${id}"]`); if (el) el.open = true; }
+  if (focused) view.querySelector(`[data-multi-filter="${focused.group}"][value="${focused.value}"]`)?.focus({ preventScroll: true });
+}
+const formatOptions = () => FORMATS.map(x => [x, t({ full: 'f_readable', frag: 'cov_frag', audio: 'f_audio', own: 'sec_mine' }[x])]);
+const lengthOptions = () => LENGTHS.map(x => [x, t('len_' + x)]);
+const awardOptions = () => AWARDS.map(x => [x, awardName(x)]);
+function languageOptions() { return [...new Set([...myLangs().filter(l => SOURCE_LANGS.includes(l)), ...SOURCE_LANGS])].map(l => [l, cap(langName(l))]); }
 let local = { files: [], positions: [], links: [], suggestions: [], bookmarks: [], tombs: [] };
 let migrated = false;
 async function loadLocal() {
@@ -1744,10 +1794,11 @@ const minutesOf = q => Math.max(1, Math.round(wordsOf(q) / WPM));
 // Neutral: people read at different speeds, so no exact minutes. Same edges as the length choice (LEN).
 function fmtDur(m) { return t(m <= LEN['15'][1] ? 'dur_few' : m <= LEN['40'][1] ? 'dur_hour' : 'dur_more'); }
 const LEN = { '15': [0, 25], '40': [25, 60], eve: [60, Infinity] };
-const inLen = (q, k) => { if (!k || k === 'any') return true; const m = minutesOf(q); return m > LEN[k][0] && m <= LEN[k][1]; };
+function minutesInLengths(minutes, selection) { const lengths = filterValues(selection, LENGTHS); return !lengths.length || lengths.some(k => minutes > LEN[k][0] && minutes <= LEN[k][1]); }
+const inLen = (q, selection) => minutesInLengths(readingMinutes(q), selection);
 // Read / Listen side by side: Read opens the text at the publisher
-const fullLink = q => { const links = (READ[q] && READ[q].links || []).filter(l => l.kind === 'full'); return myLangs().map(lang => links.find(l => (l.lang || 'en') === lang)).find(Boolean) || links[0]; };
-function readCtl(q, cls, label) { const f = fullLink(q); if (!f) return ''; const L = esc(label || t('read_btn')); return `<a class="${cls}" href="${esc(f.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="read" data-site="${esc(siteLabel(f))}">${L}${label ? '' : ' ↗'}</a>`; }
+const fullLink = (q, langs = myLangs()) => { const links = (READ[q] && READ[q].links || []).filter(l => l.kind === 'full'); return langs.map(lang => links.find(l => (l.lang || 'en') === lang)).find(Boolean) || links[0]; };
+function readCtl(q, cls, label, f = fullLink(q)) { if (!f) return ''; const L = esc(label || t('read_btn')); return `<a class="${cls}" href="${esc(f.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="read" data-site="${esc(siteLabel(f))}">${L}${label ? '' : ' ↗'}</a>`; }
 // the Listen button names where you will listen: the magazine's podcast (a human narrator) or ElevenReader (synthetic voice)
 const audioSite = l => (l.site || hostOf(l.url)).replace(/\s*Podcast$/i, '');
 const audioLinks = q => (READ[q]?.links || []).filter(l => l.kind === 'audio').sort((a, b) => {
@@ -1761,21 +1812,21 @@ const fileOf = q => (local.files || []).find(f => f.workId === q);
 // phone voice needs the text inside our reader: a file saved on the shelf
 function phoneOK(q) { return ttsOK() && !!fileOf(q); }
 // where this work can be heard, in the default order: a person reading, then ElevenReader, then the phone's own voice
-function listenOpts(q) {
-  const f = fullLink(q); const o = [];
-  audioLinks(q).filter(l => !l.part || l.part === 1).forEach((a, i) => o.push({ id: i ? 'audio:' + a.url : 'pod', type: 'audio', name: audioSite(a) + ' · ' + langName(a.lang || 'en'), sub: t(a.rights === 'unknown' ? 'ls_external_sub' : 'ls_pod_sub'), url: a.url }));
+function listenOpts(q, langs) {
+  const text = fullLink(q, langs || myLangs()), f = text && (!langs || langs.includes(text.lang || 'en')) ? text : null; const o = [];
+  audioLinks(q).filter(l => (!langs || langs.includes(l.lang || 'en')) && (!l.part || l.part === 1)).forEach((a, i) => o.push({ id: i ? 'audio:' + a.url : 'pod', type: 'audio', name: audioSite(a) + ' · ' + langName(a.lang || 'en'), sub: t(a.rights === 'unknown' ? 'ls_external_sub' : 'ls_pod_sub'), url: a.url }));
   if (f) o.push({ id: 'eleven', name: 'ElevenReader', sub: t('ls_eleven_sub'), url: f.url });
-  if (phoneOK(q)) o.push({ id: 'phone', name: t('ls_phone'), sub: t(fileOf(q) ? 'ls_phone_sub_off' : 'ls_phone_sub') });
+  if (phoneOK(q) && (!langs || f)) o.push({ id: 'phone', name: t('ls_phone'), sub: t(fileOf(q) ? 'ls_phone_sub_off' : 'ls_phone_sub') });
   return o;
 }
 const listenPick = (q, o) => { o = o || listenOpts(q); return o.find(x => x.id === prefs.listen) || o[0]; };
-function listenCtl(q, cls, compact) {
-  const o = listenOpts(q); if (!o.length) return ''; const c = listenPick(q, o);
+function listenCtl(q, cls, compact, langs) {
+  const o = listenOpts(q, langs); if (!o.length) return ''; const c = listenPick(q, o);
   const two = compact ? src => `${ICON.ear}<span class="sr">${esc(t('listen_btn'))} · ${esc(src)}</span>` : (src, arrow) => `<span class="lb">${esc(t('listen_btn'))}${arrow ? ' ↗' : ''}</span><span class="ls">${esc(src)}</span>`;
   const main = c.type === 'audio' ? `<a class="${cls} two" href="${esc(c.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(c.name)}" title="${esc(t('listen_pod', { s: c.name }))}">${two(c.name, true)}</a>`
     : c.id === 'eleven' ? `<button class="${cls} two" data-eleven="${esc(c.url)}" data-wid="${q}" title="${esc(t('listen_tts'))}">${two(c.name, false)}</button>`
     : `<button class="${cls} two" data-say="${q}" title="${esc(t('ls_phone_t'))}">${two(c.name, false)}</button>`;
-  if (o.length < 2 || compact) return main;
+  if (o.length < 2 || compact || langs) return main;
   return `<span class="lgrp">${main}<button class="${cls.replace('btn-primary', '').trim()} lmore" data-lsrc="${q}" aria-haspopup="dialog" aria-label="${esc(t('ls_more'))}" title="${esc(t('ls_more'))}">▾</button></span>`;
 }
 let listenFrom = null;
@@ -1784,7 +1835,7 @@ function openListenSheet(q) {
   const m = $('#listen-dialog'); listenFrom = document.activeElement;
   m.innerHTML = `<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ls-title">
     <h3 id="ls-title">${esc(t('ls_title'))}</h3>
-    ${w ? `<p class="small">${esc(titleOf(w))} · ${esc(fmtDur(minutesOf(q)))}</p>` : ''}
+    ${w ? `<p class="small">${esc(titleOf(w))} · ${esc(fmtDur(readingMinutes(q)))}</p>` : ''}
     <div class="lopts">${o.map(x => `<button class="lopt" data-lgo="${esc(x.id)}" data-wid="${q}" aria-current="${x.id === c.id}"><span class="lo-n">${esc(x.name)}${x.type === 'audio' ? ' ↗' : ''}</span><span class="lo-s">${esc(x.sub)}</span>${x.id === c.id ? '<span class="lo-c" aria-hidden="true">✓</span>' : ''}</button>`).join('')}</div>
     <label class="check"><input type="checkbox" id="ls-remember" checked> ${esc(t('ls_remember'))}</label>
     <div class="modal-actions"><button class="btn btn-ghost" data-lclose="1">${esc(t('cancel'))}</button></div>
@@ -1815,26 +1866,28 @@ function renderNews() {
     return `<li><span class="what">${esc(what)}</span><button class="linkbtn" data-work="${w.id}">${esc(titleOf(w))}</button><span class="small">${esc(authorsLine(w))} · ${w.awards.map(a => awardName(a[0]) + ' ' + a[2]).join(', ')}</span></li>`;
   }).join('');
   const moreLi = more ? `<li><button class="linkbtn" data-fresh="1">${esc(t('news_more', { n: more }))}</button></li>` : '';
-  return `<section class="news" aria-label="${esc(head)}"><h3>${esc(head)}</h3><ul>${li}${moreLi}</ul>${nWorks ? `<div class="row"><button class="chip" data-fresh="1" aria-pressed="${filter.fresh}">${esc(t('f_new'))}</button><button class="btn btn-ghost btn-small" id="news-seen">${esc(t('news_seen'))}</button></div>` : `<div class="row"><button class="btn btn-ghost btn-small" id="news-seen">${esc(t('news_seen'))}</button></div>`}</section>`;
+  return `<section class="news" aria-label="${esc(head)}"><h3>${esc(head)}</h3><ul>${li}${moreLi}</ul>${nWorks ? `<div class="row"><button class="chip" data-fresh="1" aria-pressed="${filter.statuses.includes('fresh')}">${esc(t('f_new'))}</button><button class="btn btn-ghost btn-small" id="news-seen">${esc(t('news_seen'))}</button></div>` : `<div class="row"><button class="btn btn-ghost btn-small" id="news-seen">${esc(t('news_seen'))}</button></div>`}</section>`;
 }
 let pickSeed = Math.floor(Math.random() * 1e6);
 function seeded(seed) { let x = seed % 2147483647; if (x <= 0) x += 2147483646; return () => (x = x * 16807 % 2147483647) / 2147483647; }
 // "Three others" walks through the shuffled list without repeats: books already shown in this visit are skipped
 // until every book of that length has been shown; then a new shuffle starts (not with the three just shown).
 const pickSeen = {}, pickLast = {}, pickWrapped = {};
-function picksNow(k) {
-  const list = pickList(k); const seen = pickSeen[k] || new Set(); const last = pickLast[k] || new Set();
+const pickScope = (k, kind = 'full') => JSON.stringify([filterValues(k, LENGTHS), kind, myLangs()]);
+function picksNow(k, kind = 'full') {
+  const list = kind === 'excerpt' ? excerptPickList(k) : kind === 'other' ? otherLanguagePickList(k) : pickList(k), scope = pickScope(k, kind);
+  const seen = pickSeen[scope] || new Set(), last = pickLast[scope] || new Set();
   const unseen = list.filter(q => !seen.has(q));
   let three = unseen.slice(0, 3);
   if (three.length < 3) three = three.concat(list.filter(q => !three.includes(q) && !last.has(q)).slice(0, 3 - three.length));
   if (three.length < 3) three = three.concat(list.filter(q => !three.includes(q)).slice(0, 3 - three.length));
   const rest = unseen.filter(q => !three.includes(q));
-  return { list, three, me: rest[0] || list.find(q => !three.includes(q)) || list[0] };
+  return { list, three, me: rest[0] || list.find(q => !three.includes(q)) || list[0], scope };
 }
-function pickNext(k) {
-  const { list, three } = picksNow(k);
-  const seen = pickSeen[k] || (pickSeen[k] = new Set()); three.forEach(q => seen.add(q)); pickLast[k] = new Set(three);
-  if (!list.some(q => !seen.has(q))) { pickSeed++; pickSeen[k] = new Set(three.length < list.length ? three : []); pickWrapped[k] = true; }
+function pickNext(k, kind = 'full') {
+  const { list, three, scope } = picksNow(k, kind);
+  const seen = pickSeen[scope] || (pickSeen[scope] = new Set()); three.forEach(q => seen.add(q)); pickLast[scope] = new Set(three);
+  if (!list.some(q => !seen.has(q))) { pickSeed++; pickSeen[scope] = new Set(three.length < list.length ? three : []); pickWrapped[scope] = true; }
 }
 /* ---------- the reader's languages: what they can read or hear comes first ----------
    prefs.langs: the languages the reader chose on the shelf; until then, the page's language and the phone's. */
@@ -1844,92 +1897,154 @@ function browserLangs() { const out = []; for (const l of (navigator.languages &
 function myLangs() { return Array.isArray(prefs.langs) && prefs.langs.length ? prefs.langs : [...new Set([LANG, ...browserLangs()])]; }
 const explicitLangs = () => Array.isArray(prefs.langs) && prefs.langs.length > 0;
 const matchingFullText = q => { const l = fullLink(q); return l && myLangs().includes(l.lang || 'en'); };
+const matchingReading = q => matchingFullText(q) || audioLinks(q).some(l => myLangs().includes(l.lang || 'en'));
+function readingMinutes(q, langs = explicitLangs() ? myLangs() : null) {
+  const text = fullLink(q, langs || myLangs());
+  if (text && (!langs || langs.includes(text.lang || 'en'))) return minutesOf(q);
+  const audio = audioLinks(q).find(l => !langs || langs.includes(l.lang || 'en'));
+  return Number.isFinite(audio?.seconds) && audio.seconds > 0 ? Math.ceil(audio.seconds / 60) : minutesOf(q);
+}
 function workLangs(q) { const r = READ[q], full = new Set(), audio = new Set(), frag = new Set(); if (r) for (const l of r.links) (l.kind === 'audio' ? audio : full).add(l.lang || 'en'); for (const x of excerptLinks(q)) frag.add(x.lang.toLowerCase()); return { full, audio, frag }; }
+const sourceLangs = selection => { const langs = selection === 'mine' ? myLangs() : filterValues(selection, SOURCE_LANGS); return langs.length ? langs : null; };
+function matchesSourceLanguage(q, selection, kind) {
+  const langs = sourceLangs(selection); if (!langs && !kind) return true;
+  const found = workLangs(q), sets = kind ? [found[kind]] : [found.full, found.audio, found.frag];
+  return !langs && !kind || sets.some(set => set && (langs ? langs.some(lang => set.has(lang)) : set.size > 0));
+}
+function matchesFormats(q, langs, formats) { return !formats.length || formats.some(kind => kind === 'own' ? isMine(q) : matchesSourceLanguage(q, langs, kind)); }
 // 2: the whole text or a reading in a language the reader knows; 1: a fragment in one; 0: nothing in their languages
 function langScore(q) { const m = myLangs(), w = workLangs(q), has = s => m.some(l => s.has(l)); return has(w.full) || has(w.audio) ? 2 : has(w.frag) ? 1 : 0; }
 const dataLangs = () => { const s = new Set(); for (const r of Object.values(READ)) for (const l of r.links) s.add(l.lang || 'en'); return s; };
 function pickList(k) {
   const started = new Set(local.positions.filter(p => p.workId).map(p => p.workId));
-  const any = Object.keys(READ).filter(q => fullLink(q) && WORKS[q] && inLen(q, k) && !isDone(q));
-  const near = any.filter(matchingFullText), all = explicitLangs() ? near : near.length >= 3 ? near : any;
+  const any = Object.keys(READ).filter(q => WORKS[q] && (fullLink(q) || audioLinks(q).length) && inLen(q, k) && !isDone(q));
+  const near = any.filter(matchingReading), all = explicitLangs() ? near : near.length >= 3 ? near : any;
   const fresh = all.filter(q => !started.has(q));
-  const mix = a => { a ^= a >>> 16; a = Math.imul(a, 0x7feb352d); a ^= a >>> 15; a = Math.imul(a, 0x846ca68b); a ^= a >>> 16; return a >>> 0; };
-  const sk = mix(pickSeed + k.length * 7919); const key = q => mix(parseInt(hash(q), 36) ^ sk);
-  return (fresh.length >= 3 ? fresh : all).map(q => [key(q), q]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  return orderPicks(fresh.length >= 3 ? fresh : all, k);
 }
-function pickCard(q) {
-  const w = work(q); const a = w.awards[0];
-  return `<article class="pick"><button class="pick-open" data-work="${q}">${coverHtml(q, 's')}<span class="pick-txt"><span class="pick-t">${esc(titleOf(w))}</span><span class="pick-a">${esc(authorsLine(w))}</span></span></button><div class="pick-actions">${readCtl(q, 'btn btn-primary')}${listenCtl(q, 'btn btn-icon', true)}</div><button class="pick-done" data-done="${q}" title="${esc(t('done_add_t'))}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>${esc(t('pick_read_it'))}</span></button></article>`;
+function orderPicks(list, k, kind = 'full') {
+  const mix = a => { a ^= a >>> 16; a = Math.imul(a, 0x7feb352d); a ^= a >>> 15; a = Math.imul(a, 0x846ca68b); a ^= a >>> 16; return a >>> 0; };
+  const sk = mix(pickSeed + parseInt(hash(pickScope(k, kind)), 36)); const key = q => mix(parseInt(hash(q), 36) ^ sk);
+  const ordered = list.map(q => [key(q), q]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+  // With two or three available books, reshuffle their order instead of hiding the action.
+  const previous = [...(pickLast[pickScope(k, kind)] || [])];
+  if (ordered.length > 1 && ordered.length <= 3 && ordered.length === previous.length && ordered.every((q, i) => q === previous[i])) ordered.push(ordered.shift());
+  return ordered;
+}
+function excerptPickList(k) {
+  // Excerpt duration is unknown; do not use the whole book's duration for its sample.
+  const list = Object.keys(WORKS).filter(q => !isDone(q) && excerptLinks(q).some(l => myLangs().includes(l.lang.toLowerCase())));
+  return orderPicks(list, k, 'excerpt');
+}
+function otherLanguageText(q) {
+  const links = (READ[q]?.links || []).filter(l => l.kind === 'full' && !myLangs().includes(l.lang || 'en'));
+  return links.find(l => (l.lang || 'en') === 'en') || links[0];
+}
+function otherLanguagePickList(k) {
+  const preferred = new Set(pickList(k));
+  const list = Object.keys(READ).filter(q => WORKS[q] && !preferred.has(q) && !isDone(q) && otherLanguageText(q) && minutesInLengths(minutesOf(q), k));
+  const english = list.filter(q => (otherLanguageText(q).lang || 'en') === 'en');
+  return orderPicks(english.length ? english : list, k, 'other');
+}
+function pickRandomCtl(q, text) {
+  if (text) return readCtl(q, 'btn', t('pick_me'), text);
+  if (!explicitLangs() || matchingFullText(q)) return readCtl(q, 'btn', t('pick_me')) || listenCtl(q, 'btn', true);
+  const audio = audioLinks(q).find(l => myLangs().includes(l.lang || 'en'));
+  return audio ? `<a class="btn" href="${esc(audio.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(audioSite(audio))}">${esc(t('pick_me'))} ↗</a>` : '';
+}
+function pickActions(picks, kind = 'full') {
+  const { list, me } = picks;
+  if (!list.length) return '';
+  return `<div class="pick-more" data-pick-actions="${kind}">${pickRandomCtl(me, kind === 'other' ? otherLanguageText(me) : null)}<button class="btn btn-ghost" data-pickmore="${kind === 'full' ? '1' : kind}"${list.length < 2 ? ' disabled' : ''}>${esc(t('pick_more'))}</button></div>`;
+}
+function pickCard(q, langs = explicitLangs() ? myLangs() : null, showLanguage = false) {
+  const w = work(q), text = fullLink(q, langs || myLangs());
+  const readable = text && (!langs || langs.includes(text.lang || 'en'));
+  const audio = audioLinks(q).find(l => !langs || langs.includes(l.lang || 'en'));
+  const lang = readable ? text.lang || 'en' : audio?.lang || 'en';
+  const title = langs ? w.titles[lang] || w.title : titleOf(w);
+  return `<article class="pick" data-reading-lang="${esc(lang)}"><button class="pick-open" data-work="${q}">${coverHtml(q, 's')}<span class="pick-txt"><span class="pick-t">${esc(title)}</span><span class="pick-a">${esc(authorsLine(w))}</span>${!readable && audio ? `<span class="small">${esc(t('av_audio'))} · ${esc(langName(lang))}</span>` : showLanguage ? `<span class="small">${esc(cap(langName(lang)))}</span>` : ''}</span></button><div class="pick-actions">${readable ? readCtl(q, 'btn btn-primary', null, text) : ''}${listenCtl(q, readable ? 'btn btn-icon' : 'btn btn-primary', !!readable, langs)}</div><button class="pick-done" data-done="${q}" title="${esc(t('done_add_t'))}"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>${esc(t('pick_read_it'))}</span></button></article>`;
 }
 function renderHome() {
   const v = $('#view-catalog');
-  const k = prefs.pickLen || '15';
-  const { list, three, me } = picksNow(k);
+  const k = homeLengths();
+  const picks = picksNow(k), { list, three } = picks;
   const rc = recallHome();
-  const matches = Object.keys(READ).some(q => WORKS[q] && fullLink(q) && inLen(q, k) && (!explicitLangs() || matchingFullText(q)));
-  const excerpts = !three.length && explicitLangs() ? Object.keys(WORKS).filter(q => excerptLinks(q).some(l => myLangs().includes(l.lang.toLowerCase()))).slice(0, 3) : [];
-  v.innerHTML = `${rc}
+  const matches = Object.keys(READ).some(q => WORKS[q] && (fullLink(q) || audioLinks(q).length) && inLen(q, k) && (!explicitLangs() || matchingReading(q)));
+  const fallback = !three.length && explicitLangs() ? picksNow(k, 'excerpt') : null;
+  const excerpts = fallback?.three || [], others = fallback && k.length ? LENGTHS.filter(x => !k.includes(x) && pickList([x]).length) : [];
+  const foreign = three.length < 3 ? picksNow(k, 'other') : null;
+  replaceFilterView(v, `${rc}
     <section class="picks" aria-labelledby="pk-h">
-      <h2 id="pk-h"${rc ? '' : ' class="sr"'}>${esc(t(rc ? 'picks_h_or' : 'picks_h_' + k))}</h2>
-      <div class="seg full" role="group" aria-label="${esc(t('len_label'))}">${['15', '40', 'eve'].map(x => `<button data-picklen="${x}" aria-pressed="${k === x}">${esc(t('len_' + x))}</button>`).join('')}</div>
+      <h2 id="pk-h"${rc ? '' : ' class="sr"'}>${esc(t(rc ? 'picks_h_or' : 'picks_h_' + (k.length === 1 ? k[0] : 'any')))}</h2>
+      <div class="filter-grid">${multiFilter('home-lengths', t('len_label'), k, lengthOptions())}</div>
       <p class="small" id="picks-languages">${esc(t('picks_languages', { l: myLangs().map(langName).join(', ') }))} <button class="linkbtn" data-goshelf="shelf-langs">${esc(t('langs_change'))}</button></p>
-      ${three.length ? `<div class="picklist">${three.map(pickCard).join('')}</div>` : `<p class="empty">${esc(t(matches ? 'picks_done' : explicitLangs() ? 'picks_none_lang' : 'picks_none', { l: myLangs().map(langName).join(', ') }))}</p>`}
-      ${excerpts.length ? `<div class="home-excerpts"><h3>${esc(t('picks_excerpts'))}</h3>${excerpts.map(q => { const w = work(q), l = excerptLinks(q).find(l => myLangs().includes(l.lang.toLowerCase())), lang = l.lang.toLowerCase(); return `<div class="file-row"><div><strong>${esc(w.titles[lang] || w.title)}</strong><span class="small">${esc(authorsLine(w))} · ${esc(langName(lang))}</span></div><a class="btn btn-small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(t('picks_excerpt_open'))} ↗</a></div>`; }).join('')}</div>` : ''}
-      ${pickWrapped[k] && list.length > 3 ? `<p class="note">${esc(t('picks_wrap', { n: list.length }))}</p>` : ''}
+      ${three.length ? `${pickActions(picks)}<div class="picklist" data-picks="reading">${three.map(q => pickCard(q)).join('')}</div>` : matches || !foreign?.three.length ? `<p class="empty">${esc(t(matches ? 'picks_done' : explicitLangs() ? 'picks_none_lang' : 'picks_none', { l: myLangs().map(langName).join(', ') }))}</p>` : ''}
+      ${others.length ? `<div class="home-lengths"><h3>${esc(t('picks_other_lengths'))}</h3><div class="row">${others.map(x => `<button class="btn" data-pickavailable="${x}">${esc(t('len_' + x))} · ${pickList(x).length}</button>`).join('')}</div></div>` : ''}
+      ${foreign?.three.length ? `<section class="other-language-picks" data-picks="other" aria-labelledby="other-languages-h"><h3 id="other-languages-h">${esc(t('picks_other_languages'))}</h3><p class="small">${esc(t(three.length ? 'picks_other_languages_few' : 'picks_other_languages_none'))}</p>${pickActions(foreign, 'other')}<div class="picklist">${foreign.three.map(q => pickCard(q, [otherLanguageText(q).lang || 'en'], true)).join('')}</div></section>` : ''}
+      ${excerpts.length ? `<div class="home-excerpts"><h3>${esc(t('picks_excerpts'))}</h3><p class="small">${esc(t('picks_excerpt_note'))}</p>${excerpts.map(q => { const w = work(q), l = excerptLinks(q).find(l => myLangs().includes(l.lang.toLowerCase())), lang = l.lang.toLowerCase(); return `<div class="file-row" data-excerpt="${q}"><div><strong>${esc(w.titles[lang] || w.title)}</strong><span class="small">${esc(authorsLine(w))} · ${esc(langName(lang))}</span></div><a class="btn btn-small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.audio ? t('ex_audio', {site:l.site,l:l.lang}) : t('picks_excerpt_open'))} ↗</a></div>`; }).join('')}${fallback.list.length > 3 ? `<button class="btn btn-ghost" data-pickmore="excerpt">${esc(t('pick_more'))}</button>` : ''}</div>` : ''}
+      ${pickWrapped[pickScope(k)] && list.length > 3 ? `<p class="note">${esc(t('picks_wrap', { n: list.length }))}</p>` : ''}
       ${three.length && three.every(q => langScore(q) < 2) ? `<p class="note">${linkify(t('picks_lang_far', { l: langName([...workLangs(three[0]).full][0] || 'en') }))}</p>` : ''}
-      <div class="pick-more">${me && list.length > 3 ? readCtl(me, 'btn', t('pick_me')) : ''}${list.length > 3 ? `<button class="btn btn-ghost" data-pickmore="1">${esc(t('pick_more'))}</button>` : ''}</div>
-    </section>`;
+    </section>`);
 }
 function renderCatalog() { renderHome(); renderLibrary(); }
+function catalogFilterControls() {
+  return `<div class="filter-grid">
+    ${multiFilter('lib-languages', t('source_language'), filter.langs, languageOptions())}
+    ${multiFilter('lib-awards', t('col_award'), filter.awards, awardOptions())}
+    ${multiFilter('lib-formats', t('filter_format'), filter.formats, formatOptions())}
+    ${multiFilter('lib-lengths', t('len_label'), filter.lengths, lengthOptions())}
+    ${multiFilter('lib-statuses', t('filter_status'), filter.statuses, [['starred', t('f_starred')], ['fresh', t('f_new')]])}
+  </div>`;
+}
 function renderLibrary(onlyBody) {
   const v = $('#view-library');
   if (onlyBody && $('#lib-body')) { $('#lib-body').innerHTML = libraryBody(); return; }
-  v.innerHTML = `
-    <div class="intro"><h2>${esc(t('intro_h'))}</h2><p>${esc(t('intro_p'))}</p></div>
-    ${searchForm('lib-q', filter.q)}
-    <div id="lib-body" class="lib-body">${libraryBody()}</div>`;
+  replaceFilterView(v, `<div class="intro"><h2>${esc(t('intro_h'))}</h2><p>${esc(t('intro_p'))}</p></div>
+    ${catalogFilterControls()}${searchForm('lib-q', filter.q)}<div id="lib-body" class="lib-body">${libraryBody()}</div>`);
 }
 // the language of the text and of the reading, dimmed when the reader does not know it
-function langChips(q) { const w = workLangs(q), m = myLangs(); const ls = [...new Set([...w.full, ...w.audio])]; return ls.map(l => `<span class="flag flag-lang${m.includes(l) ? '' : ' far'}" title="${esc(langName(l))}">${esc(l.toUpperCase())}</span>`).join(''); }
-function slipHtml(w) { const r = READ[w.id]; const orig = origOf(w); return `
+function langChips(q, langs) { const w = workLangs(q), m = myLangs(); const ls = [...new Set([...w.full, ...w.audio, ...w.frag])].filter(l => !langs || langs.includes(l)); return ls.map(l => `<span class="flag flag-lang${m.includes(l) ? '' : ' far'}" title="${esc(langName(l))}">${esc(l.toUpperCase())}</span>`).join(''); }
+function slipHtml(w) {
+  const r = READ[w.id], langs = sourceLangs(filter.langs), candidate = fullLink(w.id, langs || myLangs());
+  const text = candidate && (!langs || langs.includes(candidate.lang || 'en')) ? candidate : null;
+  const audio = audioLinks(w.id).find(l => !langs || langs.includes(l.lang || 'en'));
+  const excerpt = excerptLinks(w.id).find(l => !langs || langs.includes(l.lang.toLowerCase()));
+  const lang = text ? text.lang || 'en' : audio ? audio.lang || 'en' : excerpt?.lang.toLowerCase();
+  const title = langs ? w.titles[lang] || w.title : titleOf(w), orig = langs ? title !== w.title ? w.title : '' : origOf(w);
+  const tier = !langs ? tierOf(w.id) : text ? text.tier || r.tier : audio ? audio.tier || r.tier : 't3';
+  const duration = !text && !audio && excerpt ? t('picks_excerpt_note') : fmtDur(text ? minutesOf(w.id) : audio?.seconds > 0 ? Math.ceil(audio.seconds / 60) : readingMinutes(w.id));
+  return `
       <article class="slip${isDone(w.id) ? ' is-done' : ''}">
         ${starBtn(w.id)}
         <div class="slip-row">${coverHtml(w.id, 's')}<div class="slip-body">
         <div class="awards">${awardChips(w, false)}</div>
-        <button class="slip-open" data-work="${w.id}"><h3>${esc(titleOf(w))}</h3></button>
+        <button class="slip-open" data-work="${w.id}"><h3>${esc(title)}</h3></button>
         ${orig ? `<div class="alt" lang="en">${esc(orig)}</div>` : ''}
         <p class="byline">${esc(authorsLine(w))} · ${esc(r.pub)} · ${w.pub || ''}</p>
-        <p class="slip-time">${esc(fmtDur(minutesOf(w.id)))}</p></div></div>
-        <div class="flags">${langChips(w.id)}<span class="tier tier-${tierOf(w.id)}">${esc(t('tier_' + tierOf(w.id)))}</span>${hasAudio(w.id) ? `<span class="flag">${esc(t('f_audio'))}</span>` : ''}${workFlags(w)}</div>
-        <div class="slip-actions">${readCtl(w.id, 'btn btn-small')}${listenCtl(w.id, 'btn btn-small')}${doneBtn(w.id, 'btn btn-small btn-ghost')}</div>
+        <p class="slip-time">${esc(duration)}</p></div></div>
+        <div class="flags">${langChips(w.id, langs)}<span class="tier tier-${tier}">${esc(t('tier_' + tier))}</span>${audio ? `<span class="flag">${esc(t('f_audio'))}</span>` : ''}${workFlags(w)}</div>
+        <div class="slip-actions">${text ? readCtl(w.id, 'btn btn-small', null, text) : excerpt ? `<button class="btn btn-small" data-work="${w.id}">${esc(t('picks_excerpt_open'))}</button>` : ''}${listenCtl(w.id, 'btn btn-small', false, langs)}${doneBtn(w.id, 'btn btn-small btn-ghost')}</div>
       </article>`; }
+function passCatalog(q) {
+  const w = work(q); if (!w) return false;
+  return w.awards.some(([a]) => filterMatches(filter.awards, a))
+    && matchesSourceLanguage(q, filter.langs) && matchesFormats(q, filter.langs, filter.formats)
+    && (!filter.statuses.length || filter.statuses.some(status => status === 'starred' ? isStarred(q) : isNew(q)))
+    && minutesInLengths(readingMinutes(q, sourceLangs(filter.langs)), filter.lengths);
+}
 function libraryBody() {
   if (filter.q) {
-    const found = searchWorks(filter.q), readable = found.filter(q => READ[q]).sort((a, b) => langScore(b) - langScore(a)), other = found.filter(q => !READ[q]);
+    const found = searchWorks(filter.q).filter(passCatalog), readable = found.filter(q => READ[q]).sort((a, b) => langScore(b) - langScore(a)), other = found.filter(q => !READ[q]);
     return `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>
       ${readable.length ? `<h3 class="sub-h">${esc(t('search_readable', { n: readable.length }))}</h3><div class="slips">${readable.map(q => slipHtml(work(q))).join('')}</div>` : ''}
-      ${other.length ? `<h3 class="sub-h">${esc(t('search_other', { n: other.length }))}</h3>${searchRows(other)}` : ''}
+      ${other.length ? `<h3 class="sub-h">${esc(t('search_other', { n: other.length }))}</h3>${searchRows(other, filter.langs)}` : ''}
       ${found.length ? '' : `<p class="empty">${esc(t('nothing_found'))}</p>`}`;
   }
-  const list = Object.keys(READ).map(work).filter(Boolean)
-    .filter(w => (filter.award === 'all' || w.awards.some(a => a[0] === filter.award))
-      && (!filter.readable || hasText(w.id)) && (!filter.audio || hasAudio(w.id))
-      && (!filter.starred || isStarred(w.id)) && (!filter.fresh || isNew(w.id)) && (!filter.mine || langScore(w.id) > 0) && inLen(w.id, filter.len))
+  const list = Object.keys(READ).filter(passCatalog).map(work)
     .sort((a, b) => langScore(b.id) - langScore(a.id) || latestYear(b) - latestYear(a) || a.title.localeCompare(b.title));
-  const n = list.length;
-  return `
-    ${renderNews()}
-    <div class="scroller" role="group">
-      ${['all', ...AWARDS].map(a => `<button class="chip" id="f-${a}" data-award="${a}" aria-pressed="${filter.award === a}">${esc(a === 'all' ? t('f_all') : awardName(a))}</button>`).join('')}
-      <button class="chip" id="f-readable" data-toggle="readable" aria-pressed="${filter.readable}">${esc(t('f_readable'))}</button>
-      <button class="chip" id="f-audio" data-toggle="audio" aria-pressed="${filter.audio}">${esc(t('f_audio'))}</button>
-      <button class="chip" id="f-starred" data-toggle="starred" aria-pressed="${filter.starred}">${esc(t('f_starred'))}</button>
-      <button class="chip" id="f-mine" data-toggle="mine" aria-pressed="${filter.mine}" title="${esc(myLangs().map(langName).join(', '))}">${esc(t('f_mine'))}</button>
-    </div>
-    <div class="scroller" role="group" aria-label="${esc(t('len_label'))}">${['any', '15', '40', 'eve'].map(x => `<button class="chip chip-small" data-flen="${x}" aria-pressed="${(filter.len || 'any') === x}">${esc(t('len_' + x))}</button>`).join('')}</div>
-    <p class="count-line">${n} ${esc(plural(n, t('works')))}</p>
-    <div class="slips">${list.map(slipHtml).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}
-    </div>`;
+  return `${renderNews()}<p class="count-line">${list.length} ${esc(plural(list.length, t('works')))}</p>
+    <div class="slips">${list.map(slipHtml).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}</div>`;
 }
 
 /* ---------- search: one search over all winners ----------
@@ -1968,17 +2083,24 @@ function searchWorks(query) {
 const searchForm = (id, val) => `<form class="searchbar" role="search" data-sform="${id}"><input class="search" id="${id}" name="q" type="search" enterkeyhint="search" autocomplete="off" aria-label="${esc(t('search_go'))}" placeholder="${esc(t('search_ph'))}" value="${esc(val || '')}"><button class="btn btn-primary" type="submit">${esc(t('search_go'))}</button></form>`;
 const awardsLine = w => w.awards.map(([a, c, y]) => `${awardName(a)} ${y} · ${catName(c)}`).join('; ');
 const SEARCH_MAX = 120;
-function searchRows(list) { return `<div class="ylist">${list.slice(0, SEARCH_MAX).map(q => workRow(awardsLine(work(q)), q)).join('')}</div>${list.length > SEARCH_MAX ? `<p class="footnote">${esc(t('search_more', { n: SEARCH_MAX }))}</p>` : ''}`; }
+function searchRows(list, selection) { return `<div class="ylist">${list.slice(0, SEARCH_MAX).map(q => workRow(awardsLine(work(q)), q, selection)).join('')}</div>${list.length > SEARCH_MAX ? `<p class="footnote">${esc(t('search_more', { n: SEARCH_MAX }))}</p>` : ''}`; }
 const clearBtn = () => `<button class="linkbtn" data-sclear="1">${esc(t('search_clear'))}</button>`;
 
 /* ---------- view: Awards (structure) ---------- */
-let AV = Object.assign({ award: 'h', cat: 'S', year: null, mode: 'cats', sort: 'desc', onlyText: false, q: '' }, prefs.av || {});
-AV.q = ''; // search text is not remembered
-if (!['az', 'awards', 'desc', 'asc'].includes(AV.authorSort)) AV.authorSort = AV.sort === 'asc' ? 'asc' : 'desc';
-function saveAV() { prefs.av = { award: AV.award, mode: AV.mode, cat: AV.cat, sort: AV.sort, authorSort: AV.authorSort, onlyText: AV.onlyText }; savePrefs(); }
+let AV = {
+  awards: filterValues(savedFilters.awards?.awards, AWARDS), cats: filterValues(savedFilters.awards?.cats, CATEGORY_FILTERS),
+  langs: filterValues(savedFilters.awards?.langs, SOURCE_LANGS), formats: filterValues(savedFilters.awards?.formats, FORMATS),
+  mode: prefs.av?.mode || 'cats', sort: prefs.av?.sort === 'asc' ? 'asc' : 'desc',
+  authorSort: ['az','awards','asc','desc'].includes(prefs.av?.authorSort) ? prefs.av.authorSort : 'desc', year: null, q: ''
+};
+function saveAV() {
+  // Keep the old view snapshot scalar so a cached older page can still read it.
+  prefs.av = { mode: AV.mode, sort: AV.sort, authorSort: AV.authorSort, award: AV.awards.length === 1 ? AV.awards[0] : 'all', cat: AV.cats.length === 1 ? AV.cats[0] : 'all', lang: AV.langs.length === 1 ? AV.langs[0] : 'all', onlyText: AV.formats.length === 1 && AV.formats[0] === 'full' };
+  saveFilters();
+}
 const WIDE = () => !!(window.matchMedia && window.matchMedia('(min-width: 900px)').matches);
-function marksHtml(q) {
-  return `${hasText(q) ? `<span class="tm" title="${esc(t('lg_text'))}">${mk('text')}</span>` : isMine(q) ? `<span class="mm" title="${esc(t('lg_mine'))}">${mk('mine')}</span>` : hasExcerpt(q) ? `<span class="xm" title="${esc(t('tier_t3'))}">${mk('ex')}</span>` : ''}${hasAudio(q) ? `<span class="am">${mk('audio')}</span>` : ''}${isStarred(q) ? `<span class="sm">${mk('star')}</span>` : ''}${isNew(q) ? `<span class="nd" title="${esc(t('flag_new'))}"></span>` : ''}`;
+function marksHtml(q, selection = AV.langs) {
+  return `${matchesSourceLanguage(q, selection, 'full') ? `<span class="tm" title="${esc(t('lg_text'))}">${mk('text')}</span>` : !sourceLangs(selection) && isMine(q) ? `<span class="mm" title="${esc(t('lg_mine'))}">${mk('mine')}</span>` : matchesSourceLanguage(q, selection, 'frag') ? `<span class="xm" title="${esc(t('tier_t3'))}">${mk('ex')}</span>` : ''}${matchesSourceLanguage(q, selection, 'audio') ? `<span class="am">${mk('audio')}</span>` : ''}${isStarred(q) ? `<span class="sm">${mk('star')}</span>` : ''}${isNew(q) ? `<span class="nd" title="${esc(t('flag_new'))}"></span>` : ''}`;
 }
 // one row = one tap target: year column (opens the year) + work (opens the card)
 function yearRow(y, q, showYear, dec, tag) {
@@ -1987,18 +2109,25 @@ function yearRow(y, q, showYear, dec, tag) {
   return `<div class="yrow${dn ? ' is-done' : ''}"${dec ? ` data-dec="${dec}"` : ''}>${showYear ? `<button class="yr" data-av-year="${y}" aria-label="${y}">${y}</button>` : '<span class="yr"></span>'}<button class="yw" data-work="${q}">${tag ? `<span class="wmeta">${esc(tag)}</span>` : ''}<span class="yt">${esc(titleOf(w))}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}${origOf(w) ? ' · ' + esc(origOf(w)) : ''}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
 }
 const doneTag = () => `<b class="dtag">✓ ${esc(t('done_mark'))}</b> · `;
-function workRow(meta, q) {
+function workRow(meta, q, selection = AV.langs) {
   const w = work(q); const dn = isDone(q);
-  return `<div class="wrow${dn ? ' is-done' : ''}"><button class="wbtn" data-work="${q}"><span class="wmeta">${esc(meta)}</span><span class="yt">${esc(titleOf(w))}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}</span></button><span class="ym">${marksHtml(q)}</span></div>`;
+  return `<div class="wrow${dn ? ' is-done' : ''}"><button class="wbtn" data-work="${q}"><span class="wmeta">${esc(meta)}</span><span class="yt">${esc(titleOf(w))}</span><span class="ya">${dn ? doneTag() : ''}${esc(authorsLine(w))}</span></button><span class="ym">${marksHtml(q, selection)}</span></div>`;
 }
 function cellHtml(q, tag) {
-  const w = work(q); const cls = ['cell']; if (hasText(q)) cls.push('has-text'); if (isMine(q)) cls.push('mine'); if (isDone(q)) cls.push('is-done');
+  const w = work(q); const cls = ['cell']; if (matchesSourceLanguage(q, AV.langs, 'full')) cls.push('has-text'); if (isMine(q)) cls.push('mine'); if (isDone(q)) cls.push('is-done');
   return `<button class="${cls.join(' ')}" data-work="${q}">${tag ? `<span class="award-meta">${esc(tag)}</span>` : ''}<span class="ct">${esc(titleOf(w))}</span><span class="ca">${isDone(q) ? doneTag() : ''}${esc(authorsLine(w))}</span><span class="cm">${marksHtml(q)}</span></button>`;
 }
-const passText = q => !AV.onlyText || hasText(q) || isMine(q);
-function matchQ(q) {
-  if (!AV.q) return true; const s = AV.q.toLowerCase(); const w = work(q);
-  return [w.title, ...Object.values(w.titles), ...w.authors.flatMap(a => Object.values(AUTHORS[a].name))].some(x => x && x.toLowerCase().includes(s));
+const categoryMatches = (category, selected = AV.cats) => !selected.length || selected.some(c => c === 'N' ? CATEGORY_GROUPS.N.includes(category) : c === category);
+const passText = q => matchesSourceLanguage(q, AV.langs) && matchesFormats(q, AV.langs, AV.formats);
+const passAwards = q => passText(q) && work(q)?.awards.some(([a,c]) => filterMatches(AV.awards,a) && categoryMatches(c));
+function categoryColumns() { return AV.cats.length ? CATEGORY_FILTERS.filter(c => AV.cats.includes(c) && !(AV.cats.includes('N') && c !== 'N' && CATEGORY_GROUPS.N.includes(c))) : Object.keys(CATEGORY_GROUPS); }
+function awardsFilterControls() {
+  return `<div class="filter-grid">
+    ${multiFilter('av-languages', t('source_language'), AV.langs, languageOptions())}
+    ${multiFilter('av-awards', t('col_award'), AV.awards, awardOptions())}
+    ${multiFilter('av-categories', t('col_cat'), AV.cats, CATEGORY_FILTERS.map(c => [c, catName(c)]))}
+    ${multiFilter('av-formats', t('filter_format'), AV.formats, formatOptions())}
+  </div>`;
 }
 const decadeOf = y => Math.floor(y / 10) * 10;
 function decadeChips(years) {
@@ -2007,113 +2136,112 @@ function decadeChips(years) {
   return `<div class="scroller" role="group" aria-label="${esc(t('jump_to'))}">${decs.map(d => `<button class="chip chip-small" data-jump="${d}">${d}${esc(t('decade_suffix'))}</button>`).join('')}</div>`;
 }
 function renderAwards(onlyBody) {
-  const v = $('#view-awards');
-  const wide = WIDE();
-  if (AV.mode === 'list') AV.mode = 'years';
-  const mode = AV.mode === 'table' && !wide ? 'cats' : AV.mode; // a phone layout does not erase the chosen desktop view
-  const aw = AV.award === 'all' ? 'h' : AV.award;
-  // "All": novels of every kind (Locus: SF, fantasy, horror, first novel) count as Novel
-  const GROUP = { N: ['N', 'SF', 'FN', 'HN', 'FT'], A: ['A'], E: ['E'], S: ['S'] };
-  const ALL = AV.award === 'all';
-  const catsOf = a => ALL ? Object.keys(GROUP) : CATS[a].filter(c => DATA.aw.some(x => x[0] === a && x[1] === c));
-  if (!AV.cat || (AV.cat !== 'all' && !catsOf(aw).includes(AV.cat))) AV.cat = catsOf(aw).includes('S') ? 'S' : catsOf(aw)[0];
-  const awList = AV.award === 'all' ? AWARDS : [AV.award];
-  const awOpts = ['all', ...AWARDS];
-  const awSeg = `<div class="seg full" role="group" aria-label="${esc(t('col_award'))}">${awOpts.map(a => `<button data-av-award="${a}" aria-pressed="${AV.award === a}">${esc(a === 'all' ? t('aw_all_short') : awardName(a))}</button>`).join('')}</div>`;
-  const modes = ['cats', 'years', 'authors'].concat(wide ? ['table'] : []);
-  const modeSeg = `<div class="seg full" role="group">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${mode === m}">${esc(t('v_' + m))}</button>`).join('')}</div>`;
-  const catLabel = c => c === 'all' ? t('aw_all_short') : catName(c);
-  const catSeg = `<div class="scroller" role="group" aria-label="${esc(t('col_cat'))}">${['all', ...catsOf(aw)].map(c => `<button class="chip" data-av-cat="${c}" aria-pressed="${AV.cat === c}">${esc(catLabel(c))}</button>`).join('')}</div>`;
-  const sortControl = mode === 'authors' ? `<label class="author-sort"><span class="sr">${esc(t('author_sort'))}</span><select id="av-author-sort" aria-label="${esc(t('author_sort'))}">${['desc', 'asc', 'az', 'awards'].map(k => `<option value="${k}"${AV.authorSort === k ? ' selected' : ''}>${esc(t('author_sort_' + k))}</option>`).join('')}</select></label>` : `<button class="chip" data-av-sort="toggle">${AV.sort === 'desc' ? '↓ ' + esc(t('sort_desc')) : '↑ ' + esc(t('sort_asc'))}</button>`;
-  const tools = `<div class="${mode === 'authors' ? 'author-tools' : 'scroller'}">${sortControl}<button class="chip" data-av-text="1" aria-pressed="${AV.onlyText}">${mk('text')} ${esc(t('only_text'))}</button></div>`;
-  const search = '';
-  const LG = { '▶': 'text', '¶': 'ex', '◌': 'mine', '♪': 'audio', '★': 'star' };
-  const legend = `<p class="footnote legend">${t('legend_short').split(' · ').map(x => { const g = x[0], rest = esc(x.slice(2)); return LG[g] ? `<span>${mk(LG[g])} ${rest}</span>` : g === '●' ? `<span><span class="nd"></span> ${rest}</span>` : `<span>${esc(x)}</span>`; }).join(' ')}</p>`;
-  const sortY = ys => ys.sort((a, b) => AV.sort === 'desc' ? b - a : a - b);
-  // The same work/year/category is one entry, with every award and Locus novel subtype retained.
-  const winners = (y, cat) => {
+  const v = $('#view-awards'), wide = WIDE();
+  if (!['cats','years','authors','table'].includes(AV.mode)) AV.mode = 'years';
+  const mode = AV.mode === 'table' && !wide ? 'cats' : AV.mode;
+  const awList = AV.awards.length ? AV.awards : AWARDS, cols = categoryColumns();
+  const awLabel = AV.awards.length ? AV.awards.map(awardName).join(', ') : t('aw_all_short');
+  const catLabel = AV.cats.length ? AV.cats.map(catName).join(', ') : t('f_all');
+  const modes = ['cats','years','authors'].concat(wide ? ['table'] : []);
+  const modeSeg = `<div class="seg full" role="group" aria-label="${esc(t('filter_view'))}">${modes.map(m => `<button data-av-mode="${m}" aria-pressed="${mode === m}">${esc(t('v_'+m))}</button>`).join('')}</div>`;
+  const sortControl = mode === 'authors' ? `<label class="author-sort"><span class="sr">${esc(t('author_sort'))}</span><select id="av-author-sort" aria-label="${esc(t('author_sort'))}">${['desc','asc','az','awards'].map(k => `<option value="${k}"${AV.authorSort === k ? ' selected' : ''}>${esc(t('author_sort_'+k))}</option>`).join('')}</select></label>` : `<button class="chip" data-av-sort="toggle">${AV.sort === 'desc' ? '↓ '+esc(t('sort_desc')) : '↑ '+esc(t('sort_asc'))}</button>`;
+  const tools = `<div class="author-tools">${sortControl}</div>`;
+  const LG = { '▶':'text', '¶':'ex', '◌':'mine', '♪':'audio', '★':'star' };
+  const legend = `<p class="footnote legend">${t('legend_short').split(' · ').map(x => { const g=x[0], rest=esc(x.slice(2)); return LG[g] ? `<span>${mk(LG[g])} ${rest}</span>` : g === '●' ? `<span><span class="nd"></span> ${rest}</span>` : `<span>${esc(x)}</span>`; }).join(' ')}</p>`;
+  const sortY = ys => ys.sort((a,b) => AV.sort === 'desc' ? b-a : a-b);
+  // OR within each filter; AND between groups. Novel includes every Locus novel subtype.
+  const winners = (year, column) => {
     const by = new Map();
-    for (const a of awList) for (const c of (cat === 'all' ? CATS[a] : ALL ? GROUP[cat] : [cat])) for (const q of ((BOARD[a] || {})[y] || {})[c] || []) if (passText(q) && matchQ(q)) {
-      if (!by.has(q)) by.set(q, []);
-      const label = awardName(a) + (cat === 'all' || (ALL && c !== cat) ? ' · ' + catName(c) : '');
-      if (!by.get(q).includes(label)) by.get(q).push(label);
+    for (const a of awList) for (const c of CATS[a]) {
+      if (!categoryMatches(c) || (column && !categoryMatches(c,[column]))) continue;
+      for (const q of ((BOARD[a] || {})[year] || {})[c] || []) if (passText(q)) {
+        if (!by.has(q)) by.set(q,[]);
+        const label=awardName(a)+' · '+catName(c);
+        if (!by.get(q).includes(label)) by.get(q).push(label);
+      }
     }
     return by;
   };
-  let head = '', body = '';
+  const years = sortY([...new Set(DATA.aw.filter(([a,c,,q]) => awList.includes(a) && categoryMatches(c) && passText(q)).map(x=>x[2]))]);
+  let head = modeSeg+tools, body = '';
   if (AV.year) {
-    const y = AV.year;
-    const allYears = [...new Set(DATA.aw.filter(x => awList.includes(x[0])).map(x => x[2]))].sort((a, b) => a - b);
-    const i = allYears.indexOf(y);
-    const secs = awList.map(a => { const row = (BOARD[a] || {})[y]; if (!row) return ''; const rows = CATS[a].flatMap(c => (row[c] || []).filter(passText).map(q => workRow(catName(c), q))).join(''); return rows ? `<section class="yearsec"><h3>${esc(awardName(a))}</h3><div class="ylist">${rows}</div></section>` : ''; }).join('');
-    head = `<div class="yearbar"><button class="btn btn-ghost" data-av-clear="1">← ${esc(t('crumb_all'))}</button><div class="yearnav"><button class="btn" data-av-year="${allYears[i - 1] || ''}" ${i > 0 ? '' : 'disabled'} aria-label="${esc(t('prev_year'))}">‹</button><strong>${y}</strong><button class="btn" data-av-year="${allYears[i + 1] || ''}" ${i < allYears.length - 1 ? '' : 'disabled'} aria-label="${esc(t('next_year'))}">›</button></div></div>${awSeg}`;
-    body = secs || `<p class="empty">${esc(t('nothing_found'))}</p>`;
+    const y=AV.year, allYears=years.slice().sort((a,b)=>a-b), i=allYears.indexOf(y);
+    const secs=awList.map(a=>{
+      const row=BOARD[a]?.[y]; if(!row)return '';
+      const rows=CATS[a].filter(c=>categoryMatches(c)).flatMap(c=>(row[c]||[]).filter(passText).map(q=>workRow(catName(c),q))).join('');
+      return rows ? `<section class="yearsec"><h3>${esc(awardName(a))}</h3><div class="ylist">${rows}</div></section>` : '';
+    }).join('');
+    head=`<div class="yearbar"><button class="btn btn-ghost" data-av-clear="1">← ${esc(t('crumb_all'))}</button><div class="yearnav"><button class="btn" data-av-year="${allYears[i-1]||''}" ${i>0?'':'disabled'} aria-label="${esc(t('prev_year'))}">‹</button><strong>${y}</strong><button class="btn" data-av-year="${allYears[i+1]||''}" ${i<allYears.length-1?'':'disabled'} aria-label="${esc(t('next_year'))}">›</button></div></div>`;
+    body=secs||`<p class="empty">${esc(t('nothing_found'))}</p>`;
   } else if (mode === 'cats') {
-    const ys = sortY([...new Set(awList.flatMap(a => Object.keys(BOARD[a] || {}).map(Number)))]);
-    const shown = []; let rows = '', lastDec = null, count = 0;
-    for (const y of ys) {
-      const by = winners(y, AV.cat);
-      const qs = [...by.keys()];
-      qs.forEach((q, k) => { const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec; const ns = by.get(q); rows += yearRow(y, q, k === 0, mark, ALL || AV.cat === 'all' ? ns.join(ns.some(n => n.includes(' · ')) ? '; ' : ', ') : ''); count++; });
-      if (qs.length) shown.push(y);
+    let rows='', lastDec=null, count=0;const shown=[];
+    for(const y of years){const by=winners(y);const qs=[...by.keys()];
+      qs.forEach((q,k)=>{const dec=decadeOf(y), mark=dec!==lastDec?dec:null;lastDec=dec;rows+=yearRow(y,q,k===0,mark,by.get(q).join('; '));count++;});
+      if(qs.length)shown.push(y);
     }
-    head = `${awSeg}${modeSeg}${catSeg}${tools}${search}${decadeChips(shown)}`;
-    body = `<p class="count-line">${esc(ALL ? t('aw_all_short') : awardName(aw))} · ${esc(catLabel(AV.cat))} · ${esc(t('found', { n: fmtNum(count) }))}</p>${count ? `<div class="ylist">${rows}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
+    head+=decadeChips(shown);
+    body=`<p class="count-line">${esc(awLabel)} · ${esc(catLabel)} · ${esc(t('found',{n:fmtNum(count)}))}</p>${count?`<div class="ylist">${rows}</div>`:`<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
   } else if (mode === 'authors') {
-    const authors = new Map(), matches = AV.q ? new Set(searchWorks(AV.q)) : null;
-    for (const w of Object.values(WORKS)) {
-      const awards = w.awards.filter(([a, c]) => awList.includes(a) && (AV.cat === 'all' || (ALL ? GROUP[AV.cat].includes(c) : c === AV.cat)));
-      if (!awards.length || !passText(w.id) || (matches && !matches.has(w.id))) continue;
-      for (const aid of w.authors) { if (!authors.has(aid)) authors.set(aid, []); authors.get(aid).push({ w, awards }); }
+    const authors=new Map(), matches=AV.q?new Set(searchWorks(AV.q)):null;
+    for(const w of Object.values(WORKS)){
+      const awards=w.awards.filter(([a,c])=>awList.includes(a)&&categoryMatches(c));
+      if(!awards.length||!passText(w.id)||(matches&&!matches.has(w.id)))continue;
+      for(const aid of w.authors){if(!authors.has(aid))authors.set(aid,[]);authors.get(aid).push({w,awards});}
     }
-    const latest = entries => Math.max(...entries.flatMap(x => x.awards.map(a => a[2])));
-    const earliest = entries => Math.min(...entries.flatMap(x => x.awards.map(a => a[2])));
-    const awardCount = entries => new Set(entries.flatMap(({ w, awards }) => awards.map(a => w.id + '|' + a.join('|')))).size;
-    const byName = (a, b) => authorName(a[0]).localeCompare(authorName(b[0]), LANG);
-    const entries = [...authors].sort((a, b) => (AV.authorSort === 'az' ? 0 : AV.authorSort === 'awards' ? awardCount(b[1]) - awardCount(a[1]) : AV.authorSort === 'asc' ? earliest(a[1]) - earliest(b[1]) : latest(b[1]) - latest(a[1])) || byName(a, b));
-    head = `${awSeg}${modeSeg}${catSeg}${tools}`;
-    body = `<p class="count-line">${esc(t('authors_count', { n: entries.length }))}${AV.q ? ' · ' + clearBtn() : ''}</p><p class="footnote">${esc(t('authors_hint'))}</p>${entries.map(([aid, works]) => `<section class="yearsec authorsec"><h3><button class="btn btn-ghost author-open" data-author="${aid}"><span>${esc(authorName(aid))} ↗</span><span class="author-counts">${esc(t('author_works_n', { n: works.length }))} · ${esc(t('author_awards_n', { n: awardCount(works) }))}</span></button></h3><div class="ylist">${works.sort((a, b) => AV.authorSort === 'asc' ? earliest([a]) - earliest([b]) : latest([b]) - latest([a])).map(({w, awards}) => workRow(awards.map(([a,c,y]) => `${awardName(a)} ${y} · ${catName(c)}`).join('; '), w.id)).join('')}</div></section>`).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
+    const latest=entries=>Math.max(...entries.flatMap(x=>x.awards.map(a=>a[2]))), earliest=entries=>Math.min(...entries.flatMap(x=>x.awards.map(a=>a[2])));
+    const awardCount=entries=>new Set(entries.flatMap(({w,awards})=>awards.map(a=>w.id+'|'+a.join('|')))).size;
+    const byName=(a,b)=>authorName(a[0]).localeCompare(authorName(b[0]),LANG);
+    const entries=[...authors].sort((a,b)=>(AV.authorSort==='az'?0:AV.authorSort==='awards'?awardCount(b[1])-awardCount(a[1]):AV.authorSort==='asc'?earliest(a[1])-earliest(b[1]):latest(b[1])-latest(a[1]))||byName(a,b));
+    body=`<p class="count-line">${esc(t('authors_count',{n:entries.length}))}${AV.q?' · '+clearBtn():''}</p><p class="footnote">${esc(t('authors_hint'))}</p>${entries.map(([aid,works])=>`<section class="yearsec authorsec"><h3><button class="btn btn-ghost author-open" data-author="${aid}"><span>${esc(authorName(aid))} ↗</span><span class="author-counts">${esc(t('author_works_n',{n:works.length}))} · ${esc(t('author_awards_n',{n:awardCount(works)}))}</span></button></h3><div class="ylist">${works.sort((a,b)=>AV.authorSort==='asc'?earliest([a])-earliest([b]):latest([b])-latest([a])).map(({w,awards})=>workRow(awards.map(([a,c,y])=>`${awardName(a)} ${y} · ${catName(c)}`).join('; '),w.id)).join('')}</div></section>`).join('')||`<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
   } else if (mode === 'years') {
-    const ys = sortY([...new Set(DATA.aw.filter(x => awList.includes(x[0])).map(x => x[2]))]);
-    let count = 0; const shown = []; let lastDec = null;
-    const secs = ys.map(y => {
-      const rows = catsOf(aw).flatMap(c => [...winners(y, c)].map(([q, names]) => workRow(catName(c) + (ALL ? ' · ' + names.join('; ') : ''), q)));
-      if (!rows.length) return '';
-      count += rows.length; shown.push(y);
-      const dec = decadeOf(y); const mark = dec !== lastDec ? dec : null; lastDec = dec;
-      return `<section class="yearsec"${mark ? ` data-dec="${mark}"` : ''}><h3><button data-av-year="${y}">${y} ›</button></h3><div class="ylist">${rows.join('')}</div></section>`;
+    let count=0,lastDec=null;const shown=[];
+    const secs=years.map(y=>{
+      const rows=cols.flatMap(c=>[...winners(y,c)].map(([q,names])=>workRow(catName(c)+' · '+names.join('; '),q)));
+      if(!rows.length)return '';count+=rows.length;shown.push(y);const dec=decadeOf(y),mark=dec!==lastDec?dec:null;lastDec=dec;
+      return `<section class="yearsec"${mark?` data-dec="${mark}"`:''}><h3><button data-av-year="${y}">${y} ›</button></h3><div class="ylist">${rows.join('')}</div></section>`;
     }).join('');
-    head = `${awSeg}${modeSeg}${tools}${search}${decadeChips(shown)}`;
-    body = `<p class="count-line">${esc(t('found', { n: fmtNum(count) }))}</p>${secs || `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
+    head+=decadeChips(shown);body=`<p class="count-line">${esc(t('found',{n:fmtNum(count)}))}</p>${secs||`<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;
   } else {
-    // wide screens only: the full board
-    const cats = catsOf(aw);
-    const ys = sortY([...new Set(awList.flatMap(a => Object.keys(BOARD[a] || {}).map(Number)))]), shown = []; let lastDec = null;
-    const rows = ys.map(y => {
-      const cells = cats.map(c => [...winners(y, c)].map(([q, names]) => cellHtml(q, ALL ? names.join('; ') : '')).join(''));
-      if (!cells.some(Boolean)) return '';
-      shown.push(y); const dec = decadeOf(y), mark = dec !== lastDec ? dec : null; lastDec = dec;
-      return `<tr data-year="${y}"${mark ? ` data-dec="${mark}"` : ''}><th scope="row"><button data-av-year="${y}">${y}</button></th>${cells.map((c, i) => `<td data-category="${cats[i]}">${c}</td>`).join('')}</tr>`;
+    let lastDec=null;const shown=[];
+    const rows=years.map(y=>{
+      const cells=cols.map(c=>[...winners(y,c)].map(([q,names])=>cellHtml(q,names.join('; '))).join(''));
+      if(!cells.some(Boolean))return '';shown.push(y);const dec=decadeOf(y),mark=dec!==lastDec?dec:null;lastDec=dec;
+      return `<tr data-year="${y}"${mark?` data-dec="${mark}"`:''}><th scope="row"><button data-av-year="${y}">${y}</button></th>${cells.map((c,i)=>`<td data-category="${cols[i]}">${c}</td>`).join('')}</tr>`;
     }).join('');
-    head = `${awSeg}${modeSeg}${tools}${search}${decadeChips(shown)}`;
-    body = `<p class="count-line">${esc(ALL ? t('aw_all') : awardName(aw))} · ${esc(t('col_year'))} × ${esc(t('col_cat'))}</p><div class="board-wrap"><table class="board"><caption class="sr">${esc(ALL ? t('aw_all') : awardName(aw))}</caption><thead><tr><th scope="col"><span class="sr">${esc(t('col_year'))}</span></th>${cats.map(c => `<th scope="col"><button data-av-cat-go="${c}">${esc(catName(c))}</button></th>`).join('')}</tr></thead><tbody>${rows || `<tr><td colspan="${cats.length + 1}"><p class="empty" style="padding:10px">${esc(t('nothing_found'))}</p></td></tr>`}</tbody></table></div>${legend}`;
+    head+=decadeChips(shown);body=`<p class="count-line">${esc(awLabel)} · ${esc(t('col_year'))} × ${esc(t('col_cat'))}</p><div class="board-wrap"><table class="board"><caption class="sr">${esc(awLabel)}</caption><thead><tr><th scope="col"><span class="sr">${esc(t('col_year'))}</span></th>${cols.map(c=>`<th scope="col"><button data-av-cat-go="${c}">${esc(catName(c))}</button></th>`).join('')}</tr></thead><tbody>${rows||`<tr><td colspan="${cols.length+1}"><p class="empty">${esc(t('nothing_found'))}</p></td></tr>`}</tbody></table></div>${legend}`;
   }
-  if (AV.q && mode !== 'authors') { const found = searchWorks(AV.q); head = ''; body = `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>${found.length ? searchRows(found) : `<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`; }
-  if (onlyBody && $('#av-body')) { $('#av-head').innerHTML = head; $('#av-body').innerHTML = body; return chipIntoView(); }
-  v.innerHTML = `<div class="intro"><h2>${esc(t('aw_h2'))}</h2><p>${esc(t('aw_p'))}</p></div><div class="controls">${searchForm('av-q', AV.q)}<div id="av-head" class="controls">${head}</div></div><div id="av-body">${body}</div>
-    <p class="footnote">${esc(t('aw_note'))}</p><p class="footnote">${esc(t('aw_src'))}</p>`;
-  chipIntoView();
+  if(AV.q&&mode!=='authors'){const found=searchWorks(AV.q).filter(passAwards);body=`<p class="count-line">${esc(t('search_all',{n:fmtNum(found.length)}))} · ${clearBtn()}</p>${found.length?searchRows(found):`<p class="empty">${esc(t('nothing_found'))}</p>`}${legend}`;}
+  if(onlyBody&&$('#av-body')){$('#av-head').innerHTML=head;$('#av-body').innerHTML=body;return;}
+  replaceFilterView(v,`<div class="intro"><h2>${esc(t('aw_h2'))}</h2><p>${esc(t('aw_p'))}</p></div><div class="controls">${awardsFilterControls()}${searchForm('av-q',AV.q)}<div id="av-head" class="controls">${head}</div></div><div id="av-body">${body}</div><p class="footnote">${esc(t('aw_note'))}</p><p class="footnote">${esc(t('aw_src'))}</p>`);
 }
-// the chosen category stays in sight in the row of chips that scrolls sideways
-function chipIntoView() {
-  const c = $('#view-awards [data-av-cat][aria-pressed="true"]'), sc = c && c.parentElement; if (!sc || !c.getBoundingClientRect) return;
-  const r = c.getBoundingClientRect(), R = sc.getBoundingClientRect();
-  if (r.right > R.right || r.left < R.left) sc.scrollLeft += r.left - R.left - 16;
+function goAwards(patch) {
+  if(patch.award!==undefined)AV.awards=filterValues(patch.award,AWARDS);
+  if(patch.cat!==undefined)AV.cats=filterValues(patch.cat,CATEGORY_FILTERS);
+  AV.year=patch.year||null;if(patch.cat)AV.mode='cats';if(patch.mode)AV.mode=patch.mode;
+  saveAV();closeSheets();setView('awards');
 }
-function goAwards(patch) { Object.assign(AV, { year: null }, patch.cat ? { mode: 'cats' } : {}, patch); if (!AV.cat) AV.cat = 'S'; saveAV(); closeSheets(); setView('awards'); }
 
 /* ---------- view: Shelf ---------- */
 let shelfLangDraft = null, shelfLangDirty = false, shelfDeleted = null;
+// Explicit defaults also reset settings on cached older pages through the existing sync protocol.
+const READING_DEFAULTS = { langs: [], listen: 'pod', ttsRate: 1, askNote: true, pickLen: '15', pickLengths: [], focus: false, rsize: 19, rtheme: 'page' };
+const SHELF_PREF_KEYS = [...Object.keys(READING_DEFAULTS), 'filters', 'av', 'catalogLang'];
+const shelfCopy = x => JSON.parse(JSON.stringify(x));
+function shelfPreferences() {
+  return shelfCopy({ prefs: Object.fromEntries(SHELF_PREF_KEYS.filter(k => prefs[k] !== undefined).map(k => [k, prefs[k]])), catalog: filter, awards: AV, draft: shelfLangDraft, dirty: shelfLangDirty });
+}
+function restoreShelfPreferences(saved) {
+  for (const k of SHELF_PREF_KEYS) delete prefs[k];
+  Object.assign(prefs, shelfCopy(READING_DEFAULTS), saved?.prefs);
+  // null/absent sync settings mean defaults locally, but need explicit values to travel.
+  for (const k of SYNC_PREFS) if (prefs[k] == null) prefs[k] = shelfCopy(READING_DEFAULTS[k]);
+  filter = saved ? shelfCopy(saved.catalog) : { awards: [], langs: [], formats: [], statuses: [], lengths: [], q: '' };
+  AV = saved ? shelfCopy(saved.awards) : { awards: [], cats: [], langs: [], formats: [], mode: 'cats', sort: 'desc', authorSort: 'desc', year: null, q: '' };
+  shelfLangDraft = saved?.draft ? saved.draft.slice() : null; shelfLangDirty = !!saved?.dirty;
+  for (const history of [pickSeen, pickLast, pickWrapped]) for (const k of Object.keys(history)) delete history[k];
+  pickSeed++; recallPick = null;
+  prefs.prefsMt = Math.max(Date.now(), (prefs.prefsMt || 0) + 1); savePrefs(true);
+}
 const SHELF_TRASH = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg>';
 function shelfDeleteButton(section, key) { return `<button class="btn btn-ghost btn-small btn-danger" data-shelfdel="${section}" data-key="${esc(key)}">${esc(t('del'))}</button>`; }
 async function deleteShelfItems(section, key) {
@@ -2130,11 +2258,14 @@ async function deleteShelfItems(section, key) {
   } else if (section === 'data') { for (const s of Object.keys(rows)) rows[s] = local[s].slice(); }
   else if (['links', 'suggestions'].includes(section)) rows[section] = local[section].filter(x => !key || x.id === key);
   else return;
-  const at = Date.now(), count = Object.values(rows).reduce((n, a) => n + a.length, 0); if (!count) return;
+  const count = Object.values(rows).reduce((n, a) => n + a.length, 0); if (!count && section !== 'data') return;
+  const at = Object.values(rows).flat().reduce((mt, row) => Math.max(mt, mtOf(row) + 1), Date.now());
+  const settings = section === 'data' ? shelfPreferences() : null;
   for (const s of Object.keys(rows)) for (const x of rows[s]) await Store.del(s, x.id, at);
-  shelfDeleted = { rows, at }; recallPick = null;
+  if (settings) restoreShelfPreferences(null);
+  shelfDeleted = { rows, at, settings }; recallPick = null;
   try { syncSoon(); } catch (e) {}
-  await refreshAll(); toast(t('shelf_deleted', { n: count }), { k: 'shelfundo', v: '1', label: t('done_undo') });
+  await refreshAll(); toast(t(settings ? 'shelf_reset_done' : 'shelf_deleted', { n: count }), { k: 'shelfundo', v: '1', label: t('done_undo') });
 }
 async function renderShelf() {
   await loadLocal();
@@ -2221,8 +2352,8 @@ async function renderShelf() {
     const summary = document.createElement('summary'); summary.append(h); summary.insertAdjacentHTML('beforeend', '<svg class="shelf-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>');
     const body = document.createElement('div'); body.className = 'shelf-body'; body.append(...section.childNodes); details.append(summary, body); section.replaceWith(details);
   }
-  v.insertAdjacentHTML('beforeend', `<section class="panel shelf-danger-zone shelf-global-danger" id="shelf-danger" aria-labelledby="shelf-danger-title"><div class="shelf-danger-copy"><h4 id="shelf-danger-title">${esc(t('shelf_danger_h'))}</h4><p class="small">${esc(t('shelf_danger_all_note'))}</p><span class="small">${esc(t('shelf_danger_count', { n: totalSaved }))}</span></div><button class="btn btn-danger-strong" data-shelfclear="data"${totalSaved ? '' : ' disabled'}>${SHELF_TRASH}${esc(t('shelf_delete_data'))}</button></section>`);
-  if (READONLY) v.querySelectorAll('[data-shelfdel], [data-shelfclear], [data-delbm], [data-delfile], [data-sgdel], [data-rcdrop], #reading-clear, #sugg-clear-all, #sugg-clear-sent, #langs-save').forEach(b => { b.disabled = true; });
+  v.insertAdjacentHTML('beforeend', `<section class="panel shelf-danger-zone shelf-global-danger" id="shelf-danger" aria-labelledby="shelf-danger-title"><div class="shelf-danger-copy"><h4 id="shelf-danger-title">${esc(t('shelf_danger_h'))}</h4><p class="small">${esc(t('shelf_danger_all_note'))}</p><span class="small">${esc(t('shelf_danger_count', { n: totalSaved }))}</span></div><button class="btn btn-danger-strong" data-shelfclear="data">${SHELF_TRASH}${esc(t('shelf_delete_data'))}</button></section>`);
+  if (READONLY) v.querySelectorAll('[data-shelfdel], [data-shelfclear], [data-delbm], [data-delfile], [data-sgdel], [data-rcdrop], #reading-clear, #sugg-clear-all, #sugg-clear-sent, #langs-save, #langs-reset').forEach(b => { b.disabled = true; });
 }
 // Coverage counts unique works per kind and language, independently of the reader's preferences.
 let coverageView = 'forms';
@@ -2315,7 +2446,7 @@ async function openWork(q) {
     <div class="work-head">${coverHtml(q, 'm')}<div class="work-head-t"><div class="awards">${awardChips(w, true)}</div>
     <h2>${esc(titleOf(w))}</h2></div></div>
     ${orig ? `<div class="alt">${esc(t('title_orig'))}: <span lang="en">${esc(orig)}</span></div>` : ''}
-    <div class="row">${w.authors.map(a => `<button class="btn btn-small" data-author="${a}">${esc(authorName(a))}</button>`).join('')}<span class="small">${esc(r ? r.pub + ' · ' : '')}${w.pub || ''}${pagesOf(q) ? ' · ' + esc(t('pages', { n: pagesOf(q) })) : ''} · ${esc(fmtDur(minutesOf(q)))}</span></div>
+    <div class="row">${w.authors.map(a => `<button class="btn btn-small" data-author="${a}">${esc(authorName(a))}</button>`).join('')}<span class="small">${esc(r ? r.pub + ' · ' : '')}${w.pub || ''}${pagesOf(q) ? ' · ' + esc(t('pages', { n: pagesOf(q) })) : ''} · ${esc(fmtDur(readingMinutes(q)))}</span></div>
     <div class="flags"><span class="tier tier-${tierOf(q)}">${esc(t('tier_' + tierOf(q)))}</span>${r && r.license && tierOf(q) === 't1' ? `<span class="flag">${esc(r.license)}</span>` : ''}${workFlags(w)}</div>
     <div class="row">${doneBtn(q, 'btn btn-small')}${isDone(q) ? `<span class="small">${esc(t('done_on_date', { d: fmtDate(doneAt(q)) }))}</span>` : ''}</div>
     ${availHtml(q)}
@@ -3462,7 +3593,7 @@ document.addEventListener('click', async e => {
   if (d.view) { closeSheets(); return setView(d.view); }
   if (d.goshelf) { closeSheets(); setView('shelf'); await renderShelf(); const el = document.getElementById(d.goshelf); if (el) { const panel = el.closest('details.shelf-section'); if (panel) panel.open = true; el.scrollIntoView ? el.scrollIntoView({ block: 'start' }) : 0; el.classList.add('hit'); setTimeout(() => el.classList.remove('hit'), 1800); } return; }
   if (d.shelfdel || d.shelfclear) return deleteShelfItems(d.shelfdel || d.shelfclear, d.key);
-  if (d.shelfundo) { const gone = shelfDeleted; shelfDeleted = null; if (!gone || READONLY) return; for (const [s, rows] of Object.entries(gone.rows)) for (const row of rows) await Store.put(s, { ...row, mt: Math.max(Date.now(), gone.at + 1) }, true); try { syncSoon(); } catch (err) {} $('#toast').hidden = true; return refreshAll(); }
+  if (d.shelfundo) { const gone = shelfDeleted; shelfDeleted = null; if (!gone || READONLY) return; for (const [s, rows] of Object.entries(gone.rows)) for (const row of rows) await Store.put(s, { ...row, mt: Math.max(Date.now(), gone.at + 1) }, true); if (gone.settings) restoreShelfPreferences(gone.settings); try { syncSoon(); } catch (err) {} $('#toast').hidden = true; return refreshAll(); }
   if (d.sgsend) { const x = (await Store.all('suggestions')).find(z => z.id === d.sgsend); if (!x) return; b.disabled = true; let n = 0; try { n = await sendToInbox(x); } catch (err) {} if (n) { x.sent = Date.now(); await Store.put('suggestions', x); toast(t('sg_sent')); } else toast(t('sg_send_fail')); return renderShelf(); }
   if (d.sgdel) return deleteShelfItems('suggestions', d.sgdel);
   if (b.id === 'reading-clear' || d.rcdrop) { // the place (one, or everything not finished) and its history without notes; the work stays in the catalog; Undo puts them back
@@ -3478,32 +3609,26 @@ document.addEventListener('click', async e => {
   if (b.id === 'sugg-clear-all') return deleteShelfItems('suggestions');
   if (b.id === 'sugg-clear-sent') { for (const x of await Store.all('suggestions')) if (x.sent || x.gh) await Store.del('suggestions', x.id); return renderShelf(); }
   if (d.sclear) { const inp = b.closest('section') && b.closest('section').querySelector('form[data-sform] input'); if (inp) { inp.value = ''; runSearch(inp.id, ''); inp.focus(); } return; }
-  if (d.award) { filter.award = d.award; return renderCatalog(); }
-  if (d.toggle) { filter[d.toggle] = !filter[d.toggle]; return renderCatalog(); }
-  if (d.fresh) { filter.fresh = !filter.fresh; if (VIEW !== 'library') setView('library'); return renderCatalog(); }
-  if (d.flen) { filter.len = d.flen; return renderLibrary(); }
+  if (d.fresh) { filter.statuses = toggleFilter(filter.statuses, 'fresh', STATUSES); saveFilters(); if (VIEW !== 'library') setView('library'); return renderCatalog(); }
   if (d.mylang) { const cur = shelfLangDraft || myLangs(), l = d.mylang; const next = cur.includes(l) ? cur.filter(x => x !== l) : [...cur, l]; if (!next.length) return toast(t('langs_one')); shelfLangDraft = next; shelfLangDirty = true; return renderShelf(); }
   if (b.id === 'langs-save') { if (READONLY) return; prefs.langs = (shelfLangDraft || myLangs()).slice(); shelfLangDirty = false; shelfLangDraft = null; savePrefs(); await renderShelf(); renderCatalog(); return toast(t('langs_saved')); }
-  if (b.id === 'langs-reset') { delete prefs.langs; shelfLangDraft = null; shelfLangDirty = false; savePrefs(); await renderShelf(); return renderCatalog(); }
-  if (d.picklen) { prefs.pickLen = d.picklen; savePrefs(); return renderHome(); }
-  if (d.pickmore) { pickNext(prefs.pickLen || '15'); return renderHome(); }
+  if (b.id === 'langs-reset') { if (READONLY) return; prefs.langs = []; shelfLangDraft = null; shelfLangDirty = false; savePrefs(); await renderShelf(); return renderCatalog(); }
+  if (d.pickavailable) { prefs.pickLengths = [d.pickavailable]; savePrefs(); return renderHome(); }
+  if (d.pickmore) { pickNext(homeLengths(), ['excerpt', 'other'].includes(d.pickmore) ? d.pickmore : 'full'); return renderHome(); }
   if (b.id === 'theme-btn') return toggleTheme();
-  if (b.id === 'news-seen') { VISIT = { baseline: Date.now(), firstTime: false }; touchVisit(); filter.fresh = false; renderCatalog(); if (VIEW === 'awards') renderAwards(); return; }
+  if (b.id === 'news-seen') { VISIT = { baseline: Date.now(), firstTime: false }; touchVisit(); filter.statuses = filter.statuses.filter(x => x !== 'fresh'); saveFilters(); renderCatalog(); if (VIEW === 'awards') renderAwards(); return; }
   if (d.done) { const q = d.done; const on = !isDone(q); await setDone(q, on); await refreshDoneViews(q); if (on) toast(t('done_toast', { t: work(q) ? work(q).title : '' }), { k: 'undone', v: q, label: t('done_undo') }); else toast(t('done_removed')); return; }
   if (d.undone) { await setDone(d.undone, false); $('#toast').hidden = true; return refreshDoneViews(d.undone); }
-  if (d.star) { await toggleStar(d.star); const s = document.querySelectorAll(`[data-star="${d.star}"]`); s.forEach(x => { x.setAttribute('aria-pressed', String(isStarred(d.star))); x.textContent = isStarred(d.star) ? '★' : '☆'; }); if (VIEW === 'awards') renderAwards(); if (VIEW === 'shelf') renderShelf(); if (filter.starred) renderCatalog(); return; }
+  if (d.star) { await toggleStar(d.star); const s = document.querySelectorAll(`[data-star="${d.star}"]`); s.forEach(x => { x.setAttribute('aria-pressed', String(isStarred(d.star))); x.textContent = isStarred(d.star) ? '★' : '☆'; }); if (VIEW === 'awards') renderAwards(); if (VIEW === 'shelf') renderShelf(); if (filter.statuses.includes('starred')) renderCatalog(); return; }
   if (d.work) { $('#sheet-author').hidden = true; $('#sheet-author').innerHTML = ''; return openWork(d.work); }
   if (d.author) return openAuthor(d.author);
   if (d.goaw) { const [aw, c, y] = d.goaw.split('|'); return goAwards({ award: aw, cat: c || null, year: y ? +y : null }); }
   if (d.close !== undefined) { const s = b.closest('.sheet'); if (s) { s.hidden = true; s.innerHTML = ''; } if (s && s.id !== 'sheet-form') { renderCatalog(); if (VIEW === 'awards') renderAwards(); } return; }
   if (b.id === 'author-sort') { authorSort = authorSort === 'desc' ? 'asc' : 'desc'; return openAuthor(d.aid); }
   // awards view controls
-  if (d.avAward) { AV.award = d.avAward; saveAV(); return renderAwards(); }
   if (d.avMode) { AV.mode = d.avMode; AV.year = null; saveAV(); return renderAwards(); }
   if (d.avSort) { AV.sort = AV.sort === 'desc' ? 'asc' : 'desc'; saveAV(); return renderAwards(); }
-  if (d.avText) { AV.onlyText = !AV.onlyText; saveAV(); return renderAwards(); }
-  if (d.avCat) { AV.cat = d.avCat; AV.year = null; saveAV(); return renderAwards(); }
-  if (d.avCatGo) { AV.cat = d.avCatGo; AV.mode = 'cats'; AV.year = null; saveAV(); renderAwards(); return window.scrollTo(0, 0); }
+  if (d.avCatGo) { AV.cats = filterValues(d.avCatGo, CATEGORY_FILTERS); AV.mode = 'cats'; AV.year = null; saveAV(); renderAwards(); return window.scrollTo(0, 0); }
   if (d.avYear !== undefined) { if (!d.avYear) return; AV.year = +d.avYear; renderAwards(); return window.scrollTo(0, 0); }
   if (d.avClear) { AV.year = null; return renderAwards(); }
   if (d.jump) { const el = $(`#view-awards [data-dec="${d.jump}"]`); if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' }); return; }
@@ -3577,6 +3702,22 @@ document.addEventListener('click', async e => {
   }
 });
 document.addEventListener('change', e => {
+  const group = e.target.dataset.multiFilter;
+  if (group) {
+    const value = e.target.value;
+    if (group === 'home-lengths') { prefs.pickLengths = toggleFilter(homeLengths(), value, LENGTHS); savePrefs(); return renderHome(); }
+    const config = {
+      'lib-languages': [filter, 'langs', SOURCE_LANGS], 'lib-awards': [filter, 'awards', AWARDS],
+      'lib-formats': [filter, 'formats', FORMATS], 'lib-lengths': [filter, 'lengths', LENGTHS], 'lib-statuses': [filter, 'statuses', STATUSES],
+      'av-languages': [AV, 'langs', SOURCE_LANGS], 'av-awards': [AV, 'awards', AWARDS],
+      'av-categories': [AV, 'cats', CATEGORY_FILTERS], 'av-formats': [AV, 'formats', FORMATS]
+    }[group];
+    if (!config) return;
+    const [state, key, options] = config;
+    state[key] = toggleFilter(state[key], value, options);
+    if (state === AV) { AV.year = null; saveAV(); return renderAwards(); }
+    saveFilters(); return renderLibrary();
+  }
   if (e.target.id === 'av-author-sort' && ['az', 'awards', 'desc', 'asc'].includes(e.target.value)) { AV.authorSort = e.target.value; saveAV(); renderAwards(); $('#av-author-sort').focus(); return; }
   if (e.target.matches('input[type="file"]')) importFile(e.target);
   if (e.target.id === 'lang-sel' && e.target.value !== LANG) { LANG = e.target.value; prefs.lang = LANG; savePrefs(); applyTheme(); refreshAll(); }
@@ -3621,7 +3762,15 @@ function closeTopLayer() {
   if (!$('#reader').hidden) return requestCloseReader();
   for (const s of ['#sheet-gb', '#sheet-form', '#sheet-author', '#sheet-work']) { const el = $(s); if (!el.hidden) { el.hidden = true; el.innerHTML = ''; renderCatalog(); return; } }
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTopLayer(); });
+document.addEventListener('click', e => {
+  document.querySelectorAll('.multi-filter[open]').forEach(el => { if (!el.contains(e.target)) el.open = false; });
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  const opened = document.querySelector('.multi-filter[open]');
+  if (opened) { opened.open = false; opened.querySelector('summary').focus(); e.preventDefault(); return; }
+  closeTopLayer();
+});
 // Back on a phone: while a window, a card or the reader is open, one history entry stands for it,
 // so Back closes the top layer instead of leaving the page. Closing it with a button removes that entry.
 const openLayers = () => [...document.querySelectorAll('#reader, .sheet, .modal')].some(el => !el.hidden);
