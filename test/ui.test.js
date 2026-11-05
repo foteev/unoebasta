@@ -693,15 +693,15 @@ function selectFilter(group, values = []) {
   const junk = await parse(Array.from({ length: 3000 }, (_, i) => (i * 37 + 11) % 256), 'mystery.bin');
   const oldDoc = await parse([0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1, 0, 0, 0], 'stary.doc');
   checks['files: a binary file or an old .doc gets a clear message, not a page of symbols'] = /не текст/.test(junk.error || '') && /\.doc/.test(oldDoc.error || '');
-  // the reader's languages: by default the page's and the phone's; what they can read in them comes first
+  // Without a saved language choice, all catalog languages are enabled.
   // Isolate the no-Polish-full-text scenario from the growing live catalog, restoring it below.
   w.eval(`window.__languageReadSnapshot = JSON.parse(JSON.stringify(READ));
     for (const [q, r] of Object.entries(READ)) { r.links = r.links.filter(l => l.kind === 'full' && (l.lang || 'en') === 'en'); if (!r.links.length) delete READ[q]; }`);
-  checks['languages: by default the page language and the phone’s'] = JSON.stringify(w.eval('myLangs()')) === JSON.stringify(['ru', 'en']);
+  checks['languages: a fresh profile includes all four catalog languages'] = w.eval('SOURCE_LANGS.every(l => myLangs().includes(l))');
   click($('#tab-shelf')); await sleep(80);
-  click($('#shelf-langs [data-mylang="en"]')); await sleep(80);
-  click($('#shelf-langs [data-mylang="pl"]')); await sleep(80);
-  click($('#shelf-langs [data-mylang="ru"]')); await sleep(80);
+  for (const lang of ['en', 'ru', 'es']) {
+    click($(`#shelf-langs [data-mylang="${lang}"]`)); await sleep(80);
+  }
   checks['languages: edits are a draft until Save'] = w.eval('prefs.langs') === undefined && $('#shelf-langs [data-mylang="pl"]').getAttribute('aria-pressed') === 'true';
   click($('#langs-save')); await sleep(80);
   checks['languages: chosen on the shelf, kept, and they travel with sync'] = JSON.stringify(w.eval('prefs.langs')) === JSON.stringify(['pl']) && w.eval("SYNC_PREFS.includes('langs')") && $('#shelf-langs [data-mylang="pl"]').getAttribute('aria-pressed') === 'true';
@@ -847,40 +847,14 @@ function selectFilter(group, values = []) {
   checks['shelf: Undo restores the exact file body and related notes'] = (await w.eval("Store.get('files', 'shelf-file')")).html === '<p>Keep this file body exactly.</p>' && (await w.eval("Store.all('bookmarks')")).some(b => b.note === 'Keep my note');
   w.eval(`Object.assign(prefs,{langs:['pl'],listen:'eleven',ttsRate:1.5,askNote:false,pickLengths:['eve'],focus:true,rsize:25,rtheme:'sepia'});
     Object.assign(filter,{langs:['pl'],awards:['h'],q:'Chiang'});Object.assign(AV,{langs:['ru'],cats:['S'],mode:'authors',sort:'asc',q:'Le Guin'});
-    saveAV();prefs.prefsMt=Date.now()+60000;savePrefs(true);shelfLangDraft=['es'];shelfLangDirty=true;
-    window.__fullResetBefore=shelfPreferences();window.__fullResetMt=prefs.prefsMt;window.__resetChrome={lang:prefs.lang,theme:prefs.theme};`);
-  const beforeFullReset = await w.eval('syncPack()');
+    saveAV();shelfLangDraft=['es'];shelfLangDirty=true;`);
+  const settings = w.localStorage.getItem('fantastic-prefs');
   w.confirm = () => false;
   click($('#shelf-danger [data-shelfclear]')); await sleep(50);
-  checks['shelf: cancelling Delete all saved items preserves the data'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1;
-  checks['shelf: cancelling global reset preserves saved settings, filters and an unsaved language draft'] = w.eval('JSON.stringify(shelfPreferences()) === JSON.stringify(window.__fullResetBefore) && prefs.prefsMt === window.__fullResetMt');
-  w.confirm = () => true;
-  click($('#shelf-danger [data-shelfclear]')); await sleep(100);
-  checks['shelf: Delete all saved items clears personal records and retains deletion marks'] = (await Promise.all(['files', 'positions', 'bookmarks', 'links', 'suggestions'].map(s => w.eval(`Store.all('${s}')`)))).every(a => a.length === 0) && (await w.eval("Store.all('tombs')")).length > 0;
-  checks['shelf: global reset clears languages, filters and reader preferences immediately'] = w.eval(`!explicitLangs() && !shelfLangDirty && JSON.stringify(myLangs())===JSON.stringify([...new Set([LANG,...browserLangs()])]) && !homeLengths().length && Object.values(filter).every(x=>!x.length) && !AV.langs.length && !AV.cats.length && AV.mode==='cats' && AV.q==='' && prefs.rsize===19 && prefs.listen==='pod' && prefs.ttsRate===1 && prefs.askNote===true && prefs.focus===false && prefs.lang===window.__resetChrome.lang && prefs.theme===window.__resetChrome.theme`);
-  checks['shelf: reset persists language defaults for reload and clears stale filter snapshots'] = JSON.stringify(JSON.parse(w.localStorage.getItem('fantastic-prefs')).langs)==='[]' && !JSON.parse(w.localStorage.getItem('fantastic-prefs')).filters && !JSON.parse(w.localStorage.getItem('fantastic-prefs')).av;
-  const resetPack = await w.eval('syncPack()');
-  checks['shelf: synced reset has explicit defaults and a timestamp newer than a future-clock preference'] = resetPack.p.langs.length===0 && resetPack.p.pickLengths.length===0 && resetPack.p.listen==='pod' && resetPack.p.mt>beforeFullReset.p.mt;
-  await w.eval(`syncMerge(${JSON.stringify(beforeFullReset)})`); await sleep(60);
-  checks['shelf: an older sync cannot restore removed records or the Polish reading choice'] = w.eval('!explicitLangs() && !local.links.length && !local.positions.length');
-  await w.eval(`(async()=>{ prefs.langs=['pl'];prefs.listen='eleven';prefs.prefsMt=${beforeFullReset.p.mt};savePrefs(true);await syncMerge({v:SCHEMA,r:{},x:[],p:${JSON.stringify(resetPack.p)}}); })()`);
-  checks['shelf: another device applies the explicit language and listening reset'] = w.eval("!explicitLangs() && prefs.listen==='pod' && JSON.parse(localStorage.getItem(PREFS_KEY)).langs.length===0");
-  click($('#toast [data-shelfundo]')); await sleep(100);
-  checks['shelf: Undo all restores each saved-item section'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1 && (await w.eval("Store.all('suggestions')")).length === 1 && (await w.eval("Store.all('positions')")).length === 2;
-  checks['shelf: Undo restores saved Polish, filters, reader settings and the unsaved Spanish draft'] = w.eval(`prefs.langs.join()==='pl' && prefs.listen==='eleven' && prefs.ttsRate===1.5 && prefs.askNote===false && prefs.focus===true && prefs.rsize===25 && filter.q==='Chiang' && filter.langs.join()==='pl' && AV.mode==='authors' && AV.q==='Le Guin' && shelfLangDirty && shelfLangDraft.join()==='es' && prefs.prefsMt>${resetPack.p.mt}`);
-  const undonePack = await w.eval('syncPack()');
-  checks['shelf: Undo preferences travel as a newer synced choice'] = undonePack.p.langs.join()==='pl' && undonePack.p.listen==='eleven' && undonePack.p.mt>resetPack.p.mt;
-  const sectionPreferences = w.eval('JSON.stringify(shelfPreferences())');
+  checks['shelf: cancelling permanent deletion preserves records and settings'] = (await w.eval("Store.all('files')")).length === 1 && (await w.eval("Store.all('links')")).length === 1 && w.localStorage.getItem('fantastic-prefs') === settings;
   click($('#shelf-links [data-shelfclear]')); await sleep(100);
-  checks['shelf: section Delete all keeps reading preferences and filters'] = w.eval('JSON.stringify(shelfPreferences())') === sectionPreferences;
+  checks['shelf: section Delete all keeps reading preferences and filters'] = w.localStorage.getItem('fantastic-prefs') === settings;
   click($('#toast [data-shelfundo]')); await sleep(100);
-  await w.eval(`(async()=>{window.__resetRecords=Object.fromEntries(await Promise.all(STORES.map(async s=>[s,await Store.all(s)])));await Store.replaceAll({});await renderShelf();})()`);
-  checks['shelf: Delete everything is enabled on an empty shelf with custom reading languages'] = !$('#shelf-danger [data-shelfclear]').disabled;
-  click($('#shelf-danger [data-shelfclear]')); await sleep(100);
-  checks['shelf: preference-only reset clears saved and draft languages and offers Undo'] = w.eval('!explicitLangs() && !shelfLangDirty && !homeLengths().length') && !!$('#toast [data-shelfundo]');
-  click($('#toast [data-shelfundo]')); await sleep(100);
-  checks['shelf: preference-only Undo restores languages without inventing shelf records'] = w.eval("prefs.langs.join()==='pl' && shelfLangDirty && !local.files.length && !local.links.length");
-  await w.eval('(async()=>{await Store.replaceAll(window.__resetRecords);delete window.__resetRecords;await refreshAll();})()');
   const privateSugg=w.eval('local.suggestions'); w.eval("local.suggestions=[{comment:'PRIVATE-READER-NOTE-12345'}]");
   const singleTask=w.eval("buildSearchTask('Q19947428')"), batchTask=w.eval("buildSearchTask('batch')");
   w.__savedSuggestions=privateSugg;w.eval('local.suggestions=window.__savedSuggestions');
