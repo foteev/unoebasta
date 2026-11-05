@@ -6,7 +6,7 @@ For each work, searches were made separately in EN, PL, RU and ES for text or ex
 
 ## Outcome and limits
 
-20 links for 16 works: 5 full-text source links, 11 text fragments, and 4 audio episode pages. Language: EN 16, ES 2, PL 1, RU 1. Existing links were excluded as duplicates; alternate sources are identified as such. A result is a link, not a newly discovered work. No narratives or media files are copied into the repository.
+19 accepted links for 15 works: 5 full-text source links, 10 text fragments, and 4 audio episode pages. Language: EN 15, ES 2, PL 1, RU 1. Existing links were excluded as duplicates; alternate sources are identified as such. A result is a link, not a newly discovered work. No narratives or media files are copied into the repository.
 
 - Publisher provenance supports `t2` for the full texts and credited podcasts; it does not assert an open license. Fragment tier describes access scope, not copyright. Word counts are publisher-reported or approximate estimates as specified in evidence.
 - On 2026-11-04 the reader confirmed that all four submitted audio links are accessible and correct. The agent inspected narrator credits and episode metadata but did not independently listen; the reader's feedback does not establish an end-to-end listen, exact completeness, or redistribution rights. Runtime can include introductions. The Apple episode page was readable, while its linked publisher page was restricted in the search tool.
@@ -290,7 +290,7 @@ Author(s): Seanan McGuire. Form: novella.
 
 Author(s): Amal El-Mohtar. Form: short story.
 
-- **EN** — CSV: fragment — Macmillan. Existing catalogued link(s) excluded: full (https://www.uncannymagazine.com/article/seasons-glass-iron/).
+- **EN** — Macmillan text fragment held for reader verification. Existing catalogued link(s) excluded: full (https://www.uncannymagazine.com/article/seasons-glass-iron/).
 - **PL** — No new reviewed row.
 - **RU** — No new reviewed row.
 - **ES** — No new reviewed row.
@@ -489,3 +489,10 @@ Author(s): Caitlín R. Kiernan. Form: short story.
 - **RU** — No new reviewed row.
 - **ES** — No new reviewed row.
 
+
+
+## Maintainer review before merge — 2026-11-05 UTC
+
+Accepted 19 source rows for 15 works. The [source audit](../../docs/link-audit-2026-11-04.md) records earlier observations. At 2026-11-05T08:57:44.509Z a direct guest request to each Macmillan URL below returned HTTP 403. Indexed copies contain matching text, but live guest access is still unconfirmed. These leads were moved out of the findings CSV. To submit one again, open the exact page as a guest, confirm that the work’s narrative is readable, and record the working sample control and check date. Verify audio previews separately.
+
+- Q30005036, Seasons of Glass and Iron, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250341013/seasonsofglassandiron/)

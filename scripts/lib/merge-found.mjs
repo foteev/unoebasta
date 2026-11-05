@@ -1,13 +1,15 @@
-import { cleanUrl, validateFound } from './csv.mjs';
+import { cleanUrl, sourceUrlKey, validateFound } from './csv.mjs';
 import { readTable } from './catalog.mjs';
+import { assertSourceScope } from './source-reviews.mjs';
 
 const RANK = ['Clarkesworld', 'Lightspeed', 'Uncanny', 'Apex', 'Asimov', 'Analog', 'Strange Horizons', 'Reactor', 'GigaNotoSaurus', 'Escape Pod', 'WIRED', 'Baen'];
 const rank = s => { const i = RANK.findIndex(r => s.includes(r)); return i < 0 ? RANK.length : i; };
 const siteName = s => s.replace(/\s*\(Wayback\)\s*$/i, '');
-const key = r => JSON.stringify([r.kind, r.lang || 'en', +r.part || '', cleanUrl(r.url)]);
+const key = r => JSON.stringify([r.kind, r.lang || 'en', +r.part || '', sourceUrlKey(r.url)]);
 const groups = (rows, getKey) => { const m = new Map(); for (const r of rows) { const k = getKey(r); if (!m.has(k)) m.set(k, []); m.get(k).push(r); } return m; };
 
 export function mergeFound(source, originalData, rows, { archive = false, now = new Date().toISOString() } = {}) {
+  assertSourceScope(rows);
   rows.forEach(validateFound); // Validate everything before changing either file.
   const data = structuredClone(originalData), read = readTable(source), changed = new Map();
   const stats = { added: 0, updated: 0, links: 0, fragments: 0, titles: 0, none: 0, skipped: [] };
@@ -25,10 +27,10 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
       const x = (data.ex ||= {})[qid] ||= {}, u = cleanUrl(r.url), parsed = new URL(u);
       const shorthand = [['reactormag.com', 'en', 'r'], ['litres.ru', 'ru', 'lr'], ['legimi.pl', 'pl', 'lg']]
         .find(([host, lang]) => (parsed.hostname === host || parsed.hostname.endsWith('.' + host)) && lang === r.lang);
-      if (shorthand && !x[shorthand[2]]) { x[shorthand[2]] = parsed.pathname + parsed.search; stats.fragments++; }
-      else if (!(shorthand && new URL(x[shorthand[2]], parsed.origin).href === u)) {
+      if (shorthand && !x[shorthand[2]]) { x[shorthand[2]] = parsed.pathname + parsed.search + parsed.hash; stats.fragments++; }
+      else if (!(shorthand && sourceUrlKey(new URL(x[shorthand[2]], parsed.origin).href) === sourceUrlKey(u))) {
         const list = x.o ||= [];
-        if (!list.some(o => cleanUrl(o.u) === u && (o.l || 'en') === r.lang)) { list.push({ u, s: r.site, l: r.lang }); stats.fragments++; }
+        if (!list.some(o => sourceUrlKey(o.u) === sourceUrlKey(u) && (o.l || 'en') === r.lang)) { list.push({ u, s: r.site, l: r.lang }); stats.fragments++; }
       }
     }
     const entry = structuredClone(read[qid] || { links: [] }), before = entry.links.length;
