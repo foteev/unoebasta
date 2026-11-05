@@ -1,10 +1,10 @@
 name: Mobile shelf
 on:
   pull_request:
-    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, test/contribution-ui.test.cjs, docs/search-brief.md, scripts/build-web.mjs, .github/workflows/mobile-shelf.yml]
+    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, test/contribution-ui.test.cjs, test/filter-helpers.cjs, docs/search-brief.md, scripts/build-web.mjs, .github/workflows/mobile-shelf.yml]
   push:
     branches: [main]
-    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, test/contribution-ui.test.cjs, docs/search-brief.md, scripts/build-web.mjs, .github/workflows/mobile-shelf.yml]
+    paths: [src/index.html, test/mobile-shelf.test.cjs, test/awards-views.test.cjs, test/audio-card.test.cjs, test/contribution-ui.test.cjs, test/filter-helpers.cjs, docs/search-brief.md, scripts/build-web.mjs, .github/workflows/mobile-shelf.yml]
 permissions:
   contents: read
 jobs:

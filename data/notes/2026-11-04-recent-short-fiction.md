@@ -46,7 +46,7 @@ Author: Somto Ihezue; catalog form: novelette; latest award year: 2026.
 
 Author: Ray Nayler; catalog form: novella; latest award year: 2025.
 
-- **EN** — Macmillan excerpt in CSV; collection audiobook listings are commercial leads.
+- **EN** — Macmillan excerpt held for reader verification; collection audiobook listings are commercial leads.
 - **PL** — Original-title and PL language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
 - **RU** — Эра Бивня, translated Екатерина Романова, source PDF preview in CSV. Eksmo's 19 h 24 min Igor Knyazev audiobook is a multi-story paid collection, not free complete novella audio: https://eksmo.ru/audio/era-bivnya-ITDA64628/
 - **ES** — Original-title and ES language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
@@ -82,7 +82,7 @@ Author: Isabel J. Kim; catalog form: short story; latest award year: 2025.
 
 Author: Ursula Vernon; catalog form: novella; latest award year: 2025.
 
-- **EN** — Macmillan chapter 1 preview in CSV. T. Kingfisher is the author's pen name, copyright Ursula Vernon.
+- **EN** — Macmillan chapter 1 preview held for reader verification. T. Kingfisher is the author's pen name, copyright Ursula Vernon.
 - **PL** — Co żeruje nocą, translated Dominika Schimscheiner; Legimi excerpt in CSV. Audiobook listings are commercial.
 - **RU** — Original-title and RU language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
 - **ES** — Original-title and ES language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
@@ -118,7 +118,7 @@ Author: A. D. Sui; catalog form: novella; latest award year: 2025.
 
 Author: Ursula Vernon; catalog form: novella; latest award year: 2024.
 
-- **EN** — Macmillan, Fantasy-Hive, The Portalist and BookBrowse story excerpts in CSV; prose checked. T. Kingfisher is Ursula Vernon.
+- **EN** — Fantasy-Hive, The Portalist and BookBrowse excerpts in CSV. Macmillan excerpt held for reader verification. T. Kingfisher is Ursula Vernon.
 - **PL** — Cierń Legimi chapter 1 in CSV. Narrator Filip Kosior is listed for 2 h 54 min subscription audiobook, not a free complete recording.
 - **RU** — Original-title and RU language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
 - **ES** — Original-title and ES language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
@@ -181,7 +181,7 @@ Author: Ai Jiang; catalog form: novella; latest award year: 2024.
 
 Author: Seanan McGuire; catalog form: novella; latest award year: 2023.
 
-- **EN** — Macmillan narrative preview in CSV. Distinguish other Wayward Children volumes; commercial audio is not free complete audio.
+- **EN** — Macmillan narrative preview held for reader verification. Distinguish other Wayward Children volumes; commercial audio is not free complete audio.
 - **PL** — Original-title and PL language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
 - **RU** — Original-title and RU language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
 - **ES** — Original-title and ES language text/audio queries found no new source verified in this pass. A published translated title was not established in this pass; consult a language bibliography, then search its exact edition.
@@ -285,7 +285,7 @@ Author: John Wiswell; catalog form: novelette; latest award year: 2022.
 ## Link quality recheck — 2026-11-04
 
 - Inspected all 16 unique URLs underlying the 18 CSV rows. Twelve opened directly in the cloud browser: Cosmopolitan, the Obscura PDF, FantLab PDF, both Legimi previews, Fantasy-Hive, The Portalist, BookBrowse, WBUR, Yandex Books and both Escape Pod episodes. Access results reflect this browser and are not a guarantee for every region or device.
-- The four Macmillan pages triggered Cloudflare security verification in this browser. Search-service copies show matching narratives, but current direct access cannot be verified here. They remain flagged in the CSV; no claim that the sites are generally unavailable.
+- The four Macmillan pages triggered Cloudflare security verification in this browser. Search-service copies show matching narratives, but current direct access cannot be verified here. The initial submission flagged these rows; no claim that the sites are generally unavailable.
 - The two Escape Pod players were started; each browser timer advanced past three seconds. The page credits actor Tatiana Grey. Part 2's player reported about 41:39 while the page lists 42:10. We did not listen to the sound or verify the recordings end to end.
 - The complete-story text is split across the two Escape Pod pages: opening, continuation marker, continuation and ending were checked. Individual pages are parts, not self-contained complete stories. The word counts are those reported by the publisher and may include non-story material.
 - Four distinct English *Thornhedge* sites substantially overlap in chapter 1. They are alternate access routes, not four different extracts or works. BookBrowse splits its extract into multiple pages. Its page asserts publication permission and restricts copying.
@@ -294,4 +294,16 @@ Author: John Wiswell; catalog form: novelette; latest award year: 2022.
 
 ## Reader clarification: Macmillan text and audio previews
 
-The reader reports that Macmillan book pages provide both a readable excerpt and an audio excerpt. Search-service copies show a “Listen to Excerpt” control on the submitted pages for What Feasts at Night, Thornhedge, and Where the Drowned Girls Go alongside text previews. The cloud browser's Cloudflare challenge prevented independent playback or verification of sample scope; the control alone does not establish that an audio file loads for every region. The exact submitted The Tusks of Extinction page's audio control was not independently established during this follow-up. Do not classify any of these audio samples as full audiobook recordings. The existing CSV contains one fragment URL per Macmillan page, with the reported audio sample recorded in evidence; it does not add duplicate entries for the same page. The current findings schema does not separately describe audio versus text fragments, and the current importer renders generic submitted fragments as text excerpts; the linked publisher page is the route to the sample, while playback remains unverified in this browser. A separate audio-excerpt label requires a later importer/catalog change.
+The reader reports that Macmillan book pages provide both a readable excerpt and an audio excerpt. Search-service copies show a “Listen to Excerpt” control on the submitted pages for What Feasts at Night, Thornhedge, and Where the Drowned Girls Go alongside text previews. The cloud browser's Cloudflare challenge prevented independent playback or verification of sample scope; the control alone does not establish that an audio file loads for every region. The exact submitted The Tusks of Extinction page's audio control was not independently established during this follow-up. Do not classify any of these audio samples as full audiobook recordings. The initial submission contained one fragment URL per Macmillan page, with the reported audio sample recorded in evidence; it does not add duplicate entries for the same page. The current findings schema does not separately describe audio versus text fragments, and the current importer renders generic submitted fragments as text excerpts; the linked publisher page is the route to the sample, while playback remains unverified in this browser. A separate audio-excerpt label requires a later importer/catalog change.
+
+
+## Maintainer review before merge — 2026-11-05 UTC
+
+Accepted 14 source rows for 6 works. The [source audit](../../docs/link-audit-2026-11-04.md) records earlier observations. At 2026-11-05T08:57:44.509Z a direct guest request to each Macmillan URL below returned HTTP 403. Indexed copies contain matching text, but live guest access is still unconfirmed. These leads were moved out of the findings CSV. To submit one again, open the exact page as a guest, confirm that the work’s narrative is readable, and record the working sample control and check date. Verify audio previews separately.
+
+- Q133843128, The Tusks of Extinction, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250855527/thetusksofextinction/)
+- Q125718857, What Feasts at Night, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250830852/whatfeastsatnight/)
+- Q124381961, Thornhedge, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250409195/thornhedge/)
+- Q125635684, Where the Drowned Girls Go, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250213617/wherethedrownedgirlsgo/)
+
+Both Polish Legimi findings now link directly to the confirmed `#sample_section` and retain fragment scope.

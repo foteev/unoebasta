@@ -1,5 +1,5 @@
 name: Links
-# Checks every full-text and audio link once a week and on demand. The run summary lists dead links,
+# Checks full-text, audio, excerpt and conditional-preview addresses weekly and on demand. The run summary lists dead links,
 # links to check by hand and links that moved; the run fails when a link is dead.
 on:
   workflow_dispatch:
