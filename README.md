@@ -24,7 +24,7 @@ Everyone is welcome, no programming needed for most of it:
 
 ## Develop
 
-You need Node.js 20 or newer.
+Use Node.js 22.22.2 or later in the 22.x line, 24.15.0 or later in the 24.x line, or Node.js 26 or newer. CI uses Node.js 22.
 
 ```sh
 npm ci              # tools for tests and candidate discovery: the page itself has no build dependencies

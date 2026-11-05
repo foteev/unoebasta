@@ -23,6 +23,8 @@ _20 minute adventure_ Uno e basta — «одно — и хватит»: ещё �
 
 ## Сборка и проверка
 
+Подойдёт Node.js 22.22.2 или новее в ветке 22.x, 24.15.0 или новее в ветке 24.x либо Node.js 26 и выше. CI использует Node.js 22.
+
 ```sh
 npm ci
 npm run build          # → dist/web/index.html, один файл

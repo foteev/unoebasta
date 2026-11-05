@@ -977,6 +977,7 @@ function selectFilter(group, values = []) {
   selectFilter('av-categories',[]);
   checks['multiselect: All category restores the matching novel in search'] = !!$('#av-body [data-work="Q190192"]');
   selectFilter('av-awards',[]);w.eval("AV.q='';renderAwards()");
+  click($('#tab-catalog')); // Focus is only available in the visible Read view.
   selectFilter('home-lengths',['15','eve']);
   checks['multiselect: home duration choices share the same union behavior'] = w.eval("JSON.stringify(homeLengths())==='[\"15\",\"eve\"]' && pickList(homeLengths()).every(q=>readingMinutes(q)<=25||readingMinutes(q)>60)");
   const stored=JSON.parse(w.localStorage.getItem('fantastic-prefs'));
