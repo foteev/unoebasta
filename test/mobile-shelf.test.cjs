@@ -21,10 +21,15 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
   let browser;
   try {
     browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, locale: 'en-US' });
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'en-US' });
+    const page = await context.newPage();
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
-    await page.addInitScript(() => { if (!localStorage.getItem('fantastic-prefs')) localStorage.setItem('fantastic-prefs', JSON.stringify({ lang: 'ru' })); });
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem('fixture-started')) return;
+      sessionStorage.setItem('fixture-started', '1');
+      localStorage.setItem('fantastic-prefs', JSON.stringify({ lang: 'ru' }));
+    });
     const url = `http://127.0.0.1:${server.address().port}/`;
     await page.goto(url, { waitUntil: 'domcontentloaded' });
     await page.locator('#tab-shelf').click();
@@ -33,9 +38,10 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     await page.screenshot({ path: join(out, 'shelf-390-collapsed.png'), fullPage: true, animations: 'disabled' });
     await page.locator('#shelf-langs summary').focus(); await page.keyboard.press('Enter');
     assert.equal(await page.locator('#shelf-langs').getAttribute('open'), '', 'Keyboard opens native details');
-    for (const lang of ['es', 'en', 'ru']) {
+    assert.equal(await page.locator('[data-mylang="es"]').getAttribute('aria-pressed'), 'true');
+    for (const lang of ['en', 'pl', 'ru']) {
       await page.locator(`[data-mylang="${lang}"]`).click();
-      await page.waitForFunction(lang => document.querySelector(`[data-mylang="${lang}"]`).getAttribute('aria-pressed') === (lang === 'es' ? 'true' : 'false'), lang);
+      await page.waitForFunction(lang => document.querySelector(`[data-mylang="${lang}"]`).getAttribute('aria-pressed') === 'false', lang);
     }
     assert.equal(await page.evaluate(() => prefs.langs), undefined, 'Draft has not changed saved preferences');
     await page.locator('#langs-save').click();
@@ -196,51 +202,88 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     await page.evaluate(() => { for (const el of document.querySelectorAll('#view-shelf > details')) el.open = false; });
     assert.equal(await page.evaluate(() => document.querySelector('#view-shelf').lastElementChild.id), 'shelf-danger', 'Global danger zone stays at the bottom');
     assert.equal(await page.locator('#shelf-danger').evaluate(el => !!el.closest('details')), false, 'Global deletion is not hidden in a collapsed panel');
-    await page.evaluate(() => { prefs.langs=['pl']; prefs.listen='eleven'; prefs.pickLengths=['eve']; prefs.rsize=25; filter.langs=['pl']; AV.langs=['pl']; saveAV(); shelfLangDraft=['es']; shelfLangDirty=true; });
-    const beforeFailure = await page.evaluate(async () => ({ prefs: shelfPreferences(), data: await readAllData() }));
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.evaluate(async () => {
+      // Reported desktop setup, with Spanish missing from the browser's preferences.
+      Object.defineProperty(navigator, 'languages', { value: ['en-US', 'pl-PL', 'ru-RU'] });
+      LANG = 'en';
+      Object.assign(prefs, { lang: 'en', langs: [], theme: 'dark', listen: 'eleven', rsize: 25, pickLengths: ['eve'] });
+      filter.langs = ['pl'];
+      AV.langs = ['ru'];
+      saveAV();
+      await Store.put(META, { id: 'backup:fixture', data: { prefs: { langs: ['pl'] } } });
+      localStorage.setItem('unrelated-app', 'keep this');
+      await renderShelf();
+    });
+    await page.locator('#shelf-langs summary').click();
+    assert.equal(await page.locator('[data-mylang="es"]').getAttribute('aria-pressed'), 'false', 'The old automatic mode reproduces the report');
+
+    const beforeFailure = await page.evaluate(() => readAllData());
     await page.evaluate(() => {
-      const put = IDBObjectStore.prototype.put;
-      window.restoreTombPut = () => { IDBObjectStore.prototype.put = put; };
-      let injected = false;
-      IDBObjectStore.prototype.put = function (...args) {
-        const request = put.apply(this, args);
-        if (this.name === 'tombs' && !injected) {
-          injected = true;
-          request.addEventListener('success', () => this.transaction.abort(), { once: true });
-        }
-        return request;
-      };
+      const remove = indexedDB.deleteDatabase.bind(indexedDB);
+      window.restoreDeleteDatabase = () => { indexedDB.deleteDatabase = remove; };
+      indexedDB.deleteDatabase = () => { throw new DOMException('Test failure', 'UnknownError'); };
     });
     page.once('dialog', dialog => dialog.accept());
     await page.locator('#shelf-danger [data-shelfclear]').click();
     await page.waitForFunction(() => document.querySelector('#toast').textContent === t('shelf_delete_failed'));
-    await page.evaluate(() => window.restoreTombPut());
-    assert.deepEqual(await page.evaluate(async () => ({ prefs: shelfPreferences(), data: await readAllData() })), beforeFailure, 'Abort rolls back clears and tombstones before changing any settings');
+    await page.evaluate(() => window.restoreDeleteDatabase());
+    assert.deepEqual(await page.evaluate(() => readAllData()), beforeFailure, 'A failed database deletion keeps records and preferences');
+
+    const peer = await context.newPage();
+    await peer.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
+    await peer.goto(url, { waitUntil: 'domcontentloaded' });
+    await peer.evaluate(() => new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME);
+      req.onsuccess = () => { window.heldConnection = req.result; resolve(); };
+      req.onerror = () => reject(req.error);
+    }));
+    await page.evaluate(() => {
+      saveSync({ key: 'fixture-key' });
+    });
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'languages', { value: ['en-US', 'pl-PL', 'ru-RU'] });
+      window.storageBeforeStartup = ['fantastic-prefs', 'fantastic-visit', 'fantastic-sync'].map(key => localStorage.getItem(key));
+    });
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('#shelf-danger [data-shelfclear]').click(); await page.waitForFunction(() => !local.files.length && !local.links.length);
-    assert.ok(await page.evaluate(() => !explicitLangs() && !shelfLangDirty && !filter.langs.length && !AV.langs.length && !homeLengths().length && prefs.listen==='pod' && prefs.rsize===19), 'Delete everything also resets saved/draft languages, filters, duration and reader settings');
-    assert.deepEqual(await page.evaluate(() => myLangs()), await page.evaluate(() => [...new Set([LANG,...browserLangs()])]), 'Reading languages return to interface/browser defaults');
-    await page.evaluate(() => Store.put('links', { id: 'Q190192', url: 'https://example.test/new-link' }));
-    await page.locator('#toast [data-shelfundo]').click(); await page.waitForFunction(() => local.files.length === 1);
-    assert.equal(await page.evaluate(() => local.files[0].html), '<p>QA file body.</p>', 'Undo preserves file contents');
-    assert.equal(await page.evaluate(() => local.links[0].url), 'https://example.test/new-link', 'Undo keeps a link saved after deletion');
-    assert.ok(await page.evaluate(() => prefs.langs.join()==='pl' && prefs.listen==='eleven' && prefs.rsize===25 && filter.langs.join()==='pl' && shelfLangDirty && shelfLangDraft.join()==='es'), 'Undo also restores reading preferences and the unsaved language draft');
+    await page.locator('#shelf-danger [data-shelfclear]').click();
+    await page.waitForFunction(() => document.querySelector('#toast').textContent === t('shelf_reset_blocked'));
+    assert.equal(await page.evaluate(() => syncState()), null, 'Sync is paused while the reset waits for another tab');
+    const stale = await page.evaluate(() => syncMerge({ r: { links: [{ id: 'Q190192', url: 'https://example.test/stale', mt: Date.now() }] } }));
+    assert.equal(stale, 0, 'A stale sync response cannot write while resetting');
+    await peer.evaluate(() => window.heldConnection.close());
+    await page.waitForFunction(() => window.storageBeforeStartup && typeof myLangs === 'function');
+    assert.deepEqual(await page.evaluate(() => window.storageBeforeStartup), [null, null, null]);
+    await page.waitForFunction(async () => Boolean(await Store.get(META, 'schema')));
+    assert.ok(await page.evaluate(async () => {
+      const allEmpty = (await Promise.all(STORES.map(s => Store.all(s)))).every(records => records.length === 0);
+      const meta = await Store.all(META);
+      return allEmpty && meta.length === 1 && meta[0].id === 'schema'
+        && !syncState() && !shelfDeleted && !shelfLangDirty && VISIT.firstTime
+        && LANG === 'en' && !prefs.theme && prefs.rsize === 19 && !prefs.listen
+        && !homeLengths().length && !filter.langs.length && !AV.langs.length
+        && localStorage.getItem('unrelated-app') === 'keep this';
+    }), 'A new visit has no old data, settings, backups, tombstones, sync or Undo');
+    await peer.waitForFunction(() => typeof myLangs === 'function' && !resetting && prefs.langs === undefined && !syncState());
+    await peer.close();
+
+    await page.locator('#tab-shelf').click();
+    await page.locator('#shelf-langs summary').click();
+    assert.deepEqual(await page.evaluate(() => myLangs().sort()), ['en', 'es', 'pl', 'ru']);
+    assert.equal(await page.locator('[data-mylang="es"]').getAttribute('aria-pressed'), 'true');
+    assert.match(await page.locator('#shelf-lang-mode').textContent(), /All reading languages.*Spanish/);
+    assert.ok(await page.evaluate(() => pickList([]).some(q => fullLink(q, ['es']))), 'Spanish sources are eligible in Read');
+    assert.equal(await page.locator('#toast [data-shelfundo]').count(), 0);
+    await page.screenshot({ path: join(out, 'shelf-reset-all-languages.png'), fullPage: true, animations: 'disabled' });
+
+    await page.locator('#langs-reset').click();
+    await page.waitForFunction(() => prefs.langs?.length === 0 && !myLangs().includes('es'));
     page.once('dialog', dialog => dialog.accept());
-    await page.locator('#shelf-danger [data-shelfclear]').click(); await page.waitForFunction(() => !local.files.length && !explicitLangs());
-    await page.reload(); await page.waitForFunction(() => typeof local !== 'undefined' && !document.querySelector('#view-catalog').hidden);
-    assert.ok(await page.evaluate(() => !explicitLangs() && !homeLengths().length && !filter.langs.length && !AV.langs.length && prefs.rsize===19 && prefs.listen==='pod' && LANG==='ru' && prefs.theme==='dark'), 'Reset survives a reload and preserves interface language and theme');
-    await page.locator('#tab-shelf').click(); await page.waitForSelector('#shelf-danger [data-shelfclear]');
-    assert.ok(await page.locator('#shelf-danger [data-shelfclear]').isEnabled(), 'Empty shelf still allows a preference reset');
-    await page.evaluate(async () => { prefs.langs=['pl'];savePrefs();await renderShelf(); });
-    page.once('dialog', dialog => dialog.accept());
-    await page.locator('#shelf-danger [data-shelfclear]').click(); await page.waitForFunction(() => !explicitLangs());
-    await page.locator('#toast [data-shelfundo]').click(); await page.waitForFunction(() => prefs.langs.join()==='pl');
-    assert.ok(await page.evaluate(() => !local.files.length && !local.links.length), 'Preference-only Undo keeps an empty shelf empty');
-    page.once('dialog', dialog => dialog.accept());
-    await page.locator('#shelf-danger [data-shelfclear]').click(); await page.waitForFunction(() => !explicitLangs());
-    await page.screenshot({ path: join(out, 'shelf-reset-empty.png'), fullPage: true, animations: 'disabled' });
+    await page.locator('#shelf-danger [data-shelfclear]').click();
+    await page.waitForFunction(() => window.storageBeforeStartup?.every(value => value === null) && typeof myLangs === 'function' && prefs.langs === undefined);
+    assert.ok(await page.evaluate(() => myLangs().includes('es')), 'Delete everything also resets an already empty shelf');
     assert.deepEqual(errors, [], 'No browser runtime errors');
-    const report = { language_save_and_reload: true, no_english_fallback: true, polish_audio_and_duration: true, interface_language_independent: true, rotating_excerpts: true, home_random_actions: true, small_pool_shuffle: true, available_duration_action: true, collapse_keyboard: true, deletion_and_undo: true, reading_preferences_reset_and_undo: true, reset_survives_reload: true, empty_shelf_preference_reset: true, automatic_language_feedback: true, atomic_shelf_clear: true, undo_preserves_new_records: true, layouts, errors };
+    const report = { language_save_and_reload: true, no_english_fallback: true, polish_audio_and_duration: true, interface_language_independent: true, rotating_excerpts: true, home_random_actions: true, small_pool_shuffle: true, available_duration_action: true, collapse_keyboard: true, deletion_and_undo: true, automatic_language_feedback: true, factory_reset: true, spanish_after_reset: true, empty_shelf_reset: true, stale_sync_blocked: true, other_tab_reloaded: true, layouts, errors };
     writeFileSync(join(out, 'report.json'), JSON.stringify(report, null, 2)); console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); await new Promise(r => server.close(r)); }
 })().catch(e => { console.error(e); process.exit(1); });
