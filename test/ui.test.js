@@ -744,13 +744,13 @@ function selectFilter(group, values = []) {
   checks['language menu: the header button opens one panel with the site language and “I read in”'] = menuOpen() && $('#lang-btn').getAttribute('aria-expanded') === 'true' && $$('#lang-menu [data-lang]').length === 4 && $('#lang-menu [data-lang="ru"]').getAttribute('aria-pressed') === 'true'
     && $$('#lang-menu [data-readlang]').map(b => b.textContent).join('·') === 'Все·English·Polski·Русский·Español' && chipOn('all') && !chipOn('ru') && /Язык сайта/.test($('#lang-menu').textContent) && /Читаю на/.test($('#lang-menu').textContent);
   click($('#lang-menu [data-readlang="pl"]')); await sleep(60);
-  checks['language menu: the first language tapped while “All” is on becomes the only one, at once, kept for a reload and synced'] = JSON.stringify(w.eval('prefs.langs')) === '["pl"]' && JSON.stringify(savedLangs()) === '["pl"]' && w.eval("SYNC_PREFS.includes('langs')") && chipOn('pl') && !chipOn('all') && !chipOn('en') && menuOpen() && /польский/i.test($('#picks-languages').textContent);
+  checks['language menu: the first language tapped while “All” is on becomes the only one, at once, kept for a reload and synced'] = JSON.stringify(w.eval('prefs.langs')) === '["pl"]' && JSON.stringify(savedLangs()) === '["pl"]' && w.eval("SYNC_PREFS.includes('langs')") && chipOn('pl') && !chipOn('all') && !chipOn('en') && menuOpen() && !$('#picks-languages');
   click($('#lang-menu [data-readlang="en"]')); await sleep(40);
   const twoLangs = JSON.stringify(w.eval('prefs.langs'));
   click($('#lang-menu [data-readlang="en"]')); await sleep(40);
   checks['language menu: more languages toggle on and off'] = twoLangs === '["pl","en"]' && JSON.stringify(w.eval('prefs.langs')) === '["pl"]';
   click($('#lang-menu [data-readlang="pl"]')); await sleep(40);
-  checks['language menu: taking off the last language brings back “All”'] = w.eval('prefs.langs') === undefined && savedLangs() === undefined && chipOn('all') && !chipOn('pl') && /все/.test($('#picks-languages').textContent);
+  checks['language menu: taking off the last language brings back “All”'] = w.eval('prefs.langs') === undefined && savedLangs() === undefined && chipOn('all') && !chipOn('pl');
   click($('#lang-menu [data-readlang="pl"]')); await sleep(40);
   w.document.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await sleep(20);
   checks['language menu: Escape closes it and returns to the button'] = !menuOpen() && $('#lang-btn').getAttribute('aria-expanded') === 'false' && w.document.activeElement === $('#lang-btn');
@@ -758,7 +758,7 @@ function selectFilter(group, values = []) {
   checks['language menu: My shelf has no languages section any more'] = !$('#shelf-langs') && !$('[data-mylang]') && !/Языки, на которых читаю/.test($('#view-shelf').textContent);
   click($('#tab-catalog')); await sleep(40);
   w.eval("renderCatalog()"); await sleep(60);
-  checks['languages: saved Polish choice does not silently suggest English texts'] = !$('#view-catalog [data-picks=reading] .pick') && !!$('#view-catalog [data-picks=other] .pick') && /На других языках/.test($('#view-catalog').textContent) && !!$('#view-catalog #picks-languages [data-langmenu]') && !!$('#view-catalog .home-excerpts a');
+  checks['languages: saved Polish choice does not silently suggest English texts'] = !$('#view-catalog [data-picks=reading] .pick') && !!$('#view-catalog [data-picks=other] .pick') && /На других языках/.test($('#view-catalog').textContent) && !$('#view-catalog #picks-languages') && !/Языки чтения/.test($('#view-catalog').textContent) && !!$('#view-catalog .home-excerpts a');
   click($('#tab-library')); await sleep(60);
   checks['languages: the text language on each card, dimmed when unknown'] = !!$('#view-library .slip .flag-lang.far') && /^EN$/.test($('#view-library .slip .flag-lang').textContent);
   const wid = $('#view-library .slip [data-work]').dataset.work; w.eval(`openWork('${wid}')`); await sleep(80);
@@ -773,10 +773,10 @@ function selectFilter(group, values = []) {
   checks['languages: “In my languages” keeps what can be read or heard in them'] = $$('#view-library .slip').every(sl => w.eval(`langScore('${sl.querySelector('[data-work]').dataset.work}')`) > 0) && $$('#view-library .slip').length >= 1;
   selectFilter('lib-languages', []); await sleep(30);
   w.eval("for (const q of Object.keys(READ)) delete READ[q]; Object.assign(READ, window.__languageReadSnapshot); delete window.__languageReadSnapshot; renderCatalog();"); await sleep(40);
-  click($('#picks-languages [data-langmenu]')); await sleep(40);
+  click($('#lang-btn')); await sleep(40);
   const fromLink = menuOpen();
   click($('#lang-menu [data-readlang="all"]')); await sleep(60);
-  checks['language menu: “Change” next to the reading languages opens it, and “All” goes back to every language'] = fromLink && w.eval('prefs.langs') === undefined && w.eval('SOURCE_LANGS.every(l => myLangs().includes(l))') && chipOn('all');
+  checks['language menu: opens again from the header, and “All” goes back to every language'] = fromLink && w.eval('prefs.langs') === undefined && w.eval('SOURCE_LANGS.every(l => myLangs().includes(l))') && chipOn('all');
   click($('#tab-library')); await sleep(40);
   checks['language menu: a tap elsewhere closes it'] = !menuOpen();
   w.eval("prefs.langs = []; localStorage.setItem('fantastic-prefs', JSON.stringify(prefs))");

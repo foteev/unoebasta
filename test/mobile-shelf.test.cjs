@@ -53,7 +53,8 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     await page.keyboard.press('Escape');
     assert.equal(await page.evaluate(() => document.activeElement.id), 'lang-btn', 'Escape returns to the button');
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForFunction(() => document.querySelector('#picks-languages'));
+    await page.waitForFunction(() => document.querySelector('#view-catalog .picks'));
+    assert.equal(await page.locator('#picks-languages').count(), 0, 'Read has no reading-languages line');
     assert.deepEqual(await page.evaluate(() => prefs.langs), ['es'], 'Saved choice survives a real reload');
     assert.ok(await page.evaluate(() => [...document.querySelectorAll('#view-catalog [data-picks=reading] .pick a[data-via="read"]')].every(a =>
       READ[a.dataset.track].links.some(l => l.kind === 'full' && (l.lang || 'en') === 'es' && l.url === a.href))), 'Every suggested full text is in Spanish');
