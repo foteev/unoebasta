@@ -3,6 +3,8 @@
 //   2. stories with a free text (READ in src/index.html) and no book cover: the picture the magazine shows
 //      for that page (og:image: usually the issue cover, at Reactor the story's illustration). When a site
 //      shows the same og:image on many pages (Uncanny: the newest issue), the issue cover on the page is used.
+//      Only pages of the original publisher or the author: a page whose permission is not verified
+//      (tier "external" / rights "unknown") shows its own picture, not the story's, and a PDF has none.
 //   (a story from a collection or anthology can carry the book's cover ID in ol[QID].c with ol[QID].from)
 // Where each picture came from is kept in covers/sources.json; pages without a picture in covers/none.json,
 // so they are not asked again.
@@ -36,8 +38,17 @@ for (const [q, o] of Object.entries(data.ol || {})) if (o.c && has(q) && !SOURCE
 const books = Object.entries(data.ol || {}).filter(([q, o]) => o.c && !has(q)).map(([q, o]) => [q, { img: `${BASE}${o.c}-M.jpg?default=false`, src: `openlibrary:${o.c}` }]);
 // covers named by hand (data/awards.json → cov[QID] = image URL): when a page hides its issue cover from robots
 const named = Object.entries(data.cov || {}).filter(([q]) => !has(q)).map(([q, img]) => [q, { img, src: 'issue:' + img }]);
+const unverified = l => l.tier === 'external' || l.rights === 'unknown';
+const isPdf = u => /\.pdf($|[?#])/i.test(u);
+const pageOf = r => (r.links.find(l => l.kind === 'full' && !unverified(l) && !isPdf(l.url)) || {}).url;
 const stories = Object.entries(READ).filter(([q]) => !has(q) && !(data.ol && data.ol[q] && data.ol[q].c) && !(data.cov && data.cov[q]) && !NONE.has(q))
-  .map(([q, r]) => [q, { page: (r.links.find(l => l.kind === 'full') || {}).url }]).filter(([, j]) => j.page);
+  .map(([q, r]) => [q, { page: pageOf(r) }]).filter(([, j]) => j.page);
+// a picture taken earlier from a page that is no longer a verified source goes
+for (const [q, u] of Object.entries(SOURCES)) {
+  if (/^(openlibrary|issue):/.test(u) || !READ[q] || pageOf(READ[q])) continue;
+  for (const k of Object.keys(SIZES)) rmSync(join(OUT, k, q + '.webp'), { force: true });
+  delete SOURCES[q]; console.log(q, 'cover from an unverified page removed');
+}
 const jobs = [...books, ...named, ...stories].slice(0, LIMIT);
 console.log(`covers: ${books.length} book covers and ${stories.length} story pages to look at`);
 const BAD = /logo|favicon|default|placeholder|icon|social|avatar|gravatar/i;
@@ -59,7 +70,7 @@ const coverImg = (html, base, og) => {
 };
 
 
-let ok = 0, missing = 0, failed = 0;
+let ok = 0, missing = 0, failed = 0, unreachable = 0;
 // first look at every story page: which og:image is a site's banner (the same on 3+ pages, counting earlier runs)?
 const seen = {};
 for (const u of Object.values(SOURCES)) if (!u.startsWith('openlibrary')) seen[u] = (seen[u] || 0) + 1;
@@ -75,7 +86,7 @@ async function one([q, j]) {
     if (j.page) { // a story: its own picture, or the issue cover when the og:image is the site's banner
       const og = j.og && !BAD.test(j.og) && seen[j.og] < 3 ? j.og : null;
       const img = og || (j.cover && !BAD.test(j.cover) ? j.cover : null);
-      if (!img) { if (j.err) { failed++; return; } missing++; NONE.add(q); return; }
+      if (!img) { if (j.err) { unreachable++; console.warn(q, 'page not reachable:', j.err); return; } missing++; NONE.add(q); return; } // a site that blocks robots is tried again next time
       j = { img, src: og ? img : 'issue:' + img };
     }
     const r = await fetch(j.img, { headers: UA, signal: AbortSignal.timeout(20000) });
@@ -102,5 +113,6 @@ for (const qs of Object.values(uses)) if (qs.length >= 3) for (const q of qs) {
 }
 writeFileSync(join(OUT, 'sources.json'), JSON.stringify(Object.fromEntries(Object.entries(SOURCES).sort()), null, 1));
 writeFileSync(join(OUT, 'none.json'), JSON.stringify([...NONE].sort()));
-console.log(`covers: ${ok} saved, ${missing} without an image, ${failed} failed`);
-if (failed > jobs.length / 2) process.exit(1);
+console.log(`covers: ${ok} saved, ${missing} without an image, ${unreachable} pages not reachable, ${failed} failed`);
+// fail only when the downloads themselves fail (Open Library down), not when a magazine page blocks robots
+if (failed && failed > (ok + failed) / 2) process.exit(1);

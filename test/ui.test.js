@@ -189,7 +189,7 @@ function selectFilter(group, values = []) {
   w.eval(`openWork('${dune.id}')`); await sleep(50);
   checks['dune card: excerpt note instead of full text + own link'] = /Бесплатный фрагмент или предпросмотр/.test($('#sheet-work').textContent) && !/Бесплатного легального текста/.test($('#sheet-work').textContent) && !!$('#own-link');
   checks['titles: no Wikipedia notes such as (рассказ Ле Гуин) in a title'] = w.eval("WORKS.Q21404517.titles.ru") === 'Сур' && w.eval("bareTitle('Kamienne niebo (powieść N.K. Jemisin)')") === 'Kamienne niebo' && w.eval("bareTitle('Rok 1984 (wydanie II)')") === 'Rok 1984 (wydanie II)';
-  checks['titles: the work is called by its Russian title, the original underneath'] = $('#sheet-work h2').textContent === 'Дюна' && $('#sheet-work .alt').textContent === 'Оригинальное название: Dune';
+  checks['titles: the work is called by its Russian title, the original underneath'] = $('#sheet-work h2').textContent === 'Дюна' && $('#sheet-work .wh-meta i').textContent === 'Dune';
   // own link with a note
   $('#own-link').value = 'https://example.org/dune-pl'; $('#own-note').value = 'Polski przekład, test';
   click($('#own-link-save')); await sleep(80);
@@ -280,15 +280,22 @@ function selectFilter(group, values = []) {
   // excerpts and multi-part texts
   const dune2 = Object.values(w.eval('WORKS')).find(x => x.title === 'Dune');
   w.eval(`openWork('${dune2.id}')`); await sleep(60);
-  checks['availability: Dune RU and PL = fragment (LitRes, Legimi)'] = /RU фрагмент/.test($('#sheet-work .avail').textContent) && /PL фрагмент/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work a[href^="https://www.legimi.pl/ebook-diuna"]') && !!$('#sheet-work a[href^="https://www.litres.ru/"]');
-  checks['excerpt: Dune shows LitRes fragment'] = !!$('#sheet-work a[href^="https://www.litres.ru/book/frenk-gerbert/"][href$="/chitat-onlayn/"]') && /Фрагмент · RU/.test($('#sheet-work').textContent);
-  w.eval("openWork('Q53828903')"); await sleep(60);
+  // the card's source list: one row per source; "All" shows every language
+  const allSources = async () => { const b = $('#sheet-work [data-rl-lang="all"]'); if (b && b.getAttribute('aria-pressed') !== 'true') { click(b); await sleep(30); } };
+  const srcRows = () => $$('#sheet-work .src-list .src').map(a => ({ l: a.querySelector('.src-l').textContent, kind: a.classList.contains('src-audio') ? 'audio' : 'text', ex: a.classList.contains('src-ex'), m: (a.querySelector('.src-m') || {}).textContent || '', href: a.getAttribute('href'), warn: !!a.querySelector('.src-w') }));
+  const hasSrc = (l, kind, ex) => srcRows().some(r => r.l === l && r.kind === kind && r.ex === !!ex);
+  await allSources();
+  checks['sources: Dune RU and PL = fragment (LitRes, Legimi)'] = hasSrc('RU', 'text', true) && hasSrc('PL', 'text', true) && !!$('#sheet-work a[href^="https://www.legimi.pl/ebook-diuna"]') && !!$('#sheet-work a[href^="https://www.litres.ru/"]');
+  const lr = srcRows().find(r => /^https:\/\/www\.litres\.ru\/book\/frenk-gerbert\/.*\/chitat-onlayn\/$/.test(r.href || ''));
+  checks['excerpt: Dune shows LitRes fragment, labelled as one'] = !!lr && lr.l === 'RU' && lr.m === 'Фрагмент';
+  w.eval("openWork('Q53828903')"); await sleep(60); await allSources();
   checks['excerpt: All Systems Red shows Reactor excerpt'] = !!$('#sheet-work a[href="https://reactormag.com/meet-murderbot-in-chapter-one-of-martha-wells-all-systems-red/"]');
   w.eval("openWork('Q25349436')"); await sleep(60);
-  checks['availability: Cat Pictures Please EN = full text'] = /EN полный текст/.test($('#sheet-work .av-full').textContent);
+  checks['sources: Cat Pictures Please EN = full text, nothing added to its label'] = hasSrc('EN', 'text', false) && srcRows().filter(r => r.kind === 'text' && !r.ex).every(r => r.m === '');
   w.eval("openWork('Q19947428')"); await sleep(50);
   checks['audio pilot: Silverberg uses the published Russian title and sourced summary'] = $('#sheet-work h2').textContent === 'Раз солдат, два солдат...' && /виртуальные личности/.test($('#sheet-work #about-slot').textContent) && !!$('#about-slot a[href="https://fantlab.ru/work22792"]') && !/Википедия/.test($('#about-slot').textContent);
-  checks['audio pilot: Russian text and audio are distinguished and source verification is visible'] = /RU полный текст · аудио/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work a[href="https://flibusta.info/b/404336/read"]') && !!$('#sheet-work .audio-source a[href="https://www.youtube.com/watch?v=det3gpWwLWI"]') && /разрешение не подтверждено/.test($('#sheet-work .audio-source').textContent) && /полнота независимо не проверена/.test($('#sheet-work .audio-source').textContent);
+  await allSources();
+  checks['audio pilot: Russian text and audio are distinguished and source verification is visible'] = hasSrc('RU', 'text', false) && hasSrc('RU', 'audio', false) && !!$('#sheet-work a[href="https://flibusta.info/b/404336/read"]') && srcRows().find(r => r.href === 'https://www.youtube.com/watch?v=det3gpWwLWI').warn && /Права этих источников не проверены/.test($('#sheet-work .rl-foot').textContent) && /полнота независимо не проверена/.test($('#rl-panel').textContent);
   checks['audio pilot: original publisher text is retained'] = w.eval("READ.Q19947428.tier === 't2' && READ.Q19947428.links.some(l => l.kind === 'full' && /baen/.test(l.url))");
   const audioPref = w.eval('prefs.langs'), originalAudioLinks = w.eval('READ.Q19947428.links.slice()');
   w.eval("prefs.langs = ['ru']; READ.Q19947428.links.push({kind:'audio',lang:'en',site:'English narrator',url:'https://example.test/en-audio'},{kind:'audio',lang:'pl',site:'Polski lektor',url:'https://example.test/pl-audio'})");
@@ -296,27 +303,43 @@ function selectFilter(group, values = []) {
   checks['audio pilot: Listen chooses preferred language and offers all recordings'] = audioOptions.filter(x => x.type === 'audio').length === 3 && audioOptions[0].url === 'https://www.youtube.com/watch?v=det3gpWwLWI' && /русский/i.test(audioOptions[0].name) && /разрешение не подтверждено/.test(audioOptions[0].sub);
   w.__restoreAudio = originalAudioLinks; w.__restoreLangs = audioPref; w.eval('READ.Q19947428.links = window.__restoreAudio; prefs.langs = window.__restoreLangs');
   w.eval("openWork('Q41793715')"); await sleep(50);
-  checks['audio pilot: external-only recording is not called publisher-authorized'] = /Внешний источник/.test($('#sheet-work .tier').textContent) && !/у издателя/.test($('#sheet-work .tier').textContent) && /RU аудио/.test($('#sheet-work .avail').textContent);
+  await allSources();
+  checks['audio pilot: external-only recording is not called publisher-authorized'] = !$('#sheet-work .tier') && !/у издателя/.test($('#sheet-work').textContent) && hasSrc('RU', 'audio', false) && !!$('#sheet-work .rl-foot');
   w.eval("openWork('Q29994374')"); await sleep(60);
   checks['parts: Silently and Very Fast has part 2'] = !!$('#sheet-work a[href="https://clarkesworldmagazine.com/valente_11_11/"]') && /Часть 2/.test($('#sheet-work').textContent);
-  w.eval("openWork('Q7049279')"); await sleep(60);
-  checks['found batch 3: None So Blind offers the author text and human reading'] = /EN полный текст/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work a[href="https://sites.google.com/site/joehaldemansf/books/short-stories"]') && w.eval("listenOpts('Q7049279').some(x => x.id === 'pod' && /starshipsofano499joehaldeman/.test(x.url))");
+  w.eval("openWork('Q7049279')"); await sleep(60); await allSources();
+  checks['found batch 3: None So Blind offers the author text and human reading'] = hasSrc('EN', 'text', false) && !!$('#sheet-work a[href="https://sites.google.com/site/joehaldemansf/books/short-stories"]') && w.eval("listenOpts('Q7049279').some(x => x.id === 'pod' && /starshipsofano499joehaldeman/.test(x.url))");
   w.eval("openWork('Q28015722')"); await sleep(60);
   checks['found batch 3: Rachel in Love labels the archived text and retains audio'] = !!$('#sheet-work a[href^="https://web.archive.org/web/"]') && /архив/.test($('#sheet-work a[href^="https://web.archive.org/web/"]').textContent) && w.eval("READ.Q28015722.links.some(x => x.kind === 'audio' && /ep447-rachel-love/.test(x.url))");
-  w.eval("openWork('Q20737828')"); await sleep(60);
-  checks['reviewed findings: Bloodchild retains all English excerpt pages alongside its new Spanish full text'] = /EN фрагмент/.test($('#sheet-work .avail').textContent) && /ES полный текст/.test($('#sheet-work .avail').textContent) && $$('#sheet-work .excerpt-sources a[href^="https://www.bookbrowse.com/excerpts/"]').length === 3 && !!$('#sheet-work .text-source a[href^="https://sindominio.net/"]');
-  w.eval("openWork('Q467388')"); await sleep(60);
-  checks['reviewed findings: Merchant offers Polish and Spanish full texts with Russian audio and fragment'] = /PL полный текст/.test($('#sheet-work .avail').textContent) && /ES полный текст/.test($('#sheet-work .avail').textContent) && /RU фрагмент · аудио/.test($('#sheet-work .avail').textContent) && !!$('#sheet-work .excerpt-sources a[href^="https://libcat.ru/"]') && !!$('#sheet-work .audio-source a[href^="https://akniga.org/"]');
-  checks['reviewed findings: external full text has its own permission label beside the retailer source'] = /разрешение не подтверждено/.test($$('#sheet-work .text-source').find(el=>el.querySelector('a[href^="https://lecturia.org/"]')).textContent) && !/разрешение не подтверждено/.test($$('#sheet-work .text-source').find(el=>el.querySelector('a[href^="https://www.legimi.pl/"]')).textContent);
-  w.eval("openWork('Q4102150')"); await sleep(60);
-  checks['reviewed findings: an audio-only work still shows its text fragment'] = !!$('#sheet-work .audio-source') && !!$('#sheet-work .excerpt-sources a[href^="https://www.legimi.pl/"]') && !$('#sheet-work .text-source');
+  w.eval("openWork('Q20737828')"); await sleep(60); await allSources();
+  checks['reviewed findings: Bloodchild retains all English excerpt pages alongside its new Spanish full text'] = hasSrc('EN', 'text', true) && hasSrc('ES', 'text', false) && $$('#sheet-work .src-ex[href^="https://www.bookbrowse.com/excerpts/"]').length === 3 && !!$('#sheet-work .src-text:not(.src-ex)[href^="https://sindominio.net/"]');
+  w.eval("openWork('Q467388')"); await sleep(60); await allSources();
+  checks['reviewed findings: Merchant offers Polish and Spanish full texts with Russian audio and fragment'] = hasSrc('PL', 'text', false) && hasSrc('ES', 'text', false) && hasSrc('RU', 'text', true) && hasSrc('RU', 'audio', false) && !!$('#sheet-work .src-ex[href^="https://libcat.ru/"]') && !!$('#sheet-work .src-audio[href^="https://akniga.org/"]');
+  checks['reviewed findings: an unverified full text carries the mark, the retailer source does not'] = srcRows().find(r => /^https:\/\/lecturia\.org\//.test(r.href || '')).warn && !srcRows().find(r => /^https:\/\/www\.legimi\.pl\//.test(r.href || '')).warn;
+  // the card, 06.11: dense head, About above the sources, one list with two filters, the synthesizer under it and never counted
+  const starLangs = w.eval('prefs.langs'); w.eval("prefs.langs = ['ru', 'en']; RL.q = null");
+  w.eval("openWork('Q2634534')"); await sleep(60);
+  const order = ['#about-slot', '#rl-panel', '.done-card', '#mine-panel', '.work-actions'].map(x => $('#sheet-work ' + x));
+  checks['card: author pill above the title, facts in one line, no availability chips or external-source label'] = $('#sheet-work .wh-b .work-head-t').children[1].classList.contains('wh-authors') && $('#sheet-work .wh-b .work-head-t').children[2].tagName === 'H2' && !$('#sheet-work .avail') && !$('#sheet-work .tier') && /Infinity Science Fiction/.test($('#sheet-work .wh-meta').textContent);
+  checks['card: About, sources, finished, my materials, then the two actions, in this order'] = order.every(Boolean) && order.every((x, i) => !i || order[i - 1].compareDocumentPosition(x) & 4) && /Написать разработчику о книге/.test($('#sheet-work .work-actions').textContent) && /Скопировать задачу поиска источников по книге/.test($('#sheet-work .work-actions').textContent);
+  const segN = sel => $$(`#rl-panel [${sel}]`).map(b => b.textContent.replace(/\s+/g, ' ').trim());
+  checks['card: My languages first with counts; the synthesizer is not a source'] = JSON.stringify(segN('data-rl-lang')) === JSON.stringify(['Мои языки 2', 'Все 5']) && srcRows().map(r => r.l).join() === 'RU,EN' && !$('#rl-panel .src-list [data-eleven]') && !!$('#rl-panel .rl-synth [data-eleven]') && JSON.stringify(segN('data-rl-kind')) === JSON.stringify(['Всё 2', 'Читать 1', 'Слушать 1']);
+  click($('#rl-panel [data-rl-kind="read"]')); await sleep(30);
+  checks['card: Read hides recordings and the synthesizer'] = srcRows().every(r => r.kind === 'text') && !$('#rl-panel .rl-synth') && $('#rl-panel [data-rl-kind="read"]').getAttribute('aria-pressed') === 'true';
+  click($('#rl-panel [data-rl-lang="all"]')); await sleep(30);
+  checks['card: All languages keeps the kind filter; others after mine; one note for unverified sources'] = srcRows().map(r => r.l).join() === 'EN,ES,PL' && $$('#rl-panel .rl-foot').length === 1 && srcRows().every(r => r.warn && r.m === '');
+  click($('#mine-panel [data-mat="file"]')); await sleep(20);
+  checks['card: my materials switch between a link and a file'] = $('#mat-link').hidden && !$('#mat-file').hidden && $('#mine-panel [data-mat="file"]').getAttribute('aria-pressed') === 'true' && !!$('#mat-file #work-file');
+  w.__starLangs = starLangs; w.eval('prefs.langs = window.__starLangs; RL.q = null');
+  w.eval("openWork('Q4102150')"); await sleep(60); await allSources();
+  checks['reviewed findings: an audio-only work still shows its text fragment'] = !!$('#sheet-work .src-audio') && !!$('#sheet-work .src-ex[href^="https://www.legimi.pl/"]') && !$('#sheet-work .src-text:not(.src-ex)');
   w.eval('closeSheets()');
   // Google Books: preview opens inside the app (embedded viewer), pages in the card
   const gq = w.eval("Object.keys(WORKS).find(q => WORKS[q].gb && WORKS[q].gb.en && WORKS[q].gb.n && !READ[q] && !(WORKS[q].ex && WORKS[q].ex.r))");
   if (gq) {
-    w.eval(`openWork('${gq}')`); await sleep(60);
+    w.eval(`openWork('${gq}')`); await sleep(60); await allSources();
     const gbtn = $('#sheet-work [data-gbview]');
-    checks['google: preview button + pages'] = !!gbtn && /Предпросмотр · EN · Google Books/.test(gbtn.textContent) && /\d+ стр\./.test($('#sheet-work').textContent);
+    checks['google: preview button + pages'] = !!gbtn && /Google Books/.test(gbtn.textContent) && gbtn.querySelector('.src-m').textContent === 'Фрагмент' && gbtn.querySelector('.src-l').textContent === 'EN' && /\d+ стр\./.test($('#sheet-work .wh-meta').textContent);
     click(gbtn); await sleep(40);
     const fr = $('#sheet-gb iframe.gb-frame');
     checks['google: embedded viewer sheet'] = !$('#sheet-gb').hidden && !!fr && /books\/jsapi\.js/.test(fr.getAttribute('srcdoc')) && /DefaultViewer/.test(fr.getAttribute('srcdoc'));
@@ -348,7 +371,7 @@ function selectFilter(group, values = []) {
   checks['done: Undo brings it back'] = !w.eval(`isDone('${dq}')`) && $$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done).includes(dq);
   w.eval(`openWork('${dq}')`); await sleep(40);
   click($(`#sheet-work [data-done="${dq}"]`)); await sleep(60);
-  checks['done: full card button pressed + date'] = $(`#sheet-work [data-done="${dq}"]`).getAttribute('aria-pressed') === 'true' && $(`#sheet-work [data-done="${dq}"]`).textContent.trim() === 'Прочитано' && /прочитано \d+/.test($('#sheet-work').textContent);
+  checks['done: full card button pressed + date'] = $(`#sheet-work [data-done="${dq}"]`).getAttribute('aria-pressed') === 'true' && /^Прочитано \d+/.test($(`#sheet-work [data-done="${dq}"] .dc-n`).textContent) && /снять отметку/.test($(`#sheet-work [data-done="${dq}"]`).textContent);
   w.eval('closeSheets()');
   checks['done: muted row with mark in award lists'] = /yrow is-done/.test(w.eval(`yearRow(2020, '${dq}', true)`)) && /✓ прочитано/.test(w.eval(`yearRow(2020, '${dq}', true)`)) && /wrow is-done/.test(w.eval(`workRow('x', '${dq}')`)) && /is-done/.test(w.eval(`cellHtml('${dq}')`));
   checks['done: catalog slip muted, button pressed'] = !!$(`#view-library .slip.is-done [data-done="${dq}"][aria-pressed="true"]`);
@@ -780,7 +803,7 @@ function selectFilter(group, values = []) {
 
   const paperRu = w.eval("WORKS.Q27903111.titles.ru");
   w.eval("WORKS.Q27903111.titles.ru = ''; openWork('Q27903111')"); await sleep(60);
-  checks['titles: in Russian, a work with no Russian title keeps the original heading when a Spanish source exists'] = $('#sheet-work h2').textContent === 'The Paper Menagerie' && !$('#sheet-work .alt');
+  checks['titles: in Russian, a work with no Russian title keeps the original heading when a Spanish source exists'] = $('#sheet-work h2').textContent === 'The Paper Menagerie' && !$('#sheet-work .wh-meta i');
   w.__paperRu = paperRu; w.eval("WORKS.Q27903111.titles.ru = window.__paperRu; delete window.__paperRu;");
   w.eval('closeSheets()');
   const qRu = w.eval("Object.keys(READ).find(q => WORKS[q] && WORKS[q].titles.ru && WORKS[q].titles.ru !== WORKS[q].title)");
@@ -793,9 +816,9 @@ function selectFilter(group, values = []) {
   checks['es: the interface switches to Spanish'] = $('#tab-catalog').textContent.trim() === 'Leer' && $('#tab-library').textContent.trim() === 'Catálogo' && $('#tab-shelf').textContent.trim() === 'Mi estante' && $('#lang-es').getAttribute('aria-pressed') === 'true' && w.document.documentElement.lang === 'es';
   checks['es: same keys and placeholders as English'] = w.eval(`Object.keys(I18N.en).every(k => k in I18N.es && JSON.stringify((JSON.stringify(I18N.en[k]).match(/\\{[\\w:-]+\\}/g) || []).sort()) === JSON.stringify((JSON.stringify(I18N.es[k]).match(/\\{[\\w:-]+\\}/g) || []).sort()))`);
   w.eval("openWork('Q2008211')"); await sleep(60);
-  checks['es: a work is called by its Spanish title, the original underneath, and shows what exists in Spanish'] = $('#sheet-work h2').textContent === 'La mano izquierda de la oscuridad' && $('#sheet-work .alt').textContent === 'Título original: The Left Hand of Darkness' && /ES nada todavía/.test($('#sheet-work .avail').textContent) && /Novela/.test($('#sheet-work').textContent);
+  checks['es: a work is called by its Spanish title, the original in its facts line, the sources in Spanish'] = $('#sheet-work h2').textContent === 'La mano izquierda de la oscuridad' && $('#sheet-work .wh-meta i').textContent === 'The Left Hand of Darkness' && $('#rl-panel h4').textContent === 'Leer y escuchar' && /Novela/.test($('#sheet-work').textContent);
   w.eval("openWork('Q27903111')"); await sleep(60);
-  checks['es: The Paper Menagerie is El zoo de papel in Spanish'] = $('#sheet-work h2').textContent === 'El zoo de papel' && /The Paper Menagerie/.test($('#sheet-work .alt').textContent);
+  checks['es: The Paper Menagerie is El zoo de papel in Spanish'] = $('#sheet-work h2').textContent === 'El zoo de papel' && $('#sheet-work .wh-meta i').textContent === 'The Paper Menagerie';
   w.eval('closeSheets()');
   click($('#about-cov [data-cov-view="languages"]'));
   const nEsFragments = w.eval("coverageStats().languages.es.frag");
