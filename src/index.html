@@ -635,6 +635,43 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .work-head-t { display: grid; gap: 8px; min-width: 0; }
 .work-head h2 { margin: 0; }
 @media (max-width: 359px) { .work-head { grid-template-columns: 96px minmax(0, 1fr); } .work-head .cover-m { width: 96px; height: 144px; } }
+/* work card, 06.11: a dense head (cover, awards, author, title, one line of facts), then About, then one list of sources */
+.work-head.wh-b { grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: start; }
+.work-head.wh-b .cover-m { width: 96px; height: 144px; }
+.work-head.wh-b .work-head-t { gap: 6px; }
+.work-head.wh-b h2 { font-size: 26px; line-height: 1.12; overflow-wrap: anywhere; }
+.wh-authors { gap: 6px; }
+.author-pill { border-radius: 999px; padding: 4px 8px 4px 12px; min-height: 36px; gap: 2px; }
+.author-pill svg { width: 16px; height: 16px; color: var(--muted); flex: none; }
+.wh-meta { margin: 0; font-size: 13px; line-height: 1.35; color: var(--muted); }
+.rl-seg button { font-size: 15px; font-weight: 500; }
+.rl-seg button .n { opacity: .7; font-weight: 400; }
+.rl-seg button[disabled] { opacity: .45; cursor: default; }
+.rl-note { margin: 0; }
+.src-list { display: grid; }
+.src { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 10px 0; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); text-decoration: none; text-align: left; font: inherit; cursor: pointer; border-radius: 0; }
+.src:hover .src-n { color: var(--accent); }
+.src > svg { flex: none; width: 18px; height: 18px; color: var(--muted); }
+.src-ic { flex: none; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); }
+.src-syn .src-ic { background: var(--bg); color: var(--muted); }
+.src-t { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.src-n { font-size: 16px; font-weight: 500; line-height: 1.3; overflow-wrap: anywhere; }
+.src-m { font-size: 13px; line-height: 1.3; color: var(--muted); }
+.src-w { color: var(--warn); vertical-align: -2px; margin-left: 6px; }
+.src-l { flex: none; font: 600 11px/1 var(--f-ui); letter-spacing: .06em; padding: 5px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.rl-synth { display: grid; gap: 2px; padding-top: 10px; border-top: 1px solid var(--line); }
+.rl-synth .src { border-top: 0; min-height: 52px; padding: 6px 0; }
+.rl-foot { margin: 0; padding-top: 8px; border-top: 1px solid var(--line); font-size: 13px; color: var(--warn); display: flex; gap: 6px; align-items: center; }
+.rl-foot .src-w { margin: 0; flex: none; }
+.done-card { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 16px; border: 0; border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.done-card .dk { width: 24px; height: 24px; }
+.done-card[aria-pressed="true"] { background: var(--ok-bg); color: var(--ink); }
+.done-card[aria-pressed="true"] .dk { color: var(--ok); }
+.done-card[aria-pressed="false"] { color: var(--ink); }
+.dc-t { display: grid; gap: 1px; } .dc-n { font-weight: 500; } .dc-s { font-size: 13px; color: var(--muted); }
+.mat-pane { display: grid; gap: 10px; }
+.work-actions { display: grid; gap: 8px; }
+.work-actions .btn { width: 100%; justify-content: flex-start; text-align: left; min-height: 48px; }
 /* Jost everywhere; the serif stays only for the text you read and quotes from it */
 :root { --f-read: 'Jost', system-ui, sans-serif; --f-book: 'Literata', Georgia, 'Noto Serif', serif; }
 .rcontent, .rcontent h1, .rcontent h2, .rcontent h3, .stopq blockquote, .rmarks .mk button.go { font-family: var(--f-book); }
@@ -939,7 +976,7 @@ const I18N = {
   en: {
     author_sort: "Sort authors", author_sort_az: "Name A–Z", author_sort_awards: "Most awards", author_sort_desc: "Newest award", author_sort_asc: "Oldest award", author_awards_n: "Awards: {n}",
     cov_forms: "By format", cov_languages: "By language", cov_form: "Format", cov_language: "Language", cov_available: "With a text, fragment or audio link", cov_missing: "No link yet", cov_any_language: "Any language", cov_note: "Counts are works with catalog links. A work may have a full text, a fragment and audio. Device-generated speech is not counted.",
-    v_authors: "By author", authors_count: "Authors: {n}", authors_hint: "Open an author’s name for their biography and all award-winning works.", agent_h: "Help fill the catalog", agent_hint: "Copy a small search task for your agent. It checks four languages and returns findings for review.", agent_copy: "Copy task for my agent", agent_work: "Copy this work’s search task", agent_copied: "Task copied. Paste it into your agent.", agent_brief: "Search instructions", agent_fallback: "Copy this task and paste it into your agent.",
+    v_authors: "By author", authors_count: "Authors: {n}", authors_hint: "Open an author’s name for their biography and all award-winning works.", agent_h: "Help fill the catalog", agent_hint: "Copy a small search task for your agent. It checks four languages and returns findings for review.", agent_copy: "Copy task for my agent", agent_work: "Copy a source-search task for this book", agent_copied: "Task copied. Paste it into your agent.", agent_brief: "Search instructions", agent_fallback: "Copy this task and paste it into your agent.",
     shelf_danger_section: "Delete items in this section", shelf_danger_count: "Saved items: {n}", shelf_danger_h: "Danger zone", shelf_danger_all_note: "Permanently delete all unoebasta data and settings on this device and disconnect sync. The site will restart with all reading languages enabled.",
     shelf_delete_files_confirm: "Delete all files on this device and their reading records?", shelf_delete_data_confirm: "Permanently delete all unoebasta data and settings on this device? This also disconnects sync here. You cannot undo this.",
     shelf_delete_all: "Delete all", shelf_delete_data: "Delete everything", shelf_reset_blocked: "Close other unoebasta tabs to finish the reset.", shelf_deleted: "Deleted {n} items.", shelf_delete_failed: "Couldn’t clear your shelf. Try again.", shelf_restore_failed: "Couldn’t restore the shelf. Try again.", langs_save: "Save languages", langs_saved: "Saved. Read now uses your reading languages.", langs_save_hint: "Save to apply this choice to Read and keep it for your next visit.", langs_change: "Change", picks_languages: "Reading languages: {l}", picks_none_lang: "No full text or recording is available in {l} for this length yet.", picks_other_lengths: "Available at other lengths", filter_format: "Material", filter_status: "Status", filter_view: "View", picks_h_any: "Stories for you", source_language: "Text or audio language", source_reader_languages: "My reading languages: {l}", picks_other_languages: "Stories in other languages", picks_other_languages_none: "No stories of this length have been found in your reading languages yet. You can read stories in other languages.", picks_other_languages_few: "No more stories of this length have been found in your reading languages yet. You can read stories in other languages.", picks_excerpt_note: "Excerpt reading time is unknown.", picks_excerpts: "Excerpts in your languages", picks_excerpt_open: "Read excerpt",
@@ -960,7 +997,7 @@ const I18N = {
     sec_mine: 'My materials', own_link: 'Own link', own_link_ph: 'Paste a page address', own_link_saved: 'Saved on this device', own_edit: 'Edit', archived: 'archive', cov_h: 'What you can read today', cov_full: 'Full text', cov_frag: 'Fragment', cov_audio: 'Audio', cov_all: 'Winners', cov_total: 'Altogether', cov_langs: "The same work can appear in several languages. “Any language” counts each work once.", cov_help: "Have a link? Send it to the project. Want to search? Copy a task for your agent.", cov_brief: "Search instructions", own_note: 'Note or title (optional)', file_note: 'Name or note (optional)', file_note_ph: 'e.g. Russian translation, EPUB from the publisher', file_rename: 'Name', file_note_saved: 'Saved', own_note_ph: 'e.g. Polish translation, Nowa Fantastyka 2019', own_update: 'Save changes', own_link_bad: 'Enter a page address starting with https://',
     own_file: 'File for offline reading', own_file_hint: 'TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX or ODT. The file is stored only on this device.', doc_no: 'This is an old Word file (.doc). Save it as DOCX or TXT and add it again.', rtf_no: 'RTF does not open here. Save it as DOCX or TXT and add it again.', file_unknown: 'This file is not a text this reader knows. TXT, HTML, EPUB, FB2, DOCX and ODT open here.', choose_file: 'Add file',
     sec_more: 'Editions, translations, bibliography', isfdb_t: 'ISFDB: editions and translations', fantlab_t: 'FantLab: Russian translations', wikidata_t: 'Wikidata',
-    title_orig: 'Original title', lang_h: 'Language',
+    title_orig: 'Original title', lang_h: 'Language', rl_mine: "My languages", rl_all: "All", rl_any: "All", rl_read: "Read", rl_listen: "Listen", rl_kind_label: "Read or listen", rl_langs_note: "Your languages: {l}. Change them in {s:shelf-langs}.", rl_warn: "Permission for these sources is not verified", rl_warn_t: "permission not verified", rl_excerpt: "Excerpt", rl_synth: "Or let a speech synthesizer read the text", rl_eleven_sub: "Synthetic voice · needs an account", done_card_off: "It leaves the start screen and stays on My shelf", done_card_on: "Tap to remove the mark", mat_link: "Link", mat_file: "File", fb_work: "Write to the developer about this book",
     suggest: 'Suggest for the catalog', report: 'Report a link',
     author_awards: 'Awards', author_works_n: '{n} winning works', bio_none: 'No Wikipedia article yet.', bio_fallback: 'No article in English yet.', bio_fallback_en: 'No article in this language yet. English version below.', bio_src: 'Text: Wikipedia, CC BY-SA 4.0', wiki_link: 'Wikipedia', isfdb_a: 'ISFDB bibliography', fantlab_a: 'FantLab',
     col_year: 'Year', col_award: 'Award', col_cat: 'Category', col_work: 'Work', col_text: 'Text',
@@ -1021,7 +1058,7 @@ const I18N = {
   pl: {
     author_sort: "Sortuj autorów", author_sort_az: "Nazwa A–Z", author_sort_awards: "Najwięcej nagród", author_sort_desc: "Najnowsza nagroda", author_sort_asc: "Najstarsza nagroda", author_awards_n: "Nagrody: {n}",
     cov_forms: "Według formy", cov_languages: "Według języka", cov_form: "Forma", cov_language: "Język", cov_available: "Z linkiem do tekstu, fragmentu lub audio", cov_missing: "Jeszcze bez linku", cov_any_language: "Dowolny język", cov_note: "Liczymy utwory z linkami w katalogu. Jeden utwór może mieć pełny tekst, fragment i audio. Głos syntetyczny urządzenia nie jest liczony.",
-    v_authors: "Według autorów", authors_count: "Autorzy: {n}", authors_hint: "Otwórz nazwisko autora, aby zobaczyć biografię i wszystkie nagrodzone utwory.", agent_h: "Pomóż uzupełnić katalog", agent_hint: "Skopiuj małe zadanie dla swojego agenta. Sprawdzi cztery języki i przygotuje wyniki do weryfikacji.", agent_copy: "Kopiuj zadanie dla agenta", agent_work: "Kopiuj zadanie dla tego utworu", agent_copied: "Zadanie skopiowane. Wklej je swojemu agentowi.", agent_brief: "Instrukcja wyszukiwania", agent_fallback: "Skopiuj zadanie i wklej je swojemu agentowi.",
+    v_authors: "Według autorów", authors_count: "Autorzy: {n}", authors_hint: "Otwórz nazwisko autora, aby zobaczyć biografię i wszystkie nagrodzone utwory.", agent_h: "Pomóż uzupełnić katalog", agent_hint: "Skopiuj małe zadanie dla swojego agenta. Sprawdzi cztery języki i przygotuje wyniki do weryfikacji.", agent_copy: "Kopiuj zadanie dla agenta", agent_work: "Skopiuj zadanie wyszukania źródeł dla tej książki", agent_copied: "Zadanie skopiowane. Wklej je swojemu agentowi.", agent_brief: "Instrukcja wyszukiwania", agent_fallback: "Skopiuj zadanie i wklej je swojemu agentowi.",
     shelf_danger_section: "Usuń elementy z tej sekcji", shelf_danger_count: "Zapisane elementy: {n}", shelf_danger_h: "Strefa usuwania", shelf_danger_all_note: "Trwale usuń wszystkie dane i ustawienia unoebasta z tego urządzenia i odłącz synchronizację. Po ponownym uruchomieniu dostępne będą wszystkie języki lektury.",
     shelf_delete_files_confirm: "Usunąć wszystkie pliki na tym urządzeniu i ich zapisane miejsca w lekturze?", shelf_delete_data_confirm: "Trwale usunąć wszystkie dane i ustawienia unoebasta z tego urządzenia? Synchronizacja na tym urządzeniu zostanie odłączona. Tej operacji nie można cofnąć.",
     shelf_delete_all: "Usuń wszystko", shelf_delete_data: "Usuń wszystko", shelf_reset_blocked: "Zamknij pozostałe karty unoebasta, aby zakończyć reset.", shelf_deleted: "Usunięto elementów: {n}.", shelf_delete_failed: "Nie udało się wyczyścić półki. Spróbuj ponownie.", shelf_restore_failed: "Nie udało się przywrócić półki. Spróbuj ponownie.", langs_save: "Zapisz języki", langs_saved: "Zapisano. Czytaj korzysta teraz z wybranych języków.", langs_save_hint: "Zapisz, aby zastosować wybór w Czytaj i zachować go na następną wizytę.", langs_change: "Zmień", picks_languages: "Języki lektury: {l}", picks_none_lang: "Nie ma jeszcze pełnego tekstu ani nagrania o tej długości w językach: {l}.", picks_other_lengths: "Dostępne w innych przedziałach czasu", filter_format: "Materiały", filter_status: "Status", filter_view: "Widok", picks_h_any: "Historie dla ciebie", source_language: "Język tekstu lub nagrania", source_reader_languages: "Moje języki lektury: {l}", picks_other_languages: "Utwory w innych językach", picks_other_languages_none: "Nie znaleźliśmy jeszcze utworów o tej długości w wybranych językach. Możesz przeczytać utwory w innych językach.", picks_other_languages_few: "Nie znaleźliśmy jeszcze więcej utworów o tej długości w wybranych językach. Możesz przeczytać utwory w innych językach.", picks_excerpt_note: "Czas czytania fragmentów nie jest określony.", picks_excerpts: "Fragmenty w twoich językach", picks_excerpt_open: "Czytaj fragment",
@@ -1042,7 +1079,7 @@ const I18N = {
     sec_mine: 'Moje materiały', own_link: 'Własny link', own_link_ph: 'Wklej adres strony', own_link_saved: 'Zapisano na tym urządzeniu', own_edit: 'Zmień', archived: 'archiwum', cov_h: 'Co już można przeczytać', cov_full: 'Cały tekst', cov_frag: 'Fragment', cov_audio: 'Audio', cov_all: 'Laureaci', cov_total: 'Razem', cov_langs: "Ten sam utwór może występować w kilku językach. „Dowolny język” liczy każdy utwór raz.", cov_help: "Masz link? Wyślij go do projektu. Chcesz poszukać? Skopiuj zadanie dla swojego agenta.", cov_brief: "Instrukcja wyszukiwania", own_note: 'Notatka lub tytuł (opcjonalnie)', file_note: 'Nazwa lub notatka (opcjonalnie)', file_note_ph: 'np. przekład rosyjski, EPUB od wydawcy', file_rename: 'Nazwa', file_note_saved: 'Zapisano', own_note_ph: 'np. przekład polski, Nowa Fantastyka 2019', own_update: 'Zapisz zmiany', own_link_bad: 'Wpisz adres strony zaczynający się od https://',
     own_file: 'Plik do czytania offline', own_file_hint: 'TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX lub ODT. Plik jest przechowywany tylko na tym urządzeniu.', doc_no: 'To stary plik Worda (.doc). Zapisz go jako DOCX lub TXT i dodaj ponownie.', rtf_no: 'RTF się tu nie otwiera. Zapisz plik jako DOCX lub TXT i dodaj ponownie.', file_unknown: 'Ten plik nie jest tekstem, który czytnik zna. Otwierają się TXT, HTML, EPUB, FB2, DOCX i ODT.', choose_file: 'Dodaj plik',
     sec_more: 'Wydania, przekłady, bibliografia', isfdb_t: 'ISFDB: wydania i przekłady', fantlab_t: 'FantLab: przekłady rosyjskie', wikidata_t: 'Wikidata',
-    title_orig: 'Tytuł oryginalny', lang_h: 'Język',
+    title_orig: 'Tytuł oryginalny', lang_h: 'Język', rl_mine: "Moje języki", rl_all: "Wszystkie", rl_any: "Wszystko", rl_read: "Czytaj", rl_listen: "Słuchaj", rl_kind_label: "Czytać czy słuchać", rl_langs_note: "Twoje języki: {l}. Zmień w sekcji {s:shelf-langs}.", rl_warn: "Prawa tych źródeł nie są sprawdzone", rl_warn_t: "prawa niesprawdzone", rl_excerpt: "Fragment", rl_synth: "Albo niech tekst przeczyta syntezator mowy", rl_eleven_sub: "Głos syntetyczny · potrzebne konto", done_card_off: "Zniknie z ekranu startowego i zostanie na półce", done_card_on: "Dotknij, aby zdjąć oznaczenie", mat_link: "Link", mat_file: "Plik", fb_work: "Napisz do twórcy o tej książce",
     suggest: 'Zaproponuj do katalogu', report: 'Zgłoś link',
     author_awards: 'Nagrody', author_works_n: 'Nagrodzone utwory: {n}', bio_none: 'Brak artykułu w Wikipedii.', bio_fallback: 'Brak artykułu po polsku.', bio_fallback_en: 'Brak artykułu po polsku. Poniżej wersja angielska.', bio_src: 'Tekst: Wikipedia, CC BY-SA 4.0', wiki_link: 'Wikipedia', isfdb_a: 'Bibliografia ISFDB', fantlab_a: 'FantLab',
     col_year: 'Rok', col_award: 'Nagroda', col_cat: 'Kategoria', col_work: 'Utwór', col_text: 'Tekst',
@@ -1103,7 +1140,7 @@ const I18N = {
   ru: {
     author_sort: "Порядок авторов", author_sort_az: "Имя А–Я", author_sort_awards: "Больше всего премий", author_sort_desc: "Новая премия", author_sort_asc: "Ранняя премия", author_awards_n: "Премий: {n}",
     cov_forms: "По форме", cov_languages: "По языкам", cov_form: "Форма", cov_language: "Язык", cov_available: "Со ссылкой на текст, фрагмент или аудио", cov_missing: "Пока без ссылки", cov_any_language: "На любом языке", cov_note: "Считаем произведения со ссылками в каталоге. У одного могут быть полный текст, фрагмент и аудио. Синтез речи на устройстве не учитывается.",
-    v_authors: "По авторам", authors_count: "Авторов: {n}", authors_hint: "Нажмите на имя писателя, чтобы открыть биографию и все его произведения с премиями.", agent_h: "Помочь пополнить каталог", agent_hint: "Скопируйте небольшое задание своему агенту. Он проверит четыре языка и подготовит находки для проверки.", agent_copy: "Скопировать задание моему агенту", agent_work: "Скопировать задание по этой книге", agent_copied: "Задание скопировано. Вставьте его своему агенту.", agent_brief: "Инструкция поиска", agent_fallback: "Скопируйте задание и вставьте его своему агенту.",
+    v_authors: "По авторам", authors_count: "Авторов: {n}", authors_hint: "Нажмите на имя писателя, чтобы открыть биографию и все его произведения с премиями.", agent_h: "Помочь пополнить каталог", agent_hint: "Скопируйте небольшое задание своему агенту. Он проверит четыре языка и подготовит находки для проверки.", agent_copy: "Скопировать задание моему агенту", agent_work: "Скопировать задачу поиска источников по книге", agent_copied: "Задание скопировано. Вставьте его своему агенту.", agent_brief: "Инструкция поиска", agent_fallback: "Скопируйте задание и вставьте его своему агенту.",
     shelf_danger_section: "Удаление записей этого раздела", shelf_danger_count: "Сохранённых записей: {n}", shelf_danger_h: "Опасная зона", shelf_danger_all_note: "Удалить все данные и настройки unoebasta на этом устройстве и отключить синхронизацию. После перезапуска будут включены все языки чтения.",
     shelf_delete_files_confirm: "Удалить все файлы на этом устройстве и связанные записи чтения?", shelf_delete_data_confirm: "Навсегда удалить все данные и настройки unoebasta на этом устройстве? Синхронизация на нём отключится. Это действие нельзя отменить.",
     shelf_delete_all: "Удалить всё", shelf_delete_data: "Удалить всё", shelf_reset_blocked: "Закройте другие вкладки unoebasta, чтобы завершить сброс.", shelf_deleted: "Удалено записей: {n}.", shelf_delete_failed: "Не удалось очистить полку. Попробуйте ещё раз.", shelf_restore_failed: "Не удалось восстановить полку. Попробуйте ещё раз.", langs_save: "Сохранить языки", langs_saved: "Сохранено. Раздел «Читать» учитывает выбранные языки.", langs_save_hint: "Сохраните выбор, чтобы применить его в разделе «Читать» и оставить для следующего визита.", langs_change: "Изменить", picks_languages: "Языки чтения: {l}", picks_none_lang: "Полного текста или записи такой длительности на выбранных языках пока нет: {l}.", picks_other_lengths: "Варианты другой длительности", filter_format: "Материалы", filter_status: "Статус", filter_view: "Вид", picks_h_any: "Что почитать", source_language: "Язык текста или аудио", source_reader_languages: "Мои языки чтения: {l}", picks_other_languages: "На других языках", picks_other_languages_none: "Произведений такой длительности на выбранных языках пока не найдено. Вы можете почитать на других языках.", picks_other_languages_few: "Больше произведений такой длительности на выбранных языках пока не найдено. Вы можете почитать на других языках.", picks_excerpt_note: "Длительность фрагментов не определена.", picks_excerpts: "Фрагменты на ваших языках", picks_excerpt_open: "Читать фрагмент",
@@ -1124,7 +1161,7 @@ const I18N = {
     sec_mine: 'Мои материалы', own_link: 'Своя ссылка', own_link_ph: 'Вставьте адрес страницы', own_link_saved: 'Сохранено на этом устройстве', own_edit: 'Изменить', archived: 'архив', cov_h: 'Что уже можно прочитать', cov_full: 'Целиком', cov_frag: 'Фрагмент', cov_audio: 'Аудио', cov_all: 'Лауреатов', cov_total: 'Всего', cov_langs: "Одно произведение может быть на нескольких языках. Строка «На любом языке» считает каждое один раз.", cov_help: "Есть ссылка? Отправьте её в проект. Хотите поискать? Скопируйте задание своему агенту.", cov_brief: "Инструкция поиска", own_note: 'Заметка или название (необязательно)', file_note: 'Название или заметка (необязательно)', file_note_ph: 'например, русский перевод, EPUB от издателя', file_rename: 'Название', file_note_saved: 'Сохранено', own_note_ph: 'например, польский перевод, Nowa Fantastyka 2019', own_update: 'Сохранить изменения', own_link_bad: 'Введите адрес страницы, начиная с https://',
     own_file: 'Файл для чтения офлайн', own_file_hint: 'TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX или ODT. Файл хранится только на этом устройстве.', doc_no: 'Это старый файл Word (.doc). Сохраните его как DOCX или TXT и добавьте снова.', rtf_no: 'RTF здесь не открывается. Сохраните файл как DOCX или TXT и добавьте снова.', file_unknown: 'Этот файл — не текст, который знает читалка. Открываются TXT, HTML, EPUB, FB2, DOCX и ODT.', choose_file: 'Добавить файл',
     sec_more: 'Издания, переводы, библиография', isfdb_t: 'ISFDB: издания и переводы', fantlab_t: 'FantLab: русские переводы', wikidata_t: 'Wikidata',
-    title_orig: 'Оригинальное название', lang_h: 'Язык',
+    title_orig: 'Оригинальное название', lang_h: 'Язык', rl_mine: "Мои языки", rl_all: "Все", rl_any: "Всё", rl_read: "Читать", rl_listen: "Слушать", rl_kind_label: "Читать или слушать", rl_langs_note: "Ваши языки: {l}. Изменить: {s:shelf-langs}.", rl_warn: "Права этих источников не проверены", rl_warn_t: "права не проверены", rl_excerpt: "Фрагмент", rl_synth: "Или пусть текст прочитает синтезатор речи", rl_eleven_sub: "Синтез речи · нужен аккаунт", done_card_off: "Уйдёт с первого экрана и останется на полке", done_card_on: "Нажмите, чтобы снять отметку", mat_link: "Ссылка", mat_file: "Файл", fb_work: "Написать разработчику о книге",
     suggest: 'Предложить в каталог', report: 'Пожаловаться на ссылку',
     author_awards: 'Премии', author_works_n: 'Произведений-лауреатов: {n}', bio_none: 'Статьи в Википедии пока нет.', bio_fallback: 'Статьи на русском пока нет.', bio_fallback_en: 'Статьи на русском пока нет. Ниже английская версия.', bio_src: 'Текст: Википедия, CC BY-SA 4.0', wiki_link: 'Википедия', isfdb_a: 'Библиография ISFDB', fantlab_a: 'FantLab',
     col_year: 'Год', col_award: 'Премия', col_cat: 'Категория', col_work: 'Произведение', col_text: 'Текст',
@@ -1185,7 +1222,7 @@ const I18N = {
   es: {
     author_sort: "Ordenar autores", author_sort_az: "Nombre A–Z", author_sort_awards: "Más premios", author_sort_desc: "Premio más reciente", author_sort_asc: "Premio más antiguo", author_awards_n: "Premios: {n}",
     cov_forms: "Por formato", cov_languages: "Por idioma", cov_form: "Formato", cov_language: "Idioma", cov_available: "Con enlace a texto, fragmento o audio", cov_missing: "Aún sin enlace", cov_any_language: "Cualquier idioma", cov_note: "Contamos obras con enlaces en el catálogo. Una obra puede tener texto completo, fragmento y audio. No se cuenta la voz sintética del dispositivo.",
-    v_authors: "Por autor", authors_count: "Autores: {n}", authors_hint: "Pulsa el nombre del autor para ver su biografía y todas sus obras premiadas.", agent_h: "Ayuda a completar el catálogo", agent_hint: "Copia una pequeña tarea para tu agente. Revisará cuatro idiomas y preparará hallazgos para comprobar.", agent_copy: "Copiar tarea para mi agente", agent_work: "Copiar tarea de esta obra", agent_copied: "Tarea copiada. Pégala en tu agente.", agent_brief: "Instrucciones de búsqueda", agent_fallback: "Copia esta tarea y pégala en tu agente.",
+    v_authors: "Por autor", authors_count: "Autores: {n}", authors_hint: "Pulsa el nombre del autor para ver su biografía y todas sus obras premiadas.", agent_h: "Ayuda a completar el catálogo", agent_hint: "Copia una pequeña tarea para tu agente. Revisará cuatro idiomas y preparará hallazgos para comprobar.", agent_copy: "Copiar tarea para mi agente", agent_work: "Copiar la tarea de búsqueda de fuentes de este libro", agent_copied: "Tarea copiada. Pégala en tu agente.", agent_brief: "Instrucciones de búsqueda", agent_fallback: "Copia esta tarea y pégala en tu agente.",
     shelf_danger_section: "Borrar elementos de esta sección", shelf_danger_count: "Elementos guardados: {n}", shelf_danger_h: "Zona de peligro", shelf_danger_all_note: "Borra de forma permanente todos los datos y ajustes de unoebasta de este dispositivo y desconecta la sincronización. El sitio se reiniciará con todos los idiomas de lectura habilitados.",
     shelf_delete_files_confirm: "¿Borrar todos los archivos de este dispositivo y sus registros de lectura?", shelf_delete_data_confirm: "¿Borrar de forma permanente todos los datos y ajustes de unoebasta de este dispositivo? También se desconectará la sincronización en este dispositivo. Esta acción no se puede deshacer.",
     shelf_delete_all: "Borrar todo", shelf_delete_data: "Borrar todo", shelf_reset_blocked: "Cierra las otras pestañas de unoebasta para completar el restablecimiento.", shelf_deleted: "Elementos borrados: {n}.", shelf_delete_failed: "No se pudo vaciar el estante. Inténtalo de nuevo.", shelf_restore_failed: "No se pudo restaurar el estante. Inténtalo de nuevo.", langs_save: "Guardar idiomas", langs_saved: "Guardado. Leer usa ahora tus idiomas de lectura.", langs_save_hint: "Guarda para aplicar tu elección en Leer y conservarla para la próxima visita.", langs_change: "Cambiar", picks_languages: "Idiomas de lectura: {l}", picks_none_lang: "Todavía no hay un texto completo ni una grabación de esta duración en: {l}.", picks_other_lengths: "Disponibles con otra duración", filter_format: "Material", filter_status: "Estado", filter_view: "Vista", picks_h_any: "Historias para ti", source_language: "Idioma del texto o audio", source_reader_languages: "Mis idiomas de lectura: {l}", picks_other_languages: "Obras en otros idiomas", picks_other_languages_none: "Aún no hemos encontrado obras de esta duración en tus idiomas de lectura. Puedes leer obras en otros idiomas.", picks_other_languages_few: "Aún no hemos encontrado más obras de esta duración en tus idiomas de lectura. Puedes leer obras en otros idiomas.", picks_excerpt_note: "La duración de los fragmentos no está determinada.", picks_excerpts: "Fragmentos en tus idiomas", picks_excerpt_open: "Leer fragmento",
@@ -1201,7 +1238,7 @@ const I18N = {
     news_more: "y {n} más: mostrar solo lo nuevo", ex_note: "Un fragmento o vista previa gratuita, normalmente los primeros capítulos. Este enlace no ofrece el libro completo.", note_collection: "El relato forma parte de una colección: el enlace lleva a la página de descarga gratuita del libro entero (Creative Commons).", eleven: "Escuchar en ElevenReader", ed_title: "Escuchar en ElevenReader", ed_copied: "Se copió el enlace al texto.", ed_copy_fail: "Copia el enlace: mantenlo pulsado y elige Copiar.", ed_copy_again: "Copiar otra vez", ed_step2: "Después se abre la ventana de importación de ElevenReader. Pega el enlace en «Paste text or URLs» y pulsa Upload.", ed_step3: "El texto aparece en tu biblioteca de ElevenReader: pulsa ▶ y escucha.",
     ed_flash: "Si durante un segundo aparece «Failed to process your file», no le hagas caso: justo después se abre la ventana de importación.", ed_account: "Hace falta una cuenta de ElevenReader; el plan gratuito incluye 10 horas de escucha al mes.", ed_open: "Abrir ElevenReader", eleven_open: "Abrir ElevenReader", eleven_file_web: "Guardar como .html", share_fail: "No se pudo abrir el menú de compartir.", saved_file: "Archivo guardado. Ábrelo en ElevenReader con + → Upload file.", save_declined: "Se canceló el guardado.", sec_mine: "Mis materiales", own_link: "Enlace propio", own_link_ph: "Pega la dirección de una página", own_link_saved: "Guardado en este dispositivo", own_edit: "Editar", archived: "archivo", cov_h: "Qué puedes leer hoy", cov_full: "Texto completo", cov_frag: "Fragmento", cov_audio: "Audio", cov_all: "Obras", cov_total: "En total",
     cov_langs: "Una obra puede aparecer en varios idiomas. «Cualquier idioma» cuenta cada obra una sola vez.", cov_help: "¿Tienes un enlace? Envíalo al proyecto. ¿Quieres buscar? Copia una tarea para tu agente.", cov_brief: "Instrucciones de búsqueda", own_note: "Nota o título (opcional)", file_note: "Nombre o nota (opcional)", file_note_ph: "p. ej. traducción al español, EPUB de la editorial", file_rename: "Nombre", file_note_saved: "Guardado", own_note_ph: "p. ej. traducción al español, una revista de 2019", own_update: "Guardar cambios", own_link_bad: "Escribe una dirección que empiece por https://", own_file: "Archivo para leer sin conexión",
-    own_file_hint: "TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX u ODT. El archivo se guarda solo en este dispositivo.", doc_no: "Es un archivo antiguo de Word (.doc). Guárdalo como DOCX o TXT y vuelve a añadirlo.", rtf_no: "RTF no se abre aquí. Guárdalo como DOCX o TXT y vuelve a añadirlo.", file_unknown: "Este archivo no es un texto que este lector conozca. Aquí se abren TXT, HTML, EPUB, FB2, DOCX y ODT.", choose_file: "Añadir archivo", sec_more: "Ediciones, traducciones, bibliografía", isfdb_t: "ISFDB: ediciones y traducciones", fantlab_t: "FantLab: traducciones al ruso", wikidata_t: "Wikidata", title_orig: "Título original", lang_h: "Idioma", suggest: "Sugerir para el catálogo", report: "Avisar de un enlace", author_awards: "Premios", author_works_n: "{n} obras premiadas", bio_none: "Todavía no hay artículo en Wikipedia.",
+    own_file_hint: "TXT, HTML, EPUB, FB2, FB2.ZIP, DOCX u ODT. El archivo se guarda solo en este dispositivo.", doc_no: "Es un archivo antiguo de Word (.doc). Guárdalo como DOCX o TXT y vuelve a añadirlo.", rtf_no: "RTF no se abre aquí. Guárdalo como DOCX o TXT y vuelve a añadirlo.", file_unknown: "Este archivo no es un texto que este lector conozca. Aquí se abren TXT, HTML, EPUB, FB2, DOCX y ODT.", choose_file: "Añadir archivo", sec_more: "Ediciones, traducciones, bibliografía", isfdb_t: "ISFDB: ediciones y traducciones", fantlab_t: "FantLab: traducciones al ruso", wikidata_t: "Wikidata", title_orig: "Título original", lang_h: "Idioma", rl_mine: "Mis idiomas", rl_all: "Todos", rl_any: "Todo", rl_read: "Leer", rl_listen: "Escuchar", rl_kind_label: "Leer o escuchar", rl_langs_note: "Tus idiomas: {l}. Cámbialos en {s:shelf-langs}.", rl_warn: "Los derechos de estas fuentes no están verificados", rl_warn_t: "derechos sin verificar", rl_excerpt: "Fragmento", rl_synth: "O deja que un sintetizador de voz lea el texto", rl_eleven_sub: "Voz sintética · requiere cuenta", done_card_off: "Sale de la pantalla de inicio y se queda en Mi estante", done_card_on: "Toca para quitar la marca", mat_link: "Enlace", mat_file: "Archivo", fb_work: "Escribir al desarrollador sobre este libro", suggest: "Sugerir para el catálogo", report: "Avisar de un enlace", author_awards: "Premios", author_works_n: "{n} obras premiadas", bio_none: "Todavía no hay artículo en Wikipedia.",
     bio_fallback: "Todavía no hay artículo en inglés.", bio_fallback_en: "Todavía no hay artículo en este idioma. Abajo, la versión en inglés.", bio_src: "Texto: Wikipedia, CC BY-SA 4.0", wiki_link: "Wikipedia", isfdb_a: "Bibliografía en ISFDB", fantlab_a: "FantLab", col_year: "Año", col_award: "Premio", col_cat: "Categoría", col_work: "Obra", col_text: "Texto", note_rabbit: "El autor rechazó públicamente el Hugo de 2023 por la polémica de la votación.", note_baen: "Baen envía esta página como archivo, así que el navegador descarga un .htm en lugar de mostrarla. Añade abajo el archivo descargado para leerlo aquí, sin conexión.", note_doctorow: "El autor lo publicó con licencia CC BY-NC-SA 1.0: descarga el TXT o el EPUB de su sitio y añádelo abajo para leerlo sin conexión.", aw_h2: "Estructura de premios",
     aw_p: "Todos los ganadores de los Hugo, Nebula y Locus en ficción. Pulsa un año, una categoría o una obra.", v_table: "Tablero", v_list: "Lista", sort_desc: "Más recientes primero", sort_asc: "Más antiguos primero", only_text: "Solo con texto", search_ph: "Título o autor", search_go: "Buscar", search_all: "Encontradas: {n} en todos los premios, años y categorías", search_clear: "Borrar la búsqueda", search_more: "Se muestran las primeras {n}. Añade una palabra para afinar.", search_readable: "Para leer gratis ({n})", search_other: "Otros ganadores, todavía sin texto gratis ({n})", lg_text: "texto gratis", lg_mine: "tu enlace o archivo", lg_star: "★ guardado", lg_new: "nuevo", crumb_all: "Todos los años", year_h: "{y}", cat_hist: "{a} · {c}", prev_year: "Año anterior", next_year: "Año siguiente",
     aw_note: "Los años son los de la ceremonia. SFWA nombra los Nebula por el año de publicación, así que los «Premios Nebula 2024» se entregaron en 2025 y aparecen aquí en 2025.", aw_src: "Datos: Wikidata (CC0), cotejados en parte con sfadb.com; el último año puede ir con retraso. Biografías y descripciones de libros: Wikipedia, CC BY-SA 4.0.", found: "{n} encontradas", nothing_found: "No se encontró nada.", shelf_bm: "Guardados", shelf_bm_works: "Obras", shelf_bm_places: "Lugares en los textos", empty_bm: "Pulsa ☆ en una obra, o el botón de marcador en el lector, para tenerla aquí.", shelf_reading: "Leyendo ahora", shelf_files: "Archivos en este dispositivo", shelf_links: "Mis enlaces", shelf_sugg: "Mis sugerencias y avisos", shelf_data: "Datos en este dispositivo", sy_h: "Sincronizar entre tus dispositivos",
@@ -2534,41 +2571,91 @@ function sheetBar(title, extra) { return `<div class="sheet-bar"><div class="wra
 function closeSheets() { for (const s of ['#sheet-gb', '#sheet-form', '#sheet-author', '#sheet-work']) { const el = $(s); el.hidden = true; el.innerHTML = ''; } }
 
 /* ---------- work card ---------- */
+// "My languages" in the card: the languages the reader chose, else the interface language and the browser's; the interface language first
+function panelLangs() { return [...new Set([LANG, ...(explicitLangs() ? prefs.langs : browserLangs())])]; }
+let RL = { q: null, lang: null, kind: 'all', mat: null }; // the card's filters, kept while the same work is open
+const svgIcon = d => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const SRC_ICON = {
+  text: svgIcon('<path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2v0a2 2 0 0 0 2 2h13"/><path d="M8 7h7"/>'),
+  audio: svgIcon('<path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z"/><path d="M3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/>'),
+  voice: svgIcon('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>'),
+  out: svgIcon('<path d="M7 17 17 7"/><path d="M8 7h9v9"/>'),
+  next: svgIcon('<path d="m9 6 6 6-6 6"/>')
+};
+const warnMark = () => `<svg class="src-w" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="${esc(t('rl_warn_t'))}"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`;
+// Every place to read or listen to a work, one row each: full texts (o 0), recordings (1), text excerpts (2), audio excerpts (3).
+// Only excerpts are labelled; a speech synthesizer is not a source and is never counted.
+function workSources(q) {
+  const out = [], unverified = l => l.rights === 'unknown' || l.tier === 'external';
+  for (const l of (READ[q]?.links || []).filter(l => l.kind === 'full')) out.push({ kind: 'text', o: 0, lang: l.lang || 'en', site: siteLabel(l), url: l.url, meta: l.part ? t('part_n', { n: l.part }) : '', warn: unverified(l), track: `data-track="${q}" data-via="read" data-site="${esc(siteLabel(l))}"` });
+  for (const l of audioLinks(q)) out.push({ kind: 'audio', o: 1, lang: l.lang || 'en', site: l.site || hostOf(l.url), url: l.url, meta: l.part ? t('part_n', { n: l.part }) : '', warn: unverified(l), listed: l.verification === 'metadata', track: `data-track="${q}" data-via="listen" data-site="${esc(audioSite(l))}"` });
+  for (const x of excerptLinks(q)) out.push({ kind: x.audio ? 'audio' : 'text', o: x.audio ? 3 : 2, lang: x.lang.toLowerCase(), site: x.site, url: x.url, meta: x.coll ? `${t('rl_excerpt')} · «${x.coll}»` : t('rl_excerpt'), gb: x.gb && canNet() ? x.gb : null });
+  return out;
+}
+const RL_KIND = { all: () => true, read: s => s.kind === 'text', listen: s => s.kind === 'audio' };
+function readPanelHtml(q) {
+  const all = workSources(q), mine = panelLangs(), isMine = s => mine.includes(s.lang);
+  const rankL = l => { const i = mine.indexOf(l); return i < 0 ? mine.length : i; };
+  const nMine = all.filter(isMine).length, showLang = all.length > 0 && nMine < all.length;
+  if (RL.lang === null || (RL.lang === 'mine' && !nMine)) RL.lang = nMine ? 'mine' : 'all';
+  const lang = showLang ? RL.lang : 'all';
+  const pool = lang === 'mine' ? all.filter(isMine) : all;
+  const showKind = all.some(RL_KIND.read) && all.some(RL_KIND.listen);
+  const kind = showKind && pool.some(RL_KIND[RL.kind]) ? RL.kind : 'all';
+  const rows = pool.filter(RL_KIND[kind]).sort((a, b) => rankL(a.lang) - rankL(b.lang) || (rankL(a.lang) === mine.length ? a.lang.localeCompare(b.lang) : 0) || a.o - b.o);
+  const full = fullLink(q), say = phoneOK(q);
+  const seg = (attr, opts, cur, label) => `<div class="seg full rl-seg" role="group" aria-label="${esc(label)}">${opts.map(([v, txt, n]) => `<button data-${attr}="${v}" aria-pressed="${v === cur}"${n ? '' : ' disabled'}>${esc(txt)} <span class="n">${n}</span></button>`).join('')}</div>`;
+  const row = s => {
+    const w = s.warn || s.listed ? warnMark() : '', label = [s.site, langName(s.lang), s.meta].filter(Boolean).join(', ');
+    const inner = `<span class="src-ic">${SRC_ICON[s.kind]}</span><span class="src-t"><span class="src-n">${esc(s.site)}${s.meta ? '' : w}</span>${s.meta ? `<span class="src-m">${esc(s.meta)}${w}</span>` : ''}</span><b class="src-l" aria-hidden="true">${esc(s.lang.toUpperCase())}</b>`;
+    const cls = `src src-${s.kind}${s.o >= 2 ? ' src-ex' : ''}`;
+    return s.gb ? `<button class="${cls}" aria-label="${esc(label)}" data-gbview="${esc(s.gb.isbn ? 'ISBN:' + s.gb.isbn : s.gb.id)}" data-gbid="${esc(s.gb.id)}" data-gblang="${s.gb.lang}" data-wid="${q}">${inner}${SRC_ICON.next}</button>`
+      : `<a class="${cls}" aria-label="${esc(label)}" href="${esc(s.url)}" target="_blank" rel="noopener" ${s.track || ''}>${inner}${SRC_ICON.out}</a>`;
+  };
+  const synthRow = (attrs, name, sub) => `<button class="src src-syn" ${attrs}><span class="src-ic">${SRC_ICON.voice}</span><span class="src-t"><span class="src-n">${esc(name)}</span><span class="src-m">${esc(sub)}</span></span>${SRC_ICON.next}</button>`;
+  return `<h4>${esc(t('sec_read'))}</h4>
+      ${showLang ? seg('rl-lang', [['mine', t('rl_mine'), nMine], ['all', t('rl_all'), all.length]], lang, t('langs_h')) : ''}
+      ${showKind ? seg('rl-kind', [['all', t('rl_any'), pool.length], ['read', t('rl_read'), pool.filter(RL_KIND.read).length], ['listen', t('rl_listen'), pool.filter(RL_KIND.listen).length]], kind, t('rl_kind_label')) : ''}
+      ${showLang && lang === 'mine' ? `<p class="small rl-note">${linkify(t('rl_langs_note', { l: mine.map(langName).join(', ') }))}</p>` : ''}
+      ${rows.length ? `<div class="src-list">${rows.map(row).join('')}</div>` : `<p class="note">${esc(t('no_text'))}</p>`}
+      ${kind !== 'read' && (full || say) ? `<div class="rl-synth"><span class="small">${esc(t('rl_synth'))}</span>${full ? synthRow(`data-eleven="${esc(full.url)}" data-wid="${q}"`, 'ElevenReader', t('rl_eleven_sub')) : ''}${say ? synthRow(`data-say="${q}"`, t('ls_phone'), t('ls_phone_sub')) : ''}</div>` : ''}
+      ${rows.some(s => s.warn) ? `<p class="rl-foot">${warnMark()}<span>${esc(t('rl_warn'))}</span></p>` : ''}
+      ${rows.some(s => s.listed) ? `<p class="small">${esc(t('audio_metadata'))}</p>` : ''}
+      ${all.some(s => s.o === 0) && !all.some(s => s.o === 0 && isMine(s)) ? `<p class="note">${esc(t('lang_far', { l: langName(all.find(s => s.o === 0).lang) }))}</p>` : ''}
+      ${rows.some(s => s.o >= 2) && !rows.some(s => s.o < 2) ? `<p class="note">${esc(t('ex_note'))}</p>` : ''}
+      ${rows.some(s => s.o === 0) ? `<p class="note">${esc(t('web_note'))}</p>` : ''}`;
+}
+function redrawReadPanel(focusSel) { const p = $('#rl-panel'); if (!p) return; p.innerHTML = readPanelHtml(p.dataset.wid); const f = focusSel && p.querySelector(focusSel); if (f && !f.disabled) f.focus(); }
+const doneCard = q => `<button class="done-card done-btn" data-done="${q}" aria-pressed="${isDone(q)}">${isDone(q) ? DONE_ICON.on : DONE_ICON.off}<span class="dc-t"><span class="dc-n">${esc(isDone(q) ? cap(t('done_on_date', { d: fmtDate(doneAt(q)) })) : t('done_btn'))}</span><span class="dc-s">${esc(t(isDone(q) ? 'done_card_on' : 'done_card_off'))}</span></span></button>`;
 async function openWork(q) {
   const w = work(q); if (!w) return;
   await loadLocal();
+  if (RL.q !== q) RL = { q, lang: null, kind: 'all', mat: null };
   const r = READ[q];
   const own = local.links.find(l => l.id === q);
   const files = local.files.filter(f => f.workId === q);
-  const full = fullLink(q), audios = audioLinks(q), audio = audios[0];
-  const texts = r ? r.links.filter(l => l.kind === 'full').sort((a, b) => (b === full) - (a === full)) : [];
-  const exs = excerptLinks(q);
-  const isPdf = u => /\.pdf($|[?#])/i.test(u);
   const el = $('#sheet-work');
   const orig = origOf(w);
   const ab = aboutFor(null, q);
+  const year = w.pub && !(r && String(r.pub).includes(String(w.pub))) ? String(w.pub) : '';
+  const facts = [orig ? `<i lang="en">${esc(orig)}</i>` : '', r ? esc(r.pub) : '', esc(year), pagesOf(q) ? esc(t('pages', { n: pagesOf(q) })) : '', esc(fmtDur(readingMinutes(q)))].filter(Boolean).join(' · ');
+  const cc = r && tierOf(q) === 't1';
+  const flags = (cc ? `<span class="tier tier-t1">${esc(t('tier_t1'))}</span>${r.license ? `<span class="flag">${esc(r.license)}</span>` : ''}` : '') + workFlags(w);
+  const mat = RL.mat || (files.length && !own ? 'file' : 'link');
   el.innerHTML = sheetBar(titleOf(w), starBtn(q)) + `<div class="wrap sheet-body">
-    <div class="work-head">${coverHtml(q, 'm')}<div class="work-head-t"><div class="awards">${awardChips(w, true)}</div>
-    <h2>${esc(titleOf(w))}</h2></div></div>
-    ${orig ? `<div class="alt">${esc(t('title_orig'))}: <span lang="en">${esc(orig)}</span></div>` : ''}
-    <div class="row">${w.authors.map(a => `<button class="btn btn-small" data-author="${a}">${esc(authorName(a))}</button>`).join('')}<span class="small">${esc(r ? r.pub + ' · ' : '')}${w.pub || ''}${pagesOf(q) ? ' · ' + esc(t('pages', { n: pagesOf(q) })) : ''} · ${esc(fmtDur(readingMinutes(q)))}</span></div>
-    <div class="flags"><span class="tier tier-${tierOf(q)}">${esc(t('tier_' + tierOf(q)))}</span>${r && r.license && tierOf(q) === 't1' ? `<span class="flag">${esc(r.license)}</span>` : ''}${workFlags(w)}</div>
-    <div class="row">${doneBtn(q, 'btn btn-small')}${isDone(q) ? `<span class="small">${esc(t('done_on_date', { d: fmtDate(doneAt(q)) }))}</span>` : ''}</div>
-    ${availHtml(q)}
-    ${r && r.note && (r.note !== 'note_baen' || full?.downloads) ? `<p class="note note-warn">${esc(t(r.note))}</p>` : ''}
+    <div class="work-head wh-b">${coverHtml(q, 'm')}<div class="work-head-t"><div class="awards">${awardChips(w, true)}</div>
+    <div class="row wh-authors">${w.authors.map(a => `<button class="btn btn-small author-pill" data-author="${a}">${esc(authorName(a))}${SRC_ICON.next}</button>`).join('')}</div>
+    <h2>${esc(titleOf(w))}</h2>
+    <p class="wh-meta">${facts}</p></div></div>
+    ${flags ? `<div class="flags">${flags}</div>` : ''}
+    ${r && r.note && (r.note !== 'note_baen' || fullLink(q)?.downloads) ? `<p class="note note-warn">${esc(t(r.note))}</p>` : ''}
     ${workRecall(q)}
     <div id="about-slot">${ab ? aboutPanel(ab, 'w') : ''}</div>
-    <section class="panel"><h4>${esc(t('sec_read'))}</h4>
-      ${full || audio ? `<div class="row">
-        ${texts.map(l => `<div class="text-source"><a class="btn${l === full ? ' btn-primary' : ''}" href="${esc(l.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="read" data-site="${esc(siteLabel(l))}">${esc(t('open_original', { site: siteLabel(l) }))} · ${esc(langName(l.lang || 'en'))}${l.part ? ' · ' + esc(t('part_n', { n: l.part })) : ''} ↗</a>${l.rights === 'unknown' ? `<p class="small">${esc(t('tier_external'))}</p>` : ''}</div>`).join('')}
-        ${full ? `<button class="btn" data-eleven="${esc(full.url)}" data-wid="${q}">${esc(t('eleven'))}</button>` : ''}
-        ${phoneOK(q) ? `<button class="btn" data-say="${q}">${esc(t('say_btn'))}</button>` : ''}
-      </div>
-      ${audios.map(l => `<div class="audio-source"><a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(audioSite(l))}">${esc(t('listen', { site: l.site }))} · ${esc(langName(l.lang || 'en'))}${l.part ? ' · ' + esc(t('part_n', { n: l.part })) : ''} ↗</a>${l.rights === 'unknown' ? `<p class="small">${esc(t('ls_external_sub'))}</p>` : ''}${l.verification === 'metadata' ? `<p class="small">${esc(t('audio_metadata'))}</p>` : ''}</div>`).join('')}
-      <p class="note">${esc(t('web_note'))}</p>${full && !myLangs().includes(full.lang || 'en') ? `<p class="note">${esc(t('lang_far', { l: langName(full.lang || 'en') }))}</p>` : ''}` : !exs.length ? `<p class="note">${esc(t('no_text'))}</p>` : ''}
-      ${exs.length ? `<div class="excerpt-sources"><div class="row">${exs.map((x, i) => { const cls = `btn${i || full || audio ? '' : ' btn-primary'}`; const label = x.coll ? t('ex_coll', { c: x.coll }) : t(x.audio ? 'ex_audio' : x.gb ? 'ex_preview' : 'ex_open', { site: x.site, l: x.lang }); return x.gb && canNet() ? `<button class="${cls}" data-gbview="${esc(x.gb.isbn ? 'ISBN:' + x.gb.isbn : x.gb.id)}" data-gbid="${esc(x.gb.id)}" data-gblang="${x.gb.lang}" data-wid="${q}">${esc(label)}</button>` : `<a class="${cls}" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(label)} ↗</a>`; }).join('')}</div><p class="note">${esc(t('ex_note'))}</p></div>` : ''}
-    </section>
-    <section class="panel"><h4>${esc(t('sec_mine'))}</h4>
+    <section class="panel" id="rl-panel" data-wid="${q}">${readPanelHtml(q)}</section>
+    ${doneCard(q)}
+    <section class="panel" id="mine-panel"><h4>${esc(t('sec_mine'))}</h4>
+      <div class="seg full" role="group" aria-label="${esc(t('sec_mine'))}"><button data-mat="link" aria-pressed="${mat === 'link'}">${esc(t('mat_link'))}${own ? ' · 1' : ''}</button><button data-mat="file" aria-pressed="${mat === 'file'}">${esc(t('mat_file'))}${files.length ? ' · ' + files.length : ''}</button></div>
+      <div id="mat-link" class="mat-pane"${mat === 'link' ? '' : ' hidden'}>
       ${own ? `<div class="saved-link" id="own-card"><span class="small saved-ok">✓ ${esc(t('own_link_saved'))}</span><strong>${esc(own.note || hostOf(own.url))}</strong><a class="small" href="${esc(own.url)}" target="_blank" rel="noopener">${esc(own.url)}</a>
         <div class="row"><a class="btn btn-small btn-primary" href="${esc(own.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="read" data-site="${esc(hostOf(own.url))}">${esc(t('open'))} ↗</a><button class="btn btn-small" data-eleven="${esc(own.url)}" data-wid="${q}">${esc(t('eleven'))}</button><button class="btn btn-ghost btn-small" id="own-link-edit">✎ ${esc(t('own_edit'))}</button><button class="btn btn-ghost btn-small btn-danger" id="own-link-del" data-wid="${q}">${esc(t('del'))}</button></div></div>` : ''}
       <div id="own-form"${own ? ' hidden' : ''}>
@@ -2576,10 +2663,13 @@ async function openWork(q) {
         <div class="field"><label for="own-note">${esc(t('own_note'))}</label><input id="own-note" type="text" maxlength="200" enterkeyhint="done" placeholder="${esc(t('own_note_ph'))}" value="${esc(own && own.note ? own.note : '')}"></div>
         <div class="row"><button class="btn btn-primary" id="own-link-save" data-wid="${q}">${esc(own ? t('own_update') : t('save'))}</button>${own ? `<button class="btn btn-ghost" id="own-link-cancel">${esc(t('cancel'))}</button>` : ''}</div>
       </div>
+      </div>
+      <div id="mat-file" class="mat-pane"${mat === 'file' ? '' : ' hidden'}>
       <div class="field"><label>${esc(t('own_file'))}</label><span class="small">${esc(t('own_file_hint'))}</span></div>
       ${files.map(fileRow).join('')}
       <div class="field"><label for="work-file-note">${esc(t('file_note'))}</label><input id="work-file-note" type="text" maxlength="200" placeholder="${esc(t('file_note_ph'))}"></div>
       <div class="row"><label class="btn" for="work-file">${esc(t('choose_file'))}</label><input id="work-file" type="file" accept=".txt,.htm,.html,.xhtml,.epub,.fb2,.zip,.docx,.odt" data-wid="${q}" data-note="work-file-note" hidden></div>
+      </div>
     </section>
     <section class="panel"><h4>${esc(t('sec_more'))}</h4>
       <ul class="linklist">
@@ -2588,7 +2678,7 @@ async function openWork(q) {
         <li><a href="https://www.wikidata.org/wiki/${q}" target="_blank" rel="noopener">${esc(t('wikidata_t'))} ↗</a></li>
       </ul>
     </section>
-    <div class="row"><button class="btn" data-form="feedback" data-wid="${q}">${esc(t('fb_title'))}</button><button class="btn" data-agent-task="${q}">${esc(t('agent_work'))}</button></div>
+    <div class="work-actions"><button class="btn" data-form="feedback" data-wid="${q}">${esc(t('fb_work'))}</button><button class="btn" data-agent-task="${q}">${esc(t('agent_work'))}</button></div>
   </div>`;
   el.hidden = false; el.scrollTop = 0;
   if (!ab) fetchWikiAbout(q).then(ok => { const slot = $('#about-slot'); const sv = $('#own-link-save'); if (!ok || !slot || el.hidden || !sv || sv.dataset.wid !== q) return; const a2 = aboutFor(null, q); if (a2) slot.innerHTML = aboutPanel(a2, 'w'); });
@@ -3695,6 +3785,8 @@ document.addEventListener('click', async e => {
     document.querySelectorAll('[data-cov-view]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.covView === coverageView)));
     return;
   }
+  if (d.rlLang || d.rlKind) { if (d.rlLang) RL.lang = d.rlLang; else RL.kind = d.rlKind; return redrawReadPanel(d.rlLang ? `[data-rl-lang="${d.rlLang}"]` : `[data-rl-kind="${d.rlKind}"]`); }
+  if (d.mat) { RL.mat = d.mat; for (const x of ['link', 'file']) { const pane = $('#mat-' + x); if (pane) pane.hidden = x !== d.mat; } b.parentElement.querySelectorAll('[data-mat]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); return; }
   if (d.agentTask) return copyAgentTask(d.agentTask);
   if (d.agentClose) return closeAgentTask();
   if (d.agentRecopy) { const ta = $('#agent-task-text'); try { await navigator.clipboard.writeText(ta.value); toast(t('agent_copied')); } catch { ta.focus(); ta.select(); } return; }
