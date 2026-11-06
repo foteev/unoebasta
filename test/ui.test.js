@@ -330,6 +330,8 @@ function selectFilter(group, values = []) {
   checks['card: All languages keeps the kind filter; others after mine; one note for unverified sources'] = srcRows().map(r => r.l).join() === 'EN,ES,PL' && $$('#rl-panel .rl-foot').length === 1 && srcRows().every(r => r.warn && r.m === '');
   click($('#mine-panel [data-mat="file"]')); await sleep(20);
   checks['card: my materials switch between a link and a file'] = $('#mat-link').hidden && !$('#mat-file').hidden && $('#mine-panel [data-mat="file"]').getAttribute('aria-pressed') === 'true' && !!$('#mat-file #work-file');
+  w.eval("delete prefs.langs; RL.q = null; openWork('Q2634534')"); await sleep(60);
+  checks['card: until the reader picks languages, all languages are theirs, so there is no language filter'] = !$('#rl-panel [data-rl-lang]') && srcRows().length === 5 && srcRows()[0].l === 'RU';
   w.__starLangs = starLangs; w.eval('prefs.langs = window.__starLangs; RL.q = null');
   w.eval("openWork('Q4102150')"); await sleep(60); await allSources();
   checks['reviewed findings: an audio-only work still shows its text fragment'] = !!$('#sheet-work .src-audio') && !!$('#sheet-work .src-ex[href^="https://www.legimi.pl/"]') && !$('#sheet-work .src-text:not(.src-ex)');

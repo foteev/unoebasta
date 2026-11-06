@@ -2571,8 +2571,9 @@ function sheetBar(title, extra) { return `<div class="sheet-bar"><div class="wra
 function closeSheets() { for (const s of ['#sheet-gb', '#sheet-form', '#sheet-author', '#sheet-work']) { const el = $(s); el.hidden = true; el.innerHTML = ''; } }
 
 /* ---------- work card ---------- */
-// "My languages" in the card: the languages the reader chose, else the interface language and the browser's; the interface language first
-function panelLangs() { return [...new Set([LANG, ...(explicitLangs() ? prefs.langs : browserLangs())])]; }
+// "My languages" in the card are the reader's languages, as everywhere (all catalog languages until the reader picks some),
+// the interface language first
+function panelLangs() { const m = myLangs(); return [...new Set([...(m.includes(LANG) ? [LANG] : []), ...m])]; }
 let RL = { q: null, lang: null, kind: 'all', mat: null }; // the card's filters, kept while the same work is open
 const svgIcon = d => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const SRC_ICON = {
