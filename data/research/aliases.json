@@ -49,6 +49,27 @@
       "value": "Вычисляя звезды",
       "origin": "Эксмо 2023 Russian edition — https://fantlab.ru/edition345134.pdf",
       "recorded_at": "2026-11-06T19:03:16.829Z"
+    },
+    {
+      "qid": "Q26721390",
+      "lang": "es",
+      "value": "Entre los pliegues de Pekín",
+      "origin": "Alianza Editorial, Planetas invisibles: https://www.alianzaeditorial.es/libro/antologias-de-ken-liu/planetas-invisibles-ken-liu-9788491048336/",
+      "recorded_at": "2026-11-06T19:36:03.116Z"
+    },
+    {
+      "qid": "Q26721390",
+      "lang": "ru",
+      "value": "Складывающийся Пекин",
+      "origin": "FantLab work 750100, М. Головкин translation (2021): https://fantlab.ru/work750100",
+      "recorded_at": "2026-11-06T19:36:03.116Z"
+    },
+    {
+      "qid": "Q17001721",
+      "lang": "ru",
+      "value": "Слуги правосудия",
+      "origin": "FantLab edition 136267, В. Лушников translation (2015): https://fantlab.ru/edition136267",
+      "recorded_at": "2026-11-06T19:36:03.116Z"
     }
   ],
   "authors": [

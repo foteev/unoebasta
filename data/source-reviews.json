@@ -1381,6 +1381,59 @@
       "status": "broken_player",
       "checked_at": "2026-11-04T23:11:13Z",
       "reason": "The page links http://web3.streamhoster.com/idstaff/excerpt/Fragile_Things.mp3; the actual player resource returns HTTP 404. A surviving author page is not proof of playable audio."
+    },
+    {
+      "qid": "Q30337352",
+      "lang": "es",
+      "url": "https://www.penguinlibros.com/es/libros-de-fantasia/24345-ebook-el-portal-de-los-obeliscos-la-tierra-fragmentada-2-9788417347079/fragmento",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-06T19:36:03.116Z",
+      "reason": "The publisher page heading names N.K. Jemisin’s El portal de los obeliscos, but the guest preview serves unrelated prose about King Richard and Saxon knights. Recheck the actual narrative before enabling this URL."
+    },
+    {
+      "qid": "Q30337352",
+      "lang": "es",
+      "url": "https://www.penguinlibros.com/mx/fantasia/43597-libro-el-portal-de-los-obeliscos-la-tierra-fragmentada-2-9786073165785/fragmento",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-06T19:36:03.116Z",
+      "reason": "The publisher page heading names N.K. Jemisin’s El portal de los obeliscos, but the guest preview serves unrelated prose about King Richard and Saxon knights. Recheck the actual narrative before enabling this URL."
+    },
+    {
+      "qid": "Q7800850",
+      "lang": "en",
+      "url": "https://escapepod.org/2008/04/24/ep155-tideline/",
+      "allowed_kinds": [
+        "audio",
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-06T20:10:29.468Z",
+      "reason": "A reader confirmed that the guest Escape Pod recording contains the complete Tideline narration. The on-page text remains an opening excerpt."
+    },
+    {
+      "qid": "Q30015447",
+      "lang": "en",
+      "url": "https://www.everand.com/read/658305078/The-Long-Fall-Up",
+      "allowed_kinds": [
+        "full"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-06T20:10:29.468Z",
+      "reason": "A reader confirmed the direct Everand preview. With tracking removed, the guest reader opens the Interstellar Flight Press edition. Its contents open Ledbetter's title story. Verified 25 successive pages from the opening to the final page and the transition to Broken Wings. About 7,800 words. The preview covers this complete story within the paid collection."
+    },
+    {
+      "qid": "Q92432227",
+      "lang": "en",
+      "url": "https://escapepod.org/2008/05/08/ep157-a-small-room-in-koboldtown/",
+      "allowed_kinds": [
+        "audio",
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-06T23:02:42.445Z",
+      "reason": "A reader confirmed the complete A Small Room in Koboldtown narration after being asked to check the ending. The standalone episode is narrated by Cheyenne Wright. The visible story text on the episode page remains an opening excerpt."
     }
   ]
 }
