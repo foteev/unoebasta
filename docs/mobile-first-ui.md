@@ -45,7 +45,7 @@ Answer three questions and design the phone layout from the answers:
 
 ## 6. Checklist before shipping any element
 
-Check each item at 360 × 740 and 390 × 844, in light and dark theme:
+Check each item at 360 × 740 and 390 × 844, in the light and dark themes (and Classic and Fantasy when colours change):
 - [ ] No horizontal page scroll; no clipped tabs, headers or buttons.
 - [ ] Every target ≥ 44 px; the main action is reachable with one thumb.
 - [ ] Longest real RU/PL strings fit (wrap or clamp, never overlap).
