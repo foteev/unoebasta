@@ -4,7 +4,7 @@ const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
 const { resolve, join, extname } = require('node:path');
 const assert = require('node:assert/strict');
-const { filterOption, selectFilter } = require('./filter-helpers.cjs');
+const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require('./filter-helpers.cjs');
 
 (async () => {
   const root = resolve(__dirname, '../dist/web'), out = resolve(__dirname, '../.cache/mobile-shelf');
@@ -52,7 +52,7 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     for(const width of [360,390]) for(const theme of ['light','dark']){
       await page.setViewportSize({width,height:width===360?740:844});
       await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
-      await page.locator('#lang-sel').selectOption('ru');
+      await siteLang(page, 'ru');
       for(const mode of ['cats','authors']){
         await page.locator(`[data-av-mode="${mode}"]`).click();await page.evaluate(()=>window.scrollTo(0,0));
         const layout=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,min:Math.min(...[...document.querySelectorAll('#av-head .seg button,#av-head [data-av-cat]')].map(b=>b.getBoundingClientRect().height))}));
@@ -69,10 +69,10 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     await page.screenshot({path:join(out,'community-copy-fallback-390-dark.png'),animations:'disabled'});
     await page.keyboard.press('Escape');assert.equal(await page.locator('#agent-dialog').isVisible(),false);
     for(const lang of ['en','es','pl','ru']){
-      await page.locator('#lang-sel').selectOption(lang);assert.ok(await page.locator('#about-contribute [data-agent-task]').textContent());
+      await siteLang(page, lang);assert.ok(await page.locator('#about-contribute [data-agent-task]').textContent());
     }
     await page.evaluate(()=>{document.querySelector('#toast').hidden=true;});
-    await page.locator('#lang-sel').selectOption('en');
+    await siteLang(page, 'en');
     await page.setViewportSize({width:1280,height:1100});
     await page.locator('[data-cov-view="languages"]').click();
     assert.equal(await page.locator('#about-cov tbody tr').count(),5);
@@ -86,7 +86,7 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     for(const width of [360,390]) for(const theme of ['light','dark']) {
       await page.setViewportSize({width,height:width===360?740:844});
       await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
-      await page.locator('#lang-sel').selectOption(width===360?'pl':'ru');
+      await siteLang(page, width===360?'pl':'ru');
       for(const view of ['forms','languages']) {
         await page.locator(`[data-cov-view="${view}"]`).click();
         const layout=await page.locator('#about-cov').evaluate(el=>({width:innerWidth,scroll:document.documentElement.scrollWidth,table:el.querySelector('.cov').getBoundingClientRect().width,min:Math.min(...[...el.querySelectorAll('button,a')].map(b=>b.getBoundingClientRect().height)),cards:getComputedStyle(el.querySelector('.cov tbody tr')).display,statsTop:[...el.querySelectorAll('.cov-overview dd')].slice(1).map(x=>x.getBoundingClientRect().top)}));
@@ -159,7 +159,7 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     await selectFilter(page, 'av-languages', ['pl']);
     for(const width of [360,390]) for(const theme of ['light','dark']) {
       await page.setViewportSize({width,height:width===360?740:844});
-      await page.locator('#lang-sel').selectOption(width===360?'pl':'ru');
+      await siteLang(page, width===360?'pl':'ru');
       await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
       for(const view of ['library','awards']) {
         await page.locator('#tab-'+view).click();await page.evaluate(()=>window.scrollTo(0,0));

@@ -4,7 +4,7 @@ const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
 const { resolve, join, extname } = require('node:path');
 const assert = require('node:assert/strict');
-const { filterOption, selectFilter } = require('./filter-helpers.cjs');
+const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require('./filter-helpers.cjs');
 
 (async () => {
   const root = resolve(__dirname, '../dist/web'), out = resolve(__dirname, '../.cache/mobile-shelf');
@@ -57,7 +57,7 @@ const { filterOption, selectFilter } = require('./filter-helpers.cjs');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForFunction(() => !document.querySelector('table.board'));
     for (const lang of ['en', 'es', 'pl', 'ru']) {
-      await page.locator('#lang-sel').selectOption(lang);
+      await siteLang(page, lang);
       await page.waitForFunction(lang => document.documentElement.lang === lang, lang);
       assert.equal(await filterOption(page, 'av-awards', 'all').isChecked(), true);
     }
