@@ -1422,6 +1422,18 @@
       "status": "scope_confirmed",
       "checked_at": "2026-11-06T20:10:29.468Z",
       "reason": "A reader confirmed the direct Everand preview. With tracking removed, the guest reader opens the Interstellar Flight Press edition. Its contents open Ledbetter's title story. Verified 25 successive pages from the opening to the final page and the transition to Broken Wings. About 7,800 words. The preview covers this complete story within the paid collection."
+    },
+    {
+      "qid": "Q92432227",
+      "lang": "en",
+      "url": "https://escapepod.org/2008/05/08/ep157-a-small-room-in-koboldtown/",
+      "allowed_kinds": [
+        "audio",
+        "fragment"
+      ],
+      "status": "scope_confirmed",
+      "checked_at": "2026-11-06T23:02:42.445Z",
+      "reason": "A reader confirmed the complete A Small Room in Koboldtown narration after being asked to check the ending. The standalone episode is narrated by Cheyenne Wright. The visible story text on the episode page remains an opening excerpt."
     }
   ]
 }
