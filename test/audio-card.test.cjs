@@ -29,12 +29,15 @@ const assert = require('node:assert/strict');
     await page.goto(url, {waitUntil:'domcontentloaded'});
     await page.waitForFunction(() => typeof Store !== 'undefined');
     await page.evaluate(() => openWork('Q19947428'));
-    await page.waitForSelector('#sheet-work .audio-source');
+    await page.waitForSelector('#sheet-work .src-audio');
     assert.equal(await page.locator('#sheet-work h2').textContent(), 'Раз солдат, два солдат...');
-    assert.match(await page.locator('#sheet-work .avail').textContent(), /RU полный текст · аудио/);
+    // one list of sources: the Russian text and the Russian recording, each marked with its language
+    assert.equal(await page.locator('#sheet-work .src-text:not(.src-ex) .src-l').first().textContent(), 'RU');
+    assert.equal(await page.locator('#sheet-work .src-audio .src-l').first().textContent(), 'RU');
     assert.equal(await page.locator('#sheet-work a[href="https://flibusta.info/b/404336/read"]').count(),1);
     assert.equal(await page.locator('#about-slot a[href="https://fantlab.ru/work22792"]').count(),1);
-    assert.equal(await page.locator('#sheet-work .audio-source a[href="https://www.youtube.com/watch?v=det3gpWwLWI"]').count(),1);
+    assert.equal(await page.locator('#sheet-work a.src-audio[href="https://www.youtube.com/watch?v=det3gpWwLWI"]').count(),1);
+    assert.equal(await page.locator('#sheet-work a.src-audio[href="https://www.youtube.com/watch?v=det3gpWwLWI"] .src-w').count(),1);
     const layouts=[];
     for(const width of [360,390]) for(const theme of ['light','dark']) {
       await page.setViewportSize({width,height:width===360?740:844});
@@ -44,24 +47,27 @@ const assert = require('node:assert/strict');
       assert.ok(info.scroll<=info.width+1, 'Work card has no horizontal overflow');
       layouts.push({width,theme,...info});
       await page.screenshot({path:join(out,`audio-card-${width}-${theme}.png`),fullPage:true,animations:'disabled'});
-      await page.locator('#sheet-work .audio-source').scrollIntoViewIfNeeded();
+      await page.locator('#sheet-work .src-audio').first().scrollIntoViewIfNeeded();
       await page.screenshot({path:join(out,`audio-links-${width}-${theme}.png`),animations:'disabled'});
     }
     const recordings=await page.evaluate(()=>Object.values(READ).flatMap(r=>r.links).filter(l=>l.tier==='external'&&l.kind==='audio'));
     assert.ok(recordings.length>=6); assert.ok(recordings.every(l=>l.rights==='unknown'&&l.verification==='metadata'));
     await page.evaluate(()=>openWork('Q41793715'));
-    await page.waitForFunction(()=>document.querySelector('#sheet-work .tier')?.textContent.includes('Внешний источник'));
+    // an unverified recording: no publisher label, one note under the list
+    await page.waitForFunction(()=>!!document.querySelector('#rl-panel .rl-foot') && !document.querySelector('#sheet-work .tier'));
     await page.evaluate(()=>openWork('Q467388'));
-    await page.waitForSelector('#sheet-work .excerpt-sources');
-    assert.equal(await page.locator('#sheet-work .text-source').count(),2);
-    assert.equal(await page.locator('#sheet-work .text-source a[href^="https://www.legimi.pl/"]').count(),1);
-    assert.match(await page.locator('#sheet-work .text-source').filter({has:page.locator('a[href^="https://lecturia.org/"]')}).textContent(),/разрешение не подтверждено/);
-    assert.equal(await page.locator('#sheet-work .audio-source a[href^="https://akniga.org/"]').count(),1);
-    assert.equal(await page.locator('#sheet-work .excerpt-sources a[href^="https://libcat.ru/"]').count(),1);
+    await page.click('#rl-panel [data-rl-lang="all"]');
+    await page.waitForSelector('#sheet-work .src-ex');
+    assert.equal(await page.locator('#sheet-work .src-text:not(.src-ex)').count(),2);
+    assert.equal(await page.locator('#sheet-work .src-text:not(.src-ex)[href^="https://www.legimi.pl/"]').count(),1);
+    assert.equal(await page.locator('#sheet-work .src-text[href^="https://lecturia.org/"] .src-w').count(),1);
+    assert.equal(await page.locator('#sheet-work .src-text[href^="https://www.legimi.pl/"] .src-w').count(),0);
+    assert.equal(await page.locator('#sheet-work a.src-audio[href^="https://akniga.org/"]').count(),1);
+    assert.equal(await page.locator('#sheet-work .src-ex[href^="https://libcat.ru/"]').count(),1);
     for(const width of [360,390]) for(const theme of ['light','dark']) {
       await page.setViewportSize({width,height:width===360?740:844});
       await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
-      await page.locator('#sheet-work .text-source').first().scrollIntoViewIfNeeded();
+      await page.locator('#sheet-work .src-text').first().scrollIntoViewIfNeeded();
       assert.ok(await page.locator('#sheet-work').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
       await page.screenshot({path:join(out,`mixed-sources-${width}-${theme}.png`),animations:'disabled'});
     }
