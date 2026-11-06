@@ -1,0 +1,451 @@
+{
+  "version": 1,
+  "date": "2026-11-06",
+  "baseline": "54a1a042c6095d90b601ec341103b607df1ea30e",
+  "status": "reviewed",
+  "checked_at": "2026-11-06T19:03:16.829Z",
+  "work_language_targets": 52,
+  "english_automatic": {
+    "works": 16,
+    "checked": 70,
+    "resumed": 44,
+    "candidates": 4,
+    "errors": 1,
+    "configuration_required": 0,
+    "needs_title": 0,
+    "paused_sources": [
+      {
+        "provider": "podcastle",
+        "status": "unavailable",
+        "reason": "HTTP 500 at https://podcastle.org/?s=Jackalope+Wives",
+        "at": "2026-11-06T18:49:57.689Z",
+        "next_action": "Retry this source on the next invocation; other sources continue."
+      }
+    ]
+  },
+  "manual_checks": [
+    {
+      "qid": "Q124435017",
+      "lang": "pl",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.empik.com/witch-king-wiedzmi-krol-wells-martha%2Cp1475435867%2Cksiazka-p",
+        "https://virtualo.pl/we-need-ya-p1389/?page=3&price=6",
+        "https://virtualo.pl/ebook/witch-king-wiedzmi-krol-i521420/",
+        "https://virtualo.pl/virtualo_download.php?product=777127&file=1&download=1&sample"
+      ]
+    },
+    {
+      "qid": "Q123521600",
+      "lang": "pl",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q114310172",
+      "lang": "pl",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://www.empik.com/babel-czyli-o-koniecznosci-przemocy-audiobook-kuang-rebecca-f%2Cp1371771454%2Cebooki-i-mp3-p",
+        "https://fabrykaslow.com.pl/autorzy/rebecca-f-kuang/babel-oprawa-zintegrowana/",
+        "https://fabrykaslow.com.pl/autorzy/rebecca-f-kuang/babel/"
+      ]
+    },
+    {
+      "qid": "Q107123470",
+      "lang": "pl",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q73742845",
+      "lang": "pl",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.legimi.pl/ebook-tak-wlasnie-przegrywasz-wojne-czasu-el-mohtar-amal-gladstone-max%2Cb1040615.html",
+        "https://www.empik.com/tak-wlasnie-przegrywasz-wojne-czasu-ebook-mobi-el-mohtar-amal-gladstone-max%2Cp1376789971%2Cebooki-i-mp3-p",
+        "https://virtualo.pl/ebook/tak-wlasnie-przegrywasz-wojne-czasu-i467073/",
+        "https://virtualo.pl/virtualo_download.php?product=644611&file=1&download=1&sample"
+      ]
+    },
+    {
+      "qid": "Q63965925",
+      "lang": "pl",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://vesper.pl/1927-rachunek-gwiazd-mary-robinette-kowal-oprawa-twarda.html",
+        "https://vesper.pl/1538-rachunek-gwiazd-mary-robinette-kowal-oprawa-twarda.html"
+      ]
+    },
+    {
+      "qid": "Q56065509",
+      "lang": "pl",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q56418944",
+      "lang": "pl",
+      "status": "candidates",
+      "opened_urls": [
+        "https://virtualo.pl/ebook/moc-srebra-i236698/",
+        "https://www.empik.com/moc-srebra-novik-naomi%2Cp1220764996%2Cksiazka-p"
+      ]
+    },
+    {
+      "qid": "Q39058554",
+      "lang": "pl",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.legimi.pl/autor/n-k-jemisin%2Cad15721/",
+        "https://virtualo.pl/ebook/kamienne-niebo-i223357/",
+        "https://www.legimi.pl/wydawnictwo/wydawnictwo-sqn%2Cpd324/fantastyka%2Cg211/?filters=paperbooks"
+      ]
+    },
+    {
+      "qid": "Q53828903",
+      "lang": "pl",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://www.empik.com/pamietniki-mordbora-wszystkie-wskazniki-czerwone-sztuczny-stan-wells-martha%2Cp1389080968%2Cksiazka-p",
+        "https://mag.com.pl/wszystkie-wskazniki-czerwone-sztuczny-stan/"
+      ]
+    },
+    {
+      "qid": "Q91770852",
+      "lang": "pl",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q122238085",
+      "lang": "ru",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q105722561",
+      "lang": "ru",
+      "status": "candidates",
+      "opened_urls": [
+        "https://fantlab.ru/edition325750",
+        "https://fantlab.ru/work1335875",
+        "https://fantlab.ru/edition310047",
+        "https://fantlab.ru/edition310384",
+        "https://fantlab.ru/edition325750.pdf",
+        "https://fantlab.ru/edition403351",
+        "https://fantlab.ru/edition430777",
+        "https://fantlab.ru/edition73170",
+        "https://fantlab.ru/edition310047.pdf",
+        "https://fantlab.ru/edition310384.pdf"
+      ]
+    },
+    {
+      "qid": "Q108030514",
+      "lang": "ru",
+      "status": "candidates",
+      "opened_urls": [
+        "https://fantlab.ru/edition305114",
+        "https://fantlab.ru/work1380866",
+        "https://eksmo.ru/cicle/saga-zelenoy-kosti-ID604/",
+        "https://eksmo.ru/book/saga-zelenoy-kosti-komplekt-iz-trekh-knig-ITD1249293/",
+        "https://fantlab.ru/edition305114.pdf",
+        "https://fantlab.ru/edition336376",
+        "https://fantlab.ru/edition426692",
+        "https://fantlab.ru/edition455491",
+        "https://fantlab.ru/edition426692.pdf"
+      ]
+    },
+    {
+      "qid": "Q111915309",
+      "lang": "ru",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://eksmo.ru/ebook/khozyaeva-dzhinnov-ITD1227913/",
+        "https://eksmo.ru/book/khozyaeva-dzhinnov-ITD1243377/",
+        "https://fantlab.ru/work1282021",
+        "https://fantlab.ru/edition168226",
+        "https://fantlab.ru/edition299758",
+        "https://fantlab.ru/edition300763",
+        "https://fantlab.ru/edition313357",
+        "https://fantlab.ru/edition387218",
+        "https://fantlab.ru/edition387220",
+        "https://fantlab.ru/edition300763.pdf",
+        "https://fantlab.ru/edition313357.pdf"
+      ]
+    },
+    {
+      "qid": "Q82566838",
+      "lang": "ru",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://fantlab.ru/work1153904",
+        "https://fantlab.ru/edition280606",
+        "https://fantlab.ru/edition280607",
+        "https://fantlab.ru/edition280609",
+        "https://fantlab.ru/edition280610",
+        "https://fantlab.ru/edition291167",
+        "https://fantlab.ru/edition432600",
+        "https://www.mirf.ru/book/chitaem-knigu-arkadi-martin-pamyat-chto-zovyotsya-imperiej-vizantijskaya-kosmoopera"
+      ]
+    },
+    {
+      "qid": "Q79557367",
+      "lang": "ru",
+      "status": "candidates",
+      "opened_urls": [
+        "https://fantlab.ru/work1191547",
+        "https://eksmo.ru/news/gideon-iz-devyatogo-doma-udostoen-premii-ignotus-awards-10-2022-ID15613529/",
+        "https://eksmo.ru/authors/myuir-temsin-ITD36342/",
+        "https://fantlab.ru/edition259022",
+        "https://fantlab.ru/edition287926",
+        "https://fantlab.ru/edition297464",
+        "https://fantlab.ru/edition307499",
+        "https://fantlab.ru/edition307500",
+        "https://fantlab.ru/edition307504",
+        "https://fantlab.ru/edition297464.pdf"
+      ]
+    },
+    {
+      "qid": "Q63965925",
+      "lang": "ru",
+      "status": "candidates",
+      "opened_urls": [
+        "https://fantlab.ru/work994592",
+        "https://fantlab.ru/edition228313",
+        "https://fantlab.ru/edition243307",
+        "https://fantlab.ru/edition345134",
+        "https://fantlab.ru/edition388088",
+        "https://fantlab.ru/edition409189",
+        "https://fantlab.ru/edition49437",
+        "https://fantlab.ru/edition243307.pdf",
+        "https://fantlab.ru/edition345134.pdf"
+      ]
+    },
+    {
+      "qid": "Q56065509",
+      "lang": "ru",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://books.yandex.ru/books/TJq4Afe3/read-online",
+        "https://fantlab.ru/work994841",
+        "https://ast.ru/awards/premiya-lokus/?CODE=premiya-lokus&PAGEN_1=3",
+        "https://www.litres.ru/book/marta-uells/dnevniki-killerbota-kniga-1-otkaz-vseh-sistem-kniga-2-iskusstv-43640738/chitat-onlayn/",
+        "https://fantlab.ru/edition223707",
+        "https://fantlab.ru/edition253933",
+        "https://fantlab.ru/edition329338",
+        "https://fantlab.ru/edition372253",
+        "https://fantlab.ru/edition388088",
+        "https://fantlab.ru/edition447717",
+        "https://fantlab.ru/edition253933.pdf"
+      ]
+    },
+    {
+      "qid": "Q56418944",
+      "lang": "ru",
+      "status": "candidates",
+      "opened_urls": [
+        "https://1.librebook.me/zimnee_serebro/vol1/1",
+        "https://1.librebook.me/zimnee_serebro/vol1/6",
+        "https://fantlab.ru/work1053452",
+        "https://eksmo.ru/ebook/zimnee-serebro-ITD896745/",
+        "https://eksmo.ru/book/spinning-silver-seriya-naomi-novik-u-n--ITD896745/",
+        "https://eksmo.ru/authors/novik-naomi-ITD19450/books/",
+        "https://cdn.eksmo.ru/v2/ITD000000000896745/PDF/ITD000000000896745.pdf",
+        "https://fantlab.ru/edition239487",
+        "https://fantlab.ru/edition257892",
+        "https://fantlab.ru/edition257893",
+        "https://fantlab.ru/edition257894",
+        "https://fantlab.ru/edition257895",
+        "https://fantlab.ru/edition379989",
+        "https://fantlab.ru/edition239487.pdf",
+        "https://fantlab.ru/edition379989.pdf"
+      ]
+    },
+    {
+      "qid": "Q55392119",
+      "lang": "ru",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://ast.ru/authors/trembley-pol-dzh-itd042289/",
+        "https://ast.ru/book/kantata-pobedivshikh-smert-856832/",
+        "https://ast.ru/book/to-chto-rastet-856344/?ast_utm=book_see_also"
+      ]
+    },
+    {
+      "qid": "Q39058554",
+      "lang": "ru",
+      "status": "candidates",
+      "opened_urls": [
+        "https://eksmo.ru/ebook/kamennye-nebesa-raskolotaya-zemlya-3-ITD1142378/",
+        "https://fantlab.ru/work871723",
+        "https://cdn.eksmo.ru/v2/ITD000000001142378/PDF/ITD000000001142378.pdf",
+        "https://fantlab.ru/edition122997",
+        "https://fantlab.ru/edition171130",
+        "https://fantlab.ru/edition182065",
+        "https://fantlab.ru/edition190456",
+        "https://fantlab.ru/edition290417",
+        "https://fantlab.ru/edition422245",
+        "https://fantlab.ru/edition171130.pdf"
+      ]
+    },
+    {
+      "qid": "Q122238085",
+      "lang": "es",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://oceanoit.net/Comunicacion/DOCS/GT/OrtigaHueso_PrimPags.pdf",
+        "https://www.casadellibro.com/libro-ortiga-y-hueso/9788412669794/14331451",
+        "https://oceano.com/catalogo/ortiga-y-hueso-9788412669794",
+        "https://grantravesia.es/catalogo/ortiga-y-hueso-9788412669794",
+        "https://oceano.mx/obras/ortiga-y-hueso-t-kingfisher-23519.aspx"
+      ]
+    },
+    {
+      "qid": "Q113317364",
+      "lang": "es",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q107583553",
+      "lang": "es",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q108030514",
+      "lang": "es",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q111915309",
+      "lang": "es",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.duermevelaediciones.es/product/el-senor-de-los-djinn/",
+        "https://www.duermevelaediciones.es/wp-content/uploads/2022/07/El-senor-de-los-djinnfragmento2.pdf"
+      ]
+    },
+    {
+      "qid": "Q99838669",
+      "lang": "es",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.planetadelibros.com.mx/libro-gotico/333699",
+        "https://www.planetadelibros.cl/libro-gotico/337714",
+        "https://www.planetadelibros.com.mx/libro-gotico/333699?soporte=338598",
+        "https://pdlibrosmex.cdnstatics2.com/usuaris/libros_contenido/arxius/48/47140_1_Libro_Gotico.pdf",
+        "https://pdlibroschl.cdnstatics2.com/usuaris/libros_contenido/arxius/48/47068_1_Gotico_cap1.pdf"
+      ]
+    },
+    {
+      "qid": "Q73742845",
+      "lang": "es",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.insolitaeditorial.com/es/tienda/asi-se-pierde-la-guerra-del-tiempo/",
+        "https://docs.hoobaweb.com/5879/dossier-asplgdt.pdf",
+        "https://docs.hoobaweb.com/5879/avance-asi-se-pierde-la-guerra-del-tiempo.pdf"
+      ]
+    },
+    {
+      "qid": "Q82566838",
+      "lang": "es",
+      "status": "blocked",
+      "opened_urls": [
+        "https://www.nocturnaediciones.com/libro/396/memoria_llamada_imperio"
+      ]
+    },
+    {
+      "qid": "Q79557367",
+      "lang": "es",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.penguinlibros.com/es/libros-de-fantasia/226547-ebook-gideon-la-novena-saga-de-la-tumba-sellada-1-9788418037009",
+        "https://www.penguinlibros.com/es/libros-de-fantasia/226547-ebook-gideon-la-novena-saga-de-la-tumba-sellada-1-9788418037009/fragmento"
+      ]
+    },
+    {
+      "qid": "Q63965925",
+      "lang": "es",
+      "status": "candidates",
+      "opened_urls": [
+        "https://latam.casadellibro.com/libro-hacia-las-estrellas/9788417525484/11445663",
+        "https://ozeditorial.com/ciencia-ficcion/117-hacia-las-estrellas.html",
+        "https://extraits.tea-ebook.com/Bookwire/5/67/9788417525675.epub"
+      ]
+    },
+    {
+      "qid": "Q56065509",
+      "lang": "es",
+      "status": "inconclusive",
+      "opened_urls": []
+    },
+    {
+      "qid": "Q56418944",
+      "lang": "es",
+      "status": "blocked",
+      "opened_urls": [
+        "https://proapi.planetadelibros.com/descargas/sala-prensa-libro/sinopsis-y-biografia/298211/un-mundo-helado.pdf?_locale=es",
+        "https://proassets.planetadelibros.com/usuaris/libros_contenido/arxius/42/41002_Un_mundo_helado.pdf",
+        "https://www.amabook.es/un-mundo-helado_1",
+        "https://www.planetadelibros.com/libro-un-mundo-helado/298211",
+        "https://proassetspdlcom.cdnstatics2.com/usuaris/libros_contenido/arxius/42/41002_Un_mundo_helado.pdf"
+      ]
+    },
+    {
+      "qid": "Q18350967",
+      "lang": "es",
+      "status": "candidates",
+      "opened_urls": [
+        "https://www.lahojadearena.com/si-fueras-un-dinosaurio-amor-mio/"
+      ]
+    },
+    {
+      "qid": "Q27968157",
+      "lang": "es",
+      "status": "inconclusive",
+      "opened_urls": [
+        "https://www.asociacionportico.com/ignotus-definitivo/"
+      ]
+    }
+  ],
+  "approved": {
+    "en": {
+      "full": 1,
+      "fragment": 3
+    },
+    "pl": {
+      "fragment": 4
+    },
+    "ru": {
+      "fragment": 6
+    },
+    "es": {
+      "full": 1,
+      "fragment": 5
+    }
+  },
+  "title_aliases": [
+    {
+      "qid": "Q63965925",
+      "lang": "ru",
+      "title": "Вычисляя звезды"
+    }
+  ],
+  "unresolved_audio": [
+    {
+      "qid": "Q7800850",
+      "narrator": "Serah Eley",
+      "status": "reader_playback_needed"
+    },
+    {
+      "qid": "Q92432227",
+      "narrator": "Cheyenne Wright",
+      "status": "reader_playback_needed"
+    }
+  ],
+  "submission": "data/found/2026-11-06-continuation.csv"
+}
