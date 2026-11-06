@@ -1381,6 +1381,24 @@
       "status": "broken_player",
       "checked_at": "2026-11-04T23:11:13Z",
       "reason": "The page links http://web3.streamhoster.com/idstaff/excerpt/Fragile_Things.mp3; the actual player resource returns HTTP 404. A surviving author page is not proof of playable audio."
+    },
+    {
+      "qid": "Q30337352",
+      "lang": "es",
+      "url": "https://www.penguinlibros.com/es/libros-de-fantasia/24345-ebook-el-portal-de-los-obeliscos-la-tierra-fragmentada-2-9788417347079/fragmento",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-06T19:36:03.116Z",
+      "reason": "The publisher page heading names N.K. Jemisin’s El portal de los obeliscos, but the guest preview serves unrelated prose about King Richard and Saxon knights. Recheck the actual narrative before enabling this URL."
+    },
+    {
+      "qid": "Q30337352",
+      "lang": "es",
+      "url": "https://www.penguinlibros.com/mx/fantasia/43597-libro-el-portal-de-los-obeliscos-la-tierra-fragmentada-2-9786073165785/fragmento",
+      "allowed_kinds": [],
+      "status": "unavailable_reader",
+      "checked_at": "2026-11-06T19:36:03.116Z",
+      "reason": "The publisher page heading names N.K. Jemisin’s El portal de los obeliscos, but the guest preview serves unrelated prose about King Richard and Saxon knights. Recheck the actual narrative before enabling this URL."
     }
   ]
 }
