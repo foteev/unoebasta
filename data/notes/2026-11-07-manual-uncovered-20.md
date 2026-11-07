@@ -12,14 +12,14 @@ EN: author's publisher provides an opening excerpt. An indexed anthology PDF at 
 EN: publisher's Excerpt tab contains the work, not the complete novella. Other languages and audio: no additional independently verified link in this pass.
 
 ## Q83428178 — The Case of Death and Honey
-EN PDF: opening was visible; the independently indexed end was compared with the RU final page, rather than inspected within the PDF viewer. RU: «Дело о смерти и мёде», credited to Егор Сокол (2012), 10 reader pages; beginning and end inspected. Both external permissions unverified. PL/ES and audio: no additional independently verified link in this pass.
+EN PDF: beginning and ending observed on pages 1 and 16; compared with the RU final page. RU: «Дело о смерти и мёде», credited to Егор Сокол (2012), 10 reader pages; beginning and end inspected. Both external permissions unverified. PL/ES and audio: no additional independently verified link in this pass.
 
 ## Q1026792 — Two Hearts
-EN: the ESL Bits index has four sections for Part I, Two Hearts, and another work under Part II. Text sections were inspected and matched with an independently indexed ending; the separate PDF opens with the correct title and opening. RU: «Два сердца», first and last of 10 pages inspected. All external permissions unverified.
+EN: the ESL Bits index has four sections for Part I, Two Hearts, and another work under Part II. Text sections were inspected and matched with an independently indexed ending; the separate PDF has the correct title and opening on page 1 and ending on page 35. RU: «Два сердца», first and last of 10 pages inspected. All external permissions unverified.
 Reader check requested for EN audio at https://esl-bits.eu/Novellas.for.ESL.Students/Way.Home/indice.html: choose Part I and its first section, play audio, and confirm that the narrator actually reads this story, whether all four sections play, and whether the final section reaches the ending. The first player started and the timer advanced, but the narration and full duration were not listened to. Audio is not submitted as a finding.
 
 ## Q5706622 — Hell Is the Absence of God
-EN: 22-page PDF opens with correct story; end observed in indexed PDF text and compared with RU ending. RU: «Ад — это отсутствие Бога», translation Л. Щекотова (2005); page 18 contains ending before author's note. ES: «El infierno es la ausencia de Dios», translation Luis G. Prado in the PDF collection La historia de tu vida, printed pp. 139–159 according to indexed PDF text; collection opens in guest viewer, but PDF story boundary was not independently paged through in browser. PL and audio: no additional independently verified link. All external permissions unverified. Approximate ES/RU lengths use English reference length and may differ by language.
+EN: 22-page PDF opens with the correct story; ending on page 22 was compared with the RU ending. RU: «Ад — это отсутствие Бога», translation Л. Щекотова (2005); page 18 contains ending before author's note. ES: «El infierno es la ausencia de Dios», translation Luis G. Prado in the PDF collection La historia de tu vida, PDF pages 140–159; checked opening and ending in the guest viewer, followed by another story on page 160. PL and audio: no additional independently verified link. All external permissions unverified. Approximate ES/RU lengths use English reference length and may differ by language.
 
 ## Q7678446 — Taklamakan
 EN: Lib.ru guest text includes opening and ending; approximate visible word count includes page metadata. RU/PL/ES and audio: no additional independently verified link.
@@ -52,4 +52,4 @@ EN: the archive page contains four paragraphs marked as excerpt and links to the
 - Q3769828, RU, The Concrete Jungle: a collection reader at https://www.livelib.ru/book/492421/readpart-katalog-katastrofy-charlz-stross opens on different collection content; search snippets alone do not establish that the desired story is included in the visible sample. Do not add without checking the exact narrative.
 - Q17182684, EN, Magic for Beginners: an accessible Creative Commons collection PDF explicitly excludes this story, so it is not submitted as full text.
 - Q7127549, RU, Palimpsest: a reader was found but the actual final narrative page could not be confirmed due an upstream connection failure; no full-text claim.
-- Some PDF endings were checked via indexed extraction as noted above, rather than paging through live PDF; reader confirmation is welcome before publication, especially for the Spanish anthology.
+- Exact audio playback and completeness remain to be checked by a reader before the ESL Bits audio can be submitted.
