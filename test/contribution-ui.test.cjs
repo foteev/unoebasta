@@ -120,7 +120,14 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     const allCatalog=await page.locator('#view-library .slip').count();assert.ok(allCatalog>100);
     await selectFilter(page, 'lib-languages', ['pl']);
     assert.ok(await page.locator('#view-library .slip').count()<allCatalog);
-    await selectFilter(page, 'lib-formats', ['full']);assert.equal(await page.locator('#view-library .slip').count(),2);
+    await selectFilter(page, 'lib-formats', ['full']);
+    const expectedPolishFull = await page.evaluate(() => Object.entries(READ)
+      .filter(([qid, entry]) => WORKS[qid] && entry.links.some(link => link.lang === 'pl' && link.kind === 'full'))
+      .map(([qid]) => qid).sort());
+    const visiblePolishFull = await page.locator('#view-library .slip-open')
+      .evaluateAll(cards => cards.map(card => card.dataset.work).sort());
+    assert.ok(expectedPolishFull.length > 0);
+    assert.deepEqual(visiblePolishFull, expectedPolishFull);
     await selectFilter(page, 'lib-formats', []);
     await page.locator('#lib-q').fill('Cat Pictures Please');await page.locator('#view-library [type="submit"]').click();
     assert.equal(await page.locator('#view-library .slip-open[data-work="Q25349436"]').count(),0);
