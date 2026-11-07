@@ -5,7 +5,7 @@ _20 minute adventure_
 **unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a static catalog for reading the winners of the Hugo, Nebula and Locus awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
 
 <p style="text-align: center">
-<img width="441" height="792" alt="unoebasta-mobile-catalog-view" src="https://github.com/user-attachments/assets/77cec8ce-56a0-4977-a6b7-7db688defb61" />
+<img src="https://github.com/user-attachments/assets/77cec8ce-56a0-4977-a6b7-7db688defb61">
 </p>
 
 
@@ -22,7 +22,7 @@ _20 minute adventure_
 
 The public GitHub Pages site uses Umami Cloud. We look at aggregate visits by country and broad device type, which work cards people open, and which Read, Listen and excerpt options they click. Work events carry a public Wikidata ID (`qid`). In Umami's Events report, the `qid` property lets us group `open_work`, `read_click`, `listen_click`, `excerpt_click` and `choose_for_me` by work. We use recent activity to decide which works to cover and where to look for more texts, excerpts or recordings. A click measures interest in a source. Completion and the source language are outside that measurement.
 
-The site sends section names, canonical paths of public work, author and award pages, and a fixed list of catalog events. A direct work page emits one open event with its public QID. The first pageview can include the referring site's origin. Umami estimates location from request metadata and uses browser information to classify devices. The site keeps shelf contents, notes, files, reading progress, language preferences and transfer or sync keys out of the analytics payload. It skips loading analytics when the browser reports Do Not Track (`navigator.doNotTrack === '1'`) or the page opens with a transfer or sync link. See [Umami's metric definitions](https://docs.umami.is/docs/metric-definitions).
+**These statistics are public as well:** https://cloud.umami.is/analytics/eu/share/pnQqY1cUt3VDRI4t
 
 ## Catalog pages and awards
 
