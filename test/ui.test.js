@@ -797,8 +797,13 @@ function selectFilter(group, values = []) {
   w.eval("prefs.langs = []; localStorage.setItem('fantastic-prefs', JSON.stringify(prefs))");
   checks['languages: the old empty “automatic” list counts as all languages'] = w.eval('!explicitLangs() && SOURCE_LANGS.every(l => myLangs().includes(l))');
   w.eval('delete prefs.langs; savePrefs()');
+  // Fixed Polish sources for scenarios that assert exact counts or an empty duration bucket.
+  const keepPolishFixture = `for (const [q, r] of Object.entries(READ)) {
+      if (!['Q6271990', 'Q2634534', 'Q467388'].includes(q)) r.links = r.links.filter(l => l.lang !== 'pl');
+    }`;
   // Regression: one Polish reading language, including an audio-only work and empty duration buckets.
   w.eval(`window.__readingRegression = { prefs: {...prefs}, read: JSON.parse(JSON.stringify(READ)), bookmarks: local.bookmarks };
+    ${keepPolishFixture}
     local.bookmarks = local.bookmarks.filter(b => b.type !== 'done'); prefs.langs = ['pl']; prefs.listen = 'eleven'; prefs.pickLengths = ['eve']; renderHome();`);
   checks['languages: Polish audio-only Sandkings appears at its recorded duration, without an English text or TTS fallback'] = w.eval("pickList('eve').includes('Q6271990') && readingMinutes('Q6271990') === 106 && !pickList('40').includes('Q6271990')") && !!$('#view-catalog [data-picks=reading] .pick a[data-via="listen"][href^="https://podcasts.apple.com/"]') && !$('#view-catalog [data-picks=reading] .pick a[data-via="read"]') && !$('#view-catalog [data-picks=reading] .pick [data-eleven]');
   w.eval("READ.Q6271990.links.push({kind:'full',url:'https://example.test/sandkings-en',site:'English fixture'}); renderHome()");
@@ -943,6 +948,7 @@ function selectFilter(group, values = []) {
   checks['agent task: clipboard denial provides a selectable fallback'] = !$('#agent-dialog').hidden && $('#agent-task-text').readOnly && payload($('#agent-task-text').value)[0].qid==='Q19947428';
   w.eval('closeAgentTask()');w.navigator.clipboard.writeText=clipboardWrite;
   // Independent source-language filters and explicitly labelled English fallback.
+  w.eval(`window.__polishFilterSnapshot = JSON.parse(JSON.stringify(READ)); ${keepPolishFixture}`);
   w.eval("LANG='ru'; applyLang(); prefs.langs=['pl']; prefs.pickLengths = ['eve']; renderHome();");
   checks['home actions: a single Polish recording retains its chooser and visibly disables only reshuffling'] = !!$('#view-catalog [data-pick-actions=full] a[data-via=listen]') && $('#view-catalog [data-pick-actions=full] [data-pickmore]').disabled && /Выбери за меня/.test($('#view-catalog [data-pick-actions=full]').textContent);
   checks['home actions: English fallback offers both controls above its cards with a matching English text target'] = !!$('#view-catalog [data-pick-actions=other] a[data-via=read]') && !$('#view-catalog [data-pick-actions=other] [data-pickmore]').disabled && $('#view-catalog [data-picks=other] .picklist').previousElementSibling.dataset.pickActions==='other' && w.eval(`READ['${$('#view-catalog [data-pick-actions=other] a').dataset.track}'].links.some(l=>l.kind==='full'&&(l.lang||'en')==='en'&&l.url===${JSON.stringify($('#view-catalog [data-pick-actions=other] a').href)})`);
@@ -1009,6 +1015,7 @@ function selectFilter(group, values = []) {
   checks['multiselect: clearing the final choice restores All and the whole catalog'] = filterInput('lib-languages','all').checked && catalogIds().length===nCatalog;
   selectFilter('lib-languages',['pl']);selectFilter('lib-formats',['full','audio']);
   checks['multiselect: OR inside formats, AND with Polish language'] = catalogIds().length===3 && catalogIds().includes('Q6271990') && catalogIds().includes('Q467388') && !catalogIds().includes('Q16747517');
+  w.eval('Object.assign(READ, window.__polishFilterSnapshot); delete window.__polishFilterSnapshot;');
   selectFilter('lib-formats',[]);selectFilter('lib-languages',[]);
   selectFilter('lib-lengths',['15','eve']);
   checks['multiselect: disjoint duration buckets exclude the middle bucket'] = catalogIds().length>10 && catalogIds().every(q=>w.eval(`readingMinutes('${q}',null)<=25||readingMinutes('${q}',null)>60`));
