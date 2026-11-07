@@ -16,6 +16,10 @@ This is a model- and tool-independent task. Use the reader's chosen agent and av
 
 Refresh main and coverage before searching and again before submitting. Supplied snapshots may be stale. Coverage identifies gaps; existing URLs identify duplicates. A missing translated title or a failed provider query does not prove absence.
 
+## Excluded source: WIRED
+
+Treat all `wired.com` URLs and its subdomains as paywalled for unoebasta search and coverage. Do not submit, import, or count WIRED links as accessible full texts, excerpts, or audio, even if an individual browser or search index can display the content. Search for an independent source instead. A WIRED link may be recorded in notes only as an excluded paywalled lead; do not present it as available reading or listening.
+
 ## Search and verify each work
 
 1. Match the QID, all authors, original title, form and year. Distinguish a story from a later novel with the same title (for example Blood Music).
