@@ -695,7 +695,7 @@ function coverHtml(q, size) {
   const w = WORKS[q]; if (!w) return '';
   if (!COVERS) COVERS = new Set(DATA.covers || []);
   const big = size === 'm';
-  if (COVERS.has(q)) return `<img class="cover cover-${big ? 'm' : 's'}" src="${APP_HOME}covers/${big ? 'm' : 's'}/${q}.webp" alt="" loading="lazy" decoding="async" width="${big ? 120 : 56}" height="${big ? 180 : 84}">`;
+  if (COVERS.has(q)) return `<img class="cover cover-${big ? 'm' : 's'}" src="${PAGE_PATH ? APP_HOME : ''}covers/${big ? 'm' : 's'}/${q}.webp" alt="" loading="lazy" decoding="async" width="${big ? 120 : 56}" height="${big ? 180 : 84}">`;
   const hue = parseInt(hash(q), 36) % 360, by = (w.authors[0] && authorName(w.authors[0])) || '';
   return `<div class="cover cover-${big ? 'm' : 's'} cover-t" style="--ch:${hue}" aria-hidden="true"><span class="ct" lang="en">${esc(w.title)}</span><span class="ca">${esc(by)}</span></div>`;
 }
@@ -1169,10 +1169,7 @@ function saveFilters() {
   prefs.filters = { v: 1, catalog: { awards: filter.awards, langs: filter.langs, formats: filter.formats, statuses: filter.statuses, lengths: filter.lengths }, awards: { awards: AV.awards, cats: AV.cats, langs: AV.langs, formats: AV.formats } };
   savePrefs();
 }
-function multiFilter(id, label, values, options) {
-  const selected = values || [], summary = selected.length ? options.filter(([v]) => selected.includes(v)).map(([, name]) => name).join(', ') : t('f_all');
-  return `<details class="multi-filter" data-multi="${id}"><summary><span class="multi-label">${esc(label)}</span><span class="multi-value" title="${esc(summary)}">${esc(summary)}</span></summary><div class="multi-options" role="group" aria-label="${esc(label)}">${[['all', t('f_all')], ...options].map(([value, name, code]) => { const checked = value === 'all' ? !selected.length : selected.includes(value); return `<label class="multi-option${checked ? ' is-selected' : ''}"><input type="checkbox" data-multi-filter="${id}"${code ? ` data-award-code="${esc(code)}"` : ''} value="${value}"${checked ? ' checked' : ''}><span>${esc(name)}</span></label>`; }).join('')}</div></details>`;
-}
+const multiFilter = (id, label, values, options) => catalogMultiFilter(id, label, values, options, t('f_all'));
 function replaceFilterView(view, html) {
   const opened = [...view.querySelectorAll('.multi-filter[open]')].map(el => el.dataset.multi), active = document.activeElement;
   const focused = active?.dataset.multiFilter ? { group: active.dataset.multiFilter, value: active.value } : null;
@@ -3174,7 +3171,7 @@ function trackAnalytics(name, qid, referrer) {
   if (!analyticsReady || (!PAGE_PATH && !Object.hasOwn(ANALYTICS_SECTIONS, VIEW))) return;
   if (name && ((!PAGE_PATH && VIEW === 'shelf') || !ANALYTICS_EVENTS.has(name) || !/^Q[1-9]\d*$/.test(qid) || !Object.hasOwn(WORKS, qid))) return;
   const section = PAGE_PATH || ANALYTICS_SECTIONS[VIEW];
-  const payload = { website: ANALYTICS_ID, hostname: 'foteev.github.io', url: '/unoebasta/' + section, title: 'unoebasta · ' + section };
+  const payload = { website: ANALYTICS_ID, hostname: 'foteev.github.io', url: PAGE_PATH || '/unoebasta/' + section, title: PAGE_PATH ? document.title : 'unoebasta · ' + section };
   if (name) { payload.name = name; payload.data = { qid }; }
   if (referrer) payload.referrer = referrer;
   analyticsReady.then(tracker => tracker?.track(payload)).catch(() => {});

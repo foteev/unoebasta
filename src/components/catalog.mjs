@@ -19,3 +19,8 @@ export function catalogWorkHeading({ title, cover = '', awards, authors, facts =
     '</div><div class="row wh-authors">' + authors + '</div><' + heading + '>' + catalogEscape(title) +
     '</' + heading + '><p class="wh-meta">' + facts + '</p></div></div>';
 }
+
+export function catalogMultiFilter(id, label, values, options, allLabel) {
+  const selected = values || [], summary = selected.length ? options.filter(([v]) => selected.includes(v)).map(([, name]) => name).join(', ') : allLabel;
+  return `<details class="multi-filter" data-multi="${id}"><summary><span class="multi-label">${catalogEscape(label)}</span><span class="multi-value" title="${catalogEscape(summary)}">${catalogEscape(summary)}</span></summary><div class="multi-options" role="group" aria-label="${catalogEscape(label)}">${[['all', allLabel], ...options].map(([value, name, code]) => { const checked = value === 'all' ? !selected.length : selected.includes(value); return `<label class="multi-option${checked ? ' is-selected' : ''}"><input type="checkbox" data-multi-filter="${id}"${code ? ` data-award-code="${catalogEscape(code)}"` : ''} value="${value}"${checked ? ' checked' : ''}><span>${catalogEscape(name)}</span></label>`; }).join('')}</div></details>`;
+}
