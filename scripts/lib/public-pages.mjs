@@ -73,7 +73,7 @@ export function writePublicPages(dir, shell, data, read) {
       winners.map(([, c, , q]) => '<li>' + localized('category', c, data.registry.categories[c].name.en) + ' · ' + workLink(q) + '</li>').join('') + '</ul></section>');
     write(data.routes.award[id], a.name.en, 'Winners of the ' + a.name.en + ' award by year and category.',
       '<section class="wrap public-catalog"><h1>' + localized('award', id, a.name.en) + ' <small>' + text(a.code) + '</small></h1>' +
-      catalogLink('../../?view=awards&award=' + encodeURIComponent(a.code), 'Filter awards · ' + text(a.code), ' class="btn"') +
+      catalogLink('../../?view=awards&award=' + encodeURIComponent(a.code), '<span data-i18n="filter_awards_link">Filter awards</span> · ' + text(a.code), ' class="btn"') +
       groups.join('') + '</section>');
   }
   const urls = ['', ...Object.values(data.routes).flatMap(routes => Object.values(routes))];
