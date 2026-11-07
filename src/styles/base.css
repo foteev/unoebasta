@@ -1,0 +1,42 @@
+/* Layout: phone-first single column. Catalog = stack of award slips; Awards = years × categories board;
+   work, author and reader views slide over as full-height sheets. */
+:root {
+  --bg: #eef1f6; --surface: #ffffff; --ink: #151a2e; --muted: #59617e; --line: #d5dae7;
+  --accent: #2c3cc4; --accent-ink: #ffffff; --accent-soft: #e4e7fb;
+  --gold: #8a5f00; --gold-bg: #fbf0d6; --ok: #1d6f47; --ok-bg: #e0f2e8; --warn: #7f5200; --warn-bg: #fcefd2; --bad: #a3271f; --bad-bg: #fbe5e2;
+  --new: #c2410c;
+  --r-bg: #fbfaf6; --r-ink: #1d1b16; --r-muted: #6d675a; --r-line: #e4dfd2;
+  --f-display: 'Unbounded', 'Golos Text', system-ui, sans-serif;
+  --f-ui: 'Golos Text', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --f-read: 'Literata', Georgia, 'Noto Serif', serif;
+  --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0d1020; --surface: #161a2d; --ink: #e6e8f3; --muted: #9ba2be; --line: #2a3050;
+    --accent: #8f9cff; --accent-ink: #0d1020; --accent-soft: #232a52;
+    --gold: #e6b955; --gold-bg: #2f2612; --ok: #72d3a2; --ok-bg: #12281e; --warn: #f0c46d; --warn-bg: #2c2412; --bad: #ff9a8f; --bad-bg: #321715;
+    --new: #fb923c;
+    --r-bg: #14151b; --r-ink: #dcd8cc; --r-muted: #9a9484; --r-line: #2b2c33;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a2d; --ink: #e6e8f3; --muted: #9ba2be; --line: #2a3050;
+  --accent: #8f9cff; --accent-ink: #0d1020; --accent-soft: #232a52;
+  --gold: #e6b955; --gold-bg: #2f2612; --ok: #72d3a2; --ok-bg: #12281e; --warn: #f0c46d; --warn-bg: #2c2412; --bad: #ff9a8f; --bad-bg: #321715;
+  --new: #fb923c;
+  --r-bg: #14151b; --r-ink: #dcd8cc; --r-muted: #9a9484; --r-line: #2b2c33;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-ui); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+

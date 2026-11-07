@@ -1,0 +1,25 @@
+/* ---------- themes 07.11: Classic, a yellowed book page (as in FBReader); Fantasy, dragon's blood and gold ---------- */
+:root[data-theme="classic"] {
+  --bg: #ece0bf; --surface: #f6edd3; --ink: #3a2e1d; --muted: #6b5a40; --line: #dccb9f;
+  --accent: #8a4b1c; --accent-ink: #fff8ea; --accent-soft: #e8d5ad;
+  --gold: #6e4a12; --gold-bg: #e9d6a8; --ok: #2e6331; --ok-bg: #dfe3c0; --warn: #7a4c00; --warn-bg: #f0d9a6; --bad: #9c2a1c; --bad-bg: #f1d0b8;
+  --new: #a8430e;
+  --r-bg: #f2e6c6; --r-ink: #33291b; --r-muted: #6e5d43; --r-line: #dfcfa6;
+  --shadow: 0 1px 0 #d8c697, 0 0 18px rgba(70, 50, 20, .08); --shadow-h: 0 1px 0 #cdb985, 0 6px 22px rgba(70, 50, 20, .14);
+  color-scheme: light;
+}
+:root[data-theme="fantasy"] {
+  --bg: #24070c; --surface: #3a0d16; --ink: #f8ead8; --muted: #dcb9a6; --line: #5c1a26;
+  --accent: #e9b44c; --accent-ink: #24070c; --accent-soft: #4f1620;
+  --gold: #f2c467; --gold-bg: #4a2a0c; --ok: #8fd6a4; --ok-bg: #173022; --warn: #f2c46d; --warn-bg: #3b2a10; --bad: #ff9f8f; --bad-bg: #4a1414;
+  --new: #ffa45c;
+  --r-bg: #1c0609; --r-ink: #ecdcc5; --r-muted: #c3a48f; --r-line: #44121b;
+  --shadow: 0 0 0 1px #5c1a26; --shadow-h: 0 0 0 1px #7a2633;
+  color-scheme: dark;
+}
+:root[data-theme="classic"] .slip h3, :root[data-theme="classic"] .pick-t, :root[data-theme="classic"] .sheet h2, :root[data-theme="classic"] .recall h3 { font-family: var(--f-book); font-weight: 600; }
+:root[data-theme="fantasy"] .slip h3, :root[data-theme="fantasy"] .pick-t, :root[data-theme="fantasy"] .sheet h2, :root[data-theme="fantasy"] .recall h3, :root[data-theme="fantasy"] .rcontent h1 { font-family: 'Cormorant SC', var(--f-book); font-weight: 700; letter-spacing: .01em; }
+:root[data-theme="fantasy"] .pick-t { font-size: 24px; line-height: 1.1; }
+:root[data-theme="fantasy"] .slip h3 { font-size: 21px; line-height: 1.15; }
+:root[data-theme="fantasy"] .sheet h2, :root[data-theme="fantasy"] .work-head.wh-b h2 { font-size: 30px; line-height: 1.05; }
+:root[data-theme="fantasy"] #rbody > p:first-of-type::first-letter { float: left; margin: .06em .1em 0 0; font: 700 3.3em/.8 'Cormorant SC', var(--f-book); color: var(--accent); }

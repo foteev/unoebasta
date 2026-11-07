@@ -5,6 +5,8 @@ import { parseCsv, cleanUrl } from './csv.mjs';
 import { loadResearch } from './research.mjs';
 import { uniqueNames } from './matching.mjs';
 
+import { readAwardRegistry } from './awards.mjs';
+
 export const LANGS = ['en', 'pl', 'ru', 'es'];
 export const FORMS = ['novel', 'novella', 'novelette', 'short story'];
 const FORM = { N: 'novel', SF: 'novel', FN: 'novel', HN: 'novel', FT: 'novel', A: 'novella', E: 'novelette', S: 'short story' };
@@ -18,14 +20,16 @@ export function loadCatalog(root, { researchDir = join(root, 'data/research') } 
   // Local versioned data is the source of truth; a DNS failure cannot erase the worklist.
   const json = readFileSync(join(root, 'data/awards.json'), 'utf8');
   const data = JSON.parse(json), read = readTable(readFileSync(join(root, 'src/index.html'), 'utf8'));
+  const categories = existsSync(join(root, 'data', 'award-registry.json')) ? readAwardRegistry(root).categories : null;
   const dir = join(root, 'data/found');
   const history = existsSync(dir) ? readdirSync(dir).filter(f => f.endsWith('.csv')).sort().flatMap(f => parseCsv(readFileSync(join(dir, f), 'utf8')).map((r, i) => ({ ...r, _file: `data/found/${f}`, _row: i + 2 }))) : [];
   const research = loadResearch(researchDir);
   const works = {};
   for (const [, category, year, qid] of data.aw) {
-    if (!data.works[qid] || !FORM[category]) continue;
-    const w = works[qid] ||= { qid, form: FORM[category], latest: year };
-    if (FORMS.indexOf(FORM[category]) < FORMS.indexOf(w.form)) w.form = FORM[category];
+    const form = categories?.[category]?.form || FORM[category];
+    if (!data.works[qid] || !form) continue;
+    const w = works[qid] ||= { qid, form, latest: year };
+    if (FORMS.indexOf(form) < FORMS.indexOf(w.form)) w.form = form;
     w.latest = Math.max(w.latest, year);
   }
   for (const w of Object.values(works)) {

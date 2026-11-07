@@ -6,12 +6,14 @@ import { loadResearch, saveResearch, addAlias, addLead, noteLead, updateLead, bu
 import { loadState } from './lib/search.mjs';
 import { writeJson } from './lib/http.mjs';
 
+import { readAwardRegistry, scopeByAward } from './lib/awards.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HELP = `Usage: npm run research -- <seed|list|plan|add|note|update|check|candidate|alias|import-state> [options]
   --research-dir data/research (one writer per directory)
   seed: preserve CSV notes, localized author names and all missing translation-title tasks
   list: [--lang en|pl|ru|es --status open|needs_title|candidate|searched|blocked|confirmed|rejected|deferred --source ID --qid Q123]
-  plan: --lang all|en|pl|ru|es --kind all|full|audio|fragment --limit 50 [--out .cache/search/plan.json --providers ID,ID --qid Q123]
+  plan: --lang all|en|pl|ru|es --kind all|full|audio|fragment --limit 50 [--out .cache/search/plan.json --providers ID,ID --qid Q123 --award CODE]
   add: --qid Q123 --lang ru --kind full --source publisher --hint "Possible publication" --origin "Where the lead came from"
        [--url URL --publication "Collection, edition, translator, ISBN" --next-action "What to check"]
   note: --id LEAD_ID --note "Research note; provenance, doubts or next step"
@@ -23,12 +25,14 @@ const HELP = `Usage: npm run research -- <seed|list|plan|add|note|update|check|c
   A lead can have a publication reference without a URL. Bibliography is not proof of free access.`;
 try {
   const [command = 'help', ...args] = process.argv.slice(2), o = {};
-  const allowed = new Set(['research-dir', 'lang', 'status', 'source', 'qid', 'kind', 'limit', 'out', 'providers', 'hint', 'origin', 'url', 'publication', 'next-action', 'id', 'note', 'recheck-after', 'evidence', 'type', 'value', 'file', 'state', 'title', 'from-research']);
+  const allowed = new Set(['award', 'research-dir', 'lang', 'status', 'source', 'qid', 'kind', 'limit', 'out', 'providers', 'hint', 'origin', 'url', 'publication', 'next-action', 'id', 'note', 'recheck-after', 'evidence', 'type', 'value', 'file', 'state', 'title', 'from-research']);
   for (let i = 0; i < args.length; i++) { const key = args[i].slice(2); if (!args[i].startsWith('--') || !allowed.has(key) || !args[i + 1] || args[i + 1].startsWith('--')) throw new Error(`Invalid option ${args[i]}`); o[key] = args[++i]; }
   if (['help', '--help'].includes(command)) console.log(HELP);
   else {
+    if (o.award && command !== 'plan') throw new Error('--award is available for plan');
     const dir = resolve(root, o['research-dir'] || 'data/research'), research = loadResearch(dir), catalog = loadCatalog(root, { researchDir: dir });
     if (o.lang && !['all', ...LANGS].includes(o.lang)) throw new Error('Unsupported language');
+    if (o.award) catalog.works = scopeByAward(catalog, readAwardRegistry(root), o.award).works;
     const qids = o.qid?.split(',') || [];
     if (qids.length && !(command === 'alias' && o.type === 'authors') && qids.some(q => !catalog.works.some(w => w.qid === q))) throw new Error('Unknown work QID');
     if (qids.length > 1 && !['plan', 'list'].includes(command)) throw new Error('This command requires one QID');

@@ -1,0 +1,130 @@
+{
+  "awards": {
+    "h": {
+      "code": "HUG",
+      "slug": "hugo",
+      "name": {
+        "en": "Hugo",
+        "pl": "Hugo",
+        "ru": "Хьюго",
+        "es": "Hugo"
+      },
+      "categories": [
+        "N",
+        "A",
+        "E",
+        "S"
+      ]
+    },
+    "n": {
+      "code": "NEB",
+      "slug": "nebula",
+      "name": {
+        "en": "Nebula",
+        "pl": "Nebula",
+        "ru": "Небьюла",
+        "es": "Nebula"
+      },
+      "categories": [
+        "N",
+        "A",
+        "E",
+        "S"
+      ]
+    },
+    "l": {
+      "code": "LOC",
+      "slug": "locus",
+      "name": {
+        "en": "Locus",
+        "pl": "Locus",
+        "ru": "Локус",
+        "es": "Locus"
+      },
+      "categories": [
+        "N",
+        "SF",
+        "FN",
+        "HN",
+        "FT",
+        "A",
+        "E",
+        "S"
+      ]
+    }
+  },
+  "categories": {
+    "N": {
+      "form": "novel",
+      "name": {
+        "en": "Novel",
+        "pl": "Powieść",
+        "ru": "Роман",
+        "es": "Novela"
+      }
+    },
+    "A": {
+      "form": "novella",
+      "name": {
+        "en": "Novella",
+        "pl": "Mikropowieść",
+        "ru": "Повесть",
+        "es": "Novela corta"
+      }
+    },
+    "E": {
+      "form": "novelette",
+      "name": {
+        "en": "Novelette",
+        "pl": "Nowela",
+        "ru": "Короткая повесть",
+        "es": "Relato largo"
+      }
+    },
+    "S": {
+      "form": "short story",
+      "name": {
+        "en": "Short story",
+        "pl": "Opowiadanie",
+        "ru": "Рассказ",
+        "es": "Relato corto"
+      }
+    },
+    "SF": {
+      "form": "novel",
+      "name": {
+        "en": "SF novel",
+        "pl": "Powieść SF",
+        "ru": "НФ-роман",
+        "es": "Novela de ciencia ficción"
+      }
+    },
+    "FN": {
+      "form": "novel",
+      "name": {
+        "en": "Fantasy novel",
+        "pl": "Powieść fantasy",
+        "ru": "Фэнтези-роман",
+        "es": "Novela de fantasía"
+      }
+    },
+    "HN": {
+      "form": "novel",
+      "name": {
+        "en": "Horror novel",
+        "pl": "Powieść grozy",
+        "ru": "Роман ужасов",
+        "es": "Novela de terror"
+      }
+    },
+    "FT": {
+      "form": "novel",
+      "name": {
+        "en": "First novel",
+        "pl": "Debiut powieściowy",
+        "ru": "Дебютный роман",
+        "es": "Primera novela"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+/* Generated public catalog pages use the same components as the app. */
+a[data-work], a.award, a.author-pill { color: inherit; text-decoration: none; }
+.public-work { padding-top: 1rem; }
+.public-work > .sheet-body { padding-inline: 0; }
+.public-work-actions { justify-content: flex-end; }
+.public-catalog { padding-block: 1rem 5rem; }
+.public-catalog li { margin-block: .35rem; }

@@ -7,20 +7,22 @@ import { fileURLToPath } from 'node:url';
 import { loadResearch } from './lib/research.mjs';
 import { coverageTotals, totalsLine } from './lib/coverage-totals.mjs';
 
+import { readAwardRegistry } from './lib/awards.mjs';
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const d = JSON.parse(readFileSync(join(root, 'data', 'awards.json'), 'utf8'));
 const src = readFileSync(join(root, 'src', 'index.html'), 'utf8');
 const READ = new Function(src.slice(src.indexOf('const READ = {'), src.indexOf('const CHANGELOG')) + '; return READ;')();
 const research = loadResearch(join(root, 'data/research'));
 
-const FORM = { N: 'novel', SF: 'novel', FN: 'novel', HN: 'novel', FT: 'novel', A: 'novella', E: 'novelette', S: 'short story' };
+const registry = readAwardRegistry(root);
 const RANK = ['novel', 'novella', 'novelette', 'short story'];
 const LANGS = ['en', 'pl', 'ru', 'es'];
 const works = {};
 for (const [aw, cat, y, q] of d.aw) {
   const w = (works[q] = works[q] || { q, awards: [], form: null, last: 0 });
-  w.awards.push(`${{ h: 'Hugo', n: 'Nebula', l: 'Locus' }[aw]} ${y}`);
-  const f = FORM[cat]; if (!w.form || RANK.indexOf(f) < RANK.indexOf(w.form)) w.form = f;
+  w.awards.push(`${registry.awards[aw].name.en} ${y}`);
+  const f = registry.categories[cat].form; if (!w.form || RANK.indexOf(f) < RANK.indexOf(w.form)) w.form = f;
   w.last = Math.max(w.last, y);
 }
 function availability(q) {
