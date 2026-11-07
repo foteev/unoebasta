@@ -2,13 +2,13 @@
 
 _20 minute adventure_
 
-**unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a single web page for reading the winners of the Hugo, Nebula and Locus awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
+**unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a static catalog for reading the winners of the Hugo, Nebula and Locus awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
 
 **Open it:** https://foteev.github.io/unoebasta/
 
 ## Principles
 
-- **Pure reading.** One static page. No app, no project server, no accounts, no subscriptions, no ads.
+- **Pure reading.** Static pages. No app, no project server, no accounts, no subscriptions, no ads.
 - **Sources stay identifiable.** Publisher, author, CC and public-domain links keep their provenance. External recordings and community sources can be added with permission marked unverified. Story texts and recordings are not copied into this repository.
 - **Your data stays in your browser.** Places, notes, finished marks, bookmarks and your own files live in IndexedDB on the device. Sync between your devices needs no account: a secret key, carried once by a link or QR code, encrypts the shelf on the device, and public Nostr relays keep only the ciphertext. A one-time move link (`#move=…`) works too.
 - **No keys, no personal data in this repository.** The page needs no API keys. CI rejects anything that looks like one.
@@ -17,7 +17,28 @@ _20 minute adventure_
 
 The public GitHub Pages site uses Umami Cloud. We look at aggregate visits by country and broad device type, which work cards people open, and which Read, Listen and excerpt options they click. Work events carry a public Wikidata ID (`qid`). In Umami's Events report, the `qid` property lets us group `open_work`, `read_click`, `listen_click`, `excerpt_click` and `choose_for_me` by work. We use recent activity to decide which works to cover and where to look for more texts, excerpts or recordings. A click measures interest in a source. Completion and the source language are outside that measurement.
 
-The site sends section names and a fixed list of catalog events. The first pageview can include the referring site's origin. Umami estimates location from request metadata and uses browser information to classify devices. The site keeps shelf contents, notes, files, reading progress, language preferences and transfer or sync keys out of the analytics payload. It skips loading analytics when the browser reports Do Not Track (`navigator.doNotTrack === '1'`) or the page opens with a transfer or sync link. See [Umami's metric definitions](https://docs.umami.is/docs/metric-definitions).
+The site sends section names, canonical paths of public work, author and award pages, and a fixed list of catalog events. A direct work page emits one open event with its public QID. The first pageview can include the referring site's origin. Umami estimates location from request metadata and uses browser information to classify devices. The site keeps shelf contents, notes, files, reading progress, language preferences and transfer or sync keys out of the analytics payload. It skips loading analytics when the browser reports Do Not Track (`navigator.doNotTrack === '1'`) or the page opens with a transfer or sync link. See [Umami's metric definitions](https://docs.umami.is/docs/metric-definitions).
+
+## Catalog pages and awards
+
+The reading app and generated pages share one catalog. Work pages use `work/<title>-Q…/`, author pages use `author/<name>-Q…/`, and award pages use `award/<slug>-<code>/`. The public URL is independent of the title displayed in the chosen language. Work pages use the same QID and browser shelf as the app. Published work and author slugs live in `data/catalog-slugs.json`. Add entries for new QIDs and keep published slugs stable when correcting titles.
+
+`data/award-registry.json` defines the stable internal award IDs, public search codes, slugs, translated names and categories. Add award results in `data/awards.json` as `[awardId, categoryId, year, workQid]`. More than one work may win the same category and year.
+
+| Award | Search code | Page |
+|---|---|---|
+| Hugo | `HUG` | [Hugo](https://foteev.github.io/unoebasta/award/hugo-HUG/) |
+| Nebula | `NEB` | [Nebula](https://foteev.github.io/unoebasta/award/nebula-NEB/) |
+| Locus | `LOC` | [Locus](https://foteev.github.io/unoebasta/award/locus-LOC/) |
+
+Use a code to scope discovery or planning:
+
+```sh
+npm run search:continue -- --award HUG --limit 30
+npm run research -- plan --award NEB --lang pl --limit 20
+```
+
+The same code selects an Awards filter in a public link such as `?view=awards&award=LOC`.
 
 ## Help
 
@@ -34,16 +55,19 @@ Use Node.js 22.22.2 or later in the 22.x line, 24.15.0 or later in the 24.x line
 
 ```sh
 npm ci              # tools for tests and candidate discovery: the page itself has no build dependencies
-npm run build       # src/index.html + data/awards.json → dist/web/index.html (one file)
+npm run build       # build the portable app, public catalog pages and sitemap
 npm test            # pipeline tests and the page in jsdom
 npm run check:secrets
 ```
 
-Open `dist/web/index.html` in a browser. That is the whole site.
+Open `dist/web/index.html` in a browser for the portable app. The Pages deployment publishes `dist/web` with its public catalog pages and sitemap.
 
 | Path | What it is |
 |---|---|
-| `src/index.html` | The whole page: markup, styles, script, strings in EN/ES/PL/RU. Free texts are the `READ` table, keyed by Wikidata ID |
+| `src/index.html` | App shell, runtime and strings in EN/ES/PL/RU. Free texts are the `READ` table, keyed by Wikidata ID |
+| `src/styles/` | Stylesheets assembled in cascade order for the app and public pages |
+| `src/components/` | HTML templates shared by the app and public pages |
+| `data/award-registry.json` | Award codes, categories and labels |
 | `data/awards.json` | Prose winners since 1953: awards, works, authors, descriptions |
 | `scripts/build-web.mjs` | Puts the data into the page |
 | `scripts/coverage.mjs` | What exists in each language → `data/coverage.csv` |

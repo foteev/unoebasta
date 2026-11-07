@@ -14,6 +14,8 @@ The reader’s shelf is stored in the browser. Optional sync shares an encrypted
   - `meta`: the schema number and backups made before a migration.
 - **localStorage** `fantastic-prefs`: settings.
 
+The main app and public work pages use the same browser origin, QIDs, storage and sync. Transfer links generated on a public page use the app root. The URL slug is public catalog data and the shelf identifies a work by its QID.
+
 ## Versions of the data
 
 `SCHEMA` is the shape of the records (now 4). A new version of the page brings steps `MIGRATIONS[n]` (n−1 → n): pure functions over a plain copy `{ files, positions, links, suggestions, bookmarks, tombs, prefs }`.

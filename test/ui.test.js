@@ -1038,7 +1038,7 @@ function selectFilter(group, values = []) {
   checks['multiselect: Escape closes the group and returns focus to its summary'] = !filterInput('home-lengths','15').closest('details').open && w.document.activeElement===filterInput('home-lengths','15').closest('details').querySelector('summary');
   // Use the production URL and intercept Umami. No analytics requests leave the test.
   const analytics = new JSDOM(html, {
-    url: 'https://foteev.github.io/unoebasta/?private_query=test#sync=private-sync-token',
+    url: 'https://foteev.github.io/unoebasta/?private_query=test',
     referrer: 'https://referrer.test/private-path?private_query=test',
     runScripts: 'dangerously',
     beforeParse(win) { win.scrollTo = () => {}; }
@@ -1054,7 +1054,7 @@ function selectFilter(group, values = []) {
     const scriptSelector = 'script[src="https://cloud.umami.is/script.js"]';
     await waitFor(() => select(scriptSelector));
     const tracker = select(scriptSelector);
-    checks['analytics: only the published site loads the manual tracker, after stripping transfer hashes'] =
+    checks['analytics: only the published site loads the manual tracker'] =
       !$('script[src="https://cloud.umami.is/script.js"]') && tracker?.dataset.autoTrack === 'false' && analytics.location.hash === '';
     const hits = [];
     analytics.umami = { track: payload => { hits.push(payload); return Promise.reject(new Error('blocked')); } };
@@ -1062,7 +1062,9 @@ function selectFilter(group, values = []) {
     activate('[data-pick-actions] a');
     activate('#tab-library');
     activate('#tab-library');
-    activate('#view-library [data-work="Q25349436"]');
+    const cardLink = select('#view-library a[data-work="Q25349436"]');
+    checks['catalog links to the canonical work page'] = /^\/unoebasta\/work\/.+-Q25349436\/$/.test(cardLink?.pathname || '');
+    await analytics.eval("trackAnalytics('open_work', 'Q25349436'); openWork('Q25349436')");
     await waitFor(() => select('#sheet-work [data-analytics="read_click"]'));
     activate('#sheet-work [data-analytics="read_click"]');
     activate('#sheet-work [data-analytics="listen_click"]');
@@ -1080,6 +1082,48 @@ function selectFilter(group, values = []) {
   } finally {
     analytics.close();
   }
+
+  for (const hash of ['#sync=private-sync-token', '#move=private-move-token']) {
+    const transfer = new JSDOM(html, {
+      url: 'https://foteev.github.io/unoebasta/' + hash, runScripts: 'dangerously',
+      beforeParse(win) { win.scrollTo = () => {}; }
+    }).window;
+    try {
+      await waitFor(() => transfer.location.hash === '');
+      checks['analytics: no tracker after ' + hash.split('=')[0]] = !transfer.location.hash &&
+        !transfer.document.querySelector('script[src="https://cloud.umami.is/script.js"]');
+    } finally { transfer.close(); }
+  }
+
+  const publicDir = path.dirname(PAGE);
+  const route = 'work/better-living-through-algorithms-Q130213759/';
+  const publicHtml = fs.readFileSync(path.join(publicDir, route, 'index.html'), 'utf8');
+  const runtime = fs.readFileSync(path.join(publicDir, 'catalog-app.js'), 'utf8');
+  const publicCard = new JSDOM(publicHtml.replace('<script defer src="../../catalog-app.js"></script>', () => '<script>' + runtime + '</script>'), {
+    url: 'https://foteev.github.io/unoebasta/' + route + '?private=test', runScripts: 'dangerously',
+    beforeParse(win) { win.scrollTo = () => {}; }
+  }).window;
+  try {
+    const find = s => publicCard.document.querySelector(s);
+    await waitFor(() => find('#sheet-work [data-star="Q130213759"]'));
+    await publicCard.eval("Store.put('bookmarks', { id: 'w:Q130213759', type: 'work', workId: 'Q130213759', at: Date.now() }).then(refreshAll)");
+    await waitFor(() => find('#sheet-work [data-star="Q130213759"]')?.getAttribute('aria-pressed') === 'true');
+    checks['public card reads an existing bookmark using the same record key'] =
+      find('#sheet-work [data-star="Q130213759"]')?.getAttribute('aria-pressed') === 'true' &&
+      !!find('main h1') && !find('#fatal');
+    find('#sheet-work [data-done="Q130213759"]').click();
+    await waitFor(() => find('#sheet-work [data-done="Q130213759"]')?.getAttribute('aria-pressed') === 'true');
+    checks['public card saves to the existing shelf schema'] =
+      (await publicCard.eval("Store.get('bookmarks', 'd:Q130213759')"))?.workId === 'Q130213759' &&
+      publicCard.eval('SCHEMA === 4 && IDB_VERSION === 4');
+    const hits = [];
+    publicCard.umami = { track: hit => { hits.push(hit); } };
+    find('script[src="https://cloud.umami.is/script.js"]')?.dispatchEvent(new publicCard.Event('load'));
+    await waitFor(() => hits.length >= 2);
+    checks['public card analytics uses its canonical path and one public open event'] =
+      hits.length === 2 && hits.every(h => h.url === '/unoebasta/' + route) &&
+      hits[1].name === 'open_work' && hits[1].data.qid === 'Q130213759';
+  } finally { publicCard.close(); }
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);

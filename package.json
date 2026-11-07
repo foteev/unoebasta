@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "node scripts/build-web.mjs",
-    "test": "node --test test/pipeline.test.mjs test/research.test.mjs test/contributions.test.mjs && node test/ui.test.js",
+    "test": "node --test test/pipeline.test.mjs test/research.test.mjs test/contributions.test.mjs test/catalog-pages.test.mjs && node test/ui.test.js",
     "check:secrets": "node scripts/check-secrets.mjs",
     "coverage": "node scripts/coverage.mjs",
     "import:pending": "node scripts/import-pending.mjs",

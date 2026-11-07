@@ -10,6 +10,8 @@ import { toCsv } from './lib/csv.mjs';
 import { loadResearch, saveResearch, mergeResearch, addLead } from './lib/research.mjs';
 import { continueSearch, CONTINUE_PROVIDERS } from './lib/continue-search.mjs';
 
+import { readAwardRegistry, scopeByAward } from './lib/awards.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HELP = `Usage: npm run search -- <continue|run|list|approve|reject|export> [options]
   continue: --lang all|en|pl|ru|es --limit 50 (total across languages; default all)
@@ -17,7 +19,7 @@ const HELP = `Usage: npm run search -- <continue|run|list|approve|reject|export>
        npm run search:continue -- --limit 50
   run: --lang en|pl|ru|es --kind all|full|audio|fragment --limit 50
        --providers clarkesworld,escapepod,podcastle,pseudopod,gutenberg,librivox,google
-       --qid Q123,Q456 --forms "short story,novelette" --lead LEAD_ID --refresh
+       --award CODE (run and continue) --qid Q123,Q456 --forms "short story,novelette" --lead LEAD_ID --refresh
   list: prints candidate IDs, URLs, proposed kinds and review status
   approve: --id ID --kind full|audio|fragment --tier t1|t2|t2us|frag
            --evidence "Opened page; author, language, completeness and rights verified"
@@ -33,7 +35,7 @@ const HELP = `Usage: npm run search -- <continue|run|list|approve|reject|export>
 try {
   const [command = 'help', ...args] = process.argv.slice(2), opts = {};
   const booleans = ['retry-searched', 'refresh'];
-  const allowed = new Set(['lang', 'kind', 'limit', 'providers', 'qid', 'forms', 'lead', 'research-dir', 'id', 'evidence', 'tier', 'words', 'license', 'pub', 'title', 'part', 'archive', 'out', 'state', 'cache', ...booleans]);
+  const allowed = new Set(['award', 'lang', 'kind', 'limit', 'providers', 'qid', 'forms', 'lead', 'research-dir', 'id', 'evidence', 'tier', 'words', 'license', 'pub', 'title', 'part', 'archive', 'out', 'state', 'cache', ...booleans]);
   for (let i = 0; i < args.length; i++) {
     const name = args[i].replace(/^--/, '');
     if (!args[i].startsWith('--') || !allowed.has(name)) throw new Error(`Unknown option: ${args[i]}`);
@@ -42,6 +44,11 @@ try {
   }
   if (command === 'help' || command === '--help') { console.log(HELP); }
   else {
+    if (opts.award && !['run', 'continue'].includes(command)) throw new Error('--award is available for run and continue');
+    const scopedCatalog = researchDir => {
+      const catalog = loadCatalog(root, { researchDir });
+      return opts.award ? scopeByAward(catalog, readAwardRegistry(root), opts.award) : catalog;
+    };
     const statePath = resolve(root, opts.state || '.cache/search/state.json'), state = loadState(statePath);
     const researchDir = resolve(root, opts['research-dir'] || 'data/research'), research = loadResearch(researchDir);
     mergeResearch(research, state.research);
@@ -49,7 +56,7 @@ try {
       if (opts.lead) throw new Error('Use run --lead for a single source task');
       const lang = opts.lang || 'all', providers = opts.providers?.split(',') || CONTINUE_PROVIDERS, forms = opts.forms?.split(',') || [];
       if (!['all', ...LANGS].includes(lang) || forms.some(f => !FORMS.includes(f))) throw new Error('Invalid language or forms');
-      const report = await continueSearch({ catalog: loadCatalog(root, { researchDir }), state, statePath, research, researchDir,
+      const report = await continueSearch({ catalog: scopedCatalog(researchDir), state, statePath, research, researchDir,
         langs: lang === 'all' ? LANGS : [lang], kind: opts.kind || 'all', limit: Number(opts.limit || 50), providers, forms,
         qids: opts.qid?.split(',') || [], refresh: !!opts.refresh || !!opts['retry-searched'],
         http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http'), googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '' }),
@@ -68,7 +75,7 @@ try {
       if (providers.some(p => !PROVIDERS[p])) throw new Error('Unknown provider');
       const forms = opts.forms ? opts.forms.split(',') : [];
       if (forms.some(f => !FORMS.includes(f))) throw new Error('Unknown form');
-      const summary = await runSearch({ catalog: loadCatalog(root, { researchDir }), research, researchDir, state, statePath, lang, kind, limit, providers, forms,
+      const summary = await runSearch({ catalog: scopedCatalog(researchDir), research, researchDir, state, statePath, lang, kind, limit, providers, forms,
         qids: opts.qid ? opts.qid.split(',') : lead ? [lead.qid] : [], refresh: !!opts.refresh || !!opts['retry-searched'],
         http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http'), googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '' }),
         onCheck: c => console.log(`${c.qid} ${c.lang} ${c.provider}: ${c.status}${c.error ? ' — ' + c.error : ''}`) });
