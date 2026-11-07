@@ -1949,7 +1949,7 @@ function minutesInLengths(minutes, selection) { const lengths = filterValues(sel
 const inLen = (q, selection) => minutesInLengths(readingMinutes(q), selection);
 // Read / Listen side by side: Read opens the text at the publisher
 const fullLink = (q, langs = myLangs()) => { const links = (READ[q] && READ[q].links || []).filter(l => l.kind === 'full'); return langs.map(lang => links.find(l => (l.lang || 'en') === lang)).find(Boolean) || links[0]; };
-function readCtl(q, cls, label, f = fullLink(q)) { if (!f) return ''; const L = esc(label || t('read_btn')); return `<a class="${cls}" href="${esc(f.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="read" data-site="${esc(siteLabel(f))}">${L}${label ? '' : ' ↗'}</a>`; }
+function readCtl(q, cls, label, f = fullLink(q)) { if (!f) return ''; const L = esc(label || t('read_btn')); return `<a class="${cls}" href="${esc(f.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="read" data-site="${esc(siteLabel(f))}" data-analytics="read_click">${L}${label ? '' : ' ↗'}</a>`; }
 // the Listen button names where you will listen: the magazine's podcast (a human narrator) or ElevenReader (synthetic voice)
 const audioSite = l => (l.site || hostOf(l.url)).replace(/\s*Podcast$/i, '');
 const audioLinks = q => (READ[q]?.links || []).filter(l => l.kind === 'audio').sort((a, b) => {
@@ -1974,8 +1974,8 @@ const listenPick = (q, o) => { o = o || listenOpts(q); return o.find(x => x.id =
 function listenCtl(q, cls, compact, langs) {
   const o = listenOpts(q, langs); if (!o.length) return ''; const c = listenPick(q, o);
   const two = compact ? src => `${ICON.ear}<span class="sr">${esc(t('listen_btn'))} · ${esc(src)}</span>` : (src, arrow) => `<span class="lb">${esc(t('listen_btn'))}${arrow ? ' ↗' : ''}</span><span class="ls">${esc(src)}</span>`;
-  const main = c.type === 'audio' ? `<a class="${cls} two" href="${esc(c.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(c.name)}" title="${esc(t('listen_pod', { s: c.name }))}">${two(c.name, true)}</a>`
-    : c.id === 'eleven' ? `<button class="${cls} two" data-eleven="${esc(c.url)}" data-wid="${q}" title="${esc(t('listen_tts'))}">${two(c.name, false)}</button>`
+  const main = c.type === 'audio' ? `<a class="${cls} two" href="${esc(c.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(c.name)}" data-analytics="listen_click" title="${esc(t('listen_pod', { s: c.name }))}">${two(c.name, true)}</a>`
+    : c.id === 'eleven' ? `<button class="${cls} two" data-eleven="${esc(c.url)}" data-wid="${q}" data-analytics="listen_click" title="${esc(t('listen_tts'))}">${two(c.name, false)}</button>`
     : `<button class="${cls} two" data-say="${q}" title="${esc(t('ls_phone_t'))}">${two(c.name, false)}</button>`;
   if (o.length < 2 || compact || langs) return main;
   return `<span class="lgrp">${main}<button class="${cls.replace('btn-primary', '').trim()} lmore" data-lsrc="${q}" aria-haspopup="dialog" aria-label="${esc(t('ls_more'))}" title="${esc(t('ls_more'))}">▾</button></span>`;
@@ -1996,6 +1996,7 @@ function openListenSheet(q) {
 }
 function closeListen() { const m = $('#listen-dialog'); if (m.hidden) return; m.hidden = true; m.innerHTML = ''; if (listenFrom && listenFrom.focus && document.contains(listenFrom)) listenFrom.focus(); listenFrom = null; }
 function listenGo(q, o) {
+  if (o.type === 'audio' || o.id === 'eleven') trackAnalytics('listen_click', q);
   if (o.type === 'audio') { window.open(o.url, '_blank', 'noopener'); trackOpen(q, 'listen', o.url, o.name); return; }
   if (o.id === 'eleven') return elevenUrl(o.url, q);
   return sayWork(q);
@@ -2103,7 +2104,7 @@ function pickRandomCtl(q, text) {
   if (read) return read;
   // a recording only: the same labelled button, not a bare headphones icon
   const audio = audioLinks(q).find(l => !explicitLangs() || myLangs().includes(l.lang || 'en'));
-  return audio ? `<a class="btn" href="${esc(audio.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(audioSite(audio))}">${esc(t('pick_me'))} ↗</a>` : '';
+  return audio ? `<a class="btn" href="${esc(audio.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="listen" data-site="${esc(audioSite(audio))}" data-analytics="listen_click">${esc(t('pick_me'))} ↗</a>` : '';
 }
 function pickActions(picks, kind = 'full') {
   const { list, me } = picks;
@@ -2134,7 +2135,7 @@ function renderHome() {
       ${three.length ? `${pickActions(picks)}<div class="picklist" data-picks="reading">${three.map(q => pickCard(q)).join('')}</div>` : matches || !foreign?.three.length ? `<p class="empty">${esc(t(matches ? 'picks_done' : explicitLangs() ? 'picks_none_lang' : 'picks_none', { l: myLangs().map(langName).join(', ') }))}</p>` : ''}
       ${others.length ? `<div class="home-lengths"><h3>${esc(t('picks_other_lengths'))}</h3><div class="row">${others.map(x => `<button class="btn" data-pickavailable="${x}">${esc(t('len_' + x))} · ${pickList(x).length}</button>`).join('')}</div></div>` : ''}
       ${foreign?.three.length ? `<section class="other-language-picks" data-picks="other" aria-labelledby="other-languages-h"><h3 id="other-languages-h">${esc(t('picks_other_languages'))}</h3><p class="small">${esc(t(three.length ? 'picks_other_languages_few' : 'picks_other_languages_none'))}</p>${pickActions(foreign, 'other')}<div class="picklist">${foreign.three.map(q => pickCard(q, [otherLanguageText(q).lang || 'en'], true)).join('')}</div></section>` : ''}
-      ${excerpts.length ? `<div class="home-excerpts"><h3>${esc(t('picks_excerpts'))}</h3><p class="small">${esc(t('picks_excerpt_note'))}</p>${excerpts.map(q => { const w = work(q), l = excerptLinks(q).find(l => myLangs().includes(l.lang.toLowerCase())), lang = l.lang.toLowerCase(); return `<div class="file-row" data-excerpt="${q}"><div><strong>${esc(w.titles[lang] || w.title)}</strong><span class="small">${esc(authorsLine(w))} · ${esc(langName(lang))}</span></div><a class="btn btn-small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.audio ? t('ex_audio', {site:l.site,l:l.lang}) : t('picks_excerpt_open'))} ↗</a></div>`; }).join('')}${fallback.list.length > 3 ? `<button class="btn btn-ghost" data-pickmore="excerpt">${esc(t('pick_more'))}</button>` : ''}</div>` : ''}
+      ${excerpts.length ? `<div class="home-excerpts"><h3>${esc(t('picks_excerpts'))}</h3><p class="small">${esc(t('picks_excerpt_note'))}</p>${excerpts.map(q => { const w = work(q), l = excerptLinks(q).find(l => myLangs().includes(l.lang.toLowerCase())), lang = l.lang.toLowerCase(); return `<div class="file-row" data-excerpt="${q}"><div><strong>${esc(w.titles[lang] || w.title)}</strong><span class="small">${esc(authorsLine(w))} · ${esc(langName(lang))}</span></div><a class="btn btn-small" href="${esc(l.url)}" target="_blank" rel="noopener" data-analytics="excerpt_click" data-wid="${q}">${esc(l.audio ? t('ex_audio', {site:l.site,l:l.lang}) : t('picks_excerpt_open'))} ↗</a></div>`; }).join('')}${fallback.list.length > 3 ? `<button class="btn btn-ghost" data-pickmore="excerpt">${esc(t('pick_more'))}</button>` : ''}</div>` : ''}
       ${pickWrapped[pickScope(k)] && list.length > 3 ? `<p class="note">${esc(t('picks_wrap', { n: list.length }))}</p>` : ''}
       ${three.length && three.every(q => langScore(q) < 2) ? `<p class="note">${linkify(t('picks_lang_far', { l: langName([...workLangs(three[0]).full][0] || 'en') }))}</p>` : ''}
     </section>`);
@@ -2654,8 +2655,8 @@ function readPanelHtml(q) {
     const w = s.warn || s.listed ? warnMark() : '', label = [s.site, langName(s.lang), s.meta].filter(Boolean).join(', ');
     const inner = `<span class="src-ic">${SRC_ICON[s.kind]}</span><span class="src-t"><span class="src-n">${esc(s.site)}${s.meta ? '' : w}</span>${s.meta ? `<span class="src-m">${esc(s.meta)}${w}</span>` : ''}</span><b class="src-l" aria-hidden="true">${esc(s.lang.toUpperCase())}</b>`;
     const cls = `src src-${s.kind}${s.o >= 2 ? ' src-ex' : ''}`;
-    return s.gb ? `<button class="${cls}" aria-label="${esc(label)}" data-gbview="${esc(s.gb.isbn ? 'ISBN:' + s.gb.isbn : s.gb.id)}" data-gbid="${esc(s.gb.id)}" data-gblang="${s.gb.lang}" data-wid="${q}">${inner}${SRC_ICON.next}</button>`
-      : `<a class="${cls}" aria-label="${esc(label)}" href="${esc(s.url)}" target="_blank" rel="noopener" ${s.track || ''}>${inner}${SRC_ICON.out}</a>`;
+    return s.gb ? `<button class="${cls}" aria-label="${esc(label)}" data-gbview="${esc(s.gb.isbn ? 'ISBN:' + s.gb.isbn : s.gb.id)}" data-gbid="${esc(s.gb.id)}" data-gblang="${s.gb.lang}" data-wid="${q}" data-analytics="excerpt_click">${inner}${SRC_ICON.next}</button>`
+      : `<a class="${cls}" aria-label="${esc(label)}" href="${esc(s.url)}" target="_blank" rel="noopener" data-analytics="${s.o >= 2 ? 'excerpt_click' : s.kind === 'audio' ? 'listen_click' : 'read_click'}" data-wid="${q}" ${s.track || ''}>${inner}${SRC_ICON.out}</a>`;
   };
   // once, while the reader has not chosen languages and this work can be read in more than one: which ones?
   const askLangs = !explicitLangs() && !prefs.langsAsked && !READONLY && new Set(all.map(s => s.lang)).size > 1;
@@ -2671,7 +2672,7 @@ function readPanelHtml(q) {
       ${showKind ? seg('rl-kind', [['all', t('rl_any'), pool.length], ['read', t('rl_read'), pool.filter(RL_KIND.read).length], ['listen', t('rl_listen'), pool.filter(RL_KIND.listen).length]], kind, t('rl_kind_label')) : ''}
       ${showLang && lang === 'mine' ? `<p class="small rl-note">${linkify(t('rl_langs_note', { l: mine.map(langName).join(', ') }))}</p>` : ''}
       ${rows.length ? `<div class="src-list">${rows.map(row).join('')}</div>` : `<p class="note">${esc(t('no_text'))}</p>`}
-      ${kind !== 'read' && (full || say) ? `<div class="rl-synth"><span class="small">${esc(t('rl_synth'))}</span>${full ? synthRow(`data-eleven="${esc(full.url)}" data-wid="${q}"`, 'ElevenReader', t('rl_eleven_sub')) : ''}${say ? synthRow(`data-say="${q}"`, t('ls_phone'), t('ls_phone_sub')) : ''}</div>` : ''}
+      ${kind !== 'read' && (full || say) ? `<div class="rl-synth"><span class="small">${esc(t('rl_synth'))}</span>${full ? synthRow(`data-eleven="${esc(full.url)}" data-wid="${q}" data-analytics="listen_click"`, 'ElevenReader', t('rl_eleven_sub')) : ''}${say ? synthRow(`data-say="${q}"`, t('ls_phone'), t('ls_phone_sub')) : ''}</div>` : ''}
       ${rows.some(s => s.warn) ? `<p class="rl-foot">${warnMark()}<span>${esc(t('rl_warn'))}</span></p>` : ''}
       ${rows.some(s => s.listed) ? `<p class="small">${esc(t('audio_metadata'))}</p>` : ''}
       ${all.some(s => s.o === 0) && !all.some(s => s.o === 0 && isMine(s)) ? `<p class="note">${esc(t('lang_far', { l: langName(all.find(s => s.o === 0).lang) }))}</p>` : ''}
@@ -3821,10 +3822,56 @@ async function importAll(text) {
   migrated = false; toast(t('import_done', { n })); refreshAll();
 }
 
+/* ---------- analytics: send only public section names and catalog actions ---------- */
+const ANALYTICS_ID = 'a4439374-4d07-4d26-91a7-3b6c91591dd2';
+const ANALYTICS_SECTIONS = { catalog: 'read', library: 'catalog', awards: 'awards', shelf: 'shelf', about: 'about' };
+const ANALYTICS_EVENTS = new Set(['open_work', 'read_click', 'listen_click', 'excerpt_click', 'choose_for_me']);
+let analyticsReady = null;
+
+function trackAnalytics(name, qid, referrer) {
+  if (!analyticsReady || !Object.hasOwn(ANALYTICS_SECTIONS, VIEW)) return;
+  if (name && (VIEW === 'shelf' || !ANALYTICS_EVENTS.has(name) || !/^Q[1-9]\d*$/.test(qid) || !Object.hasOwn(WORKS, qid))) return;
+  const section = ANALYTICS_SECTIONS[VIEW];
+  const payload = { website: ANALYTICS_ID, hostname: 'foteev.github.io', url: '/unoebasta/' + section, title: 'unoebasta · ' + section };
+  if (name) { payload.name = name; payload.data = { qid }; }
+  if (referrer) payload.referrer = referrer;
+  analyticsReady.then(tracker => tracker?.track(payload)).catch(() => {});
+}
+
+function startAnalytics() {
+  if (location.origin !== 'https://foteev.github.io' || !['/unoebasta/', '/unoebasta/index.html'].includes(location.pathname)) return;
+  if (/^#(?:sync|move)=/.test(location.hash) || navigator.doNotTrack === '1') return;
+  const script = document.createElement('script');
+  script.src = 'https://cloud.umami.is/script.js';
+  script.referrerPolicy = 'no-referrer';
+  script.dataset.websiteId = ANALYTICS_ID;
+  script.dataset.autoTrack = 'false'; // Use only the explicit payload above, never the raw URL or DOM.
+  analyticsReady = new Promise(resolve => {
+    script.addEventListener('load', () => resolve(window.umami), { once: true });
+    script.addEventListener('error', () => resolve(null), { once: true });
+  });
+  let referrer;
+  if (document.referrer) {
+    const source = new URL(document.referrer);
+    if (['http:', 'https:'].includes(source.protocol) && source.origin !== location.origin) referrer = source.origin;
+  }
+  trackAnalytics(undefined, undefined, referrer);
+  document.head.appendChild(script);
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest?.('[data-analytics]');
+  if (!el || el.closest('#reader')) return;
+  const name = el.closest('[data-pick-actions]') ? 'choose_for_me' : el.dataset.analytics;
+  trackAnalytics(name, el.dataset.track || el.dataset.wid);
+}, true);
+
 /* ---------- navigation and events ---------- */
 let VIEW = 'catalog';
 function setView(v) {
+  const changed = VIEW !== v;
   VIEW = v;
+  if (changed) trackAnalytics();
   ['catalog', 'library', 'awards', 'shelf', 'about'].forEach(x => { $('#view-' + x).hidden = x !== v; $('#tab-' + x).setAttribute('aria-selected', String(x === v)); });
   if (v === 'shelf') renderShelf();
   if (v === 'awards') renderAwards();
@@ -3962,7 +4009,10 @@ document.addEventListener('click', async e => {
   if (d.done) { const q = d.done; const on = !isDone(q); await setDone(q, on); await refreshDoneViews(q); if (on) toast(t('done_toast', { t: work(q) ? work(q).title : '' }), { k: 'undone', v: q, label: t('done_undo') }); else toast(t('done_removed')); return; }
   if (d.undone) { await setDone(d.undone, false); $('#toast').hidden = true; return refreshDoneViews(d.undone); }
   if (d.star) { await toggleStar(d.star); const s = document.querySelectorAll(`[data-star="${d.star}"]`); s.forEach(x => { x.setAttribute('aria-pressed', String(isStarred(d.star))); x.textContent = isStarred(d.star) ? '★' : '☆'; }); if (VIEW === 'awards') renderAwards(); if (VIEW === 'shelf') renderShelf(); if (filter.statuses.includes('starred')) renderCatalog(); return; }
-  if (d.work) { $('#sheet-author').hidden = true; $('#sheet-author').innerHTML = ''; return openWork(d.work); }
+  if (d.work) {
+    trackAnalytics('open_work', d.work);
+    $('#sheet-author').hidden = true; $('#sheet-author').innerHTML = ''; return openWork(d.work);
+  }
   if (d.author) return openAuthor(d.author);
   if (d.goaw) { const [aw, c, y] = d.goaw.split('|'); return goAwards({ award: aw, cat: c || null, year: y ? +y : null }); }
   if (d.close !== undefined) { const s = b.closest('.sheet'); if (s) { s.hidden = true; s.innerHTML = ''; } if (s && s.id !== 'sheet-form') { renderCatalog(); if (VIEW === 'awards') renderAwards(); } return; }
@@ -4143,7 +4193,10 @@ if (window.matchMedia) { const mq = window.matchMedia('(min-width: 900px)'); con
   applyLang(); applyTheme(); renderCatalog(); renderAbout();
   try { window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
   setView('catalog');
-  ensureSchema().catch(e => console.warn('[unoebasta] schema', e)).then(() => refreshAll()).then(() => checkMoveLink()).then(() => { if (syncState() && !location.hash) { syncLast = Date.now(); syncNow(true); } }).catch(e => showFatal('start: ' + (e && (e.stack || e.message) || e)));
+  ensureSchema().catch(e => console.warn('[unoebasta] schema', e)).then(() => refreshAll()).then(() => checkMoveLink()).then(() => {
+    startAnalytics();
+    if (syncState() && !location.hash) { syncLast = Date.now(); syncNow(true); }
+  }).catch(e => showFatal('start: ' + (e && (e.stack || e.message) || e)));
 })();
 </script>
 </body>

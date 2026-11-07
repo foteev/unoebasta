@@ -1036,6 +1036,50 @@ function selectFilter(group, values = []) {
   checks['multiselect: selection retains the open group and keyboard focus'] = w.document.activeElement===filterInput('home-lengths','15') && filterInput('home-lengths','15').closest('details').open;
   w.document.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
   checks['multiselect: Escape closes the group and returns focus to its summary'] = !filterInput('home-lengths','15').closest('details').open && w.document.activeElement===filterInput('home-lengths','15').closest('details').querySelector('summary');
+  // Use the production URL and intercept Umami. No analytics requests leave the test.
+  const analytics = new JSDOM(html, {
+    url: 'https://foteev.github.io/unoebasta/?private_query=test#sync=private-sync-token',
+    referrer: 'https://referrer.test/private-path?private_query=test',
+    runScripts: 'dangerously',
+    beforeParse(win) { win.scrollTo = () => {}; }
+  }).window;
+  try {
+    const select = s => analytics.document.querySelector(s);
+    const activate = s => {
+      const el = select(s);
+      if (!el) throw new Error('Missing analytics test control: ' + s);
+      el.addEventListener('click', e => e.preventDefault(), { once: true });
+      el.click();
+    };
+    const scriptSelector = 'script[src="https://cloud.umami.is/script.js"]';
+    await waitFor(() => select(scriptSelector));
+    const tracker = select(scriptSelector);
+    checks['analytics: only the published site loads the manual tracker, after stripping transfer hashes'] =
+      !$('script[src="https://cloud.umami.is/script.js"]') && tracker?.dataset.autoTrack === 'false' && analytics.location.hash === '';
+    const hits = [];
+    analytics.umami = { track: payload => { hits.push(payload); return Promise.reject(new Error('blocked')); } };
+    tracker?.dispatchEvent(new analytics.Event('load'));
+    activate('[data-pick-actions] a');
+    activate('#tab-library');
+    activate('#tab-library');
+    activate('#view-library [data-work="Q25349436"]');
+    await waitFor(() => select('#sheet-work [data-analytics="read_click"]'));
+    activate('#sheet-work [data-analytics="read_click"]');
+    activate('#sheet-work [data-analytics="listen_click"]');
+    activate('#tab-shelf');
+    analytics.eval("trackAnalytics('read_click', 'Q25349436')");
+    await waitFor(() => hits.length >= 7);
+    checks['analytics: screen changes and catalog actions each send one allowlisted event'] =
+      hits.map(x => x.name || x.url).join(',') === '/unoebasta/read,choose_for_me,/unoebasta/catalog,open_work,read_click,listen_click,/unoebasta/shelf';
+    checks['analytics: payloads include only virtual URLs, public work IDs and the referral origin'] =
+      hits[0]?.referrer === 'https://referrer.test' && hits.slice(1).every(x => !('referrer' in x)) &&
+      hits.every(x => /^\/unoebasta\/(read|catalog|shelf)$/.test(x.url) &&
+        (!x.name || (/^Q[1-9]\d*$/.test(x.data.qid) && Object.keys(x.data).length === 1))) &&
+      !/private|#sync=|#move=/.test(JSON.stringify(hits));
+    checks['analytics: a blocked tracker leaves the site usable'] = !select('#fatal') && !select('#view-shelf').hidden;
+  } finally {
+    analytics.close();
+  }
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);
