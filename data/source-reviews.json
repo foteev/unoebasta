@@ -1,7 +1,7 @@
 {
   "v": 1,
   "reviewed_at": "2026-11-04T23:11:13Z",
-  "report": "docs/link-audit-2026-11-04.md",
+  "report": "docs/archive/link-audit-2026-11-04.md",
   "policy": "Observed scope only. Restricted clients and timeout/429 responses are review limits, not proof of paid or dead content. Re-enable an excluded source only after a maintainer records new evidence.",
   "sources": [
     {

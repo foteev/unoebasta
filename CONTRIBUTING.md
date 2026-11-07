@@ -6,7 +6,7 @@ Thank you for helping. Most help needs no code: a link to a free text, a broken 
 
 1. **Record access and provenance separately.** Publisher, author, CC and public-domain links remain preferred. External text/audio portals are accepted as public link records with `tier=external` and permission unverified; never label them publisher-authorized or CC without evidence. Do not copy story bodies or recordings into this repository.
 2. **No keys, no tokens, no personal data.** The page needs no API keys and has no server. Never commit a key, a `.env` file, an e-mail address or anything about a reader. `npm run check:secrets` runs on every pull request and fails if it finds one. If you ever commit a real key by mistake, revoke it first: removing it from the history is not enough.
-3. **Nothing that tracks readers.** No analytics, no third-party scripts that phone home, no fonts or libraries from new hosts without a reason in the pull request.
+3. **Keep analytics limited to public catalog activity.** The existing [Umami integration](README.md#analytics) uses a fixed list of section views and catalog events. Keep personal shelf data, reader settings and transfer or sync keys out of analytics. Explain any proposed analytics change or new external dependency in the pull request.
 4. **Be kind.** We follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Reader and agent findings

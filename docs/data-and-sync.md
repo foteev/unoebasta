@@ -1,11 +1,11 @@
 # Readers’ data: storage, versions, moving between devices
 
-Everything personal lives in the reader’s browser. There is no server. This file is the contract every change must keep.
+The reader’s shelf is stored in the browser. Optional sync shares an encrypted subset via public Nostr relays. Manual export writes a local JSON copy. [Umami analytics](../README.md#analytics) covers public site usage separately from shelf storage.
 
 ## Storage
 
 - **IndexedDB** database `fantastic` (the old internal name stays so nobody loses data), layout version `IDB_VERSION = 4`. Stores, all with `keyPath: 'id'`:
-  - `files`: the reader’s own books (parsed HTML in `html`). Never leaves the device.
+  - `files`: the reader’s own books (parsed HTML in `html`). Included in a manual export, excluded from transfer links and relay sync.
   - `positions`: where the reader stopped. `file:<id>` for own files, `ext:<QID>` for a story opened on a magazine site.
   - `bookmarks`: `type` is `work` (starred), `done` (finished), `pos` (bookmark in a text), `recall` (one line of reading history, with an optional note), `about` (a cached description).
   - `links`: the reader’s own links to a work.
@@ -23,13 +23,13 @@ On start, `ensureSchema()`:
 2. a step fails: put everything back as it was, switch to read-only and say so;
 3. data newer than the page: read-only, ask to reload.
 
-Export files carry `{ app: 'unoebasta', v: SCHEMA }` and go through the same steps on import.
+The manual JSON export includes the shelf, file bodies and preferences. It carries `{ app: 'unoebasta', v: SCHEMA }` and goes through the same schema steps on import.
 
 **Rules for a new step:**
 - only add fields; never drop or rename one without a step;
 - never touch `files[].html`;
 - every step gets a fixture and checks in `test/ui.test.js`;
-- never change the page address after release: a new address means an empty storage (readers move with the transfer link).
+- preserve the site origin (scheme, hostname and port). On a new origin the browser gives the site separate storage. Readers can move shelf data with a transfer link or use export/import to bring their own files too.
 
 Steps so far: **2→3** every record gets `at` and a book label `book: { title, by }` (to find the work again by title and author if its ID changes). **3→4** deletion marks (`tombs`) and `mt`, the time a record last changed.
 
@@ -51,7 +51,7 @@ While the reader has not chosen languages, a work card whose sources span more t
 
 **What travels:** `positions`, `bookmarks` (without cached `about` descriptions), `links`, deletion marks from the last 400 days, and the settings `listen`, `ttsRate`, `askNote`, `pickLengths`, `langs`, `langsAsked`, `focus` (with their own time `prefsMt`). A newer settings record without `langs` means All on the receiving device too. Interface language, theme and font size stay per device. `pickLen` remains readable for cached older pages; current pages use the additive `pickLengths` array (empty means all durations). Book titles and authors do not travel: the catalog rebuilds them.
 
-**Own files** never travel. A place in one travels by a fingerprint of the text (`ff:<hash>`) and lands when the same file is on the other device.
+**Own files** are excluded from relay sync and transfer links. A place in one travels by a fingerprint of the text (`ff:<hash>`) and lands when the same file is on the other device.
 
 **The transfer link** (My shelf → Data on this device → Link for another device):
 - the pack is deflated (`CompressionStream('deflate-raw')`, `z…`) or plain (`j…`), base64url, after `#move=`; browsers never send that part to a server;
@@ -64,7 +64,7 @@ While the reader has not chosen languages, a work card whose sources span more t
 - **From the key:** a Nostr secret key `sha256(key ‖ "unoebasta/nostr-key")` and a label `d = hex(sha256(key ‖ "unoebasta/label"))[0..24]`. Same key → same identity on every device; nobody can tie the label to a person.
 - **The event.** `syncPack()` → deflate → base64url → NIP-44 encrypted to itself → kind 30078 (NIP-78), tag `d`, published to six relays run by different people (`RELAYS` in `src/index.html`). Replaceable: each relay keeps only the newest. Kept under ~40 KB; a bigger shelf drops old history first (`slimPack`).
 - **When.** Pull + merge when the page opens and when you come back to it (at most every 30 s); push 4 s after a local change and when the page is hidden; "Sync now" on the shelf. A push happens only when the content changed (`h` = hash of the pack).
-- **Library.** nostr-tools 2.25.2 from jsDelivr, loaded only when sync is on.
+- **Library.** nostr-tools 2.25.2 from jsDelivr, loaded on demand for sync or for sending feedback.
 - **Safety.** Relays see ciphertext, the author key (random), the label and times. The main copy stays in the browser: a relay that forgets the event only delays the next sync. Losing every device and the key link loses the copy on the relays too.
 - **Checked** in tests with an in-memory relay, and against the real relays from a browser: all six accept and return a ~40 KB kind-30078 event and keep only the newest.
 

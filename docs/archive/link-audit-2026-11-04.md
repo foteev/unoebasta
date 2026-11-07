@@ -1,5 +1,7 @@
 # Source-link audit — 2026-11-04 UTC
 
+This is a historical snapshot of the audit. Access results and pull request states below reflect what was observed at the time. Current publication decisions are in [source reviews](../../data/source-reviews.json).
+
 Baseline: `52ae687fbe414f3977b21c4f8394caa1bb7bb74e`. Reviewed the published reading links and source additions reachable through the repository’s merged/closed history, the historical findings CSVs, and open research PRs [#24](https://github.com/foteev/unoebasta/pull/24) and [#25](https://github.com/foteev/unoebasta/pull/25). The open dependency PRs do not contribute catalog sources.
 
 ## Results
@@ -13,7 +15,7 @@ Baseline: `52ae687fbe414f3977b21c4f8394caa1bb7bb74e`. Reviewed the published rea
 | Legimi | 70 pages contain guest samples; links now target `#sample_section` |
 | Audio | Anonymous playback started on all 24 catalogued Akniga pages and all 5 Uncanny recordings whose direct HTTP checks returned 403; 72 additional linked media endpoints sampled, with 39 partial-audio responses, 32 access restrictions and 1 missing file |
 
-Full machine-readable, per-claim evidence and provenance: [source access records](../data/research/audits/2026-11-04-source-access.json). Browser playback observations: [audio samples](../data/research/audits/2026-11-04-audio-samples.json). Publication-scope decisions: [source reviews](../data/source-reviews.json). No story bodies or media files are published with this audit.
+Full machine-readable, per-claim evidence and provenance: [source access records](../../data/research/audits/2026-11-04-source-access.json). Browser playback observations: [audio samples](../../data/research/audits/2026-11-04-audio-samples.json). Publication-scope decisions: [source reviews](../../data/source-reviews.json). No story bodies or media files are published with this audit.
 
 ## The reported Legimi link
 
