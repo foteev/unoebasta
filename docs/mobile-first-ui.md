@@ -52,10 +52,10 @@ Check each item at 360 × 740 and 390 × 844, in the light and dark themes (and 
 - [ ] Tables replaced by lists or picker + list on phones.
 - [ ] Inputs ≥ 16 px; keyboard does not cover the field being typed in.
 - [ ] Works with system font size at 130 % and in landscape.
-- [ ] Look at a real screenshot at phone width before publishing (for claude.ai artifacts: the `artifact-emulator` skill, phone viewport; otherwise Playwright at 390 px). A layout change that has not been seen at phone width is not finished.
+- [ ] Review a real browser screenshot at phone width before publishing. The [Mobile shelf workflow](../.github/workflows/mobile-shelf.yml) runs the project's Playwright checks and uploads screenshots.
 
 ## 7. Project patterns (unoebasta)
 
 - Award structure (years × categories): phone = award segmented control + category chip scroller + list of years (year | title, author | marks) with decade jump chips. Wide screens add the full board as an extra view. All awards is available in Board, By year and By category. Combined views merge a work only within the same year and category, retaining all award names and Locus novel subcategories. Switching to a phone layout must not erase the selected desktop Board view or award scope.
 - Author awards: list rows "2024 · Hugo · Novelette" + title, sortable by year with one toggle; counters per award as large tappable tiles.
-- Navigation: bottom bar Read · Awards · Shelf · About on phones; top tabs from 720 px.
+- Navigation: bottom bar with Read, Catalog, Awards, My shelf and About below 720 px. From 720 px the tabs move to the top.

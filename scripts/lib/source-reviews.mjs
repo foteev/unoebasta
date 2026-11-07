@@ -10,7 +10,7 @@ export function assertSourceScope(rows, reviews = SOURCE_REVIEWS) {
     if (!row.url || row.kind === 'none') continue;
     const review = sourceReview(row, reviews);
     if (review && ((review.allowed_kinds && !review.allowed_kinds.includes(row.kind)) || review.excluded_kinds?.includes(row.kind))) {
-      throw new Error(`${row.qid}: source review excludes ${row.kind} at ${row.url}: ${review.reason} See docs/link-audit-2026-11-04.md; a maintainer must review new evidence before re-enabling it.`);
+      throw new Error(`${row.qid}: source review excludes ${row.kind} at ${row.url}: ${review.reason} See docs/archive/link-audit-2026-11-04.md; a maintainer must review new evidence before re-enabling it.`);
     }
   }
 }

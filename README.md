@@ -8,10 +8,16 @@ _20 minute adventure_
 
 ## Principles
 
-- **Pure reading.** One static page. No app, no server, no accounts, no subscriptions, no ads, no analytics.
+- **Pure reading.** One static page. No app, no project server, no accounts, no subscriptions, no ads.
 - **Sources stay identifiable.** Publisher, author, CC and public-domain links keep their provenance. External recordings and community sources can be added with permission marked unverified. Story texts and recordings are not copied into this repository.
 - **Your data stays in your browser.** Places, notes, finished marks, bookmarks and your own files live in IndexedDB on the device. Sync between your devices needs no account: a secret key, carried once by a link or QR code, encrypts the shelf on the device, and public Nostr relays keep only the ciphertext. A one-time move link (`#move=…`) works too.
 - **No keys, no personal data in this repository.** The page needs no API keys. CI rejects anything that looks like one.
+
+## Analytics
+
+The public GitHub Pages site uses Umami Cloud. We look at aggregate visits by country and broad device type, which work cards people open, and which Read, Listen and excerpt options they click. Work events carry a public Wikidata ID (`qid`). In Umami's Events report, the `qid` property lets us group `open_work`, `read_click`, `listen_click`, `excerpt_click` and `choose_for_me` by work. We use recent activity to decide which works to cover and where to look for more texts, excerpts or recordings. A click measures interest in a source. Completion and the source language are outside that measurement.
+
+The site sends section names and a fixed list of catalog events. The first pageview can include the referring site's origin. Umami estimates location from request metadata and uses browser information to classify devices. The site keeps shelf contents, notes, files, reading progress, language preferences and transfer or sync keys out of the analytics payload. It skips loading analytics when the browser reports Do Not Track (`navigator.doNotTrack === '1'`) or the page opens with a transfer or sync link. See [Umami's metric definitions](https://docs.umami.is/docs/metric-definitions).
 
 ## Help
 
@@ -46,10 +52,10 @@ Open `dist/web/index.html` in a browser. That is the whole site.
 | `scripts/search.mjs` | Cached discovery, review queue and approved CSV export; see [the pipeline](docs/search-pipeline.md) |
 | `npm run search:continue` | Resume a batch across four languages; see [continue search](docs/continue-search.md) |
 | `scripts/research.mjs` | Language aliases, source plans, publication leads and durable notes; see [research](docs/research.md) |
-| `scripts/check-links.mjs` | Checks every text and audio link (the “Links” workflow, weekly) |
+| `scripts/check-links.mjs` | Checks the reachability of text, audio, excerpt and conditional preview links (the weekly “Links” workflow) |
 | `scripts/check-secrets.mjs` | Fails on keys, tokens or personal e-mail addresses |
 | `test/ui.test.js` | jsdom tests |
-| `docs/` | How user data is stored, migrated and moved; mobile-first rules |
+| `docs/` | Contributor search contract, maintainer workflows, shelf storage and mobile UI guidelines |
 
 ## Licenses
 
@@ -66,4 +72,4 @@ unoebasta is a non-commercial project and is not affiliated with the Hugo, Nebul
 
 **Multilingual audio research.** `search audio` requests a supervised GPT Luna discovery batch; `npm run audio:plan` prepares a four-language queue. See [the audio workflow](docs/audio-search.md). The CLI prepares tasks; it does not launch or bill an AI agent.
 
-**Bring your own agent.** Copy a search task from About or a work card, then give it to any capable agent. The [task contract](docs/search-brief.md) limits it to a few works and a findings-only PR. Readers can also send a link and description through the existing Nostr form.
+**Bring your own agent.** Copy a search task from About or a work card, then give it to any capable agent. The [task contract](docs/search-brief.md) assigns 30 works by default and keeps the PR limited to findings files. Readers can also send a link and description through the existing Nostr form.

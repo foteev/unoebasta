@@ -32,7 +32,7 @@ Refresh main and coverage before searching and again before submitting. Supplied
 
 ## Request a reader check
 
-If a paywall, consent or bot check, regional restriction, broken player or ambiguous collection sample prevents verification, keep the source as a lead and ask a reader to check the exact URL. Specify which work and language to look for, whether the text or player opens, and which part of the story it contains. When practical, ask whether the beginning and ending are present. Continue other checks while waiting.
+If a paywall, consent or bot check, regional restriction, broken player or ambiguous collection sample prevents verification, keep the source as a lead and ask a reader to check the exact URL. Specify which work and language to look for, whether the text or player opens, and which part of the story it contains. When practical, ask whether the beginning and ending are present. On publisher pages that offer both a text excerpt and an audio sample, such as Macmillan, ask the reader to check the two controls separately. Continue other checks while waiting.
 
 Record the date and what the reader confirmed in the matching note and, for an accepted source, in the CSV evidence. A reader confirming playback and identity has checked those two things. Completeness and permission still need their own evidence. Keep a mismatch or an inconclusive result in the notes. Include any remaining reader checks and exact URLs in the findings PR.
 
