@@ -20,6 +20,7 @@
     "test": "node --test test/pipeline.test.mjs test/research.test.mjs test/contributions.test.mjs && node test/ui.test.js",
     "check:secrets": "node scripts/check-secrets.mjs",
     "coverage": "node scripts/coverage.mjs",
+    "import:pending": "node scripts/import-pending.mjs",
     "search": "node scripts/search.mjs",
     "search:continue": "node scripts/search.mjs continue",
     "research": "node scripts/research.mjs",

@@ -6,6 +6,8 @@ import { join } from 'node:path';
 import { FOUND_FIELDS, parseCsv, toCsv, validateFound, sourceUrlKey } from '../scripts/lib/csv.mjs';
 import { readTable, loadCatalog } from '../scripts/lib/catalog.mjs';
 import { mergeFound } from '../scripts/lib/merge-found.mjs';
+import { importPending } from '../scripts/import-pending.mjs';
+import { coverageTotals } from '../scripts/lib/coverage-totals.mjs';
 import { pageAccessIssue } from '../scripts/lib/link-access.mjs';
 import { assertSourceScope, SOURCE_REVIEWS } from '../scripts/lib/source-reviews.mjs';
 import { CachedHttp, HttpError, hash } from '../scripts/lib/http.mjs';
@@ -313,4 +315,19 @@ test('content diagnostics catch successful missing-reader pages without mistakin
   assert.equal(pageAccessIssue('https://www.legimi.pl/ebook.html','<h1>Buy ebook and audiobook</h1>'),'missing_sample');
   assert.equal(pageAccessIssue('https://example.com/story','<title>Site Unavailable</title><p>Unable to access this site.</p>'),'placeholder_page');
   assert.equal(pageAccessIssue('https://www.litres.ru/book/a/chitat-onlayn/','<script>"Что-то пошло не так Нет в продаже"</script><p>Available narrative</p>'),'');
+});
+
+test('import-pending imports each new file once, isolates a failing file and the totals match the page counters', () => {
+  const a = row({ url: 'https://example.org/a' }), b = row({ url: 'https://example.org/b', lang: 'ru', kind: 'audio', tier: 'external', words: '' , evidence: 'Opened the player page and checked the recording title' });
+  const files = [{ name: 'a.csv', text: toCsv([a]) }, { name: 'bad.csv', text: toCsv([{ ...a, url: 'javascript:alert(1)' }]) }, { name: 'b.csv', text: toCsv([b]) }];
+  const first = importPending(source({}), data(), files);
+  assert.equal(first.report.find(r => r.name === 'a.csv').stats.links, 1);
+  assert.match(first.report.find(r => r.name === 'bad.csv').error, /HTTP/);
+  assert.equal(first.report.find(r => r.name === 'b.csv').stats.links, 1, 'a failing file does not stop the next one');
+  assert.deepEqual(Object.keys(readTable(first.source).Q1.links.reduce((m, l) => ({ ...m, [l.kind + (l.lang || 'en')]: 1 }), {})).sort(), ['audioru', 'fullen']);
+  const again = importPending(first.source, first.data, [files[0], files[2]]);
+  assert.deepEqual(again.report, [], 'a second run reports nothing new');
+  const cov = [{ en: 'full', pl: 'none', ru: 'none', es: 'none', audio: '' }, { en: 'part', pl: 'none', ru: 'none', es: 'none', audio: '' },
+    { en: 'none', pl: 'none', ru: 'none', es: 'none', audio: '', audio_ru: 'yes' }, { en: 'none', pl: 'none', ru: 'none', es: 'none', audio: '' }];
+  assert.deepEqual(coverageTotals(cov), { works: 4, withLink: 3, withoutLink: 1, full: 1, audio: 1 });
 });

@@ -47,12 +47,24 @@ Approval requires explicit kind, tier and evidence, plus an estimated word count
 
 ## Import and publish
 
+**Merging a findings PR does not change the site.** It only adds `data/found/<stem>.csv` and a note. The page reads the catalog (`src/index.html`, `data/awards.json`), so the counters on the front page (works with a link, without, full text, audio) stay the same until a maintainer imports the file and merges the result. Do this after every merged findings PR:
+
 ```sh
-node scripts/merge-found.mjs data/found/2026-11-03.csv
-npm run coverage
+npm ci                                  # once per checkout
+npm run import:pending                  # lists the files in data/found/ that data/imported-found.json does not have yet
+npm run import:pending -- --write       # imports them, records them in data/imported-found.json, reruns coverage
 npm run check:secrets
 npm run build
 npm test
+```
+
+`--write` ends with `Before: …` and `After: …` lines (works, with a link, no link yet, full text, audio); the same figures as the front page. Copy them into the PR body. Commit `src/index.html`, `data/awards.json`, `data/coverage.csv` and `data/imported-found.json` on a branch `import/<date>-<stem>` and open a PR; Pages deploys when it is merged into `main`. A file that fails validation (for example a source excluded in `data/source-reviews.json`) is reported, stays out of `data/imported-found.json` and makes the command exit with 1; fix or drop its rows in a reviewed PR first. Files imported before the list existed are in it from the start.
+
+To import a single file by hand, or to re-run one that is already listed:
+
+```sh
+node scripts/merge-found.mjs data/found/2026-11-03.csv
+npm run coverage        # also prints the totals
 ```
 
 The importer validates the whole CSV before writing. It adds links to existing works, preserves their previous sources, handles each language/kind independently and requires consecutive multipart sets. Every distinct reviewed site is retained for each language/kind. Known-permission sources are ordered before unverified external sources within a new batch; publisher preference affects ordering, never eligibility. Alternative copies do not add together their word counts; only numbered parts of the chosen text source are summed. New links on existing works carry their own `added` timestamp; the work keeps its original date so News announces the new recording or text link. Duplicate links are ignored; a second identical import does not change timestamps. Wayback requires `--archive`. Submit the reviewed CSV and resulting catalog changes in a PR; Pages deploys when merged into `main`.
