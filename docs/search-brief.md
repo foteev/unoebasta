@@ -63,7 +63,7 @@ Notes: group by QID and language; record sourced aliases, translator/edition ref
 
 ## Submit
 
-The CSV-only restriction is the scope of this search task. Code and design contributions are welcome in separate PRs; see [CONTRIBUTING.md](../CONTRIBUTING.md).
+The CSV-only restriction is the scope of this search task. Merging your PR adds the findings to `data/found/`; the site counters change only after the maintainer runs the import (`npm run import:pending`) and merges the resulting PR. Code and design contributions are welcome in separate PRs; see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 Anyone with a normal GitHub account can propose a contribution to this public repository through their own **fork**. No invitation, write access to `foteev/unoebasta`, project API key or maintainer credentials are needed. Searching and reading the public catalog do not require GitHub sign-in.
 

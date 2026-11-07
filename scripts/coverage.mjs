@@ -1,10 +1,11 @@
 // What the catalog has for each winner and language: full text, excerpt/preview or nothing.
-// Writes data/coverage.csv and prints what to look for next.
+// Writes data/coverage.csv, prints what to look for next and the totals shown on the front page.
 // Usage: node scripts/coverage.mjs
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadResearch } from './lib/research.mjs';
+import { coverageTotals, totalsLine } from './lib/coverage-totals.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const d = JSON.parse(readFileSync(join(root, 'data', 'awards.json'), 'utf8'));
@@ -53,3 +54,4 @@ const csv = rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? '"' + String(v).
 writeFileSync(join(root, 'data', 'coverage.csv'), csv + '\n');
 console.log(`data/coverage.csv: ${rows.length - 1} works`);
 for (const f of RANK) console.log(f.padEnd(12), LANGS.map(l => `${l}: full ${tally[`${f}|${l}|full`] || 0}, part ${tally[`${f}|${l}|part`] || 0}, none ${tally[`${f}|${l}|none`] || 0}`).join('  |  '));
+console.log(totalsLine(coverageTotals(rows.slice(1).map(r => Object.fromEntries(rows[0].map((h, i) => [h, r[i]]))))));

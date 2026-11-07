@@ -41,7 +41,7 @@ The direct way, as a pull request:
    - `links`: `kind` is `full` or `audio`; `site` is the name readers see.
 4. `npm run build && npm test`.
 
-**Many links at once.** A search result in the CSV format of [the search brief](docs/search-brief.md) goes into `data/found/` and is merged with `node scripts/merge-found.mjs data/found/<file>.csv`: full texts and audio become `READ` entries, fragments go to `ex` in `data/awards.json`, rows already on the page are skipped. Wayback snapshots are skipped unless you add `--archive`. Then `node scripts/coverage.mjs` updates `data/coverage.csv`.
+**Many links at once.** A search result in the CSV format of [the search brief](docs/search-brief.md) goes into `data/found/` and is merged with `node scripts/merge-found.mjs data/found/<file>.csv`: full texts and audio become `READ` entries, fragments go to `ex` in `data/awards.json`, rows already on the page are skipped. Wayback snapshots are skipped unless you add `--archive`. Then `node scripts/coverage.mjs` updates `data/coverage.csv` and prints the front-page totals. To import everything that was merged since the last import in one go, run `npm run import:pending` (a list) and `npm run import:pending -- --write`; see [Import and publish](docs/search-pipeline.md#import-and-publish). Merging a findings PR alone does not change the site counters.
 
 **Automated discovery.** See [the search pipeline](docs/search-pipeline.md) for cached, resumable candidate searches and explicit review before CSV export. The importer also adds new links to existing works and handles each language separately.
 
