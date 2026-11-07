@@ -1,6 +1,6 @@
 {
   "name": "unoebasta",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "A single web page with text and audio links for Hugo, Nebula and Locus winners. No app, no server, no accounts.",
   "license": "MIT",
