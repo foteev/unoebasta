@@ -67,6 +67,15 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     assert.equal(await page.locator('#view-catalog [data-picks=reading] .pick').count(), 0, 'No English fallback when Spanish full texts are unavailable');
     assert.ok(await page.locator('#view-catalog .home-excerpts a').count(), 'Spanish excerpt is offered');
     await page.evaluate(() => { Object.assign(READ, window.__readBeforeFallback); delete window.__readBeforeFallback; renderHome(); });
+    // Keep the Polish duration and shuffle cases independent of catalog additions.
+    const usePolishFixture = () => page.evaluate(() => {
+      window.__polishRead = JSON.parse(JSON.stringify(READ));
+      for (const [qid, entry] of Object.entries(READ)) {
+        if (!['Q6271990', 'Q2634534', 'Q467388'].includes(qid)) entry.links = entry.links.filter(link => link.lang !== 'pl');
+      }
+      renderHome();
+    });
+    await usePolishFixture();
     // Reported phone case: Polish alone, then a Spanish interface, with the long-duration bucket selected.
     await readLang(page, 'pl');
     await readLang(page, 'es');
@@ -119,11 +128,12 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
       await page.screenshot({path:join(out,`reading-pl-${lang}-${width}-${theme}.png`),fullPage:true,animations:'disabled'});
     }
     await page.reload({waitUntil:'domcontentloaded'});
+    await page.waitForFunction(() => document.querySelector('#view-catalog .picks'));
+    await usePolishFixture();
     await page.waitForSelector('#view-catalog [data-picks=reading] .pick a[data-via="listen"]');
     assert.deepEqual(await page.evaluate(() => prefs.langs),['pl']);
     assert.deepEqual(await page.evaluate(() => prefs.pickLengths),['eve']);
     await page.evaluate(() => {
-      window.__polishRead = JSON.parse(JSON.stringify(READ));
       READ.Q6271990.links = READ.Q6271990.links.filter(l => l.lang !== 'pl');
       renderHome();
     });
