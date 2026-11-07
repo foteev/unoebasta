@@ -299,7 +299,7 @@ The reader reports that Macmillan book pages provide both a readable excerpt and
 
 ## Maintainer review before merge — 2026-11-05 UTC
 
-Accepted 14 source rows for 6 works. The [source audit](../../docs/archive/link-audit-2026-11-04.md) records earlier observations. At 2026-11-05T08:57:44.509Z a direct guest request to each Macmillan URL below returned HTTP 403. Indexed copies contain matching text, but live guest access is still unconfirmed. These leads were moved out of the findings CSV. To submit one again, open the exact page as a guest, confirm that the work’s narrative is readable, and record the working sample control and check date. Verify audio previews separately.
+Accepted 14 source rows for 6 works. The [source audit](../../docs/link-audit-2026-11-04.md) records earlier observations. At 2026-11-05T08:57:44.509Z a direct guest request to each Macmillan URL below returned HTTP 403. Indexed copies contain matching text, but live guest access is still unconfirmed. These leads were moved out of the findings CSV. To submit one again, open the exact page as a guest, confirm that the work’s narrative is readable, and record the working sample control and check date. Verify audio previews separately.
 
 - Q133843128, The Tusks of Extinction, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250855527/thetusksofextinction/)
 - Q125718857, What Feasts at Night, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250830852/whatfeastsatnight/)

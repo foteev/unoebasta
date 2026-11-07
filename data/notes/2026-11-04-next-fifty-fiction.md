@@ -493,6 +493,6 @@ Author(s): Caitlín R. Kiernan. Form: short story.
 
 ## Maintainer review before merge — 2026-11-05 UTC
 
-Accepted 19 source rows for 15 works. The [source audit](../../docs/archive/link-audit-2026-11-04.md) records earlier observations. At 2026-11-05T08:57:44.509Z a direct guest request to each Macmillan URL below returned HTTP 403. Indexed copies contain matching text, but live guest access is still unconfirmed. These leads were moved out of the findings CSV. To submit one again, open the exact page as a guest, confirm that the work’s narrative is readable, and record the working sample control and check date. Verify audio previews separately.
+Accepted 19 source rows for 15 works. The [source audit](../../docs/link-audit-2026-11-04.md) records earlier observations. At 2026-11-05T08:57:44.509Z a direct guest request to each Macmillan URL below returned HTTP 403. Indexed copies contain matching text, but live guest access is still unconfirmed. These leads were moved out of the findings CSV. To submit one again, open the exact page as a guest, confirm that the work’s narrative is readable, and record the working sample control and check date. Verify audio previews separately.
 
 - Q30005036, Seasons of Glass and Iron, EN text fragment. [Publisher page](https://us.macmillan.com/books/9781250341013/seasonsofglassandiron/)
