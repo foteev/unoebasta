@@ -2,7 +2,7 @@
 
 Checked 2026-11-08 against main at `e4dc1cd85752ea889162d3ccd2c7feb64d4f2387`. The 30 works had no English full text or audio in the coverage snapshot and do not overlap the preceding batch. Title-and-author web queries covered each work. Selected promising collection, magazine and reprint results were opened and checked for story identity and extent.
 
-Four works have guest-readable full texts proposed in the CSV. The Lincoln Train collection PDF includes a CC BY-NC-SA 3.0 license. Permission for the other rehosts is unverified. Word counts are approximations. No audio playback was verified in this pass.
+Five works have guest-readable full texts proposed in the CSV. The Lincoln Train collection PDF includes a CC BY-NC-SA 3.0 license. Permission for the other rehosts is unverified. Word counts are approximations. No audio playback was verified in this pass.
 
 ## Works checked
 
@@ -14,7 +14,7 @@ Four works have guest-readable full texts proposed in the CSV. The Lincoln Train
 - **Q27976025 — The Soul Selects Her Own Society**, Connie Willis. Exact English title and author searches produced bibliographic or collection leads, but no guest text or audio was established in this pass.
 - **Q4903762 — Bicycle Repairman**, Bruce Sterling. The Readli transcription truncates some lines, including a sentence near the ending. The Asimov's issue scan preserves the relevant passage and story boundaries.
 - **Q131308059 — Gone**, John Crowley. Exact English title and author searches produced bibliographic or collection leads, but no guest text or audio was established in this pass.
-- **Q56685889 — A Birthday**, Esther Friesner. Exact English title and author searches produced bibliographic or collection leads, but no guest text or audio was established in this pass.
+- **Q56685889 — A Birthday**, Esther Friesner. The guest transcription starts with Tessa's birthday and ends after Linda's river scene. Permission for this rehost is unverified.
 - **Q28015756 — Lifeboat on a Burning Sea**, Bruce Holland Rogers. Exact English title and author searches produced bibliographic or collection leads, but no guest text or audio was established in this pass.
 - **Q7747390 — The Lincoln Train**, Maureen F. McHugh. An earlier batch recorded a maintainer-observed registration wall on the Short Story Project page. The submitted source is a separate guest-accessible CC-licensed book PDF from Metabiblioteca. It contains the story ending and next heading.
 - **Q29917997 — When the Old Gods Die**, Mike Resnick. The Blue Gecko page identifies the title and contains the final departure. A separate 38-page Zanotowane transcription ends at the same scene. The page calls it an extract from Kirinyaga, the story collection.
@@ -42,3 +42,5 @@ Four works have guest-readable full texts proposed in the CSV. The Lincoln Train
 - **Q7747390 The Lincoln Train**. The earlier finding recorded a registration wall at [The Short Story Project](https://shortstoryproject.com/stories/the-lincoln-train/). Search extraction displayed the complete story on this pass, but does not establish browser guest access. The separate licensed PDF in the CSV was checked.
 - **Q5547948 Georgia on My Mind**. [Baen's collection sample](https://www.baen.com/Chapters/9781618240637/9781618240637.htm) links to a frameless reader. Check whether it opens and includes the title story from beginning to end.
 - **Q27976010 Boobs**. [Yumpu](https://www.yumpu.com/en/document/view/41879901/suzy-mckee-charnas-boobs) lists a document. Check guest access to the actual pages and the story ending.
+
+- **Q4102150 Tower of Babylon**. [The Great Stories on Apple Podcasts](https://podcasts.apple.com/au/podcast/tower-of-babylon-by-ted-chiang/id1483509065?i=1000593828944) describes a 1h 16m episode where Trev Downey reads and discusses the story. Check guest playback and confirm the reading covers the complete story.
