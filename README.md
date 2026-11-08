@@ -26,24 +26,7 @@ The public GitHub Pages site uses Umami Cloud. We look at aggregate visits by co
 
 ## Catalog pages and awards
 
-The reading app and generated pages share one catalog. Work pages use `work/<title>-Q…/`, author pages use `author/<name>-Q…/`, and award pages use `award/<slug>-<code>/`. The public URL is independent of the title displayed in the chosen language. Work pages use the same QID and browser shelf as the app. Published work and author slugs live in `data/catalog-slugs.json`. Add entries for new QIDs and keep published slugs stable when correcting titles.
-
-`data/award-registry.json` defines the stable internal award IDs, public search codes, slugs, translated names and categories. Add award results in `data/awards.json` as `[awardId, categoryId, year, workQid]`. More than one work may win the same category and year.
-
-| Award | Search code | Page |
-|---|---|---|
-| Hugo | `HUG` | [Hugo](https://foteev.github.io/unoebasta/award/hugo-HUG/) |
-| Nebula | `NEB` | [Nebula](https://foteev.github.io/unoebasta/award/nebula-NEB/) |
-| Locus | `LOC` | [Locus](https://foteev.github.io/unoebasta/award/locus-LOC/) |
-
-Use a code to scope discovery or planning:
-
-```sh
-npm run search:continue -- --award HUG --limit 30
-npm run research -- plan --award NEB --lang pl --limit 20
-```
-
-The same code selects an Awards filter in a public link such as `?view=awards&award=LOC`.
+See [catalog pages and awards](docs/catalog-pages.md) for public URLs, award codes and filters.
 
 ## Help
 
@@ -56,35 +39,8 @@ Everyone is welcome, no programming needed for most of it:
 
 ## Develop
 
-Use Node.js 22.22.2 or later in the 22.x line, 24.15.0 or later in the 24.x line, or Node.js 26 or newer. CI uses Node.js 22.
-
-```sh
-npm ci              # tools for tests and candidate discovery: the page itself has no build dependencies
-npm run build       # build the portable app, public catalog pages and sitemap
-npm test            # pipeline tests and the page in jsdom
-npm run check:secrets
-```
-
-Open `dist/web/index.html` in a browser for the portable app. The Pages deployment publishes `dist/web` with its public catalog pages and sitemap.
-
-| Path | What it is |
-|---|---|
-| `src/index.html` | App shell, runtime and strings in EN/ES/PL/RU. Free texts are the `READ` table, keyed by Wikidata ID |
-| `src/styles/` | Stylesheets assembled in cascade order for the app and public pages |
-| `src/components/` | HTML templates shared by the app and public pages |
-| `data/award-registry.json` | Award codes, categories and labels |
-| `data/awards.json` | Prose winners since 1953: awards, works, authors, descriptions |
-| `scripts/build-web.mjs` | Puts the data into the page |
-| `scripts/coverage.mjs` | What exists in each language → `data/coverage.csv` |
-| `scripts/fetch-covers.mjs` | Downloads covers by Open Library cover ID → `covers/s` (80×120) and `covers/m` (160×240), WebP |
-| `scripts/merge-found.mjs` | Merges a search result (`data/found/*.csv`) into the page and the data |
-| `scripts/search.mjs` | Cached discovery, review queue and approved CSV export; see [the pipeline](docs/search-pipeline.md) |
-| `npm run search:continue` | Resume a batch across four languages; see [continue search](docs/continue-search.md) |
-| `scripts/research.mjs` | Language aliases, source plans, publication leads and durable notes; see [research](docs/research.md) |
-| `scripts/check-links.mjs` | Checks the reachability of text, audio, excerpt and conditional preview links (the weekly “Links” workflow) |
-| `scripts/check-secrets.mjs` | Fails on keys, tokens or personal e-mail addresses |
-| `test/ui.test.js` | jsdom tests |
-| `docs/` | Contributor search contract, maintainer workflows, shelf storage and mobile UI guidelines |
+- [Development guide](docs/development.md) for local setup, builds, tests and project structure.
+- [Audio research](docs/audio-search.md) for the supervised search workflow.
 
 ## Licenses
 
@@ -98,7 +54,5 @@ Open `dist/web/index.html` in a browser for the portable app. The Pages deployme
 - **Fonts:** [Jost](https://fonts.google.com/specimen/Jost) and [Literata](https://fonts.google.com/specimen/Literata), SIL Open Font License. **Icons:** [Lucide](https://lucide.dev/), ISC License.
 
 unoebasta is a non-commercial project and is not affiliated with the Hugo, Nebula or Locus awards.
-
-**Multilingual audio research.** `search audio` requests a supervised GPT Luna discovery batch; `npm run audio:plan` prepares a four-language queue. See [the audio workflow](docs/audio-search.md). The CLI prepares tasks; it does not launch or bill an AI agent.
 
 **Bring your own agent.** Copy a search task from About or a work card, then give it to any capable agent. The [task contract](docs/search-brief.md) assigns 30 works by default and keeps the PR limited to findings files. Readers can also send a link and description through the existing Nostr form.
