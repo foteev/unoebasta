@@ -4,8 +4,8 @@ _20 minute adventure_
 
 **unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a static catalog for reading the winners of the Hugo, Nebula and Locus awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
 
-<p style="text-align: center">
-<img src="https://github.com/user-attachments/assets/77cec8ce-56a0-4977-a6b7-7db688defb61">
+<p align="center">
+  <img width="441" height="792" alt="unoebasta mobile catalog view" src="https://github.com/user-attachments/assets/77cec8ce-56a0-4977-a6b7-7db688defb61" />
 </p>
 
 
