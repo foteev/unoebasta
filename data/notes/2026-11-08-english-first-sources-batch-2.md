@@ -2,7 +2,7 @@
 
 Checked 2026-11-08 against main at `e4dc1cd85752ea889162d3ccd2c7feb64d4f2387`. The 30 works had no English full text or audio in the coverage snapshot and do not overlap the preceding batch. Title-and-author web queries covered each work. Selected promising collection, magazine and reprint results were opened and checked for story identity and extent.
 
-Five works have guest-readable full texts proposed in the CSV. The Lincoln Train collection PDF includes a CC BY-NC-SA 3.0 license. Permission for the other rehosts is unverified. Word counts are approximations. No audio playback was verified in this pass.
+Five works have guest-readable full texts proposed in the CSV. The Lincoln Train collection PDF includes a CC BY-NC-SA 3.0 license. Permission for the other rehosts is unverified. Word counts are approximations. The reader confirmed the full Tower of Babylon audio plays without logging in on 2026-11-08.
 
 ## Works checked
 
@@ -43,4 +43,4 @@ Five works have guest-readable full texts proposed in the CSV. The Lincoln Train
 - **Q5547948 Georgia on My Mind**. [Baen's collection sample](https://www.baen.com/Chapters/9781618240637/9781618240637.htm) links to a frameless reader. Check whether it opens and includes the title story from beginning to end.
 - **Q27976010 Boobs**. [Yumpu](https://www.yumpu.com/en/document/view/41879901/suzy-mckee-charnas-boobs) lists a document. Check guest access to the actual pages and the story ending.
 
-- **Q4102150 Tower of Babylon**. [The Great Stories on Apple Podcasts](https://podcasts.apple.com/au/podcast/tower-of-babylon-by-ted-chiang/id1483509065?i=1000593828944) describes a 1h 16m episode where Trev Downey reads and discusses the story. Check guest playback and confirm the reading covers the complete story.
+- **Q4102150 Tower of Babylon**. The reader confirmed on 2026-11-08 that [The Great Stories on Apple Podcasts](https://podcasts.apple.com/au/podcast/tower-of-babylon-by-ted-chiang/id1483509065?i=1000593828944) plays without a login and contains the complete story. Trev Downey reads and discusses the story, and the full episode lasts approximately 1 hour 16 minutes. Permission for the recording remains unverified.
