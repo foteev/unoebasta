@@ -7,7 +7,7 @@ Checked 2026-11-09 against main at `e4dc1cd85752ea889162d3ccd2c7feb64d4f2387`. T
 ## Follow-up leads, not proposed as verified sources
 
 - **Goat Song (Q16385825).** An English LibCat reader contains the opening and final page; recheck intermediate pages and rate limiting before proposing it. Permission is unverified.
-- **Inconstant Moon (Q16386319).** The LibCat reader's opening and final page were previously observed but the reader returned HTTP 429 during a fresh check. Recheck availability; permission is unverified.
+- **Inconstant Moon (Q16386319).** The reader confirmed on 2026-11-09 that page 7 opens and navigation between pages works. The previously inspected final page matches the story's ending. The site returned HTTP 429 in an earlier check; availability can be intermittent. Rehost permission is unverified.
 - **Cassandra (Q5049223).** A LibCat result with an English title is actually in Italian, so it is not an English source.
 
 No audio playback was verified.
