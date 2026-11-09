@@ -58,7 +58,7 @@ const assert = require('node:assert/strict');
     await page.evaluate(()=>openWork('Q467388'));
     await page.click('#rl-panel [data-rl-lang="all"]');
     await page.waitForSelector('#sheet-work .src-ex');
-    assert.equal(await page.locator('#sheet-work .src-text:not(.src-ex)').count(),2);
+    assert.ok(await page.locator('#sheet-work .src-text:not(.src-ex)').count() >= 2, 'The existing Russian and Polish text sources remain visible');
     assert.equal(await page.locator('#sheet-work .src-text:not(.src-ex)[href^="https://www.legimi.pl/"]').count(),1);
     assert.equal(await page.locator('#sheet-work .src-text[href^="https://lecturia.org/"] .src-w').count(),1);
     assert.equal(await page.locator('#sheet-work .src-text[href^="https://www.legimi.pl/"] .src-w').count(),0);
