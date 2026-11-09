@@ -11,7 +11,7 @@ Three complete English sources are proposed. Permission for these copies is unve
 - **Q16386364 — Inside Job**, Connie Willis. Exact title and author searches yielded bibliographic, collection or commercial-edition leads. No guest-accessible full text or verified recording was established in this pass.
 - **Q17182684 — Magic for Beginners**, Kelly Link. The free Creative Commons collection editions found on Unglue.it and Nebraska's government library explicitly exclude the title story. Their table of contents alone is not evidence of its presence.
 - **Q3769828 — The Concrete Jungle**, Charles Stross. A Golden Gryphon publisher link is cited by a bibliography, but the story page needs a direct access and scope check.
-- **Q29994382 — Golden City Far**, Gene Wolfe. PodCastle lists a Kane Lynch narration, 1:35:51. Guest playback and whether the complete story is included remain to be checked.
+- **Q29994382 — Golden City Far**, Gene Wolfe. The reader reported the PodCastle episode unavailable on 2026-11-09; do not propose it as available audio.
 - **Q3818994 — The Green Leopard Plague**, Walter Jon Williams. Exact title and author searches yielded bibliographic, collection or commercial-edition leads. No guest-accessible full text or verified recording was established in this pass.
 - **Q475125 — Coraline**, Neil Gaiman. The school PDF contains the beginning and ending of the novel-length edition; it matches the catalog's Coraline work.
 - **Q7767912 — The Tain**, China Miéville. An indexed two-page PDF contains only the opening; RoyalLib's text was not visible to the research tool. Both require further checking.
@@ -39,5 +39,8 @@ Three complete English sources are proposed. Permission for these copies is unve
 
 ## Playback follow-up
 
-- **Q29994382 Golden City Far**. [PodCastle 201](https://podcastle.org/2012/03/20/podcastle-201-giant-episode-golden-city-far/) credits narrator Kane Lynch and lists a 1:35:51 episode. Check guest playback, advancing timer and full narrative scope.
-- **Q7620415 Story of Your Life**. [SFFaudio's readalong](https://www.sffaudio.com/the-sffaudio-podcast-425-readalong-story-of-your-life-by-ted-chiang/) is a lead. Check whether it contains a complete human reading or only discussion.
+- **Q29994382 Golden City Far**. [PodCastle 201](https://podcastle.org/2012/03/20/podcastle-201-giant-episode-golden-city-far/) was reported unavailable by the reader on 2026-11-09. Do not offer it as available audio.
+- **Q7620415 Story of Your Life** SFFaudio is excluded from consideration at the reader's direction; look for an alternative source.
+
+
+Reader decision (2026-11-09): exclude SFFaudio podcasts from this project; the reader checked Houston, Houston, Do You Read? and found no complete reading. Other episodes in this note are excluded by the reader's decision, not individually verified.
