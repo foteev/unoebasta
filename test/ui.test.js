@@ -347,9 +347,10 @@ function selectFilter(group, values = []) {
   w.eval("prefs.langs = ['ru']; prefs.langsAsked = false; RL.q = null; openWork('Q2634534')"); await sleep(60);
   checks['card: a reader who already chose languages is not asked'] = !$('#rl-panel .rl-ask');
   w.__starLangs = starLangs; w.eval('prefs.langs = window.__starLangs; delete prefs.langsAsked; RL.q = null');
-  w.eval("openWork('Q4102150')"); await sleep(60); await allSources();
+  // Test audio-only behavior independently of future additions to this work's sources.
+  w.eval("window.__audioOnlyLinks = READ.Q4102150.links; READ.Q4102150.links = READ.Q4102150.links.filter(link => link.kind !== 'full'); openWork('Q4102150')"); await sleep(60); await allSources();
   checks['reviewed findings: an audio-only work still shows its text fragment'] = !!$('#sheet-work .src-audio') && !!$('#sheet-work .src-ex[href^="https://www.legimi.pl/"]') && !$('#sheet-work .src-text:not(.src-ex)');
-  w.eval('closeSheets()');
+  w.eval('READ.Q4102150.links = window.__audioOnlyLinks; delete window.__audioOnlyLinks; closeSheets()');
   // Google Books: preview opens inside the app (embedded viewer), pages in the card
   const gq = w.eval("Object.keys(WORKS).find(q => WORKS[q].gb && WORKS[q].gb.en && WORKS[q].gb.n && !READ[q] && !(WORKS[q].ex && WORKS[q].ex.r))");
   if (gq) {
