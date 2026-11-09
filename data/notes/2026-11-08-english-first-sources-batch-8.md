@@ -14,7 +14,7 @@ Four complete English texts are proposed. The Penguin anthology sample includes 
 - **Q24963670 — The Gold at the Starbow's End**, Frederik Pohl. The accessible HTML text runs through Knefhausen's final scene. Permission is unverified.
 - **Q3371119 — A Meeting with Medusa**, Arthur C. Clarke. Title and author searches yielded bibliographic, collection, adaptation or commercial-edition leads. No guest-accessible full text or independently verified recording was established in this pass.
 - **Q27956407 — The Missing Man**, Katherine MacLean. Title and author searches yielded bibliographic, collection, adaptation or commercial-edition leads. No guest-accessible full text or independently verified recording was established in this pass.
-- **Q5998666 — Ill Met in Lankhmar**, Fritz Leiber. SFFaudio's readalong is an audio lead. A complete guest recording and its scope need verification.
+- **Q5998666 — Ill Met in Lankhmar**, Fritz Leiber. SFFaudio is excluded at the reader's direction; search another source.
 - **Q27945493 — Ship of Shadows**, Fritz Leiber. Title and author searches yielded bibliographic, collection, adaptation or commercial-edition leads. No guest-accessible full text or independently verified recording was established in this pass.
 - **Q2901129 — Nightwings**, Robert Silverberg. Searches mainly located expanded novel editions; check the original 1968 novella independently.
 - **Q21501950 — Dragonrider**, Anne McCaffrey. Title and author searches yielded bibliographic, collection, adaptation or commercial-edition leads. No guest-accessible full text or independently verified recording was established in this pass.
@@ -27,5 +27,8 @@ Four complete English texts are proposed. The Penguin anthology sample includes 
 
 ## Playback follow-up
 
-- **Q7736542 The Girl Who Was Plugged In**. [SFFaudio's readalong](https://www.sffaudio.com/the-sffaudio-podcast-285-readalong-the-girl-who-was-plugged-in-by-james-tiptree-jr/) requires guest playback and narrative-scope checks.
-- **Q5998666 Ill Met in Lankhmar**. [SFFaudio's readalong](https://www.sffaudio.com/the-sffaudio-podcast-783-readalong-ill-met-in-lankhmar-by-fritz-leiber/) requires guest playback and narrative-scope checks.
+- **Q7736542 The Girl Who Was Plugged In** SFFaudio is excluded from consideration at the reader's direction; look for an alternative source.
+- **Q5998666 Ill Met in Lankhmar** SFFaudio is excluded from consideration at the reader's direction; look for an alternative source.
+
+
+Reader decision (2026-11-09): exclude SFFaudio podcasts from this project; the reader checked Houston, Houston, Do You Read? and found no complete reading. Other episodes in this note are excluded by the reader's decision, not individually verified.
