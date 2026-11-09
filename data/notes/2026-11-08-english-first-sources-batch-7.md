@@ -39,5 +39,8 @@ Three complete English texts are proposed. Permission for the copies is unverifi
 
 ## Playback follow-up
 
-- **Q5916312 Houston, Houston, Do You Read?** [SFFaudio's readalong](https://www.sffaudio.com/the-sffaudio-podcast-778-readalong-houston-houston-do-you-read-by-james-tiptree-jr/) needs a guest playback check and confirmation of full narrative scope.
-- **Q61685459 Sailing to Byzantium**. [SFFaudio's readalong](https://www.sffaudio.com/the-sffaudio-podcast-773-readalong-sailing-to-byzantium-by-robert-silverberg/) needs a guest playback check and confirmation of full narrative scope.
+- **Q5916312 Houston, Houston, Do You Read?** The reader checked the SFFaudio podcast on 2026-11-09 and reported it does not contain a complete reading; excluded from audio findings.
+- **Q61685459 Sailing to Byzantium** SFFaudio is excluded from consideration at the reader's direction; look for an alternative source.
+
+
+Reader decision (2026-11-09): exclude SFFaudio podcasts from this project; the reader checked Houston, Houston, Do You Read? and found no complete reading. Other episodes in this note are excluded by the reader's decision, not individually verified.
