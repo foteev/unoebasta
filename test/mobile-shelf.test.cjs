@@ -73,6 +73,8 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
       for (const [qid, entry] of Object.entries(READ)) {
         if (!['Q6271990', 'Q2634534', 'Q467388'].includes(qid)) entry.links = entry.links.filter(link => link.lang !== 'pl');
       }
+      READ.Q6271990.links = READ.Q6271990.links.filter(link =>
+        link.kind === 'audio' && link.lang === 'pl' && new URL(link.url).hostname === 'podcasts.apple.com');
       renderHome();
     });
     await usePolishFixture();
