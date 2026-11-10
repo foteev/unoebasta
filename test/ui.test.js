@@ -801,7 +801,9 @@ function selectFilter(group, values = []) {
   // Fixed Polish sources for scenarios that assert exact counts or an empty duration bucket.
   const keepPolishFixture = `for (const [q, r] of Object.entries(READ)) {
       if (!['Q6271990', 'Q2634534', 'Q467388'].includes(q)) r.links = r.links.filter(l => l.lang !== 'pl');
-    }`;
+    }
+    READ.Q6271990.links = READ.Q6271990.links.filter(l =>
+      l.kind === 'audio' && l.lang === 'pl' && new URL(l.url).hostname === 'podcasts.apple.com');`;
   // Regression: one Polish reading language, including an audio-only work and empty duration buckets.
   w.eval(`window.__readingRegression = { prefs: {...prefs}, read: JSON.parse(JSON.stringify(READ)), bookmarks: local.bookmarks };
     ${keepPolishFixture}
