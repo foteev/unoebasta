@@ -1,0 +1,12 @@
+# Two sources per work, batch 1
+
+Checked eight works against main at `659edb33eab92841585c0a270d42460f08763011`. A navigable multi-page edition counts as one source. The target includes guest-readable text and excerpts and verified human narration. Distinct scenes in publisher excerpts can supply independent reading links. No audio player was verified in this batch.
+
+- **Q5444396 — Fermi and Frost.** The already imported Baen edition and the Russian guest text both contain the opening and both endings. FantLab documents the Korzhenevsky translation and its alias «Девятый день рождения». Akniga lists Kirill Golovin and other narrators, with playback still to check.
+- **Q7406369 — Salvador.** The already imported Baen edition and the five-page Russian edition contain the opening and final club scene. FantLab records the Polish title *Salwador* and a print lead in *Don Wollheim proponuje 1985*. The Readle endpoint returned 403.
+- **Q7719408 — The Borderland of Sol.** The Russian Flibusta guest reader runs from Jinx to the same final scene as the English collection. FantLab identifies E. Monakhova's published Russian translation.
+- **Q27975991 — Tricentennial.** RoyalLib has the Russian narrative with the final NASA report. The original issue is [Analog, July 1976](https://www.luminist.org/archives/SF/AN.htm). The [linked scan](https://s3.us-west-1.wasabisys.com/luminist/SF/AN/AN_1976_07.pdf) exceeded this reader's size limit. Verify the story's pages in that scan before adding it.
+- **Q138775929 — The Everlasting.** Macmillan displays the prologue. The catalog already has Reactor's chapters 6 and 7. The separate Reactor prologue and chapter 1 URL returned 403 when opened, and the audio excerpt remains unchecked.
+- **Q133500649 — The Buffalo Hunter Hunter.** The publisher opening and the People scene are readable. Dread Central also has a publisher-permitted excerpt and remains a follow-up for overlap review.
+- **Q133843405 — Stitched to Skin Like Family Is.** Uncanny's existing text and Issue 57 contents were located. Issue listings and reviews surfaced in the targeted EN narration and translation queries. No distinct narration or translation was verified.
+- **Q133843377 — The Four Sisters Overlooking the Sea.** Asimov's PDF and its host alias lead to the same edition. Naomi Kritzer's short-fiction bibliography and exact-title EN/ES/RU queries supplied no distinct verified source.
