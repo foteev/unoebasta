@@ -29,7 +29,10 @@ const dataText = safeJson(data);
 const template = replaceOnce(src, '__CATALOG_COMPONENTS__', components);
 const app = replaceOnce(replaceOnce(replaceOnce(template, '__SITE_CSS__', css), '__AWARDS_JSON__', dataText), '__SEARCH_BRIEF_JSON__', brief);
 mkdirSync(dist, { recursive: true });
-writeFileSync(join(dist, 'index.html'), replaceOnce(app, '<title>unoebasta</title>', '<title>unoebasta</title>\n<link rel="canonical" href="' + SITE + '">'));
+const homeMetadata = `<title>unoebasta</title>
+<link rel="canonical" href="${SITE}">
+<meta name="google-site-verification" content="K4v2MmrqwzwD1Ve3ygC7yQR0_EYqP9vDwTrx-ODoYzU">`;
+writeFileSync(join(dist, 'index.html'), replaceOnce(app, '<title>unoebasta</title>', homeMetadata));
 const runtime = template.match(/<script>\n('use strict';[\s\S]*?)<\/script>/)?.[1];
 if (!runtime) throw new Error('App script is missing');
 const publicRuntime = replaceOnce(replaceOnce(runtime,
