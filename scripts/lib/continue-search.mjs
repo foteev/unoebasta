@@ -9,7 +9,8 @@ export const CONTINUE_PROVIDERS = ['clarkesworld', 'escapepod', 'podcastle', 'ps
 
 export async function continueSearch({ catalog, state, statePath, research = catalog.research, researchDir, http,
   langs = LANGS, kind = 'all', limit = 50, providers = CONTINUE_PROVIDERS, qids = [], forms = [], refresh = false,
-  registry = PROVIDERS, now = () => new Date().toISOString(), onCheck = () => {}, reportPath = join(dirname(statePath), 'report.json') }) {
+  registry = PROVIDERS, now = () => new Date().toISOString(), onCheck = () => {}, onProgress = () => {},
+  concurrency = 3, shouldStop = () => false, reportPath = join(dirname(statePath), 'report.json') }) {
   if (!langs.length || new Set(langs).size !== langs.length || langs.some(l => !LANGS.includes(l))) throw new Error('Choose distinct supported languages');
   if (!Number.isInteger(limit) || limit < 1 || limit > 500) throw new Error('Limit must be 1..500 work/language targets in total');
   if (!['all', 'full', 'audio', 'fragment'].includes(kind) || !providers.length || providers.some(p => !registry[p])) throw new Error('Invalid kind or providers');
@@ -39,15 +40,16 @@ export async function continueSearch({ catalog, state, statePath, research = cat
   save();
   try {
     let remaining = limit;
-    for (let i = 0; i < order.length && remaining; i++) {
+    for (let i = 0; i < order.length && remaining && !shouldStop(); i++) {
       const lang = order[i], quota = Math.ceil(remaining / (order.length - i));
       const summary = await runSearch({ catalog, state, statePath, research, researchDir, http, lang, kind, providers, qids, forms,
-        limit: quota, refresh, registry, now, pausedProviders: paused,
+        limit: quota, refresh, registry, now, pausedProviders: paused, concurrency, shouldStop,
         onProviderError: (provider, error) => {
           paused.add(provider);
           report.paused_sources.push({ provider, status: error.code === 'CONFIGURATION_REQUIRED' ? 'configuration_required' : 'unavailable',
             reason: error.message, at: now(), next_action: 'Retry this source on the next invocation; other sources continue.' });
-        }, onCheck: c => { checks.push(c); onCheck(c); } });
+        }, onCheck: c => { checks.push(c); onCheck(c); },
+        onProgress: p => { report.by_language[lang] = p.summary; report.progress = { ...p, at: now() }; save(); onProgress(p); } });
       report.by_language[lang] = summary; remaining -= summary.works;
       // Candidate URLs/publications belong in the versioned registry, even before approval.
       importState(research, state, catalog, 'continuation checkpoint');
@@ -59,9 +61,9 @@ export async function continueSearch({ catalog, state, statePath, research = cat
     const plan = buildPlan(selected, research, { langs, kind, limit, now: now() });
     writeJson(join(dirname(statePath), 'plan.json'), plan);
     report.follow_up_tasks = plan.tasks.length;
-    report.status = report.paused_sources.length ? 'completed_with_issues' : 'completed';
+    report.status = shouldStop() ? 'interrupted' : report.paused_sources.length ? 'completed_with_issues' : 'completed';
     report.finished_at = now(); save();
-    state.continuation.next_language = (start + 1) % langs.length;
+    state.continuation.next_language = shouldStop() ? start : (start + 1) % langs.length;
     writeJson(statePath, state);
     return report;
   } catch (error) {

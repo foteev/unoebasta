@@ -15,6 +15,7 @@ import { readAwardRegistry, scopeByAward } from './lib/awards.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const HELP = `Usage: npm run search -- <continue|run|list|approve|reject|export> [options]
   continue: --lang all|en|pl|ru|es --limit 50 (total across languages; default all)
+       --concurrency 1..4 (default 3 concurrent providers; per-host limits still apply)
        Plan follow-ups, discover, preserve candidates/notes and write report.json. Repeat to advance.
        npm run search:continue -- --limit 50
   run: --lang en|pl|ru|es --kind all|full|audio|fragment --limit 50
@@ -35,7 +36,7 @@ const HELP = `Usage: npm run search -- <continue|run|list|approve|reject|export>
 try {
   const [command = 'help', ...args] = process.argv.slice(2), opts = {};
   const booleans = ['retry-searched', 'refresh'];
-  const allowed = new Set(['award', 'lang', 'kind', 'limit', 'providers', 'qid', 'forms', 'lead', 'research-dir', 'id', 'evidence', 'tier', 'words', 'license', 'pub', 'title', 'part', 'archive', 'out', 'state', 'cache', ...booleans]);
+  const allowed = new Set(['award', 'lang', 'kind', 'limit', 'concurrency', 'providers', 'qid', 'forms', 'lead', 'research-dir', 'id', 'evidence', 'tier', 'words', 'license', 'pub', 'title', 'part', 'archive', 'out', 'state', 'cache', ...booleans]);
   for (let i = 0; i < args.length; i++) {
     const name = args[i].replace(/^--/, '');
     if (!args[i].startsWith('--') || !allowed.has(name)) throw new Error(`Unknown option: ${args[i]}`);
@@ -56,12 +57,20 @@ try {
       if (opts.lead) throw new Error('Use run --lead for a single source task');
       const lang = opts.lang || 'all', providers = opts.providers?.split(',') || CONTINUE_PROVIDERS, forms = opts.forms?.split(',') || [];
       if (!['all', ...LANGS].includes(lang) || forms.some(f => !FORMS.includes(f))) throw new Error('Invalid language or forms');
-      const report = await continueSearch({ catalog: scopedCatalog(researchDir), state, statePath, research, researchDir,
+      let stopping = false;
+      const stop = () => { if (!stopping) { stopping = true; console.error('Stopping: waiting for active provider requests, then saving the interrupted report.'); } };
+      process.on('SIGINT', stop); process.on('SIGTERM', stop);
+      let report;
+      try { report = await continueSearch({ catalog: scopedCatalog(researchDir), state, statePath, research, researchDir,
         langs: lang === 'all' ? LANGS : [lang], kind: opts.kind || 'all', limit: Number(opts.limit || 50), providers, forms,
         qids: opts.qid?.split(',') || [], refresh: !!opts.refresh || !!opts['retry-searched'],
+        concurrency: Number(opts.concurrency || 3), shouldStop: () => stopping,
         http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http'), googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '' }),
-        onCheck: c => console.log(`${c.qid} ${c.lang} ${c.kind} ${c.provider}: ${c.status}${c.error ? ' — ' + c.error : ''}`) });
+        onProgress: p => console.log(p.event === 'start' ? `${p.qid} ${p.lang} ${p.provider}: started` : `${p.qid} ${p.lang} ${p.provider}: ${p.status} (${(p.elapsed_ms / 1000).toFixed(1)}s)`),
+        onCheck: c => { if (c.error) console.error(`${c.qid} ${c.lang} ${c.provider}: ${c.error}`); } });
+      } finally { process.off('SIGINT', stop); process.off('SIGTERM', stop); }
       console.log(JSON.stringify(report));
+      if (report.status === 'interrupted') process.exitCode = 130;
     } else if (command === 'run') {
       const lead = opts.lead ? research.leads.find(l => l.id === opts.lead) : undefined;
       if (opts.lead && !lead) throw new Error('Unknown lead');
@@ -76,7 +85,7 @@ try {
       const forms = opts.forms ? opts.forms.split(',') : [];
       if (forms.some(f => !FORMS.includes(f))) throw new Error('Unknown form');
       const summary = await runSearch({ catalog: scopedCatalog(researchDir), research, researchDir, state, statePath, lang, kind, limit, providers, forms,
-        qids: opts.qid ? opts.qid.split(',') : lead ? [lead.qid] : [], refresh: !!opts.refresh || !!opts['retry-searched'],
+        qids: opts.qid ? opts.qid.split(',') : lead ? [lead.qid] : [], refresh: !!opts.refresh || !!opts['retry-searched'], concurrency: Number(opts.concurrency || 3),
         http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http'), googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '' }),
         onCheck: c => console.log(`${c.qid} ${c.lang} ${c.provider}: ${c.status}${c.error ? ' — ' + c.error : ''}`) });
       console.log(JSON.stringify(summary));

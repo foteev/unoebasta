@@ -32,6 +32,8 @@ It shares a total budget of 50 work/language targets across EN, PL, RU and ES, r
 
 Run it again to advance. Fresh checks do not consume the batch limit; small budgets rotate through languages. Errors pause only the affected source for that invocation and produce `completed_with_issues`; other sources continue. Failed sources retry on the next invocation. Fatal input/storage errors still fail the command. HTTP caching and host rate limits apply.
 
+Up to three different providers are queried concurrently for each work; requests to the same host remain serialized and rate-limited. Start and completion messages include the work, provider and elapsed time. `report.json` is updated during each language rather than only at the end. Use `--concurrency 1` for sequential operation or choose a value up to 4. On Ctrl-C or SIGTERM, the runner stops scheduling requests, waits for active requests to finish and saves an `interrupted` report; rerun the command to resume. Active HTTP retries may take time to finish. Abrupt termination (for example SIGKILL or a machine failure) cannot update that report, but per-check checkpoints remain available.
+
 ```sh
 npm run search:continue -- --limit 100
 npm run search:continue -- --lang es --kind fragment --limit 20
