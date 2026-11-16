@@ -113,8 +113,10 @@ test('same URL may provide independent languages and kinds', () => {
 });
 
 test('one page can be reviewed separately for full text and audio; notes survive refresh', async t => {
-  const o = options(t, { kind: 'all', registry: registry(async w => ({ candidates: [candidate(w, { proposed_kind: 'audio' })], scope: 'Publisher page with media' }), ['full', 'audio']) });
+  const progress = [];
+  const o = options(t, { kind: 'all', onProgress: p => progress.push(p), registry: registry(async w => ({ candidates: [candidate(w, { proposed_kind: 'audio' })], scope: 'Publisher page with media' }), ['full', 'audio']) });
   await runSearch(o); assert.equal(Object.keys(o.state.candidates).length, 2);
+  assert.deepEqual(progress.filter(p => p.event === 'check').map(p => p.kind), ['full', 'audio']);
   const text = Object.values(o.state.candidates).find(c => c.requested_kind === 'full'), audio = Object.values(o.state.candidates).find(c => c.requested_kind === 'audio');
   assert.notEqual(text.id, audio.id);
   const lead = o.research.leads.find(l => text.lead_ids.includes(l.id)); noteLead(o.research, lead.id, 'Body has been checked to its ending', NOW); text.notes = 'Curator annotation';
