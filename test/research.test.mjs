@@ -212,6 +212,28 @@ test('continuation pauses a failed source while other sources and languages adva
   assert.equal((await continueSearch(o)).status, 'completed'); assert.equal(bad, 5);
 });
 
+test('concurrent providers checkpoint progress and an interrupted run leaves unstarted work resumable', async t => {
+  let stopped = false, release, started = 0, max = 0, active = 0;
+  const gate = new Promise(resolve => { release = resolve; });
+  const sources = ['gutenberg', 'google', 'clarkesworld'];
+  const r = Object.fromEntries(sources.map(id => [id, { kinds: ['full'], languages: ['en'], search: async () => {
+    started++; active++; max = Math.max(max, active);
+    if (started === 2) release();
+    await gate; active--;
+    return { candidates: [], scope: 'Exact query' };
+  } }]));
+  const o = options(t, { langs: ['en'], providers: sources, registry: r, concurrency: 2, shouldStop: () => stopped,
+    onCheck: () => { stopped = true; } });
+  const report = await continueSearch(o);
+  assert.equal(report.status, 'interrupted'); assert.equal(max, 2); assert.equal(started, 2);
+  assert.equal(report.summary.checked, 2); assert.equal(Object.keys(o.state.checks).length, 2);
+  assert.equal(JSON.parse(readFileSync(join(o.statePath, '..', 'report.json'), 'utf8')).status, 'interrupted');
+  stopped = false; o.onCheck = () => {};
+  const resumed = await continueSearch(o);
+  assert.equal(resumed.status, 'completed'); assert.equal(started, 3);
+  assert.equal(Object.keys(o.state.checks).length, 3);
+});
+
 test('continuation restores pending URLs and publications from the registry after cache loss', async t => {
   let calls = 0;
   const dir = temp(t), o = options(t, { catalog: catalog([multilingual('Q1')]), langs: ['en'], kind: 'full', limit: 1, researchDir: dir,

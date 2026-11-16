@@ -19,7 +19,9 @@ export const knownLink = (w, row) => w.knownLinks ? w.knownLinks.some(l => l.kin
 
 export async function runSearch({ catalog, state, statePath, http, lang = 'en', kind = 'all', providers = Object.keys(PROVIDERS),
   qids = [], forms = [], limit = 50, refresh = false, maxAge = 7 * 86400000, research = catalog.research || emptyResearch(), researchDir,
-  now = () => new Date().toISOString(), onCheck = () => {}, registry = PROVIDERS, pausedProviders = new Set(), onProviderError = () => {} }) {
+  now = () => new Date().toISOString(), onCheck = () => {}, onProgress = () => {}, registry = PROVIDERS,
+  pausedProviders = new Set(), onProviderError = () => {}, concurrency = 3, shouldStop = () => false }) {
+  if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 4) throw new Error('Concurrency must be an integer from 1 to 4');
   for (const id of providers) {
     if (!registry[id]) throw new Error(`Unknown provider: ${id}`);
     if (!research.sources.some(s => s.id === id)) research.sources.push({ id, name: id, mode: 'auto', languages: registry[id].languages, kinds: registry[id].kinds, next_action: 'Review the matched work and legal access.' });
@@ -35,7 +37,7 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
     writeJson(statePath, state);
   };
   for (const w of selectWorks(catalog, { lang, kind, qids, forms, limit: Infinity })) {
-    if (summary.works >= limit) break;
+    if (summary.works >= limit || shouldStop()) break;
     if (!titlesFor(w, lang).length) {
       const lead = titleLead(research, w, lang, now()); touchedLeads.add(lead.id); summary.needs_title++; summary.works++; save(); continue;
     }
@@ -55,8 +57,11 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
     }
     if (!jobs.length) continue; // Completed work-source pairs do not consume the next batch.
     summary.works++;
-    for (const id of [...new Set(jobs.map(j => j.id))]) {
+    const ids = [...new Set(jobs.map(j => j.id))]; let cursor = 0;
+    const runProvider = async id => {
       const pending = jobs.filter(j => j.id === id), requested = new Set(); let result, failure;
+      const started = Date.now();
+      onProgress({ event: 'start', qid: w.qid, lang, provider: id, summary: { ...summary } });
       try {
         result = await registry[id].search(w, lang, { googleBooksConfigured: http?.googleBooksConfigured, get: url => { requested.add(url); return http.get(url); } });
         if (!Array.isArray(result.candidates) || !result.scope) throw new Error('Invalid provider result');
@@ -87,8 +92,16 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
         }
         const recorded = recordCheck(research, check); touchedChecks.add(recorded.id); applyCheckToLead(lead, recorded);
         state.checks[key] = recorded; summary.checked++; save(); onCheck(recorded);
+        onProgress({ event: 'check', qid: w.qid, lang, provider: id, status: recorded.status, elapsed_ms: Date.now() - started, summary: { ...summary } });
       }
-    }
+    };
+    const worker = async () => {
+      while (!shouldStop()) {
+        const id = ids[cursor++]; if (!id) break;
+        await runProvider(id);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(concurrency, ids.length) }, worker));
   }
   state.last_run = { at: now(), lang, kind, providers, summary }; save(); return summary;
 }
