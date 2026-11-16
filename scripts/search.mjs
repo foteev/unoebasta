@@ -66,7 +66,7 @@ try {
         qids: opts.qid?.split(',') || [], refresh: !!opts.refresh || !!opts['retry-searched'],
         concurrency: Number(opts.concurrency || 3), shouldStop: () => stopping,
         http: new CachedHttp({ dir: resolve(root, opts.cache || '.cache/search/http'), googleBooksApiKey: process.env.GOOGLE_BOOKS_API_KEY || '' }),
-        onProgress: p => console.log(p.event === 'start' ? `${p.qid} ${p.lang} ${p.provider}: started` : `${p.qid} ${p.lang} ${p.provider}: ${p.status} (${(p.elapsed_ms / 1000).toFixed(1)}s)`),
+        onProgress: p => console.log(p.event === 'start' ? `${p.qid} ${p.lang} ${p.provider}: started` : `${p.qid} ${p.lang} ${p.kind} ${p.provider}: ${p.status} (${(p.elapsed_ms / 1000).toFixed(1)}s)`),
         onCheck: c => { if (c.error) console.error(`${c.qid} ${c.lang} ${c.provider}: ${c.error}`); } });
       } finally { process.off('SIGINT', stop); process.off('SIGTERM', stop); }
       console.log(JSON.stringify(report));

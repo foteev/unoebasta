@@ -92,7 +92,7 @@ export async function runSearch({ catalog, state, statePath, http, lang = 'en', 
         }
         const recorded = recordCheck(research, check); touchedChecks.add(recorded.id); applyCheckToLead(lead, recorded);
         state.checks[key] = recorded; summary.checked++; save(); onCheck(recorded);
-        onProgress({ event: 'check', qid: w.qid, lang, provider: id, status: recorded.status, elapsed_ms: Date.now() - started, summary: { ...summary } });
+        onProgress({ event: 'check', qid: w.qid, lang, kind: recorded.kind, provider: id, status: recorded.status, elapsed_ms: Date.now() - started, summary: { ...summary } });
       }
     };
     const worker = async () => {
