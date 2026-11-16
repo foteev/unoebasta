@@ -1,0 +1,119 @@
+{
+  "version": 1,
+  "status": "completed_with_issues",
+  "started_at": "2026-11-16T11:48:24.225Z",
+  "languages": [
+    "en",
+    "pl",
+    "ru",
+    "es"
+  ],
+  "kind": "all",
+  "limit": 50,
+  "providers": [
+    "clarkesworld",
+    "escapepod",
+    "podcastle",
+    "pseudopod",
+    "google"
+  ],
+  "by_language": {
+    "en": {
+      "works": 13,
+      "checked": 57,
+      "resumed": 0,
+      "candidates": 0,
+      "errors": 0,
+      "configuration_required": 1,
+      "needs_title": 0
+    },
+    "pl": {
+      "works": 13,
+      "checked": 0,
+      "resumed": 0,
+      "candidates": 0,
+      "errors": 0,
+      "configuration_required": 0,
+      "needs_title": 13
+    },
+    "ru": {
+      "works": 12,
+      "checked": 0,
+      "resumed": 0,
+      "candidates": 0,
+      "errors": 0,
+      "configuration_required": 0,
+      "needs_title": 12
+    },
+    "es": {
+      "works": 12,
+      "checked": 0,
+      "resumed": 0,
+      "candidates": 0,
+      "errors": 0,
+      "configuration_required": 0,
+      "needs_title": 12
+    }
+  },
+  "paused_sources": [
+    {
+      "provider": "google",
+      "status": "configuration_required",
+      "reason": "Google Books needs GOOGLE_BOOKS_API_KEY; set it in the environment or repository Actions secrets",
+      "at": "2026-11-16T11:50:39.403Z",
+      "next_action": "Retry this source on the next invocation; other sources continue."
+    }
+  ],
+  "summary": {
+    "works": 50,
+    "checked": 57,
+    "resumed": 0,
+    "candidates": 0,
+    "errors": 0,
+    "configuration_required": 1,
+    "needs_title": 37
+  },
+  "restored_candidate_ids": [
+    "ec508dc5219dc8fb7468",
+    "dbafb9ae2ebc8ca01945",
+    "d70c8571a492f6471fb8",
+    "6302d8cb742021e3ac69",
+    "cad8c35fe67c7c407c86",
+    "8e1f7755052ba4f59d9e"
+  ],
+  "new_candidate_ids": [],
+  "pending_candidate_ids": [
+    "ec508dc5219dc8fb7468",
+    "dbafb9ae2ebc8ca01945",
+    "d70c8571a492f6471fb8",
+    "6302d8cb742021e3ac69",
+    "cad8c35fe67c7c407c86",
+    "8e1f7755052ba4f59d9e"
+  ],
+  "outcomes": {
+    "not_found": 56,
+    "configuration_required": 1
+  },
+  "progress": {
+    "event": "check",
+    "qid": "Q30002253",
+    "lang": "en",
+    "provider": "pseudopod",
+    "status": "not_found",
+    "elapsed_ms": 5127,
+    "summary": {
+      "works": 13,
+      "checked": 57,
+      "resumed": 0,
+      "candidates": 0,
+      "errors": 0,
+      "configuration_required": 1,
+      "needs_title": 0
+    },
+    "at": "2026-11-16T11:50:44.335Z"
+  },
+  "follow_up_tasks": 855,
+  "finished_at": "2026-11-16T11:50:50.014Z",
+  "baseline": "6946f46c743f280aa8f203340b182598dd80abf9",
+  "note": "Automatic source checks only; candidates require manual verification. Generated plan-only open leads omitted from this snapshot."
+}
