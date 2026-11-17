@@ -1,0 +1,15 @@
+# Two sources per work, batch 7
+
+Base catalog `662e641c8dc859c1dc592d126f71b1a87ed74218`. Five guest-accessible links for four works: two complete English texts, one complete Spanish text, one English story excerpt, and one English audio recording. Full-text word counts are estimates. The Spanish translation's rehost permission is unverified.
+
+- **Q110217500 · Two Truths and a Lie (EN).** Tor's 15th-anniversary PDF contains the complete Sarah Pinsker story from Stella and Marco's opening to the hillside ending. It is a distinct reading format on the same publisher domain as the existing full story page.
+- **Q133843377 · The Four Sisters Overlooking the Sea (EN).** Streets.mn transcribes Naomi Kritzer reading a beach scene, followed by interview discussion. This is an interior fragment. The existing Asimov's PDF has the complete novelette.
+- **Q16990038 · Ponies (EN).** Reactor's Rocket Talk 22 identifies Emmet Asher-Perrin as narrator, 10:32. Guest playback started and the media timer advanced; the complete ending was not independently listened through. The existing full text is on Reactor.
+- **Q29918133 · When Sysadmins Ruled the Earth (EN/ES).** Doctorow's own standalone HTML contains the opening and ending and an explicit CC BY-NC-SA 2.5 license. A Spanish rehost reproduces the opening, middle, and ending and attributes the magazine Axxón. The Axxón original returned an unavailable page in this check. Translation and rehost rights remain unknown; the Spanish link is marked external. The direct English HTML is easier to read than the catalogued collection download hub, though both are on the author's domain.
+
+## Leads and checks not accepted
+
+- **Q7836111 · Travels With My Cats (EN audio).** Escape Pod 82's 49:52 player loaded and advanced, but that exact episode URL is already catalogued. No duplicate submitted. The page offers only its opening paragraphs as text.
+- **Q131308104 · Open House on Haunted Hill (EN audio).** John Wiswell identifies LeVar Burton's narration as the full story. The Simplecast page rendered blank in this browser after a reload; guest playback could not be checked. Reader check: open https://levar-burton-reads.simplecast.com/episodes/open-house-on-haunted-hill-by-john-wiswell and confirm the player loads, title and narrator, timer advance, and whether the full story is available. Do not count it yet.
+- **Q29918133 · Axxón original (ES).** The author's bibliography points to https://axxon.com.ar/rev/176/c-176cuento4.htm; one indexed page contained Spanish prose but subsequent requests returned 502 and the live browser displayed Site Unavailable. Recheck the magazine before replacing the external rehost.
+- The bounded English magazine-provider pass checked 20 works and returned four candidates. Three Escape Pod full-text candidates (*Bridesicle*, *Tideline*, *A Small Room in Koboldtown*) already have rejected decisions because the page contains only opening paragraphs. The fourth, Escape Pod 82, is already catalogued as audio. These checks do not show that other providers or languages lack sources.
