@@ -21,8 +21,9 @@ body { font: 400 16px/1.55 var(--f-ui); -webkit-font-smoothing: antialiased; }
 .brand-e { font-weight: 300; }
 .motto { font: italic 400 17px/1.4 var(--f-ui); }
 .iconbtn svg { width: 20px; height: 20px; }
-/* one button for every language setting: it shows the site's language and opens a short menu (the site's language, the languages the reader reads) */
+/* One menu for the site language and preferred reading languages. */
 .lang-btn { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; font: 500 13px/1 var(--f-ui); letter-spacing: .04em; color: var(--ink); cursor: pointer; }
+#lang-reading { margin-left: 2px; padding-left: 6px; border-left: 1px solid var(--line); color: var(--accent); }
 .lang-btn svg { transition: transform .15s; }
 .lang-btn[aria-expanded="true"] { background: var(--accent-soft); border-color: var(--accent-soft); }
 .lang-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
