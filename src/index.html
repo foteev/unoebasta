@@ -23,7 +23,7 @@ __SITE_CSS__</style>
       <svg class="logo" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
       <span>uno<span class="brand-e">e</span>basta</span>
     </button></h1>
-    <button id="lang-btn" class="lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-menu" aria-label="Language"><span id="lang-cur" aria-hidden="true">EN</span><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+    <button id="lang-btn" class="lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-menu" aria-label="Language"><span id="lang-cur" aria-hidden="true">EN</span><span id="lang-reading" aria-hidden="true" hidden></span><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
     <button id="theme-btn" class="iconbtn" aria-label="Theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-menu"></button>
   </div>
   <nav class="wrap tabs" role="tablist">
@@ -1474,6 +1474,7 @@ const cap = s => s.charAt(0).toLocaleUpperCase(LANG) + s.slice(1);
 function browserLangs() { const out = []; for (const l of (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])) { const c = String(l).toLowerCase().split('-')[0]; if (/^[a-z]{2,3}$/.test(c) && !out.includes(c)) out.push(c); } return out; }
 const explicitLangs = () => Array.isArray(prefs.langs) && prefs.langs.length > 0;
 function myLangs() { return explicitLangs() ? prefs.langs : [...new Set([LANG, ...SOURCE_LANGS, ...dataLangs()])]; }
+const readingLanguageLabel = () => explicitLangs() ? myLangs().map(langName).join(', ') : t('rl_all');
 const matchingFullText = q => { const l = fullLink(q); return l && myLangs().includes(l.lang || 'en'); };
 const matchingReading = q => matchingFullText(q) || audioLinks(q).some(l => myLangs().includes(l.lang || 'en'));
 function readingMinutes(q, langs = explicitLangs() ? myLangs() : null) {
@@ -2102,7 +2103,7 @@ function readPanelHtml(q, otherOpen = false) {
       <div class="row"><button class="btn btn-primary btn-small" data-askdone${RL.ask.length ? '' : ' disabled'}>${esc(t('ask_done'))}</button><button class="btn btn-ghost btn-small" data-asklater>${esc(t('ask_later'))}</button></div></div>` : '';
   return `<h4 tabindex="-1">${esc(t('sec_read'))}</h4>
       ${ask}
-      ${other.length ? `<p class="small rl-note">${linkify(t('rl_langs_note', { l: mine.map(langName).join(', ') }))}</p>` : ''}
+      ${all.length && !askLangs ? `<p class="small rl-note">${linkify(t('rl_langs_note', { l: readingLanguageLabel() }))}</p>` : ''}
       ${group(preferred, RL.kind, 'rl-kind', fullInMine ? full : null, phoneOK(q))}
       ${full && !fullInMine ? `<p class="note">${esc(t('lang_far', { l: langName(full.lang || 'en') }))}</p>` : ''}
       ${other.length ? `<details class="rl-other"${otherOpen ? ' open' : ''}>
@@ -2111,6 +2112,11 @@ function readPanelHtml(q, otherOpen = false) {
       </details>` : ''}`;
 }
 function redrawReadPanel(focusSel, otherOpen = $('#rl-panel .rl-other')?.open) { const p = $('#rl-panel'); if (!p) return; p.innerHTML = readPanelHtml(p.dataset.wid, otherOpen); const f = focusSel && p.querySelector(focusSel); if (f) f.focus(); }
+function workFacts(w) {
+  const q = w.id, r = READ[q], orig = origOf(w);
+  const year = w.pub && !(r && String(r.pub).includes(String(w.pub))) ? String(w.pub) : '';
+  return [orig ? `<i lang="en">${esc(orig)}</i>` : '', r ? esc(r.pub) : '', esc(year), pagesOf(q) ? esc(t('pages', { n: pagesOf(q) })) : '', esc(fmtDur(readingMinutes(q)))].filter(Boolean).join(' · ');
+}
 const doneCard = q => `<button class="done-card done-btn" data-done="${q}" aria-pressed="${isDone(q)}">${isDone(q) ? DONE_ICON.on : DONE_ICON.off}<span class="dc-t"><span class="dc-n">${esc(isDone(q) ? cap(t('done_on_date', { d: fmtDate(doneAt(q)) })) : t('done_btn'))}</span><span class="dc-s">${esc(t(isDone(q) ? 'done_card_on' : 'done_card_off'))}</span></span></button>`;
 async function openWork(q) {
   const w = work(q); if (!w) return;
@@ -2121,10 +2127,7 @@ async function openWork(q) {
   const own = local.links.find(l => l.id === q);
   const files = local.files.filter(f => f.workId === q);
   const el = $('#sheet-work');
-  const orig = origOf(w);
   const ab = aboutFor(null, q);
-  const year = w.pub && !(r && String(r.pub).includes(String(w.pub))) ? String(w.pub) : '';
-  const facts = [orig ? `<i lang="en">${esc(orig)}</i>` : '', r ? esc(r.pub) : '', esc(year), pagesOf(q) ? esc(t('pages', { n: pagesOf(q) })) : '', esc(fmtDur(readingMinutes(q)))].filter(Boolean).join(' · ');
   const cc = r && tierOf(q) === 't1';
   const flags = (cc ? `<span class="tier tier-t1">${esc(t('tier_t1'))}</span>${r.license ? `<span class="flag">${esc(r.license)}</span>` : ''}` : '') + workFlags(w);
   const mat = RL.mat || (files.length && !own ? 'file' : 'link');
@@ -2135,9 +2138,9 @@ async function openWork(q) {
         const href = catalogRoute('author', a);
         return href ? catalogLink(href, label, ' class="btn btn-small author-pill"')
           : `<button class="btn btn-small author-pill" data-author="${a}">${label}</button>`;
-      }).join(''), facts, page: !!PAGE_WORK })}
+      }).join(''), facts: workFacts(w), page: !!PAGE_WORK })}
     ${flags ? `<div class="flags">${flags}</div>` : ''}
-    ${r && r.note && (r.note !== 'note_baen' || fullLink(q)?.downloads) ? `<p class="note note-warn">${esc(t(r.note))}</p>` : ''}
+    ${r?.note ? `<p class="note note-warn" id="work-source-note"${r.note === 'note_baen' && !fullLink(q)?.downloads ? ' hidden' : ''}>${esc(t(r.note))}</p>` : ''}
     ${workRecall(q)}
     <div id="about-slot">${ab ? aboutPanel(ab, 'w') : ''}</div>
     <section class="panel" id="rl-panel" data-wid="${q}">${readPanelHtml(q, otherOpen)}</section>
@@ -3327,14 +3330,25 @@ function applyLang() {
   document.querySelectorAll('[data-public-category]').forEach(el => { el.textContent = catName(el.dataset.publicCategory); });
   const home = $('.brand-home'); if (home) home.title = t('home_t');
   document.querySelectorAll('[data-i18n]').forEach(n => { n.textContent = t(n.dataset.i18n); });
-  const cur = $('#lang-cur'); if (cur) cur.textContent = LANG.toUpperCase();
-  const lb = $('#lang-btn'); if (lb) lb.setAttribute('aria-label', t('lm_btn', { l: NATIVE_LANG[LANG] }));
+  updateLanguageButton();
   const lm = $('#lang-menu'); if (lm) { lm.setAttribute('aria-label', t('lm_title')); drawLangMenu(); }
 }
 /* ---------- the language menu: the site's language and the languages the reader reads, in one place ----------
    "I read in": all languages (no prefs.langs) or the ones chosen; a tap applies at once. The first language tapped
    while "All" is on becomes the only one; the last one taken off brings "All" back. */
 const NATIVE_LANG = { en: 'English', pl: 'Polski', ru: 'Русский', es: 'Español' };
+function interfaceLanguage(saved) {
+  const nav = (navigator.language || 'en').slice(0, 2);
+  return SOURCE_LANGS.includes(saved) ? saved : SOURCE_LANGS.includes(nav) ? nav : 'en';
+}
+function updateLanguageButton() {
+  const site = LANG.toUpperCase(), reading = explicitLangs() ? myLangs() : [];
+  const badge = $('#lang-reading');
+  $('#lang-cur').textContent = site;
+  badge.textContent = reading.length ? reading[0].toUpperCase() + (reading.length > 1 ? ` +${reading.length - 1}` : '') : '';
+  badge.hidden = !reading.length || badge.textContent === site;
+  $('#lang-btn').setAttribute('aria-label', t('lm_btn', { l: NATIVE_LANG[LANG] }) + '. ' + t('source_reader_languages', { l: readingLanguageLabel() }));
+}
 function langMenuHtml() {
   const all = !explicitLangs(), mine = myLangs();
   const read = [...new Set([...SOURCE_LANGS, ...(all ? [] : mine)])];
@@ -3345,7 +3359,7 @@ function langMenuHtml() {
 }
 // the header menus (language, theme): one open at a time, under the button or the link that opened it; a tap applies at once
 const POP = {
-  lang: { btn: 'lang-btn', el: 'lang-menu', html: () => langMenuHtml(), first: () => `[data-lang="${LANG}"]`, keep: el => el.dataset.lang ? `[data-lang="${el.dataset.lang}"]` : null, from: '#lang-btn, [data-langmenu]' },
+  lang: { btn: 'lang-btn', el: 'lang-menu', html: () => langMenuHtml(), first: () => `[data-lang="${LANG}"]`, keep: el => el.dataset.readlang ? `[data-readlang="${el.dataset.readlang}"]` : el.dataset.lang ? `[data-lang="${el.dataset.lang}"]` : null, from: '#lang-btn, [data-langmenu]' },
   theme: { btn: 'theme-btn', el: 'theme-menu', html: () => themeMenuHtml(), first: () => `[data-theme-pick="${themeNow()}"]`, keep: el => el.dataset.themePick ? `[data-theme-pick="${el.dataset.themePick}"]` : null, from: '#theme-btn, #r-theme' }
 };
 const popEl = k => document.getElementById(POP[k].el);
@@ -3356,7 +3370,8 @@ function drawPop(k, focusSel) {
 }
 function placePop() {
   if (!popKind) return;
-  const m = popEl(popKind), a = popFrom; if (m.hidden || !a || !a.isConnected) return; // the link it came from was redrawn: stay where it is
+  const m = popEl(popKind), a = popFrom.isConnected ? popFrom : popBack && $(popBack + ' [data-langmenu]');
+  if (m.hidden || !a) return;
   const g = 16, vw = document.documentElement.clientWidth || innerWidth, vh = innerHeight, r = a.getBoundingClientRect();
   const w = Math.min(340, vw - 2 * g); m.style.width = w + 'px';
   const left = Math.min(Math.max(g, a.id === POP[popKind].btn || a.id === 'r-theme' ? r.right - w : r.left), vw - g - w);
@@ -3369,24 +3384,61 @@ function openPop(k, from) {
   popKind = k; popFrom = from || document.getElementById(POP[k].btn);
   popBack = ['#rl-panel'].find(sel => popFrom.closest(sel)) || null;
   popEl(k).hidden = false; document.getElementById(POP[k].btn).setAttribute('aria-expanded', 'true');
-  drawPop(k, POP[k].first());
+  const focus = popBack && k === 'lang' ? `[data-readlang="${explicitLangs() ? myLangs()[0] : 'all'}"]` : POP[k].first();
+  drawPop(k, focus);
 }
 function closePop(back) {
   if (!popKind) return false;
   const k = popKind, m = popEl(k);
   m.hidden = true; m.innerHTML = ''; document.getElementById(POP[k].btn).setAttribute('aria-expanded', 'false');
   let from = popFrom; popKind = null; popFrom = null;
-  if (from && !from.isConnected) from = popBack && $(popBack + ' [data-langmenu]');
+  if (from && !from.isConnected) from = popBack && ($(popBack + ' [data-langmenu]') || $(popBack + ' h4'));
   if (back) (from && !from.closest('[hidden]') ? from : document.getElementById(POP[k].btn)).focus({ preventScroll: true });
   return true;
 }
 const openLangMenu = from => openPop('lang', from), closeLangMenu = back => closePop(back);
 function drawLangMenu(focusSel) { if (popKind === 'lang') drawPop('lang', focusSel); }
-// after the reading languages change: Read, an open card and the menu itself show the new choice
-function readLangsChanged(focusSel) {
-  savePrefs(); RL.otherKind = 'all'; RL.ask = null;
+function updateReadingLanguageViews(focusSel) {
+  RL.otherKind = 'all'; RL.ask = null;
   renderCatalog(); redrawReadPanel(null, false);
+  if (VIEW === 'awards') renderAwards();
+  const q = $('#rl-panel')?.dataset.wid;
+  if (q) {
+    $('#sheet-work .wh-meta').innerHTML = workFacts(work(q));
+    const note = $('#work-source-note');
+    if (note && READ[q]?.note === 'note_baen') note.hidden = !fullLink(q)?.downloads;
+  }
+  updateLanguageButton();
   drawLangMenu(focusSel);
+}
+function readLangsChanged(focusSel) {
+  savePrefs();
+  updateReadingLanguageViews(focusSel);
+}
+// A work has its own URL. A page restored by Back still has the preferences from before that navigation.
+function restoreSavedLanguages() {
+  if (resetting) return false;
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem(PREFS_KEY)); } catch { return false; }
+  if (!saved) return false;
+  const lang = interfaceLanguage(saved.lang);
+  const langs = Array.isArray(saved.langs) && saved.langs.length ? saved.langs : [];
+  const readingChanged = JSON.stringify(langs) !== JSON.stringify(explicitLangs() ? myLangs() : []) || !!saved.langsAsked !== !!prefs.langsAsked;
+  if (lang === LANG && !readingChanged) return false;
+  if (readingChanged) {
+    for (const key of [...SYNC_PREFS, 'prefsMt']) {
+      if (saved[key] === undefined) delete prefs[key];
+      else prefs[key] = saved[key];
+    }
+    if (!langs.length) delete prefs.langs;
+    lastPrefsSig = prefsSig();
+    RL.otherKind = 'all'; RL.ask = null;
+  }
+  prefs.lang = saved.lang || null;
+  if (lang !== LANG) {
+    LANG = lang; applyTheme(); refreshAll();
+  } else updateReadingLanguageViews();
+  return true;
 }
 window.addEventListener('resize', placePop);
 document.addEventListener('scroll', e => { if (popKind && !popEl(popKind).contains(e.target)) placePop(); }, true);
@@ -3635,13 +3687,18 @@ new MutationObserver(syncNav).observe(document.body, { subtree: true, attributes
 if (window.matchMedia) { const mq = window.matchMedia('(min-width: 900px)'); const re = () => { if (VIEW === 'awards') renderAwards(); }; if (mq.addEventListener) mq.addEventListener('change', re); else if (mq.addListener) mq.addListener(re); }
 
 /* ---------- start ---------- */
-if (PAGE_WORK) {
-  window.addEventListener('pageshow', event => { if (event.persisted) refreshAll(); });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && !resetting) refreshAll(); });
+function refreshResumedPage() {
+  if (!resetting && !restoreSavedLanguages() && PAGE_WORK) refreshAll();
 }
+window.addEventListener('storage', event => {
+  if (event.key === PREFS_KEY && event.newValue !== null) restoreSavedLanguages();
+});
+window.addEventListener('pageshow', event => { if (event.persisted) refreshResumedPage(); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshResumedPage();
+});
 (function start() {
-  const nav = (navigator.language || 'en').slice(0, 2);
-  LANG = prefs.lang || (['ru', 'pl', 'es'].includes(nav) ? nav : 'en');
+  LANG = interfaceLanguage(prefs.lang);
   initVisit();
   // draw the page from the catalog first, then fill in what is stored on the device
   applyLang(); applyTheme(); renderCatalog(); renderAbout();
