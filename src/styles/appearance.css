@@ -107,8 +107,13 @@ textarea, .copybox { font-family: ui-monospace, Menlo, Consolas, monospace; }
 .wh-meta { margin: 0; font-size: 13px; line-height: 1.35; color: var(--muted); }
 .rl-seg button { font-size: 15px; font-weight: 500; }
 .rl-seg button .n { opacity: .7; font-weight: 400; }
-.rl-seg button[disabled] { opacity: .45; cursor: default; }
 .rl-note { margin: 0; }
+.rl-other { border-top: 1px solid var(--line); }
+.rl-other > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; color: var(--accent); font-weight: 500; cursor: pointer; list-style: none; }
+.rl-other > summary::-webkit-details-marker { display: none; }
+.rl-other > summary svg { flex: none; width: 16px; height: 16px; }
+.rl-other[open] > summary svg { transform: rotate(90deg); }
+.rl-other-body { display: grid; gap: 10px; }
 .src-list { display: grid; }
 .src { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 10px 0; border: 0; border-top: 1px solid var(--line); background: none; color: var(--ink); text-decoration: none; text-align: left; font: inherit; cursor: pointer; border-radius: 0; }
 .src:hover .src-n { color: var(--accent); }

@@ -280,9 +280,9 @@ function selectFilter(group, values = []) {
   // excerpts and multi-part texts
   const dune2 = Object.values(w.eval('WORKS')).find(x => x.title === 'Dune');
   w.eval(`openWork('${dune2.id}')`); await sleep(60);
-  // the card's source list: one row per source; "All" shows every language
-  const allSources = async () => { const b = $('#sheet-work [data-rl-lang="all"]'); if (b && b.getAttribute('aria-pressed') !== 'true') { click(b); await sleep(30); } };
-  const srcRows = () => $$('#sheet-work .src-list .src').map(a => ({ l: a.querySelector('.src-l').textContent, kind: a.classList.contains('src-audio') ? 'audio' : 'text', ex: a.classList.contains('src-ex'), m: (a.querySelector('.src-m') || {}).textContent || '', href: a.getAttribute('href'), warn: !!a.querySelector('.src-w') }));
+  // the card's source lists: one row per source, with a disclosure for other languages
+  const allSources = async () => { const other = $('#rl-panel .rl-other'); if (other && !other.open) { click(other.querySelector('summary')); await sleep(30); } };
+  const srcRows = (scope = '#rl-panel .src-list') => $$(scope + ' .src').map(a => ({ l: a.querySelector('.src-l').textContent, kind: a.classList.contains('src-audio') ? 'audio' : 'text', ex: a.classList.contains('src-ex'), m: (a.querySelector('.src-m') || {}).textContent || '', href: a.getAttribute('href'), warn: !!a.querySelector('.src-w') }));
   const hasSrc = (l, kind, ex) => srcRows().some(r => r.l === l && r.kind === kind && r.ex === !!ex);
   await allSources();
   checks['sources: Dune RU and PL = fragment (LitRes, Legimi)'] = hasSrc('RU', 'text', true) && hasSrc('PL', 'text', true) && !!$('#sheet-work a[href^="https://www.legimi.pl/ebook-diuna"]') && !!$('#sheet-work a[href^="https://www.litres.ru/"]');
@@ -316,36 +316,44 @@ function selectFilter(group, values = []) {
   w.eval("openWork('Q467388')"); await sleep(60); await allSources();
   checks['reviewed findings: Merchant offers Polish and Spanish full texts with Russian audio and fragment'] = hasSrc('PL', 'text', false) && hasSrc('ES', 'text', false) && hasSrc('RU', 'text', true) && hasSrc('RU', 'audio', false) && !!$('#sheet-work .src-ex[href^="https://libcat.ru/"]') && !!$('#sheet-work .src-audio[href^="https://akniga.org/"]');
   checks['reviewed findings: an unverified full text carries the mark, the retailer source does not'] = srcRows().find(r => /^https:\/\/lecturia\.org\//.test(r.href || '')).warn && !srcRows().find(r => /^https:\/\/www\.legimi\.pl\//.test(r.href || '')).warn;
-  // the card, 06.11: dense head, About above the sources, one list with two filters, the synthesizer under it and never counted
+  // the card: About above the sources, with a separate list for other languages
   const starLangs = w.eval('prefs.langs'); w.eval("prefs.langs = ['ru', 'en']; RL.q = null");
   w.eval("openWork('Q2634534')"); await sleep(60);
   const order = ['#about-slot', '#rl-panel', '.done-card', '#mine-panel', '.work-actions'].map(x => $('#sheet-work ' + x));
   checks['card: author pill above the title, facts in one line, no availability chips or external-source label'] = $('#sheet-work .wh-b .work-head-t').children[1].classList.contains('wh-authors') && $('#sheet-work .wh-b .work-head-t').children[2].tagName === 'H2' && !$('#sheet-work .avail') && !$('#sheet-work .tier') && /Infinity Science Fiction/.test($('#sheet-work .wh-meta').textContent);
   checks['card: About, sources, finished, my materials, then the two actions, in this order'] = order.every(Boolean) && order.every((x, i) => !i || order[i - 1].compareDocumentPosition(x) & 4) && /Написать разработчику о книге/.test($('#sheet-work .work-actions').textContent) && /Скопировать задачу поиска источников по книге/.test($('#sheet-work .work-actions').textContent);
   const segN = sel => $$(`#rl-panel [${sel}]`).map(b => b.textContent.replace(/\s+/g, ' ').trim());
-  checks['card: My languages first with counts; the synthesizer is not a source'] = JSON.stringify(segN('data-rl-lang')) === JSON.stringify(['Мои языки 2', 'Все 5']) && srcRows().map(r => r.l).join() === 'RU,EN' && !$('#rl-panel .src-list [data-eleven]') && !!$('#rl-panel .rl-synth [data-eleven]') && JSON.stringify(segN('data-rl-kind')) === JSON.stringify(['Всё 2', 'Читать 1', 'Слушать 1']);
+  const preferredRows = () => srcRows('#rl-panel > .src-list');
+  const otherRows = () => srcRows('#rl-panel .rl-other .src-list');
+  const otherLanguages = () => $('#rl-panel .rl-other');
+  checks['card: preferred languages first with counts; the synthesizer is not a source'] = preferredRows().map(r => r.l).join() === 'RU,EN' && !$('#rl-panel .src-list [data-eleven]') && !!$('#rl-panel > .rl-synth [data-eleven]') && JSON.stringify(segN('data-rl-kind')) === JSON.stringify(['Всё 2', 'Читать 1', 'Слушать 1']);
+  checks['card: other languages are collapsed with a count of all their sources'] = !otherLanguages().open && otherLanguages().querySelector('summary').textContent === 'На других языках (3)' && otherRows().length === 3 && otherRows().every(r => ['ES', 'PL'].includes(r.l));
+  await allSources();
   click($('#rl-panel [data-rl-kind="read"]')); await sleep(30);
-  checks['card: Read hides recordings and the synthesizer'] = srcRows().every(r => r.kind === 'text') && !$('#rl-panel .rl-synth') && $('#rl-panel [data-rl-kind="read"]').getAttribute('aria-pressed') === 'true';
-  click($('#rl-panel [data-rl-lang="all"]')); await sleep(30);
-  checks['card: All languages keeps the kind filter; others after mine; one note for unverified sources'] = srcRows().map(r => r.l).join() === 'EN,ES,PL' && $$('#rl-panel .rl-foot').length === 1 && srcRows().every(r => r.warn && r.m === '');
+  checks['card: Read filters preferred sources and keeps the other languages open and complete'] = preferredRows().length === 1 && preferredRows()[0].kind === 'text' && !$('#rl-panel > .rl-synth') && $('#rl-panel [data-rl-kind="read"]').getAttribute('aria-pressed') === 'true' && otherLanguages().open && otherRows().length === 3;
+  const otherRead = '#rl-panel [data-rl-other-kind="read"]';
+  click($(otherRead)); await sleep(30);
+  checks['card: other languages have their own kind filter and a stable total'] = otherLanguages().open && w.document.activeElement === $(otherRead) && otherLanguages().querySelector('summary').textContent === 'На других языках (3)' && otherRows().map(r => r.l).join() === 'ES,PL' && preferredRows().map(r => r.l).join() === 'EN' && srcRows().every(r => r.warn && r.m === '');
   click($('#mine-panel [data-mat="file"]')); await sleep(20);
   checks['card: my materials switch between a link and a file'] = $('#mat-link').hidden && !$('#mat-file').hidden && $('#mine-panel [data-mat="file"]').getAttribute('aria-pressed') === 'true' && !!$('#mat-file #work-file');
   w.eval("delete prefs.langs; RL.q = null; openWork('Q2634534')"); await sleep(60);
-  checks['card: until the reader picks languages, all languages are theirs, so there is no language filter'] = !$('#rl-panel [data-rl-lang]') && srcRows().length === 5 && srcRows()[0].l === 'RU';
+  checks['card: until the reader picks languages, all sources are in the main list'] = !otherLanguages() && preferredRows().length === 5 && preferredRows()[0].l === 'RU';
   const askChip = l => $(`#rl-panel [data-asklang="${l}"]`);
   checks['card: asks once which languages the reader reads, the site language already chosen'] = !!$('#rl-panel .rl-ask') && /На каких языках вы читаете/.test($('#rl-panel .rl-ask').textContent) && $$('#rl-panel [data-asklang]').map(b => b.textContent).join('·') === 'English·Polski·Русский·Español' && askChip('ru').getAttribute('aria-pressed') === 'true' && askChip('en').getAttribute('aria-pressed') === 'false' && /RU ▾/.test($('#rl-panel .rl-ask').textContent);
   click(askChip('ru')); await sleep(20);
   const askEmpty = $('#rl-panel [data-askdone]').disabled;
   click(askChip('en')); await sleep(20); click(askChip('ru')); await sleep(20);
   click($('#rl-panel [data-askdone]')); await sleep(60);
-  checks['card: Done keeps the chosen languages, the question goes and the card filters by them'] = askEmpty && JSON.stringify(w.eval('prefs.langs')) === '["en","ru"]' && w.eval('prefs.langsAsked === true && SYNC_PREFS.includes("langsAsked")') && !$('#rl-panel .rl-ask') && !!$('#rl-panel [data-rl-lang="mine"]') && /RU ▾/.test($('#toast').textContent);
+  checks['card: Done keeps the chosen languages and collapses all other sources'] = askEmpty && JSON.stringify(w.eval('prefs.langs')) === '["en","ru"]' && w.eval('prefs.langsAsked === true && SYNC_PREFS.includes("langsAsked")') && !$('#rl-panel .rl-ask') && preferredRows().map(r => r.l).join() === 'RU,EN' && !otherLanguages().open && /RU ▾/.test($('#toast').textContent);
   w.eval("delete prefs.langs; RL.q = null; openWork('Q2634534')"); await sleep(60);
   checks['card: the question is asked only once, even after going back to all languages'] = !$('#rl-panel .rl-ask');
   w.eval("prefs.langsAsked = false; RL.q = null; openWork('Q2634534')"); await sleep(60);
   click($('#rl-panel [data-asklater]')); await sleep(40);
   checks['card: Not now keeps all languages and does not ask again'] = !$('#rl-panel .rl-ask') && w.eval('prefs.langs === undefined && prefs.langsAsked === true');
   w.eval("prefs.langs = ['ru']; prefs.langsAsked = false; RL.q = null; openWork('Q2634534')"); await sleep(60);
-  checks['card: a reader who already chose languages is not asked'] = !$('#rl-panel .rl-ask');
+  checks['card: a single preferred language keeps every other source under the disclosure'] = !$('#rl-panel .rl-ask') && preferredRows().map(r => r.l).join() === 'RU' && !otherLanguages().open && otherLanguages().querySelector('summary').textContent === 'На других языках (4)';
+  w.eval("prefs.langs = ['ru', 'en', 'es', 'pl']; readLangsChanged()"); await sleep(30);
+  checks['card: a language change removes the disclosure when all sources match'] = !otherLanguages() && preferredRows().length === 5;
   w.__starLangs = starLangs; w.eval('prefs.langs = window.__starLangs; delete prefs.langsAsked; RL.q = null');
   // Test audio-only behavior independently of future additions to this work's sources.
   w.eval("window.__audioOnlyLinks = READ.Q4102150.links; READ.Q4102150.links = READ.Q4102150.links.filter(link => link.kind !== 'full'); openWork('Q4102150')"); await sleep(60); await allSources();
@@ -777,8 +785,8 @@ function selectFilter(group, values = []) {
   checks['languages: saved Polish choice does not silently suggest English texts'] = !$('#view-catalog [data-picks=reading] .pick') && !!$('#view-catalog [data-picks=other] .pick') && /На других языках/.test($('#view-catalog').textContent) && !$('#view-catalog #picks-languages') && !/Языки чтения/.test($('#view-catalog').textContent) && !!$('#view-catalog .home-excerpts a');
   click($('#tab-library')); await sleep(60);
   checks['languages: the text language on each card, dimmed when unknown'] = !!$('#view-library .slip .flag-lang.far') && /^EN$/.test($('#view-library .slip .flag-lang').textContent);
-  const wid = $('#view-library .slip [data-work]').dataset.work; w.eval(`openWork('${wid}')`); await sleep(80);
-  checks['languages: the work card says the text is in English and how to translate'] = /Браузер может перевести страницу/.test($('#sheet-work').textContent);
+  w.eval("openWork('Q25349436')"); await sleep(80);
+  checks['languages: with no matching sources, the card still offers the English text under the disclosure'] = !preferredRows().length && !otherLanguages().open && otherRows().some(r => r.l === 'EN' && r.kind === 'text') && /На выбранных языках источников пока нет/.test($('#rl-panel').textContent) && /Браузер может перевести страницу/.test($('#rl-panel').textContent);
   w.eval('closeSheets()');
   w.eval("READ.Q190192 = { w: 3000, tier: 't2', added: '2026-10-01T00:00:00Z', pub: 'Test', links: [{ kind: 'full', url: 'https://x.test/diuna-pl', site: 'Test', lang: 'pl' }] }; renderLibrary();"); await sleep(60);
   checks['languages: a Polish text comes first for a Polish reader'] = $('#view-library .slip [data-work]').dataset.work === 'Q190192' && $('#view-library .slip .flag-lang').textContent === 'PL' && !$('#view-library .slip .flag-lang').classList.contains('far');

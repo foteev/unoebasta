@@ -1,4 +1,4 @@
-// Real-browser coverage for the same award scope in Board, By year and By category.
+// Real-browser coverage for reading and listening sources on the work card.
 const { chromium } = require('playwright');
 const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
@@ -13,7 +13,7 @@ const assert = require('node:assert/strict');
     if (file !== root && !file.startsWith(root + '/')) { res.writeHead(403).end(); return; }
     try {
       const path = file === root ? join(root, 'index.html') : file;
-      res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
+      res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
       res.end(readFileSync(path));
     } catch { res.writeHead(404).end(); }
   });
@@ -25,7 +25,10 @@ const assert = require('node:assert/strict');
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
     const url = `http://127.0.0.1:${server.address().port}/`;
-    await page.addInitScript(() => localStorage.setItem('fantastic-prefs', JSON.stringify({lang:'ru',langs:['ru']})));
+    await page.addInitScript(() => {
+      const lang = location.pathname.startsWith('/work/') ? 'pl' : 'ru';
+      localStorage.setItem('fantastic-prefs', JSON.stringify({lang, langs: [lang]}));
+    });
     await page.goto(url, {waitUntil:'domcontentloaded'});
     await page.waitForFunction(() => typeof Store !== 'undefined');
     await page.evaluate(() => openWork('Q19947428'));
@@ -56,7 +59,13 @@ const assert = require('node:assert/strict');
     // an unverified recording: no publisher label, one note under the list
     await page.waitForFunction(()=>!!document.querySelector('#rl-panel .rl-foot') && !document.querySelector('#sheet-work .tier'));
     await page.evaluate(()=>openWork('Q467388'));
-    await page.click('#rl-panel [data-rl-lang="all"]');
+    const other = page.locator('#rl-panel .rl-other');
+    const summary = other.locator('summary');
+    await summary.waitFor();
+    assert.equal(await other.locator('.src-list .src').first().isVisible(), false);
+    await summary.press('Enter');
+    await other.locator('.src-list .src').first().waitFor();
+    assert.equal(await other.evaluate(el => el.open), true);
     await page.waitForSelector('#sheet-work .src-ex');
     assert.ok(await page.locator('#sheet-work .src-text:not(.src-ex)').count() >= 2, 'The existing Russian and Polish text sources remain visible');
     assert.equal(await page.locator('#sheet-work .src-text:not(.src-ex)[href^="https://www.legimi.pl/"]').count(),1);
@@ -67,10 +76,29 @@ const assert = require('node:assert/strict');
     for(const width of [360,390]) for(const theme of ['light','dark']) {
       await page.setViewportSize({width,height:width===360?740:844});
       await page.evaluate(theme=>{prefs.theme=theme;savePrefs();applyTheme();},theme);
-      await page.locator('#sheet-work .src-text').first().scrollIntoViewIfNeeded();
+      await summary.scrollIntoViewIfNeeded();
+      assert.ok((await summary.boundingBox()).height >= 44);
       assert.ok(await page.locator('#sheet-work').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
       await page.screenshot({path:join(out,`mixed-sources-${width}-${theme}.png`),animations:'disabled'});
     }
+    const workPath = await page.evaluate(() => DATA.routes.work.Q467388);
+    await page.setViewportSize({width:360,height:740});
+    await page.goto(url + workPath + 'index.html', {waitUntil:'domcontentloaded'});
+    await summary.waitFor();
+    assert.match(await summary.textContent(), /^W innych językach \(\d+\)$/);
+    assert.ok((await summary.boundingBox()).height >= 44);
+    assert.equal(await other.evaluate(el => el.open), false);
+    const preferred = await page.locator('#rl-panel > .src-list .src-l').allTextContents();
+    assert.ok(preferred.length && preferred.every(lang => lang === 'PL'));
+    await page.locator('#rl-panel').scrollIntoViewIfNeeded();
+    await page.screenshot({path:join(out,'other-languages-360-collapsed.png'),animations:'disabled'});
+    await summary.click();
+    assert.ok(await other.locator('.src-list .src').first().isVisible());
+    const foreign = await other.locator('.src-list .src-l').allTextContents();
+    assert.equal(await summary.textContent(), `W innych językach (${foreign.length})`);
+    assert.ok(foreign.every(lang => lang !== 'PL'));
+    await summary.evaluate(el => { el.scrollIntoView({block:'start'}); window.scrollBy(0, -100); });
+    await page.screenshot({path:join(out,'other-languages-360-expanded.png'),animations:'disabled'});
     assert.deepEqual(errors,[]);
     const report={external_recordings:recordings.length,sourced_summary:true,language_audio_badge:true,layouts,errors};
     writeFileSync(join(out,'audio-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
