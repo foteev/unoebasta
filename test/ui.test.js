@@ -1135,7 +1135,7 @@ function selectFilter(group, values = []) {
   }
 
   const publicDir = path.dirname(PAGE);
-  const route = 'work/better-living-through-algorithms-Q130213759/';
+  const route = 'work/naomi-kritzer-better-living-through-algorithms-Q130213759/';
   const publicHtml = fs.readFileSync(path.join(publicDir, route, 'index.html'), 'utf8');
   const runtime = fs.readFileSync(path.join(publicDir, 'catalog-app.js'), 'utf8');
   const publicCard = new JSDOM(publicHtml.replace('<script defer src="../../catalog-app.js"></script>', () => '<script>' + runtime + '</script>'), {
