@@ -38,3 +38,17 @@ test('a new prize and category can be registered without changing code', () => {
   sample.awards.fixture.code = 'HUG';
   assert.throws(() => validateAwards(sample, extended), /Invalid award/);
 });
+
+test('World Fantasy Award keeps shared wins, existing work IDs and ISFDB-only routes', () => {
+  const winners = data.aw.filter(([award]) => award === 'wfa');
+  assert.equal(winners.length, 162);
+  assert.deepEqual(winners.filter(([, category, year]) => category === 'N' && year === 1985).map(row => data.works[row[3]][0]).sort(), ['Bridge of Birds', 'Mythago Wood']);
+  assert.ok(winners.some(([, , year, id]) => year === 2012 && id === 'Q27903111'));
+  assert.equal(routes.work.T3406511, 'work/once-was-willem-T3406511/');
+  const page = read('dist/web/' + routes.award.wfa + 'index.html');
+  assert.match(page, /Long Fiction/);
+  assert.match(page, /Short Fiction/);
+  assert.ok(page.includes(routes.work.T3406511));
+  const catalog = { data, works: Object.keys(data.works).map(qid => ({ qid })) };
+  assert.equal(scopeByAward(catalog, registry, 'WFA').works.length, 162);
+});

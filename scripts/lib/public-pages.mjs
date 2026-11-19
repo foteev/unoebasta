@@ -10,7 +10,7 @@ const text = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&am
 export function catalogRoutes(data, slugs) {
   const entities = (type, entries) => Object.fromEntries(Object.keys(entries).map(qid => {
     const slug = slugs[type]?.[qid];
-    if (!/^Q[1-9]\d*$/.test(qid) || !slugPattern.test(slug || '')) throw new Error('Missing or invalid stable slug for ' + type + ' ' + qid);
+    if (!(type === 'work' ? /^[QT][1-9]\d*$/ : /^[QA][1-9]\d*$/).test(qid) || !slugPattern.test(slug || '')) throw new Error('Missing or invalid stable slug for ' + type + ' ' + qid);
     return [qid, type + '/' + slug + '-' + qid + '/'];
   }));
   return {

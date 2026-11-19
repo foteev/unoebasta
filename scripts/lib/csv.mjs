@@ -44,7 +44,7 @@ export function sourceUrlKey(value) { const u = new URL(cleanUrl(value)); u.hash
 export function validateFound(r) {
   const fail = message => { throw new Error(`${r.qid || 'row'}: ${message}`); };
   if (FOUND_FIELDS.some(k => !(k in r))) fail('missing CSV columns');
-  if (!/^Q[1-9]\d*$/.test(r.qid)) fail('invalid QID');
+  if (!/^[QT][1-9]\d*$/.test(r.qid)) fail('invalid QID');
   if (!['en', 'pl', 'ru', 'es'].includes(r.lang)) fail('unsupported language');
   if (!['novel', 'novella', 'novelette', 'short story'].includes(r.form)) fail('invalid form');
   if (!['full', 'audio', 'fragment', 'none'].includes(r.kind)) fail('invalid kind');

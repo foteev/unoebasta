@@ -6,11 +6,11 @@ The reading app and generated pages share one catalog.
 
 | Page | Path |
 |---|---|
-| Work | `work/<title>-Q…/` |
-| Author | `author/<name>-Q…/` |
+| Work | `work/<title>-<id>/` |
+| Author | `author/<name>-<id>/` |
 | Award | `award/<slug>-<code>/` |
 
-Each URL is independent of the displayed language. Work pages share the app’s QIDs and [browser shelf](data-and-sync.md#storage). Add a slug to [`data/catalog-slugs.json`](../data/catalog-slugs.json) for each new work or author QID. Keep published slugs stable when correcting titles.
+Each URL is independent of the displayed language. Work pages share the app’s catalog IDs and [browser shelf](data-and-sync.md#storage). Add a slug to [`data/catalog-slugs.json`](../data/catalog-slugs.json) for each new work or author ID. Records with verified Wikidata identifiers use `Q…`. World Fantasy Award entries without a matched Wikidata item use the ISFDB title ID with a `T` prefix or the ISFDB author ID with an `A` prefix. Keep published slugs stable when correcting titles.
 
 ## Award registry
 
@@ -21,6 +21,11 @@ Each URL is independent of the displayed language. Work pages share the app’s 
 | Hugo | `HUG` | [Hugo](https://foteev.github.io/unoebasta/award/hugo-HUG/) |
 | Nebula | `NEB` | [Nebula](https://foteev.github.io/unoebasta/award/nebula-NEB/) |
 | Locus | `LOC` | [Locus](https://foteev.github.io/unoebasta/award/locus-LOC/) |
+| World Fantasy Award | `WFA` | [World Fantasy Award](https://foteev.github.io/unoebasta/award/world-fantasy-WFA/) |
+
+World Fantasy Award covers Novel, Long Fiction (historically Novella), and Short Fiction from 1975 through 2026. The [World Fantasy Convention archive](https://worldfantasy.org/awards/winners/) covers historical results through 2023. The [SFADB yearly results](https://www.sfadb.com/World_Fantasy_Awards_Winners_By_Year) and [ISFDB award records](https://www.isfdb.org/cgi-bin/awardtype.cgi?44) supply newer years, corroborate shared wins, and distinguish standalone works from collections or later versions. In 1980, 1991, and 1993 both ISFDB and SFADB list shared wins where the Convention archive displays a single winner.
+
+The initial WFA links were checked on 19 November 2026. [Reactor](https://reactormag.com/the-hungry-mouth-renan-bernardo/), [PodCastle](https://podcastle.org/2023/05/30/podcastle-789-emet/), [Uncanny](https://www.uncannymagazine.com/article/like-river-loves-sky/), [Lightspeed](https://www.lightspeedmagazine.com/fiction/ten-deals-with-the-indigo-snake/), and [Strange Horizons](https://strangehorizons.com/wordpress/fiction/the-birding-a-fairy-tale/) provide the full English texts of five short fiction winners. The PodCastle and Lightspeed media files both responded and decoded from the start. The episodes are listed at 1:06:54 and 31:07 respectively, read by Rebecca Fraimow and Judy Young. The recordings were sampled at the start. The Orbit and Tordotcom excerpts for the 2026 Novel and Long Fiction winners contain English prose. Ebookpoint’s guest reader opens with the Polish chapters of *Zatruty kielich*.
 
 ## Search and filter by award
 
@@ -28,7 +33,7 @@ Use an award code to scope discovery or planning.
 
 ```sh
 npm run search:continue -- --award HUG --limit 30
-npm run research -- plan --award NEB --lang pl --limit 20
+npm run research -- plan --award WFA --lang pl --limit 20
 ```
 
 The same code selects an Awards filter in a public link. [Filter Awards to Locus](https://foteev.github.io/unoebasta/?view=awards&award=LOC)

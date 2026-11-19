@@ -35,13 +35,13 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     assert.equal(await filterOption(page, 'av-awards', 'all').isChecked(), true);
     const entries = await page.locator('table.board .cell').count();
     assert.ok(entries > 500, 'All-awards board contains the combined corpus');
-    assert.ok(await page.locator('table.board .award-meta').evaluateAll(xs => ['Hugo', 'Nebula', 'Locus'].every(a => xs.some(x => x.textContent.includes(a)))));
+    assert.ok(await page.locator('table.board .award-meta').evaluateAll(xs => ['Hugo', 'Nebula', 'Locus', 'World Fantasy Award'].every(a => xs.some(x => x.textContent.includes(a)))));
     for (const theme of ['light', 'dark']) {
       await page.evaluate(theme => { prefs.theme = theme; savePrefs(); applyTheme(); window.scrollTo(0, 0); }, theme);
       await page.screenshot({ path: join(out, `awards-board-${theme}.png`), animations: 'disabled' });
     }
     await page.locator('table.board [data-av-year="2024"]').click();
-    assert.equal(await page.locator('#av-body .yearsec h3').count(), 3, 'Year drilldown includes all three awards');
+    assert.equal(await page.locator('#av-body .yearsec h3').count(), 4, 'Year drilldown includes all four awards');
     await page.locator('[data-av-clear]').click();
     assert.equal(await page.locator('table.board .cell').count(), entries, 'Return preserves combined board');
     await page.reload({ waitUntil: 'domcontentloaded' });
@@ -76,6 +76,13 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
       layouts.push({ ...layout, theme, mode });
       await page.screenshot({ path: join(out, `awards-${mode}-${width}-${theme}.png`), animations: 'disabled' });
     }
+    await page.setViewportSize({ width: 360, height: 740 });
+    await selectFilter(page, 'av-awards', ['wfa']);
+    await page.locator('[data-av-mode="cats"]').click();
+    assert.equal(await page.locator('#av-body .yrow').count(), 162);
+    assert.equal(await page.locator('#av-body [data-work="T3406511"]').count(), 1);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: join(out, 'world-fantasy-award-360.png'), animations: 'disabled' });
     await page.addStyleTag({ content: 'html { font-size: 130% !important; }' });
     await page.setViewportSize({ width: 740, height: 360 });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Landscape at enlarged font size fits');

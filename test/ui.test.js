@@ -71,7 +71,7 @@ function selectFilter(group, values = []) {
   click($('#tab-awards')); await sleep(50);
   selectFilter('av-awards',['h']); selectFilter('av-categories',['S']);
   checks['phone: no table'] = !$('#view-awards table.board');
-  checks['phone: category picker'] = $$('#view-awards [data-multi-filter="av-categories"]').length === 9;
+  checks['phone: category picker'] = $$('#view-awards [data-multi-filter="av-categories"]').length === w.eval('CATEGORY_FILTERS.length + 1');
   const ss = $$('#view-awards .yrow');
   checks['hugo short story list ~71'] = ss.length >= 68 && ss.length <= 74;
   checks['decade jump chips'] = $$('#view-awards [data-jump]').length >= 7;
@@ -85,12 +85,12 @@ function selectFilter(group, values = []) {
   click($('#view-awards [data-av-sort]')); await sleep(50);
   checks['sort toggle → 1953 first'] = /1953/.test($('#view-awards .yrow').textContent);
   selectFilter('av-awards', ['l']); await sleep(50);
-  checks['locus 8 category chips'] = $$('#view-awards [data-multi-filter="av-categories"]').length === 9;
+  checks['all category filters stay available for Locus'] = $$('#view-awards [data-multi-filter="av-categories"]').length === w.eval('CATEGORY_FILTERS.length + 1');
   // "All" by category: every award at once, one row per work, the awards named on it
   selectFilter('av-awards', []); await sleep(50);
   selectFilter('av-categories', ['S']); await sleep(50);
   const allRows = $$('#view-awards .yrow'), hugoS = w.eval("DATA.aw.filter(x => x[0] === 'h' && x[1] === 'S').length");
-  checks['awards “All” by category: more than one award, no duplicates, awards named'] = $$('#view-awards [data-multi-filter="av-categories"]').length === 9 && allRows.length > hugoS && allRows.length < w.eval("DATA.aw.filter(x => x[1] === 'S').length") && allRows.some(r => /;/.test((r.querySelector('.wmeta') || {}).textContent || '')) && /^Все/.test($('#view-awards .count-line').textContent);
+  checks['awards “All” by category: more than one award, no duplicates, awards named'] = $$('#view-awards [data-multi-filter="av-categories"]').length === w.eval('CATEGORY_FILTERS.length + 1') && allRows.length > hugoS && allRows.length < w.eval("DATA.aw.filter(x => CATEGORY_GROUPS.S.includes(x[1])).length") && allRows.some(r => /;/.test((r.querySelector('.wmeta') || {}).textContent || '')) && /^Все/.test($('#view-awards .count-line').textContent);
   selectFilter('av-categories', ['N']); await sleep(50);
   checks['awards “All” novels include Locus fantasy novels'] = $$('#view-awards .wmeta').some(m => /Локус · /.test(m.textContent));
   click($('#view-awards [data-av-mode="years"]')); await sleep(30);
@@ -138,12 +138,12 @@ function selectFilter(group, values = []) {
   selectFilter('av-awards', []); await sleep(30);
   const boardRows = $$('#view-awards table.board tbody tr[data-year]');
   const boardEntries = boardRows.flatMap(row => [...row.querySelectorAll('td')].flatMap(td => [...td.querySelectorAll('[data-work]')].map(b => `${row.dataset.year}|${td.dataset.category}|${b.dataset.work}`)));
-  const expectedEntries = [...new Set(w.eval("DATA.aw.map(([a,c,y,q]) => y + '|' + (['SF','FN','HN','FT'].includes(c) ? 'N' : c) + '|' + q)"))];
+  const expectedEntries = [...new Set(w.eval("DATA.aw.map(([a,c,y,q]) => y + '|' + (Object.keys(CATEGORY_GROUPS).find(g => CATEGORY_GROUPS[g].includes(c)) || c) + '|' + q)"))];
   checks['all-awards board: every award record represented, no duplicate work/year/category'] = boardEntries.length === expectedEntries.length && new Set(boardEntries).size === boardEntries.length && expectedEntries.every(x => boardEntries.includes(x));
   checks['all-awards board: All stays selected and every entry names its awards'] = w.eval("AV.awards.length === 0") && $('#view-awards [data-multi-filter="av-awards"][value="all"]').checked && $$('#view-awards table.board .award-meta').length === boardEntries.length && $$('#view-awards table.board .award-meta').some(x => /Хьюго.*; Небьюла/.test(x.textContent));
   checks['all-awards board: Locus novel subcategories and tied winners remain visible'] = $$('#view-awards table.board [data-category="N"] .award-meta').some(x => /Локус · Фэнтези-роман/.test(x.textContent)) && expectedEntries.filter(x => x.startsWith('1966|N|')).every(x => boardEntries.includes(x));
   click($('#view-awards [data-av-mode="years"]')); await sleep(30);
-  checks['all-awards by year: same winners as board, grouped by category with award labels'] = $$('#view-awards .yearsec .wrow').length === boardEntries.length && w.eval("AV.awards.length === 0") && $$('#view-awards .yearsec .wmeta').every(x => /Хьюго|Небьюла|Локус/.test(x.textContent));
+  checks['all-awards by year: same winners as board, grouped by category with award labels'] = $$('#view-awards .yearsec .wrow').length === boardEntries.length && w.eval("AV.awards.length === 0") && $$('#view-awards .yearsec .wmeta').every(x => /Хьюго|Небьюла|Локус|World Fantasy Award/.test(x.textContent));
   click($('#view-awards [data-av-mode="table"]')); await sleep(30);
   click($('#view-awards [data-av-cat-go="N"]')); await sleep(30);
   checks['all-awards board → category: All remains selected and no novel winners lost'] = w.eval("AV.awards.length === 0 && AV.cats.join() === 'N' && AV.mode === 'cats'") && $$('#view-awards .yrow').length === boardEntries.filter(x => x.split('|')[1] === 'N').length;
@@ -153,7 +153,7 @@ function selectFilter(group, values = []) {
   click(filterInput('av-formats', 'full')); await sleep(30);
   selectFilter('av-categories',[]);
   click($('#view-awards [data-av-year="2024"]')); await sleep(30);
-  checks['all-awards board → year: every award and return to board'] = $$('#view-awards .yearsec h3').length === 3 && w.eval("AV.awards.length === 0 && AV.mode === 'table'");
+  checks['all-awards board → year: every award and return to board'] = $$('#view-awards .yearsec h3').length === 4 && w.eval("AV.awards.length === 0 && AV.mode === 'table'");
   click($('#view-awards [data-av-clear]')); await sleep(30);
   w.matchMedia = undefined; w.eval("renderAwards()");
   checks['back to phone: all awards without a table; desktop choice preserved'] = !$('#view-awards table.board') && w.eval("AV.awards.length === 0 && AV.mode === 'table'") && $('#view-awards [data-av-mode="cats"]').getAttribute('aria-pressed') === 'true';

@@ -1,6 +1,6 @@
 # Contribute findings to unoebasta — task contract v1
 
-Find public text, excerpt and human-audio links for the assigned Hugo, Nebula and Locus winning works. Work on **only the supplied QIDs**; the default task assigns 30 works. A larger explicitly assigned batch is allowed within the file and row limits below. Check EN, PL, RU and ES independently. Deliver reviewed findings and short unresolved notes. Do not implement product features or run a whole-catalog crawl.
+Find public text, excerpt and human-audio links for the assigned Hugo, Nebula, Locus and World Fantasy Award winning works. Work on **only the supplied QIDs**; the default task assigns 30 works. A larger explicitly assigned batch is allowed within the file and row limits below. Check EN, PL, RU and ES independently. Deliver reviewed findings and short unresolved notes. Do not implement product features or run a whole-catalog crawl.
 
 This is a model- and tool-independent task. Use the reader's chosen agent and available search tools; no particular provider, paid API or source-domain whitelist is required. The source names below are examples, not a closed list. Return all distinct reviewed sources for the assigned works; a preferred publisher source does not make other matching links ineligible. Unknown permission stays unknown.
 
@@ -50,7 +50,7 @@ CSV is UTF-8, comma-separated, with this exact header and column order:
 qid,title,form,lang,kind,site,url,tier,license,words,pub,part,archive,evidence,checked_at
 ```
 
-- `qid`: assigned existing work QID; `title`: exact title at the source; `form`: coverage form (`novel`, `novella`, `novelette`, `short story`).
+- `qid`: assigned existing work ID (Wikidata `Q…` or ISFDB title `T…`); `title`: exact title at the source; `form`: coverage form (`novel`, `novella`, `novelette`, `short story`).
 - `lang`: `en`, `pl`, `ru`, `es`; `kind`: `full`, `audio`, `fragment`. Put unsuccessful checks in notes, not findings rows.
 - `site`: source name; `url`: clean canonical public HTTP(S) URL, without credentials or tracking. No search-result URLs or private/local addresses.
 - `tier`: `t1`, `t2`, `t2us`, `external`, or `frag` as described above; `license`: exact evidenced license or empty. No invented CC labels.
