@@ -12,6 +12,7 @@ const load = path => readFileSync(join(root, path), 'utf8');
 const safeJson = value => JSON.stringify(value).replace(/</g, '\\u003c');
 const data = JSON.parse(load('data/awards.json'));
 data.registry = readAwardRegistry(root);
+data.authorNominations = JSON.parse(load('data/author-nominations.json'));
 validateAwards(data.registry, data);
 data.routes = catalogRoutes(data, JSON.parse(load('data/catalog-slugs.json')));
 const cdir = join(root, 'covers');

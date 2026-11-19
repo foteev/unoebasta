@@ -445,6 +445,8 @@ const OLD_IDS = { 'in-my-country': 'Q139732068', 'never-eaten-vegetables': 'Q139
 /* ---------- interface strings ---------- */
 const I18N = {
   en: {
+    catalog_books: 'Books', catalog_authors: 'Authors', catalog_author_search: 'Search authors', author_sort_works: 'Most works', author_sort_nominations: 'Most nominations',
+    author_nominations_n: 'Nominations: {n}', author_nominations_scope: 'Published fiction award entries, including wins, from',
     author_work_sort: 'Sort works', author_work_title: 'Title A–Z',
     work_words_est: 'About {n} words', work_read_est: 'About {n} min to read',
     theme_h: "Theme", theme_btn: "Theme: {t}", theme_auto: "As in the system", theme_light: "Light", theme_dark: "Dark", theme_classic: "Classic", theme_fantasy: "Fantasy", theme_note: "The reader opens in the same theme.",
@@ -532,6 +534,8 @@ const I18N = {
     ],
   },
   pl: {
+    catalog_books: 'Książki', catalog_authors: 'Autorzy', catalog_author_search: 'Szukaj autorów', author_sort_works: 'Najwięcej utworów', author_sort_nominations: 'Najwięcej nominacji',
+    author_nominations_n: 'Nominacje: {n}', author_nominations_scope: 'Opublikowane wyniki w kategoriach literackich, w tym wygrane, według',
     author_work_sort: 'Sortuj utwory', author_work_title: 'Tytuł A–Z',
     work_words_est: 'Około {n} słów', work_read_est: 'Około {n} min czytania',
     theme_h: "Motyw", theme_btn: "Motyw: {t}", theme_auto: "Jak w systemie", theme_light: "Jasny", theme_dark: "Ciemny", theme_classic: "Klasyczny", theme_fantasy: "Fantasy", theme_note: "Czytnik otwiera się w tym samym motywie.",
@@ -619,6 +623,8 @@ const I18N = {
     ],
   },
   ru: {
+    catalog_books: 'Книги', catalog_authors: 'Авторы', catalog_author_search: 'Поиск авторов', author_sort_works: 'Больше всего произведений', author_sort_nominations: 'Больше всего номинаций',
+    author_nominations_n: 'Номинаций: {n}', author_nominations_scope: 'Опубликованные результаты в литературных категориях, включая победы, по данным',
     author_work_sort: 'Сортировка произведений', author_work_title: 'Название А–Я',
     work_words_est: 'Около {n} слов', work_read_est: 'Около {n} мин чтения',
     theme_h: "Тема", theme_btn: "Тема: {t}", theme_auto: "Как в системе", theme_light: "Светлая", theme_dark: "Тёмная", theme_classic: "Классика", theme_fantasy: "Фэнтези", theme_note: "Читалка открывается в той же теме.",
@@ -706,6 +712,8 @@ const I18N = {
     ],
   },
   es: {
+    catalog_books: 'Libros', catalog_authors: 'Autores', catalog_author_search: 'Buscar autores', author_sort_works: 'Más obras', author_sort_nominations: 'Más nominaciones',
+    author_nominations_n: 'Nominaciones: {n}', author_nominations_scope: 'Resultados publicados de ficción, incluidas las victorias, según',
     author_work_sort: 'Ordenar obras', author_work_title: 'Título A–Z',
     work_words_est: 'Unas {n} palabras', work_read_est: 'Unos {n} min de lectura',
     theme_h: "Tema", theme_btn: "Tema: {t}", theme_auto: "Como el sistema", theme_light: "Claro", theme_dark: "Oscuro", theme_classic: "Clásico", theme_fantasy: "Fantasía", theme_note: "El lector se abre con el mismo tema.",
@@ -1268,6 +1276,13 @@ const filterMatches = (values, value) => !values.length || values.includes(value
 const homeLengths = () => filterValues(prefs.pickLengths, LENGTHS);
 const savedFilters = prefs.filters?.v === 1 ? prefs.filters : {};
 let filter = { awards: filterValues(savedFilters.catalog?.awards, AWARDS), langs: filterValues(savedFilters.catalog?.langs, SOURCE_LANGS), formats: filterValues(savedFilters.catalog?.formats, FORMATS), statuses: filterValues(savedFilters.catalog?.statuses, STATUSES), lengths: filterValues(savedFilters.catalog?.lengths, LENGTHS), q: '' };
+let catalogScope = new URLSearchParams(location.search).get('catalog') === 'authors' || !PUBLIC_LINKS && history.state?.ubCatalog === 'authors' ? 'authors' : 'books';
+const catalogAuthorFilter = { q: '', sort: 'az' };
+const CATALOG_AUTHOR_SORTS = ['az', 'works', 'nominations'];
+const catalogAuthorCounts = new Map();
+for (const w of Object.values(WORKS)) {
+  for (const id of w.authors) catalogAuthorCounts.set(id, (catalogAuthorCounts.get(id) || 0) + 1);
+}
 const authorFilter = { awards: [], langs: [], formats: [], statuses: [], lengths: [], q: '', sort: 'az' };
 const authorWorks = PAGE_AUTHOR ? Object.values(WORKS).filter(w => w.authors.includes(PAGE_AUTHOR)) : [];
 const AUTHOR_WORK_SORTS = ['az', 'desc', 'asc'];
@@ -1581,9 +1596,58 @@ function catalogFilterControls(state = filter, prefix = 'lib') {
 }
 function renderLibrary(onlyBody) {
   const v = $('#view-library');
-  if (onlyBody && $('#lib-body')) { $('#lib-body').innerHTML = libraryBody(); return; }
+  const authors = catalogScope === 'authors', body = authors ? catalogAuthorsBody : libraryBody;
+  if (onlyBody && $('#lib-body')) { $('#lib-body').innerHTML = body(); return; }
+  const scopes = ['books', 'authors'];
+  const tabs = `<div class="seg catalog-scopes" role="group" aria-label="${esc(t('nav_library'))}">${scopes.map(scope =>
+    `<button type="button" data-catalog-scope="${scope}" aria-pressed="${catalogScope === scope}">${esc(t('catalog_' + scope))}</button>`).join('')}</div>`;
   replaceFilterView(v, `<div class="intro"><h2>${esc(t('intro_h'))}</h2><p>${esc(t('intro_p'))}</p></div>
-    ${catalogFilterControls()}${searchForm('lib-q', filter.q)}<div id="lib-body" class="lib-body">${libraryBody()}</div>`);
+    ${tabs}${authors ? catalogAuthorControls() : catalogFilterControls() + searchForm('lib-q', filter.q)}
+    <div id="lib-body" class="lib-body">${body()}</div>`);
+}
+function catalogAuthorControls() {
+  const options = CATALOG_AUTHOR_SORTS.map(key => `<option value="${key}"${catalogAuthorFilter.sort === key ? ' selected' : ''}>${esc(t('author_sort_' + key))}</option>`).join('');
+  return searchForm('catalog-author-q', catalogAuthorFilter.q, t('catalog_author_search')) +
+    `<div class="author-tools catalog-author-tools"><label class="author-sort"><span class="sr">${esc(t('author_sort'))}</span><select id="catalog-author-sort">${options}</select></label></div>`;
+}
+function catalogAuthorsBody() {
+  const words = fold(catalogAuthorFilter.q).split(' ').filter(Boolean);
+  const nominations = id => DATA.authorNominations.counts[AUTHORS[id]?.isfdb];
+  const sort = catalogAuthorFilter.sort;
+  const ids = [...catalogAuthorCounts.keys()].filter(id => !words.length || Object.values(AUTHORS[id].name).some(name => {
+    const normalized = fold(name);
+    return words.every(word => normalized.includes(word));
+  }));
+  ids.sort((a, b) => {
+    const byName = authorName(a).localeCompare(authorName(b), LANG);
+    if (sort === 'nominations') return (nominations(b) ?? -1) - (nominations(a) ?? -1) || byName;
+    if (sort === 'works') return catalogAuthorCounts.get(b) - catalogAuthorCounts.get(a) || byName;
+    return byName;
+  });
+  const cards = ids.map(id => {
+    const works = catalogAuthorCounts.get(id);
+    const count = nominations(id);
+    const detail = sort === 'nominations' && count != null ? t('author_nominations_n', { n: fmtNum(count) }) : '';
+    const description = [t('author_works_n', { n: fmtNum(works) }), detail].filter(Boolean).join(' · ');
+    const content = `<span><strong>${esc(authorName(id))}</strong><span class="author-counts">${esc(description)}</span></span><span aria-hidden="true">›</span>`;
+    const href = catalogRoute('author', id);
+    return href ? catalogLink(href, content, ' class="catalog-author-entry"') : `<button type="button" class="catalog-author-entry" data-author="${esc(id)}">${content}</button>`;
+  });
+  const scope = sort === 'nominations' ? `<p class="footnote">${esc(t('author_nominations_scope'))} <a href="${esc(DATA.authorNominations.source)}" rel="noopener" target="_blank">ISFDB</a>.</p>` : '';
+  return `<p class="count-line" role="status">${esc(t('authors_count', { n: fmtNum(ids.length) }))}${catalogAuthorFilter.q ? ' · ' + clearBtn() : ''}</p>${scope}` +
+    (cards.length ? `<div class="slips">${cards.join('')}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`);
+}
+function setCatalogScope(scope) {
+  catalogScope = scope;
+  if (!PUBLIC_LINKS) {
+    history.replaceState({ ...history.state, ubCatalog: scope }, '');
+    return;
+  }
+  const url = new URL(location.href);
+  url.searchParams.set('view', 'library');
+  if (scope === 'authors') url.searchParams.set('catalog', 'authors');
+  else url.searchParams.delete('catalog');
+  history.replaceState(history.state, '', url);
 }
 function renderPublicAuthor(onlyBody = false) {
   if (!authorWorks.length) return;
@@ -1677,7 +1741,7 @@ function searchWorks(query) {
   }
   return out.sort((a, b) => b[1] - a[1] || latestYear(work(b[0])) - latestYear(work(a[0]))).map(x => x[0]);
 }
-const searchForm = (id, val) => `<form class="searchbar" role="search" data-sform="${id}"><input class="search" id="${id}" name="q" type="search" enterkeyhint="search" autocomplete="off" aria-label="${esc(t('search_go'))}" placeholder="${esc(t('search_ph'))}" value="${esc(val || '')}"><button class="btn btn-primary" type="submit">${esc(t('search_go'))}</button></form>`;
+const searchForm = (id, val, hint) => `<form class="searchbar" role="search" data-sform="${id}"><input class="search" id="${id}" name="q" type="search" enterkeyhint="search" autocomplete="off" aria-label="${esc(hint || t('search_go'))}" placeholder="${esc(hint || t('search_ph'))}" value="${esc(val || '')}"><button class="btn btn-primary" type="submit">${esc(t('search_go'))}</button></form>`;
 const awardsLine = w => w.awards.map(([a, c, y]) => `${awardName(a)} ${y} · ${catName(c)}`).join('; ');
 const SEARCH_MAX = 120;
 function searchRows(list, selection) { return `<div class="ylist">${list.slice(0, SEARCH_MAX).map(q => workRow(awardsLine(work(q)), q, selection)).join('')}</div>${list.length > SEARCH_MAX ? `<p class="footnote">${esc(t('search_more', { n: SEARCH_MAX }))}</p>` : ''}`; }
@@ -3333,7 +3397,7 @@ document.addEventListener('click', e => {
 let VIEW = 'catalog';
 function setView(v, initial = false) {
   if (PAGE_PATH && !initial) {
-    location.assign(APP_HOME + '?view=' + encodeURIComponent(v));
+    location.assign(APP_HOME + '?view=' + encodeURIComponent(v) + (PAGE_AUTHOR && v === 'library' ? '&catalog=authors' : ''));
     return;
   }
   const changed = VIEW !== v;
@@ -3511,6 +3575,12 @@ document.addEventListener('click', async e => {
   if (d.agentRecopy) { const ta = $('#agent-task-text'); try { await navigator.clipboard.writeText(ta.value); toast(t('agent_copied')); } catch { ta.focus(); ta.select(); } return; }
   if (d.lang) { if (d.lang === LANG) return; LANG = d.lang; prefs.lang = LANG; savePrefs(); applyTheme(); return refreshAll(); }
   if (d.view) { if (!PAGE_PATH) closeSheets(); return setView(d.view); }
+  if (['books', 'authors'].includes(d.catalogScope)) {
+    setCatalogScope(d.catalogScope);
+    renderLibrary();
+    $(`[data-catalog-scope="${d.catalogScope}"]`).focus({ preventScroll: true });
+    return;
+  }
   if (d.goshelf) { if (PAGE_PATH) return setView('shelf'); closeSheets(); setView('shelf'); await renderShelf(); const el = document.getElementById(d.goshelf); if (el) { const panel = el.closest('details.shelf-section'); if (panel) panel.open = true; el.scrollIntoView ? el.scrollIntoView({ block: 'start' }) : 0; el.classList.add('hit'); setTimeout(() => el.classList.remove('hit'), 1800); } return; }
   if (d.shelfdel || d.shelfclear) return deleteShelfItems(d.shelfdel || d.shelfclear, d.key);
   if (d.shelfundo) return undoShelfDeletion();
@@ -3529,7 +3599,7 @@ document.addEventListener('click', async e => {
   if (b.id === 'sugg-clear-all') return deleteShelfItems('suggestions');
   if (b.id === 'sugg-clear-sent') { for (const x of await Store.all('suggestions')) if (x.sent || x.gh) await Store.del('suggestions', x.id); return renderShelf(); }
   if (d.sclear) { const inp = b.closest('section') && b.closest('section').querySelector('form[data-sform] input'); if (inp) { inp.value = ''; runSearch(inp.id, ''); inp.focus(); } return; }
-  if (d.fresh) { filter.statuses = toggleFilter(filter.statuses, 'fresh', STATUSES); saveFilters(); if (VIEW !== 'library') setView('library'); return renderCatalog(); }
+  if (d.fresh) { filter.statuses = toggleFilter(filter.statuses, 'fresh', STATUSES); saveFilters(); if (catalogScope !== 'books') setCatalogScope('books'); if (VIEW !== 'library') setView('library'); return renderCatalog(); }
   if (d.pickavailable) { prefs.pickLengths = [d.pickavailable]; savePrefs(); return renderHome(); }
   if (d.pickmore) { pickNext(homeLengths(), ['excerpt', 'other'].includes(d.pickmore) ? d.pickmore : 'full'); return renderHome(); }
   if (b.id === 'news-seen') { VISIT = { baseline: Date.now(), firstTime: false }; touchVisit(); filter.statuses = filter.statuses.filter(x => x !== 'fresh'); saveFilters(); renderCatalog(); if (VIEW === 'awards') renderAwards(); return; }
@@ -3640,6 +3710,7 @@ document.addEventListener('change', e => {
     saveFilters(); return renderLibrary();
   }
   if (e.target.id === 'author-work-sort' && AUTHOR_WORK_SORTS.includes(e.target.value)) { authorFilter.sort = e.target.value; return renderPublicAuthor(true); }
+  if (e.target.id === 'catalog-author-sort' && CATALOG_AUTHOR_SORTS.includes(e.target.value)) { catalogAuthorFilter.sort = e.target.value; return renderLibrary(true); }
   if (e.target.id === 'av-author-sort' && ['az', 'awards', 'desc', 'asc'].includes(e.target.value)) { AV.authorSort = e.target.value; saveAV(); renderAwards(); $('#av-author-sort').focus(); return; }
   if (e.target.matches('input[type="file"]')) importFile(e.target);
   if (e.target.id === 'set-asknote') { prefs.askNote = e.target.checked; savePrefs(); }
@@ -3661,10 +3732,11 @@ let qT = null;
 function runSearch(id, val) {
   if (id === 'av-q') { AV.q = val.trim(); renderAwards(true); }
   if (id === 'lib-q') { filter.q = val.trim(); renderLibrary(true); }
+  if (id === 'catalog-author-q') { catalogAuthorFilter.q = val.trim(); renderLibrary(true); }
   if (id === 'author-q') { authorFilter.q = val.trim(); renderPublicAuthor(true); }
 }
 document.addEventListener('input', e => {
-  if (!['av-q', 'lib-q', 'author-q'].includes(e.target.id)) return;
+  if (!['av-q', 'lib-q', 'author-q', 'catalog-author-q'].includes(e.target.id)) return;
   clearTimeout(qT); const id = e.target.id, val = e.target.value;
   qT = setTimeout(() => runSearch(id, val), 250);
 });
