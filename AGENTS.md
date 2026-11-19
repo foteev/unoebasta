@@ -10,6 +10,10 @@ Carry the requested batch through discovery, targeted source checks, review, dur
 
 The automatic runner does not perform human verification. Measure useful outcomes by verified new links, resolved title/author identities and specific publication leads; request counts alone do not demonstrate success.
 
+# Public catalog pages and Google Search
+
+For each new or substantially updated public page, follow the [publication and indexing checks](docs/catalog-pages.md#publication-and-indexing-checks). Run the local checks for every change. After an authorized deployment, check the live pages and use Search Console for a small sample when access is available. Report crawl and index status separately. Reader-delegated tasks stop at the contribution files.
+
 # Multilingual audio research
 
 When asked to **search audio**, **ищи аудио** or continue the audio agent, follow [docs/audio-search.md](docs/audio-search.md). The user requested GPT Luna for first-pass discovery. Use `gpt-6-luna` when that model is available for delegation; the parent reviews identities and source evidence before publication. Prepare and carry a bounded batch through durable records, reviewed import, tests and deployment. If the model is unavailable, state that fact rather than silently claiming Luna ran.

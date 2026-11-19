@@ -10,6 +10,31 @@ const data = { ...JSON.parse(read('data/awards.json')), registry };
 const slugs = JSON.parse(read('data/catalog-slugs.json'));
 const routes = catalogRoutes(data, slugs);
 
+test('the homepage links directly to each generated award page', () => {
+  const home = read('dist/web/index.html');
+  const directory = home.match(/<nav id="award-directory"[\s\S]*?<\/nav>/)?.[0];
+  assert.ok(directory);
+  assert.match(home, /<title>Unoebasta · Award-Winning Sci-Fi and Fantasy to Read or Hear<\/title>/);
+  for (const path of Object.values(routes.award)) {
+    assert.ok(directory.includes(`href="./${path}"`), path);
+    assert.ok(read('dist/web/' + path + 'index.html').includes(`rel="canonical" href="https://foteev.github.io/unoebasta/${path}"`));
+  }
+});
+
+test('initial work HTML gives publication facts and separates full text, audio and excerpts', () => {
+  const work = id => read('dist/web/' + routes.work[id] + 'index.html');
+  const emet = work('Q131472627');
+  assert.match(emet, /<title>\(emet\) by Lauren Ring · unoebasta<\/title>/);
+  assert.match(emet, /<p class="wh-meta">Published 2021 · PodCastle 789 · About 7,877 words · About 39 min to read<\/p>/);
+  assert.match(emet, /World Fantasy Award 2022<b>Short Fiction<\/b>/);
+  assert.match(emet, />Full text · English · PodCastle<\/a>/);
+  assert.match(emet, />Audio · English · PodCastle · 1:06:54<\/a>/);
+  assert.match(work('Q1410482'), />Excerpt · Polish · Legimi<\/a>/);
+  const pill = work('Q131245261');
+  assert.match(pill, />Text · English · Escape Pod · Part 1<\/a>/);
+  assert.doesNotMatch(work('T3514919'), /Published null/);
+});
+
 test('the published work path and the prize codes appear in the static artifact', () => {
   const workPath = routes.work.Q130213759;
   assert.equal(workPath, 'work/better-living-through-algorithms-Q130213759/');

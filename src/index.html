@@ -444,6 +444,7 @@ const OLD_IDS = { 'in-my-country': 'Q139732068', 'never-eaten-vegetables': 'Q139
 /* ---------- interface strings ---------- */
 const I18N = {
   en: {
+    work_words_est: 'About {n} words', work_read_est: 'About {n} min to read',
     theme_h: "Theme", theme_btn: "Theme: {t}", theme_auto: "As in the system", theme_light: "Light", theme_dark: "Dark", theme_classic: "Classic", theme_fantasy: "Fantasy", theme_note: "The reader opens in the same theme.",
     lm_btn: "Language: {l}. Site and reading languages", lm_title: "Languages", lm_site: "Site language", lm_read: "I read in", lm_read_all: "All languages for now. Pick yours and Read and the book cards start with them.", lm_read_some: "Read and the book cards start with these languages.", ask_langs: "Which languages do you read?", ask_note: "Books in these languages will come first. You can change this in the {c} ▾ menu at the top.", ask_done: "Done", ask_later: "Not now", ask_saved: "Languages saved: {l}. Change them in the {c} ▾ menu at the top.",
     author_sort: "Sort authors", author_sort_az: "Name A–Z", author_sort_awards: "Most awards", author_sort_desc: "Newest award", author_sort_asc: "Oldest award", author_awards_n: "Awards: {n}",
@@ -529,6 +530,7 @@ const I18N = {
     ],
   },
   pl: {
+    work_words_est: 'Około {n} słów', work_read_est: 'Około {n} min czytania',
     theme_h: "Motyw", theme_btn: "Motyw: {t}", theme_auto: "Jak w systemie", theme_light: "Jasny", theme_dark: "Ciemny", theme_classic: "Klasyczny", theme_fantasy: "Fantasy", theme_note: "Czytnik otwiera się w tym samym motywie.",
     lm_btn: "Język: {l}. Język strony i lektury", lm_title: "Języki", lm_site: "Język strony", lm_read: "Czytam w językach", lm_read_all: "Na razie wszystkie języki. Wybierz swoje, a Czytaj i karty książek zaczną się od nich.", lm_read_some: "Czytaj i karty książek zaczynają się od tych języków.", ask_langs: "W jakich językach czytasz?", ask_note: "Książki w tych językach będą pierwsze. Zmienisz to w menu {c} ▾ u góry.", ask_done: "Gotowe", ask_later: "Nie teraz", ask_saved: "Zapisano języki: {l}. Zmienisz je w menu {c} ▾ u góry.",
     author_sort: "Sortuj autorów", author_sort_az: "Nazwa A–Z", author_sort_awards: "Najwięcej nagród", author_sort_desc: "Najnowsza nagroda", author_sort_asc: "Najstarsza nagroda", author_awards_n: "Nagrody: {n}",
@@ -614,6 +616,7 @@ const I18N = {
     ],
   },
   ru: {
+    work_words_est: 'Около {n} слов', work_read_est: 'Около {n} мин чтения',
     theme_h: "Тема", theme_btn: "Тема: {t}", theme_auto: "Как в системе", theme_light: "Светлая", theme_dark: "Тёмная", theme_classic: "Классика", theme_fantasy: "Фэнтези", theme_note: "Читалка открывается в той же теме.",
     lm_btn: "Язык: {l}. Язык сайта и чтения", lm_title: "Языки", lm_site: "Язык сайта", lm_read: "Читаю на", lm_read_all: "Пока все языки. Выберите свои — «Читать» и карточки книг начнутся с них.", lm_read_some: "«Читать» и карточки книг начинаются с этих языков.", ask_langs: "На каких языках вы читаете?", ask_note: "Книги на этих языках пойдут первыми. Изменить можно в меню {c} ▾ вверху.", ask_done: "Готово", ask_later: "Не сейчас", ask_saved: "Языки сохранены: {l}. Изменить можно в меню {c} ▾ вверху.",
     author_sort: "Порядок авторов", author_sort_az: "Имя А–Я", author_sort_awards: "Больше всего премий", author_sort_desc: "Новая премия", author_sort_asc: "Ранняя премия", author_awards_n: "Премий: {n}",
@@ -699,6 +702,7 @@ const I18N = {
     ],
   },
   es: {
+    work_words_est: 'Unas {n} palabras', work_read_est: 'Unos {n} min de lectura',
     theme_h: "Tema", theme_btn: "Tema: {t}", theme_auto: "Como el sistema", theme_light: "Claro", theme_dark: "Oscuro", theme_classic: "Clásico", theme_fantasy: "Fantasía", theme_note: "El lector se abre con el mismo tema.",
     lm_btn: "Idioma: {l}. Idioma del sitio y de lectura", lm_title: "Idiomas", lm_site: "Idioma del sitio", lm_read: "Leo en", lm_read_all: "Por ahora, todos los idiomas. Elige los tuyos y Leer y las fichas de libros empezarán por ellos.", lm_read_some: "Leer y las fichas de libros empiezan por estos idiomas.", ask_langs: "¿En qué idiomas lees?", ask_note: "Los libros en estos idiomas aparecerán primero. Puedes cambiarlo en el menú {c} ▾ de arriba.", ask_done: "Listo", ask_later: "Ahora no", ask_saved: "Idiomas guardados: {l}. Puedes cambiarlos en el menú {c} ▾ de arriba.",
     author_sort: "Ordenar autores", author_sort_az: "Nombre A–Z", author_sort_awards: "Más premios", author_sort_desc: "Premio más reciente", author_sort_asc: "Premio más antiguo", author_awards_n: "Premios: {n}",
@@ -1331,23 +1335,10 @@ function workFlags(w) {
   return f.join('');
 }
 function tierOf(q) { return fullLink(q)?.tier || (READ[q] ? READ[q].tier : (hasExcerpt(q) ? 't3' : 't4')); }
-// excerpt links: r = Reactor (Tor) excerpt post path, lr = LitRes book path (free fragment in Russian),
-// lg = Legimi ebook page (the page shows a free fragment of the Polish edition),
-// o = other publishers' excerpt pages: [{ u: url, s: site, l: language }]
-// excerpt links: Reactor (Tor excerpt post), LitRes (free fragment of a Russian edition),
-// Google Books previews the publisher allows (gb: {en|pl|ru: [volumeId, isbn], n: pages, s: [volumeId, collection title, isbn] for a short work inside a collection})
-const gbUrl = (id, q) => `https://books.google.com/books?id=${encodeURIComponent(id)}${q ? '&q=' + encodeURIComponent('"' + q + '"') : '&printsec=frontcover'}`;
 function excerptLinks(q) {
   const w = WORKS[q]; if (!w) return [];
-  const x = w.ex || {}, g = w.gb || {}, out = [];
-  if (x.r) { const audio = /audio-excerpt/.test(x.r); out.push({ url: 'https://reactormag.com' + x.r, site: 'Reactor (Tor)', lang: 'EN', html: !audio, audio }); }
-  if (x.lr) out.push({ url: 'https://www.litres.ru' + x.lr, site: LANG === 'ru' ? 'ЛитРес' : 'LitRes', lang: 'RU', html: true });
-  if (x.lg) out.push({ url: 'https://www.legimi.pl' + x.lg, site: 'Legimi', lang: 'PL', html: true });
-  for (const o of x.o || []) out.push({ url: o.u, site: o.s, lang: (o.l || 'en').toUpperCase(), html: true });
-  for (const l of ['en', 'pl', 'ru', 'es']) if (g[l] && !(l === 'en' && x.r) && !(l === 'ru' && x.lr) && !(l === 'pl' && x.lg)) out.push({ url: gbUrl(g[l][0]), site: 'Google Books', lang: l.toUpperCase(), gb: { id: g[l][0], isbn: g[l][1], lang: l } });
-  if (g.s) out.push({ url: gbUrl(g.s[0], w.title), site: 'Google Books', lang: 'EN', coll: g.s[1] });
-  const L = LANG.toUpperCase(); out.sort((a, b) => (b.lang === L) - (a.lang === L));
-  return out;
+  const L = LANG.toUpperCase();
+  return catalogExcerpts(w, LANG === 'ru' ? 'ЛитРес' : undefined).sort((a, b) => (b.lang === L) - (a.lang === L));
 }
 // What exists for each language: 'full' = free full text, 'part' = excerpt or preview, '' = nothing yet.
 // READ links are English unless they carry lang. The same rule feeds scripts/coverage.mjs (what to look for next).
@@ -1371,7 +1362,7 @@ const FORM_ORDER = ['novel', 'novella', 'novelette', 'short'];
 const FORM_WORDS = { novel: 100000, novella: 28000, novelette: 11000, short: 4500 };
 function formOf(q) { const w = WORKS[q]; let f = null; if (w) for (const a of w.awards) { const x = CAT_FORM[a[1]]; if (x && (!f || FORM_ORDER.indexOf(x) < FORM_ORDER.indexOf(f))) f = x; } return f || 'short'; }
 // pages: Google Books first, then the Open Library median across editions
-const pagesOf = q => { const w = WORKS[q]; return (w && ((w.gb && w.gb.n) || (w.ol && w.ol.n))) || null; };
+const pagesOf = q => catalogPageCount(WORKS[q]?.gb, WORKS[q]?.ol);
 function wordsOf(q) { const r = READ[q]; if (r && r.w) return r.w; const n = pagesOf(q); if (n) return n * 280; return FORM_WORDS[formOf(q)]; }
 const minutesOf = q => Math.max(1, Math.round(wordsOf(q) / WPM));
 // Neutral: people read at different speeds, so no exact minutes. Same edges as the length choice (LEN).
@@ -2067,7 +2058,10 @@ const warnMark = () => `<svg class="src-w" viewBox="0 0 24 24" width="14" height
 function workSources(q) {
   const out = [], unverified = l => l.rights === 'unknown' || l.tier === 'external';
   for (const l of (READ[q]?.links || []).filter(l => l.kind === 'full')) out.push({ kind: 'text', o: 0, lang: l.lang || 'en', site: siteLabel(l), url: l.url, meta: l.part ? t('part_n', { n: l.part }) : '', warn: unverified(l), track: `data-track="${q}" data-via="read" data-site="${esc(siteLabel(l))}"` });
-  for (const l of audioLinks(q)) out.push({ kind: 'audio', o: 1, lang: l.lang || 'en', site: l.site || hostOf(l.url), url: l.url, meta: l.part ? t('part_n', { n: l.part }) : '', warn: unverified(l), listed: l.verification === 'metadata', track: `data-track="${q}" data-via="listen" data-site="${esc(audioSite(l))}"` });
+  for (const l of audioLinks(q)) {
+    const meta = [l.part ? t('part_n', { n: l.part }) : '', catalogAudioDuration(l.seconds)].filter(Boolean).join(' · ');
+    out.push({ kind: 'audio', o: 1, lang: l.lang || 'en', site: l.site || hostOf(l.url), url: l.url, meta, warn: unverified(l), listed: l.verification === 'metadata', track: `data-track="${q}" data-via="listen" data-site="${esc(audioSite(l))}"` });
+  }
   for (const x of excerptLinks(q)) out.push({ kind: x.audio ? 'audio' : 'text', o: x.audio ? 3 : 2, lang: x.lang.toLowerCase(), site: x.site, url: x.url, meta: x.coll ? `${t('rl_excerpt')} · «${x.coll}»` : t('rl_excerpt'), gb: x.gb && canNet() ? x.gb : null });
   return out;
 }
@@ -2121,7 +2115,11 @@ function redrawReadPanel(focusSel, otherOpen = $('#rl-panel .rl-other')?.open) {
 function workFacts(w) {
   const q = w.id, r = READ[q], orig = origOf(w);
   const year = w.pub && !(r && String(r.pub).includes(String(w.pub))) ? String(w.pub) : '';
-  return [orig ? `<i lang="en">${esc(orig)}</i>` : '', r ? esc(r.pub) : '', esc(year), pagesOf(q) ? esc(t('pages', { n: pagesOf(q) })) : '', esc(fmtDur(readingMinutes(q)))].filter(Boolean).join(' · ');
+  const pages = pagesOf(q), showEstimate = PAGE_WORK && Number.isFinite(r?.w) && r.w > 0;
+  return [orig ? `<i lang="en">${esc(orig)}</i>` : '', r ? esc(r.pub) : '', esc(year),
+    pages ? esc(t('pages', { n: fmtNum(pages) })) : '',
+    showEstimate ? esc(t('work_words_est', { n: fmtNum(r.w) })) : '',
+    esc(showEstimate ? t('work_read_est', { n: fmtNum(minutesOf(q)) }) : fmtDur(readingMinutes(q)))].filter(Boolean).join(' · ');
 }
 const doneCard = q => `<button class="done-card done-btn" data-done="${q}" aria-pressed="${isDone(q)}">${isDone(q) ? DONE_ICON.on : DONE_ICON.off}<span class="dc-t"><span class="dc-n">${esc(isDone(q) ? cap(t('done_on_date', { d: fmtDate(doneAt(q)) })) : t('done_btn'))}</span><span class="dc-s">${esc(t(isDone(q) ? 'done_card_on' : 'done_card_off'))}</span></span></button>`;
 async function openWork(q) {
@@ -2392,7 +2390,6 @@ async function elevenFile(id) {
 // Descriptions ('about' records) come from the text itself (FB2/EPUB annotation, page description) or from Wikipedia,
 // fetched once and kept for offline use.
 const RECALL_GAP = 5 * 60e3;               // reopening after this long shows the reminder window first
-const WPM = 200;
 const canNet = () => !window.claude && !/claudeusercontent|claude\.ai/.test(location.hostname); // the claude.ai viewer blocks requests to other sites
 let skipRecallOnce = false, recallPick = null, recallFrom = null, clearedReading = null;
 function relTime(ms) {
@@ -3324,6 +3321,8 @@ function setView(v, initial = false) {
   if (changed && !initial) trackAnalytics();
   if (!PAGE_PATH && !history.state?.ub) history.replaceState({ ...history.state, ubView: v }, '');
   ['catalog', 'library', 'awards', 'shelf', 'about'].forEach(x => { $('#view-' + x).hidden = !!PAGE_PATH || x !== v; $('#tab-' + x).setAttribute('aria-selected', String(x === v)); });
+  const directory = $('#award-directory');
+  if (directory) directory.hidden = v !== 'catalog';
   if (v === 'shelf') renderShelf();
   if (v === 'awards') renderAwards();
   if (!initial) window.scrollTo(0, 0);
