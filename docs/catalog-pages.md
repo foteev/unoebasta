@@ -12,10 +12,16 @@ The reading app and generated pages share one catalog.
 
 Each URL is independent of the displayed language. Work pages share the app’s catalog IDs and [browser shelf](data-and-sync.md#storage). Add a slug to [`data/catalog-slugs.json`](../data/catalog-slugs.json) for each new work or author ID. Records with verified Wikidata identifiers use `Q…`. World Fantasy Award entries without a matched Wikidata item use the ISFDB title ID with a `T` prefix or the ISFDB author ID with an `A` prefix. Keep published slugs stable when correcting titles.
 
+## Browse works by author
+
+Author pages show the same work cards as the Catalog. Search the author's works or filter by award, source language, format, reading time, and status. Sort by title, latest award, or earliest award. The controls apply to this author page. Stars and finished marks use the shared browser shelf.
+
+Without JavaScript, the cards and work links remain available in title order. JavaScript adds search, sort, filters, and reading actions.
+
 ## Publication and indexing checks
 
 1. Run `npm run build` and `npm test`. Use the generated files under `dist/web` to check each new or substantially updated public page.
-2. Check the page title, canonical URL and sitemap entry. Follow a regular HTML link to the page with JavaScript disabled. The homepage links to the award pages. The award pages link to the works. Work pages link to their authors.
+2. Check the page title, canonical URL and sitemap entry. Follow a regular HTML link to the page with JavaScript disabled. The homepage links to the award pages. The award pages link to the works. Work pages link to their authors. Author cards link back to their works.
 3. Check the initial HTML for the facts a reader needs. On work pages, check the award, category and year, plus publication details and page count when available. Label word counts and reading times as estimates. Distinguish full text, parts, excerpts and audio by source and language. Include a recorded duration when the catalog has one. Keep provenance and verification details accurate. Omit unknown values.
 4. After deployment, open the live URL and check its HTTP status, canonical, internal links and visible content. With Search Console access, confirm that Google can read the [sitemap](https://foteev.github.io/unoebasta/sitemap.xml). Use URL Inspection for an important new page or a representative sample from a batch. Check the last crawl, rendered content and Google-selected canonical when available. Request indexing once for priority pages after a substantial change. Track index status, impressions and clicks over time. Record when Search Console access is unavailable.
 

@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { WPM, catalogAudioDuration, catalogAward, catalogExcerpts, catalogLink, catalogPageCount, catalogWorkHeading } from '../../src/components/catalog.mjs';
+import { WPM, catalogAudioDuration, catalogAward, catalogCover, catalogExcerpts, catalogLink, catalogPageCount, catalogSlip, catalogWorkHeading } from '../../src/components/catalog.mjs';
 
 export const SITE = 'https://foteev.github.io/unoebasta/';
 const prefix = new URL(SITE).pathname;
@@ -59,6 +59,10 @@ export function writePublicPages(dir, shell, data, read) {
   const workLink = q => catalogLink(local('work', q), localized('work', q, data.works[q][0]), ' data-work="' + q + '"');
   const rowsByWork = new Map(Object.keys(data.works).map(q => [q, []]));
   for (const row of data.aw) rowsByWork.get(row[3]).push(row);
+  const awardsFor = (q, linked = false) => rowsByWork.get(q).map(([a, c, y]) => catalogAward(
+    data.registry.awards[a].name.en, y, data.registry.categories[c].name.en,
+    linked ? { href: local('award', a) } : undefined)).join('');
+  const covers = new Set(data.covers);
   const write = (path, title, description, content, qid) => {
     const url = absolute(path);
     const meta = '<link rel="canonical" href="' + text(url) + '">\n' +
@@ -77,10 +81,9 @@ export function writePublicPages(dir, shell, data, read) {
   };
   for (const [q, w] of Object.entries(data.works)) {
     const rows = rowsByWork.get(q);
-    const awards = rows.map(([a, c, y]) => catalogAward(data.registry.awards[a].name.en, y,
-      data.registry.categories[c].name.en, { href: local('award', a) })).join('');
+    const awards = awardsFor(q, true);
     const authors = w[3].map(a => catalogLink(local('author', a), text(data.authors[a][0]), ' class="btn btn-small author-pill"')).join('');
-    const cover = data.covers.includes(q) ? '<img class="cover cover-m" src="../../covers/m/' + q + '.webp" alt="" width="120" height="180">' : '';
+    const cover = covers.has(q) ? '<img class="cover cover-m" src="../../covers/m/' + q + '.webp" alt="" width="120" height="180">' : '';
     const entry = read[q], words = entry?.w, pages = catalogPageCount(data.gb?.[q], data.ol?.[q]);
     const hasWordCount = Number.isFinite(words) && words > 0;
     const facts = [w[6] && 'Published ' + w[6], entry?.pub, pages && numbers.format(pages) + ' pages',
@@ -99,9 +102,19 @@ export function writePublicPages(dir, shell, data, read) {
   }
   for (const [q, a] of Object.entries(data.authors)) {
     const works = Object.entries(data.works).filter(([, w]) => w[3].includes(q)).sort(([, a], [, b]) => a[0].localeCompare(b[0], 'en'));
+    const cards = works.map(([id, w]) => {
+      const names = w[3].map(author => data.authors[author][0]);
+      return catalogSlip({
+        opener: catalogLink(local('work', id), '<h3>' + text(w[0]) + '</h3>', ' class="slip-open" data-work="' + id + '"'),
+        cover: catalogCover({ id, title: w[0], author: names[0], image: covers.has(id), base: '../../' }),
+        awards: awardsFor(id), byline: [names.join(', '), read[id]?.pub, w[6]].filter(Boolean).join(' · ')
+      });
+    });
     write(data.routes.author[q], a[0], 'Award-winning works by ' + a[0] + ' on unoebasta.',
-      '<section class="wrap public-catalog"><h1>' + localized('author', q, a[0]) + '</h1><ul>' +
-      works.map(([id]) => '<li>' + workLink(id) + '</li>').join('') + '</ul></section>');
+      '<section id="public-author" class="wrap public-author" data-author-id="' + q + '" aria-labelledby="author-name">' +
+      '<h1 id="author-name">' + localized('author', q, a[0]) + '</h1><div id="author-controls"></div>' +
+      '<div id="author-works" aria-live="polite">' + (cards.length ? '<div class="slips">' + cards.join('') + '</div>' :
+        '<p class="empty" data-i18n="nothing_found">Nothing found</p>') + '</div></section>');
   }
   for (const [id, a] of Object.entries(data.registry.awards)) {
     const rows = data.aw.filter(([award]) => award === id).sort((a, b) => b[2] - a[2]);

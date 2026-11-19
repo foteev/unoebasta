@@ -20,6 +20,33 @@ export function catalogWorkHeading({ title, cover = '', awards, authors, facts =
     '</' + heading + '><p class="wh-meta">' + facts + '</p></div></div>';
 }
 
+export function hash(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
+export function catalogCover({ id, title, author, image, size = 's', base = '' }) {
+  const big = size === 'm';
+  if (image) return `<img class="cover cover-${size}" src="${catalogEscape(base)}covers/${size}/${catalogEscape(id)}.webp" alt="" loading="lazy" decoding="async" width="${big ? 120 : 56}" height="${big ? 180 : 84}">`;
+  const hue = parseInt(hash(id), 36) % 360;
+  return `<div class="cover cover-${size} cover-t" style="--ch:${hue}" aria-hidden="true"><span class="ct" lang="en">${catalogEscape(title)}</span><span class="ca">${catalogEscape(author)}</span></div>`;
+}
+
+export function catalogSlip({ opener, cover, awards, byline, original = '', duration = '', flags = '', actions = '', star = '', done = false }) {
+  return `<article class="slip${done ? ' is-done' : ''}">
+    ${star}
+    <div class="slip-row">${cover}<div class="slip-body">
+      <div class="awards">${awards}</div>
+      ${opener}
+      ${original ? `<div class="alt" lang="en">${catalogEscape(original)}</div>` : ''}
+      <p class="byline">${catalogEscape(byline)}</p>
+      ${duration ? `<p class="slip-time">${catalogEscape(duration)}</p>` : ''}</div></div>
+    ${flags ? `<div class="flags">${flags}</div>` : ''}
+    ${actions ? `<div class="slip-actions">${actions}</div>` : ''}
+  </article>`;
+}
+
 export const WPM = 200;
 export const catalogPageCount = (gb, ol) => gb?.n || ol?.n || null;
 

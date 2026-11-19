@@ -45,8 +45,21 @@ test('the published work path and the prize codes appear in the static artifact'
     assert.ok(read('dist/web/sitemap.xml').includes('/unoebasta/' + awardPath));
   }
   for (const path of Object.values(routes.author)) {
-    assert.ok(read('dist/web/' + path + 'index.html').includes('<h1>'));
+    assert.ok(read('dist/web/' + path + 'index.html').includes('<h1 id="author-name">'));
   }
+});
+
+test('public author cards link to every work with JavaScript disabled', () => {
+  const author = 'Q210059';
+  const page = read('dist/web/' + routes.author[author] + 'index.html');
+  assert.match(page, /<span data-public-author="Q210059">Neil Gaiman<\/span>/);
+  assert.ok(page.includes(`<link rel="canonical" href="https://foteev.github.io/unoebasta/${routes.author[author]}">`));
+  const works = Object.entries(data.works).filter(([, w]) => w[3].includes(author)).map(([id]) => id);
+  const linked = [...page.matchAll(/<a href="\.\.\/\.\.\/work\/[^\"]+" class="slip-open" data-work="([^\"]+)"/g)].map(match => match[1]);
+  assert.deepEqual(linked.sort(), works.sort());
+  assert.match(page, /<img class="cover cover-s" src="\.\.\/\.\.\/covers\/s\//);
+  assert.match(page, /class="cover cover-s cover-t"/);
+  assert.match(page, /<span class="award">[^<]+<b>[^<]+<\/b><\/span>/);
 });
 
 test('a new prize and category can be registered without changing code', () => {
