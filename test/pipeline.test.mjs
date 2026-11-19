@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { FOUND_FIELDS, parseCsv, toCsv, validateFound, sourceUrlKey } from '../scripts/lib/csv.mjs';
 import { readTable, loadCatalog } from '../scripts/lib/catalog.mjs';
 import { mergeFound } from '../scripts/lib/merge-found.mjs';
@@ -273,7 +274,7 @@ test('legacy negatives do not block new sources; unknown translation titles rema
 });
 
 test('current catalog and historical CSVs load without remote coverage.csv', () => {
-  const c = loadCatalog(new URL('..', import.meta.url).pathname);
+  const c = loadCatalog(fileURLToPath(new URL('..', import.meta.url)));
   c.history.forEach(validateFound);
   assert.ok(c.works.length >= 656); assert.ok(c.history.length >= 177); assert.ok(c.works.every(w => w.authors.length));
 });
@@ -294,7 +295,7 @@ test('reviewed unavailable sources cannot return through old findings or a diffe
   assert.throws(()=>assertSourceScope([{...deadAudio,kind:'audio'}]),/player resource returns HTTP 404/);
   assert.doesNotThrow(()=>assertSourceScope([{...bad,kind:'none',url:''}]));
   const source=readFileSync(new URL('../src/index.html',import.meta.url),'utf8'),data=JSON.parse(readFileSync(new URL('../data/awards.json',import.meta.url),'utf8'));
-  const catalog=loadCatalog(new URL('..',import.meta.url).pathname);
+  const catalog=loadCatalog(fileURLToPath(new URL('..',import.meta.url)));
   for(const w of catalog.works)assert.doesNotThrow(()=>assertSourceScope(w.knownLinks.filter(l=>!catalog.history.some(h=>h.qid===w.qid&&h.url===l.url)).map(l=>({...l,qid:w.qid}))));
   for(const r of SOURCE_REVIEWS.filter(r=>r.status==='unavailable_reader'))assert.notEqual(data.ex?.[r.qid]?.lr,new URL(r.url).pathname);
   assert.ok(!readTable(source)[deadAudio.qid].links.some(l=>l.kind==='audio'&&sourceUrlKey(l.url)===sourceUrlKey(deadAudio.url)));

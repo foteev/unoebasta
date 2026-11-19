@@ -6,11 +6,11 @@ The reading app and generated pages share one catalog.
 
 | Page | Path |
 |---|---|
-| Work | `work/<title>-<id>/` |
+| Work | `work/<author>-<title>-<id>/` |
 | Author | `author/<name>-<id>/` |
 | Award | `award/<slug>-<code>/` |
 
-Each URL is independent of the displayed language. Work pages share the app’s catalog IDs and [browser shelf](data-and-sync.md#storage). Add a slug to [`data/catalog-slugs.json`](../data/catalog-slugs.json) for each new work or author ID. Records with verified Wikidata identifiers use `Q…`. World Fantasy Award entries without a matched Wikidata item use the ISFDB title ID with a `T` prefix or the ISFDB author ID with an `A` prefix. Keep published slugs stable when correcting titles.
+Each URL is independent of the displayed language. Work URLs prefix the title slug with the credited author slug(s). Work pages share the app’s catalog IDs and [browser shelf](data-and-sync.md#storage). Add a slug to [`data/catalog-slugs.json`](../data/catalog-slugs.json) for each new work or author ID. Records with verified Wikidata identifiers use `Q…`. World Fantasy Award entries without a matched Wikidata item use the ISFDB title ID with a `T` prefix or the ISFDB author ID with an `A` prefix. Keep published slugs stable when correcting titles.
 
 ## Browse works by author
 

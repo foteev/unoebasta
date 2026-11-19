@@ -41,10 +41,16 @@ function sourceList(sources) {
 }
 
 export function catalogRoutes(data, slugs) {
+  const authorPrefix = qid => {
+    const authors = data.works?.[qid]?.[3] || [];
+    const authorSlugs = authors.map(id => slugs.author?.[id]).filter(Boolean);
+    return authorSlugs.length ? authorSlugs.join('-') + '-' : '';
+  };
   const entities = (type, entries) => Object.fromEntries(Object.keys(entries).map(qid => {
     const slug = slugs[type]?.[qid];
     if (!(type === 'work' ? /^[QT][1-9]\d*$/ : /^[QA][1-9]\d*$/).test(qid) || !slugPattern.test(slug || '')) throw new Error('Missing or invalid stable slug for ' + type + ' ' + qid);
-    return [qid, type + '/' + slug + '-' + qid + '/'];
+    const prefix = type === 'work' ? authorPrefix(qid) : '';
+    return [qid, type + '/' + prefix + slug + '-' + qid + '/'];
   }));
   return {
     work: entities('work', data.works),

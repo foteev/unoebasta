@@ -37,7 +37,7 @@ test('initial work HTML gives publication facts and separates full text, audio a
 
 test('the published work path and the prize codes appear in the static artifact', () => {
   const workPath = routes.work.Q130213759;
-  assert.equal(workPath, 'work/better-living-through-algorithms-Q130213759/');
+  assert.equal(workPath, 'work/naomi-kritzer-better-living-through-algorithms-Q130213759/');
   assert.match(read('dist/web/' + workPath + 'index.html'), /<h1>Better Living Through Algorithms<\/h1>/);
   for (const award of Object.keys(registry.awards)) {
     const awardPath = routes.award[award];
@@ -82,7 +82,7 @@ test('World Fantasy Award keeps shared wins, existing work IDs and ISFDB-only ro
   assert.equal(winners.length, 162);
   assert.deepEqual(winners.filter(([, category, year]) => category === 'N' && year === 1985).map(row => data.works[row[3]][0]).sort(), ['Bridge of Birds', 'Mythago Wood']);
   assert.ok(winners.some(([, , year, id]) => year === 2012 && id === 'Q27903111'));
-  assert.equal(routes.work.T3406511, 'work/once-was-willem-T3406511/');
+  assert.equal(routes.work.T3406511, 'work/m-r-carey-once-was-willem-T3406511/');
   const page = read('dist/web/' + routes.award.wfa + 'index.html');
   assert.match(page, /Long Fiction/);
   assert.match(page, /Short Fiction/);

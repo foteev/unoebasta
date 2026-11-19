@@ -17,7 +17,7 @@ validateAwards(data.registry, data);
 data.routes = catalogRoutes(data, JSON.parse(load('data/catalog-slugs.json')));
 const cdir = join(root, 'covers');
 data.covers = existsSync(join(cdir, 'm')) ? readdirSync(join(cdir, 'm')).filter(f => f.endsWith('.webp')).map(f => f.slice(0, -5)).filter(q => existsSync(join(cdir, 's', q + '.webp'))).sort() : [];
-const src = load('src/index.html');
+const src = load('src/index.html').replace(/\r\n/g, '\n');
 const css = ['base', 'lists', 'reading', 'sheets', 'appearance', 'themes', 'public-pages']
   .map(name => load('src/styles/' + name + '.css')).join('');
 const components = load('src/components/catalog.mjs').replace(/^export /gm, '');
