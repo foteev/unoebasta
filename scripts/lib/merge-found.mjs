@@ -85,9 +85,11 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
       if (!pattern.test(source)) throw new Error(`${qid}: READ entry is not on one line`);
       source = source.replace(pattern, () => line);
     } else {
-      const end = source.indexOf('\n};\nconst CHANGELOG');
-      if (end < 0) throw new Error('READ end not found');
-      source = source.slice(0, end) + '\n' + line + source.slice(end);
+      const match = source.match(/\r?\n\};\r?\nconst CHANGELOG/);
+      if (!match) throw new Error('READ end not found');
+      const end = match.index;
+      const nl = match[0].startsWith('\r\n') ? '\r\n' : '\n';
+      source = source.slice(0, end) + nl + line + source.slice(end);
     }
   }
   if (stats.fragments) data.ex_at = now.slice(0, 10);
