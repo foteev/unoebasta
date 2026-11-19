@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readAwardRegistry, validateAwards } from './lib/awards.mjs';
 import { readTable } from './lib/catalog.mjs';
-import { catalogRoutes, SITE, writePublicPages } from './lib/public-pages.mjs';
+import { catalogAwardDirectory, catalogRoutes, SITE, writePublicPages } from './lib/public-pages.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist', 'web');
@@ -29,10 +29,11 @@ const dataText = safeJson(data);
 const template = replaceOnce(src, '__CATALOG_COMPONENTS__', components);
 const app = replaceOnce(replaceOnce(replaceOnce(template, '__SITE_CSS__', css), '__AWARDS_JSON__', dataText), '__SEARCH_BRIEF_JSON__', brief);
 mkdirSync(dist, { recursive: true });
-const homeMetadata = `<title>unoebasta</title>
+const homeMetadata = `<title>Unoebasta · Award-Winning Sci-Fi and Fantasy to Read or Hear</title>
 <link rel="canonical" href="${SITE}">
 <meta name="google-site-verification" content="K4v2MmrqwzwD1Ve3ygC7yQR0_EYqP9vDwTrx-ODoYzU">`;
-writeFileSync(join(dist, 'index.html'), replaceOnce(app, '<title>unoebasta</title>', homeMetadata));
+const home = replaceOnce(app, '<title>unoebasta</title>', homeMetadata);
+writeFileSync(join(dist, 'index.html'), replaceOnce(home, '</main>', catalogAwardDirectory(data) + '</main>'));
 const runtime = template.match(/<script>\n('use strict';[\s\S]*?)<\/script>/)?.[1];
 if (!runtime) throw new Error('App script is missing');
 const publicRuntime = replaceOnce(replaceOnce(runtime,
