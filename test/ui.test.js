@@ -1142,6 +1142,40 @@ function selectFilter(group, values = []) {
       hits.length === 2 && hits.every(h => h.url === '/unoebasta/' + route) &&
       hits[1].name === 'open_work' && hits[1].data.qid === 'Q130213759';
   } finally { publicCard.close(); }
+  const authorRoute = 'author/neil-gaiman-Q210059/';
+  const authorHtml = fs.readFileSync(path.join(publicDir, authorRoute, 'index.html'), 'utf8');
+  const author = new JSDOM(authorHtml.replace('<script defer src="../../catalog-app.js"></script>', () => '<script>' + runtime + '</script>'), {
+    url: 'https://foteev.github.io/unoebasta/' + authorRoute, runScripts: 'dangerously',
+    beforeParse(win) {
+      win.scrollTo = () => {};
+      win.localStorage.setItem('fantastic-prefs', JSON.stringify({ lang: 'en', filters: { v: 1, catalog: { statuses: ['starred'] } } }));
+    }
+  }).window;
+  try {
+    const find = s => author.document.querySelector(s);
+    const ids = () => [...author.document.querySelectorAll('#author-works .slip-open')].map(a => a.dataset.work);
+    await author.eval('refreshAll()');
+    const initial = ids();
+    checks['public author renders all its works with shared cards and independent filters'] = initial.length > 10 &&
+      initial.length === author.eval('authorWorks.length') && initial.some(q => author.eval(`!READ['${q}']`)) &&
+      find('#author-works .slip .star') && find('#author-works .slip .slip-actions');
+    const sort = find('#author-work-sort');
+    sort.value = 'desc'; sort.dispatchEvent(new author.Event('change', { bubbles: true }));
+    const sorted = ids();
+    const years = sorted.map(q => author.eval(`latestYear(work('${q}'))`));
+    checks['public author sorts by award year'] = sorted[0] !== initial[0] && years.every((year, i) => i === 0 || years[i - 1] >= year);
+    const award = find('[data-multi-filter="author-awards"][value="wfa"]');
+    award.click();
+    const filtered = ids();
+    checks['public author filters works and keeps the catalog preferences'] = filtered.length > 0 && filtered.length < initial.length &&
+      filtered.every(q => author.eval(`work('${q}').awards.some(a => a[0] === 'wfa')`)) && author.eval("filter.statuses.join(',') === 'starred'");
+    find('[data-multi-filter="author-awards"][value="all"]').click();
+    const search = find('#author-q');
+    search.value = 'Coraline';
+    search.dispatchEvent(new author.Event('input', { bubbles: true }));
+    await waitFor(() => ids().length < initial.length);
+    checks['public author search returns work cards'] = /Coraline/.test(find('#author-works').textContent) && !find('#fatal');
+  } finally { author.close(); }
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);

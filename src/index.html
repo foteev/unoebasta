@@ -86,6 +86,7 @@ window.addEventListener('unhandledrejection', e => showFatal('promise: ' + ((e.r
 const DATA = JSON.parse(document.getElementById('awards-data').textContent);
 const PAGE_PATH = document.body.dataset.pagePath;
 const PAGE_WORK = document.body.dataset.pageWork;
+const PAGE_AUTHOR = document.querySelector('#public-author')?.dataset.authorId;
 const APP_HOME = PAGE_PATH ? '../../' : './';
 const PUBLIC_LINKS = !!PAGE_PATH || location.pathname.startsWith('/unoebasta/');
 const PRIVATE_ENTRY = /^#(?:sync|move)=/.test(location.hash);
@@ -444,6 +445,7 @@ const OLD_IDS = { 'in-my-country': 'Q139732068', 'never-eaten-vegetables': 'Q139
 /* ---------- interface strings ---------- */
 const I18N = {
   en: {
+    author_work_sort: 'Sort works', author_work_title: 'Title A–Z',
     work_words_est: 'About {n} words', work_read_est: 'About {n} min to read',
     theme_h: "Theme", theme_btn: "Theme: {t}", theme_auto: "As in the system", theme_light: "Light", theme_dark: "Dark", theme_classic: "Classic", theme_fantasy: "Fantasy", theme_note: "The reader opens in the same theme.",
     lm_btn: "Language: {l}. Site and reading languages", lm_title: "Languages", lm_site: "Site language", lm_read: "I read in", lm_read_all: "All languages for now. Pick yours and Read and the book cards start with them.", lm_read_some: "Read and the book cards start with these languages.", ask_langs: "Which languages do you read?", ask_note: "Books in these languages will come first. You can change this in the {c} ▾ menu at the top.", ask_done: "Done", ask_later: "Not now", ask_saved: "Languages saved: {l}. Change them in the {c} ▾ menu at the top.",
@@ -530,6 +532,7 @@ const I18N = {
     ],
   },
   pl: {
+    author_work_sort: 'Sortuj utwory', author_work_title: 'Tytuł A–Z',
     work_words_est: 'Około {n} słów', work_read_est: 'Około {n} min czytania',
     theme_h: "Motyw", theme_btn: "Motyw: {t}", theme_auto: "Jak w systemie", theme_light: "Jasny", theme_dark: "Ciemny", theme_classic: "Klasyczny", theme_fantasy: "Fantasy", theme_note: "Czytnik otwiera się w tym samym motywie.",
     lm_btn: "Język: {l}. Język strony i lektury", lm_title: "Języki", lm_site: "Język strony", lm_read: "Czytam w językach", lm_read_all: "Na razie wszystkie języki. Wybierz swoje, a Czytaj i karty książek zaczną się od nich.", lm_read_some: "Czytaj i karty książek zaczynają się od tych języków.", ask_langs: "W jakich językach czytasz?", ask_note: "Książki w tych językach będą pierwsze. Zmienisz to w menu {c} ▾ u góry.", ask_done: "Gotowe", ask_later: "Nie teraz", ask_saved: "Zapisano języki: {l}. Zmienisz je w menu {c} ▾ u góry.",
@@ -616,6 +619,7 @@ const I18N = {
     ],
   },
   ru: {
+    author_work_sort: 'Сортировка произведений', author_work_title: 'Название А–Я',
     work_words_est: 'Около {n} слов', work_read_est: 'Около {n} мин чтения',
     theme_h: "Тема", theme_btn: "Тема: {t}", theme_auto: "Как в системе", theme_light: "Светлая", theme_dark: "Тёмная", theme_classic: "Классика", theme_fantasy: "Фэнтези", theme_note: "Читалка открывается в той же теме.",
     lm_btn: "Язык: {l}. Язык сайта и чтения", lm_title: "Языки", lm_site: "Язык сайта", lm_read: "Читаю на", lm_read_all: "Пока все языки. Выберите свои — «Читать» и карточки книг начнутся с них.", lm_read_some: "«Читать» и карточки книг начинаются с этих языков.", ask_langs: "На каких языках вы читаете?", ask_note: "Книги на этих языках пойдут первыми. Изменить можно в меню {c} ▾ вверху.", ask_done: "Готово", ask_later: "Не сейчас", ask_saved: "Языки сохранены: {l}. Изменить можно в меню {c} ▾ вверху.",
@@ -702,6 +706,7 @@ const I18N = {
     ],
   },
   es: {
+    author_work_sort: 'Ordenar obras', author_work_title: 'Título A–Z',
     work_words_est: 'Unas {n} palabras', work_read_est: 'Unos {n} min de lectura',
     theme_h: "Tema", theme_btn: "Tema: {t}", theme_auto: "Como el sistema", theme_light: "Claro", theme_dark: "Oscuro", theme_classic: "Clásico", theme_fantasy: "Fantasía", theme_note: "El lector se abre con el mismo tema.",
     lm_btn: "Idioma: {l}. Idioma del sitio y de lectura", lm_title: "Idiomas", lm_site: "Idioma del sitio", lm_read: "Leo en", lm_read_all: "Por ahora, todos los idiomas. Elige los tuyos y Leer y las fichas de libros empezarán por ellos.", lm_read_some: "Leer y las fichas de libros empiezan por estos idiomas.", ask_langs: "¿En qué idiomas lees?", ask_note: "Los libros en estos idiomas aparecerán primero. Puedes cambiarlo en el menú {c} ▾ de arriba.", ask_done: "Listo", ask_later: "Ahora no", ask_saved: "Idiomas guardados: {l}. Puedes cambiarlos en el menú {c} ▾ de arriba.",
@@ -766,7 +771,6 @@ const locale = () => LANG === 'en' ? 'en-GB' : LANG;
 const fmtNum = n => Number(n).toLocaleString(locale());
 const fmtDate = ms => new Date(ms).toLocaleDateString(locale(), { day: 'numeric', month: 'long' });
 function fmtBytes(b) { if (b == null) return '—'; const u = ['B', 'KB', 'MB', 'GB']; let i = 0; while (b >= 1024 && i < 3) { b /= 1024; i++; } return (i ? b.toFixed(1) : b) + ' ' + u[i]; }
-function hash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
 function toast(msg, act) { const el = $('#toast'); el.innerHTML = esc(msg) + (act ? `<button class="toast-act" data-${act.k}="${esc(act.v)}">${esc(act.label)}</button>` : ''); el.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { el.hidden = true; }, act ? 6000 : 3200); }
 const MOTTO = '20 minute adventure'; // the motto stays in English in every language, like the name
 const registryName = entry => entry?.name[LANG] || entry?.name.en || '';
@@ -795,10 +799,8 @@ let COVERS = null;
 function coverHtml(q, size) {
   const w = WORKS[q]; if (!w) return '';
   if (!COVERS) COVERS = new Set(DATA.covers || []);
-  const big = size === 'm';
-  if (COVERS.has(q)) return `<img class="cover cover-${big ? 'm' : 's'}" src="${PAGE_PATH ? APP_HOME : ''}covers/${big ? 'm' : 's'}/${q}.webp" alt="" loading="lazy" decoding="async" width="${big ? 120 : 56}" height="${big ? 180 : 84}">`;
-  const hue = parseInt(hash(q), 36) % 360, by = (w.authors[0] && authorName(w.authors[0])) || '';
-  return `<div class="cover cover-${big ? 'm' : 's'} cover-t" style="--ch:${hue}" aria-hidden="true"><span class="ct" lang="en">${esc(w.title)}</span><span class="ca">${esc(by)}</span></div>`;
+  return catalogCover({ id: q, title: w.title, author: (w.authors[0] && authorName(w.authors[0])) || '',
+    image: COVERS.has(q), size, base: PAGE_PATH ? APP_HOME : '' });
 }
 
 /* ---------- icons: Lucide (ISC), thin outline ---------- */
@@ -1266,6 +1268,9 @@ const filterMatches = (values, value) => !values.length || values.includes(value
 const homeLengths = () => filterValues(prefs.pickLengths, LENGTHS);
 const savedFilters = prefs.filters?.v === 1 ? prefs.filters : {};
 let filter = { awards: filterValues(savedFilters.catalog?.awards, AWARDS), langs: filterValues(savedFilters.catalog?.langs, SOURCE_LANGS), formats: filterValues(savedFilters.catalog?.formats, FORMATS), statuses: filterValues(savedFilters.catalog?.statuses, STATUSES), lengths: filterValues(savedFilters.catalog?.lengths, LENGTHS), q: '' };
+const authorFilter = { awards: [], langs: [], formats: [], statuses: [], lengths: [], q: '', sort: 'az' };
+const authorWorks = PAGE_AUTHOR ? Object.values(WORKS).filter(w => w.authors.includes(PAGE_AUTHOR)) : [];
+const AUTHOR_WORK_SORTS = ['az', 'desc', 'asc'];
 function saveFilters() {
   prefs.filters = { v: 1, catalog: { awards: filter.awards, langs: filter.langs, formats: filter.formats, statuses: filter.statuses, lengths: filter.lengths }, awards: { awards: AV.awards, cats: AV.cats, langs: AV.langs, formats: AV.formats } };
   savePrefs();
@@ -1564,14 +1569,14 @@ function renderHome() {
       ${three.length && three.every(q => langScore(q) < 2) ? `<p class="note">${linkify(t('picks_lang_far', { l: langName([...workLangs(three[0]).full][0] || 'en') }))}</p>` : ''}
     </section>`);
 }
-function renderCatalog() { renderHome(); renderLibrary(); }
-function catalogFilterControls() {
+function renderCatalog() { renderHome(); renderLibrary(); if (PAGE_AUTHOR) renderPublicAuthor(); }
+function catalogFilterControls(state = filter, prefix = 'lib') {
   return `<div class="filter-grid">
-    ${multiFilter('lib-languages', t('source_language'), filter.langs, languageOptions())}
-    ${multiFilter('lib-awards', t('col_award'), filter.awards, awardOptions())}
-    ${multiFilter('lib-formats', t('filter_format'), filter.formats, formatOptions())}
-    ${multiFilter('lib-lengths', t('len_label'), filter.lengths, lengthOptions())}
-    ${multiFilter('lib-statuses', t('filter_status'), filter.statuses, [['starred', t('f_starred')], ['fresh', t('f_new')]])}
+    ${multiFilter(prefix + '-languages', t('source_language'), state.langs, languageOptions())}
+    ${multiFilter(prefix + '-awards', t('col_award'), state.awards, awardOptions())}
+    ${multiFilter(prefix + '-formats', t('filter_format'), state.formats, formatOptions())}
+    ${multiFilter(prefix + '-lengths', t('len_label'), state.lengths, lengthOptions())}
+    ${multiFilter(prefix + '-statuses', t('filter_status'), state.statuses, [['starred', t('f_starred')], ['fresh', t('f_new')]])}
   </div>`;
 }
 function renderLibrary(onlyBody) {
@@ -1580,48 +1585,63 @@ function renderLibrary(onlyBody) {
   replaceFilterView(v, `<div class="intro"><h2>${esc(t('intro_h'))}</h2><p>${esc(t('intro_p'))}</p></div>
     ${catalogFilterControls()}${searchForm('lib-q', filter.q)}<div id="lib-body" class="lib-body">${libraryBody()}</div>`);
 }
+function renderPublicAuthor(onlyBody = false) {
+  if (!authorWorks.length) return;
+  if (!onlyBody) {
+    const options = AUTHOR_WORK_SORTS.map(k => `<option value="${k}"${authorFilter.sort === k ? ' selected' : ''}>${esc(t(k === 'az' ? 'author_work_title' : 'author_sort_' + k))}</option>`).join('');
+    replaceFilterView($('#author-controls'), `${catalogFilterControls(authorFilter, 'author')}${searchForm('author-q', authorFilter.q)}
+      <label class="author-sort"><span>${esc(t('author_work_sort'))}</span><select id="author-work-sort">${options}</select></label>`);
+  }
+  const query = authorFilter.q ? new Set(searchWorks(authorFilter.q)) : null;
+  const list = authorWorks.filter(w => (!query || query.has(w.id)) && passCatalog(w.id, authorFilter));
+  list.sort((a, b) => {
+    const byTitle = titleOf(a).localeCompare(titleOf(b), LANG);
+    if (authorFilter.sort === 'desc') return latestYear(b) - latestYear(a) || byTitle;
+    if (authorFilter.sort === 'asc') return (a.awards[0]?.[2] ?? Infinity) - (b.awards[0]?.[2] ?? Infinity) || byTitle;
+    return byTitle;
+  });
+  $('#author-works').innerHTML = list.length ? `<p class="count-line">${esc(t('author_works_n', { n: fmtNum(list.length) }))}</p>
+    <div class="slips">${list.map(w => slipHtml(w, authorFilter.langs)).join('')}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`;
+}
 // the language of the text and of the reading, dimmed when the reader does not know it
 function langChips(q, langs) { const w = workLangs(q), m = myLangs(); const ls = [...new Set([...w.full, ...w.audio, ...w.frag])].filter(l => !langs || langs.includes(l)); return ls.map(l => `<span class="flag flag-lang${m.includes(l) ? '' : ' far'}" title="${esc(langName(l))}">${esc(l.toUpperCase())}</span>`).join(''); }
-function slipHtml(w) {
-  const r = READ[w.id], langs = sourceLangs(filter.langs), candidate = fullLink(w.id, langs || myLangs());
+function slipHtml(w, selectedLangs = filter.langs) {
+  const r = READ[w.id], langs = sourceLangs(selectedLangs), candidate = fullLink(w.id, langs || myLangs());
   const text = candidate && (!langs || langs.includes(candidate.lang || 'en')) ? candidate : null;
   const audio = audioLinks(w.id).find(l => !langs || langs.includes(l.lang || 'en'));
   const excerpt = excerptLinks(w.id).find(l => !langs || langs.includes(l.lang.toLowerCase()));
   const lang = text ? text.lang || 'en' : audio ? audio.lang || 'en' : excerpt?.lang.toLowerCase();
   const title = langs ? w.titles[lang] || w.title : titleOf(w), orig = langs ? title !== w.title ? w.title : '' : origOf(w);
-  const tier = !langs ? tierOf(w.id) : text ? text.tier || r.tier : audio ? audio.tier || r.tier : 't3';
+  const tier = !langs ? tierOf(w.id) : text ? text.tier || r.tier : audio ? audio.tier || r.tier : excerpt ? 't3' : 't4';
   const duration = !text && !audio && excerpt ? t('picks_excerpt_note') : fmtDur(text ? minutesOf(w.id) : audio?.seconds > 0 ? Math.ceil(audio.seconds / 60) : readingMinutes(w.id));
-  return `
-      <article class="slip${isDone(w.id) ? ' is-done' : ''}">
-        ${starBtn(w.id)}
-        <div class="slip-row">${coverHtml(w.id, 's')}<div class="slip-body">
-        <div class="awards">${awardChips(w, false)}</div>
-        ${workEntry(w.id, `slip-open`, `<h3>${esc(title)}</h3>`)}
-        ${orig ? `<div class="alt" lang="en">${esc(orig)}</div>` : ''}
-        <p class="byline">${esc(authorsLine(w))} · ${esc(r.pub)} · ${w.pub || ''}</p>
-        <p class="slip-time">${esc(duration)}</p></div></div>
-        <div class="flags">${langChips(w.id, langs)}<span class="tier tier-${tier}">${esc(t('tier_' + tier))}</span>${audio ? `<span class="flag">${esc(t('f_audio'))}</span>` : ''}${workFlags(w)}</div>
-        <div class="slip-actions">${text ? readCtl(w.id, 'btn btn-small', null, text) : excerpt ? `${workEntry(w.id, `btn btn-small`, `${esc(t('picks_excerpt_open'))}`)}` : ''}${listenCtl(w.id, 'btn btn-small', false, langs)}${doneBtn(w.id, 'btn btn-small btn-ghost')}</div>
-      </article>`; }
-function passCatalog(q) {
+  const flags = `${langChips(w.id, langs)}<span class="tier tier-${tier}">${esc(t('tier_' + tier))}</span>${audio ? `<span class="flag">${esc(t('f_audio'))}</span>` : ''}${workFlags(w)}`;
+  const read = text ? readCtl(w.id, 'btn btn-small', null, text) : excerpt ? workEntry(w.id, 'btn btn-small', esc(t('picks_excerpt_open'))) : '';
+  return catalogSlip({
+    opener: workEntry(w.id, 'slip-open', `<h3>${esc(title)}</h3>`), cover: coverHtml(w.id, 's'), awards: awardChips(w, false),
+    byline: [authorsLine(w), r?.pub, w.pub].filter(Boolean).join(' · '), original: orig, duration, flags,
+    actions: read + listenCtl(w.id, 'btn btn-small', false, langs) + doneBtn(w.id, 'btn btn-small btn-ghost'),
+    star: starBtn(w.id), done: isDone(w.id)
+  });
+}
+function passCatalog(q, state = filter) {
   const w = work(q); if (!w) return false;
-  return w.awards.some(([a]) => filterMatches(filter.awards, a))
-    && matchesSourceLanguage(q, filter.langs) && matchesFormats(q, filter.langs, filter.formats)
-    && (!filter.statuses.length || filter.statuses.some(status => status === 'starred' ? isStarred(q) : isNew(q)))
-    && minutesInLengths(readingMinutes(q, sourceLangs(filter.langs)), filter.lengths);
+  return (!state.awards.length || w.awards.some(([a]) => state.awards.includes(a)))
+    && matchesSourceLanguage(q, state.langs) && matchesFormats(q, state.langs, state.formats)
+    && (!state.statuses.length || state.statuses.some(status => status === 'starred' ? isStarred(q) : isNew(q)))
+    && minutesInLengths(readingMinutes(q, sourceLangs(state.langs)), state.lengths);
 }
 function libraryBody() {
   if (filter.q) {
-    const found = searchWorks(filter.q).filter(passCatalog), readable = found.filter(q => READ[q]).sort((a, b) => langScore(b) - langScore(a)), other = found.filter(q => !READ[q]);
+    const found = searchWorks(filter.q).filter(q => passCatalog(q)), readable = found.filter(q => READ[q]).sort((a, b) => langScore(b) - langScore(a)), other = found.filter(q => !READ[q]);
     return `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>
       ${readable.length ? `<h3 class="sub-h">${esc(t('search_readable', { n: readable.length }))}</h3><div class="slips">${readable.map(q => slipHtml(work(q))).join('')}</div>` : ''}
       ${other.length ? `<h3 class="sub-h">${esc(t('search_other', { n: other.length }))}</h3>${searchRows(other, filter.langs)}` : ''}
       ${found.length ? '' : `<p class="empty">${esc(t('nothing_found'))}</p>`}`;
   }
-  const list = Object.keys(READ).filter(passCatalog).map(work)
+  const list = Object.keys(READ).filter(q => passCatalog(q)).map(work)
     .sort((a, b) => langScore(b.id) - langScore(a.id) || latestYear(b) - latestYear(a) || a.title.localeCompare(b.title));
   return `${renderNews()}<p class="count-line">${list.length} ${esc(plural(list.length, t('works')))}</p>
-    <div class="slips">${list.map(slipHtml).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}</div>`;
+    <div class="slips">${list.map(w => slipHtml(w)).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}</div>`;
 }
 
 /* ---------- search: one search over all winners ----------
@@ -3515,7 +3535,7 @@ document.addEventListener('click', async e => {
   if (b.id === 'news-seen') { VISIT = { baseline: Date.now(), firstTime: false }; touchVisit(); filter.statuses = filter.statuses.filter(x => x !== 'fresh'); saveFilters(); renderCatalog(); if (VIEW === 'awards') renderAwards(); return; }
   if (d.done) { const q = d.done; await loadLocal(); const on = !isDone(q); await setDone(q, on); await refreshDoneViews(q); if (on) toast(t('done_toast', { t: work(q) ? work(q).title : '' }), { k: 'undone', v: q, label: t('done_undo') }); else toast(t('done_removed')); return; }
   if (d.undone) { await setDone(d.undone, false); $('#toast').hidden = true; return refreshDoneViews(d.undone); }
-  if (d.star) { await loadLocal(); await toggleStar(d.star); const s = document.querySelectorAll(`[data-star="${d.star}"]`); s.forEach(x => { x.setAttribute('aria-pressed', String(isStarred(d.star))); x.textContent = isStarred(d.star) ? '★' : '☆'; }); if (VIEW === 'awards') renderAwards(); if (VIEW === 'shelf') renderShelf(); if (filter.statuses.includes('starred')) renderCatalog(); return; }
+  if (d.star) { await loadLocal(); await toggleStar(d.star); const s = document.querySelectorAll(`[data-star="${d.star}"]`); s.forEach(x => { x.setAttribute('aria-pressed', String(isStarred(d.star))); x.textContent = isStarred(d.star) ? '★' : '☆'; }); if (VIEW === 'awards') renderAwards(); if (VIEW === 'shelf') renderShelf(); if (filter.statuses.includes('starred')) renderCatalog(); else if (authorFilter.statuses.includes('starred')) renderPublicAuthor(true); return; }
   if (d.work) {
     trackAnalytics('open_work', d.work);
     $('#sheet-author').hidden = true; $('#sheet-author').innerHTML = ''; return openWork(d.work);
@@ -3605,18 +3625,21 @@ document.addEventListener('change', e => {
   if (group) {
     const value = e.target.value;
     if (group === 'home-lengths') { prefs.pickLengths = toggleFilter(homeLengths(), value, LENGTHS); savePrefs(); return renderHome(); }
+    const catalogState = group.startsWith('author-') ? authorFilter : filter;
     const config = {
-      'lib-languages': [filter, 'langs', SOURCE_LANGS], 'lib-awards': [filter, 'awards', AWARDS],
-      'lib-formats': [filter, 'formats', FORMATS], 'lib-lengths': [filter, 'lengths', LENGTHS], 'lib-statuses': [filter, 'statuses', STATUSES],
+      'lib-languages': [catalogState, 'langs', SOURCE_LANGS], 'lib-awards': [catalogState, 'awards', AWARDS],
+      'lib-formats': [catalogState, 'formats', FORMATS], 'lib-lengths': [catalogState, 'lengths', LENGTHS], 'lib-statuses': [catalogState, 'statuses', STATUSES],
       'av-languages': [AV, 'langs', SOURCE_LANGS], 'av-awards': [AV, 'awards', AWARDS],
       'av-categories': [AV, 'cats', CATEGORY_FILTERS], 'av-formats': [AV, 'formats', FORMATS]
-    }[group];
+    }[group.replace(/^author-/, 'lib-')];
     if (!config) return;
     const [state, key, options] = config;
     state[key] = toggleFilter(state[key], value, options);
     if (state === AV) { AV.year = null; saveAV(); return renderAwards(); }
+    if (state === authorFilter) return renderPublicAuthor();
     saveFilters(); return renderLibrary();
   }
+  if (e.target.id === 'author-work-sort' && AUTHOR_WORK_SORTS.includes(e.target.value)) { authorFilter.sort = e.target.value; return renderPublicAuthor(true); }
   if (e.target.id === 'av-author-sort' && ['az', 'awards', 'desc', 'asc'].includes(e.target.value)) { AV.authorSort = e.target.value; saveAV(); renderAwards(); $('#av-author-sort').focus(); return; }
   if (e.target.matches('input[type="file"]')) importFile(e.target);
   if (e.target.id === 'set-asknote') { prefs.askNote = e.target.checked; savePrefs(); }
@@ -3638,9 +3661,10 @@ let qT = null;
 function runSearch(id, val) {
   if (id === 'av-q') { AV.q = val.trim(); renderAwards(true); }
   if (id === 'lib-q') { filter.q = val.trim(); renderLibrary(true); }
+  if (id === 'author-q') { authorFilter.q = val.trim(); renderPublicAuthor(true); }
 }
 document.addEventListener('input', e => {
-  if (e.target.id !== 'av-q' && e.target.id !== 'lib-q') return;
+  if (!['av-q', 'lib-q', 'author-q'].includes(e.target.id)) return;
   clearTimeout(qT); const id = e.target.id, val = e.target.value;
   qT = setTimeout(() => runSearch(id, val), 250);
 });
@@ -3693,7 +3717,7 @@ if (window.matchMedia) { const mq = window.matchMedia('(min-width: 900px)'); con
 
 /* ---------- start ---------- */
 function refreshResumedPage() {
-  if (!resetting && !restoreSavedLanguages() && PAGE_WORK) refreshAll();
+  if (!resetting && !restoreSavedLanguages() && (PAGE_WORK || PAGE_AUTHOR)) refreshAll();
 }
 window.addEventListener('storage', event => {
   if (event.key === PREFS_KEY && event.newValue !== null) restoreSavedLanguages();
@@ -3713,7 +3737,7 @@ document.addEventListener('visibilitychange', () => {
   const awardCode = params.get('award');
   const awardId = AWARDS.find(id => AWARD_REGISTRY.awards[id].code === awardCode);
   if (!PAGE_PATH && awardId) AV.awards = [awardId];
-  setView(Object.hasOwn(ANALYTICS_SECTIONS, initialView) ? initialView : 'catalog', true);
+  setView(Object.hasOwn(ANALYTICS_SECTIONS, initialView) ? initialView : PAGE_AUTHOR ? 'library' : 'catalog', true);
   ensureSchema().catch(e => console.warn('[unoebasta] schema', e)).then(() => refreshAll()).then(() => PAGE_WORK && openWork(PAGE_WORK)).then(() => checkMoveLink()).then(() => {
     startAnalytics();
     if (syncState() && !location.hash) { syncLast = Date.now(); syncNow(true); }
