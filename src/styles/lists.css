@@ -26,6 +26,15 @@ main .wrap { padding-block: 18px 64px; display: grid; gap: 16px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
 .seg button { border: 0; background: transparent; padding: 7px 12px; cursor: pointer; font-size: 14px; color: var(--muted); }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.catalog-scopes { margin-block-end: 12px; }
+.catalog-scopes button { min-height: 44px; padding-inline: 18px; }
+.catalog-scopes button:focus-visible { outline-offset: -3px; }
+.catalog-author-tools { margin-block-end: 12px; }
+.catalog-author-entry { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 64px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); text-align: start; text-decoration: none; }
+.catalog-author-entry:hover { border-color: var(--accent); }
+.catalog-author-entry strong, .catalog-author-entry .author-counts { display: block; }
+.catalog-author-entry > :first-child { min-width: 0; overflow-wrap: anywhere; }
+.catalog-author-entry > :last-child { color: var(--accent); }
 .search { flex: 1 1 220px; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 8px 11px; }
 
 /* news */

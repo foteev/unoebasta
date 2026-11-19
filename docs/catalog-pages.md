@@ -14,9 +14,17 @@ Each URL is independent of the displayed language. Work pages share the app’s 
 
 ## Browse works by author
 
+Open Catalog and select Books or Authors. The Authors tab lets you search by name and sort by name, most works in the catalog, or most nominations. Each result opens the author's public page. The [Authors tab](https://foteev.github.io/unoebasta/?view=library&catalog=authors) has a direct link.
+
 Author pages show the same work cards as the Catalog. Search the author's works or filter by award, source language, format, reading time, and status. Sort by title, latest award, or earliest award. The controls apply to this author page. Stars and finished marks use the shared browser shelf.
 
 Without JavaScript, the cards and work links remain available in title order. JavaScript adds search, sort, filters, and reading actions.
+
+### Author nomination counts
+
+**Most nominations** counts the published fiction entries that ISFDB records as wins, nominations, or numbered placements in Hugo, Nebula, Locus, and World Fantasy Award categories. It counts a shared entry once for each credited catalog author. The counts use the catalog's ISFDB author IDs. Asterisks and separate Retro Hugo categories are outside this count.
+
+Run `node scripts/refresh-author-nominations.mjs` after you add authors or update the award data. The script records the mirror snapshot and category IDs in [`data/author-nominations.json`](../data/author-nominations.json). Review the count changes before publication. The build uses the saved file.
 
 ## Publication and indexing checks
 

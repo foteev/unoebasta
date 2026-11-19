@@ -1082,6 +1082,27 @@ function selectFilter(group, values = []) {
     activate('#tab-library');
     const cardLink = select('#view-library a[data-work="Q25349436"]');
     checks['catalog links to the canonical work page'] = /^\/unoebasta\/work\/.+-Q25349436\/$/.test(cardLink?.pathname || '');
+    activate('[data-catalog-scope="authors"]');
+    const authors = () => [...analytics.document.querySelectorAll('#lib-body a.catalog-author-entry')];
+    const authorCount = authors().length;
+    checks['catalog authors tab opens a linked directory in the same main view'] = authorCount > 300 &&
+      select('[data-catalog-scope="authors"]').getAttribute('aria-pressed') === 'true' &&
+      select('#tab-library').getAttribute('aria-selected') === 'true' && analytics.location.search.includes('catalog=authors');
+    const directorySort = select('#catalog-author-sort');
+    directorySort.value = 'nominations';
+    directorySort.dispatchEvent(new analytics.Event('change', { bubbles: true }));
+    const nominations = authors().map(link => Number(link.textContent.match(/Nominations: (\d+)/)?.[1] ?? -1));
+    checks['catalog authors sort by source nominations with counts visible'] = nominations[0] > 0 &&
+      nominations.every((n, i) => i === 0 || nominations[i - 1] >= n) && !!select('#lib-body a[href*="isfdb"]');
+    const authorQuery = select('#catalog-author-q');
+    authorQuery.value = 'Gaiman Neil';
+    authorQuery.dispatchEvent(new analytics.Event('input', { bubbles: true }));
+    await waitFor(() => authors().length === 1);
+    checks['catalog can find an author by name and link to the public page'] = authors().length === 1 &&
+      authors()[0].pathname === '/unoebasta/author/neil-gaiman-Q210059/';
+    activate('[data-catalog-scope="books"]');
+    checks['returning to books preserves catalog behavior'] = !analytics.location.search.includes('catalog=authors') &&
+      select('[data-catalog-scope="books"]').getAttribute('aria-pressed') === 'true' && !!select('#view-library a[data-work="Q25349436"]');
     await analytics.eval("trackAnalytics('open_work', 'Q25349436'); openWork('Q25349436')");
     await waitFor(() => select('#sheet-work [data-analytics="read_click"]'));
     activate('#sheet-work [data-analytics="read_click"]');

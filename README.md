@@ -46,6 +46,7 @@ Everyone is welcome, no programming needed for most of it:
 - **Award data** in `data/awards.json` draws on [Wikidata](https://www.wikidata.org/) (CC0 1.0) and the sources documented in [Catalog pages and awards](docs/catalog-pages.md).
 - **Page counts and cover IDs** come from [Google Books](https://books.google.com/) and [Open Library](https://openlibrary.org/) (the Internet Archive asserts no copyright over its catalog data).
 - **Descriptions and biographies** in `data/awards.json` are from [Wikipedia](https://www.wikipedia.org/), CC BY-SA 4.0. If you reuse them, keep the attribution and the license.
+- **Nomination counts** in `data/author-nominations.json` aggregate fiction award entries from the [Internet Speculative Fiction Database](https://www.isfdb.org/) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 - **The stories** belong to their authors and publishers. unoebasta only links to them.
 - **Fragments** of novels are links to the free samples that publishers and shops show themselves: Reactor (Tor), Google Books, LitRes (Russian), Legimi (Polish). unoebasta earns nothing from them.
 - **Cover images** in `covers/` are fetched from [Open Library](https://openlibrary.org/) by `scripts/fetch-covers.mjs` (the “Covers” workflow). Cover art belongs to its publishers and artists and is shown only so readers can recognize a book. If you hold the rights and want a cover removed, open an issue.
