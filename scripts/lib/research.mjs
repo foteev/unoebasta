@@ -14,7 +14,7 @@ const bundledSources = () => JSON.parse(readFileSync(new URL('../../data/researc
 export const emptyResearch = () => ({ version: 1, aliases: { version: 1, titles: [], authors: [] }, sources: bundledSources(), leads: [], checks: [] });
 export const missingKinds = (w, lang, kind = 'all') => (kind === 'all' ? KINDS : [kind]).filter(k => !w.availability[lang]?.[k] && !(k === 'fragment' && w.availability[lang]?.full));
 const timestamp = s => typeof s === 'string' && /Z$/.test(s) && Number.isFinite(Date.parse(s));
-const qid = q => /^Q[1-9]\d*$/.test(q);
+const qid = q => /^[QTA][1-9]\d*$/.test(q);
 const readLines = path => existsSync(path) ? readFileSync(path, 'utf8').split('\n').filter(s => s.trim()).map((s, i) => {
   try { return JSON.parse(s); } catch { throw new Error(`${path}:${i + 1}: invalid JSON`); }
 }) : [];

@@ -2,7 +2,7 @@
 
 _20 minute adventure_
 
-**unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a static catalog for reading the winners of the Hugo, Nebula and Locus awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
+**unoebasta** (Italian _uno e basta_, “one and that’s it”: one more page, one story, done) is a static catalog for reading the winners of the Hugo, Nebula, Locus and World Fantasy awards with online text and audio links. It is made for busy readers and for readers with ADHD: one main action per screen, the time a story takes, three picks for the time you have.
 
 ![unoebasta mobile catalog view](docs/images/mobile-catalog.png)
 
@@ -43,7 +43,7 @@ Everyone is welcome, no programming needed for most of it:
 ## Licenses
 
 - **Code:** MIT, see [LICENSE](LICENSE).
-- **Award data** in `data/awards.json` comes from [Wikidata](https://www.wikidata.org/) (CC0 1.0).
+- **Award data** in `data/awards.json` draws on [Wikidata](https://www.wikidata.org/) (CC0 1.0) and the sources documented in [Catalog pages and awards](docs/catalog-pages.md).
 - **Page counts and cover IDs** come from [Google Books](https://books.google.com/) and [Open Library](https://openlibrary.org/) (the Internet Archive asserts no copyright over its catalog data).
 - **Descriptions and biographies** in `data/awards.json` are from [Wikipedia](https://www.wikipedia.org/), CC BY-SA 4.0. If you reuse them, keep the attribution and the license.
 - **The stories** belong to their authors and publishers. unoebasta only links to them.
@@ -51,6 +51,6 @@ Everyone is welcome, no programming needed for most of it:
 - **Cover images** in `covers/` are fetched from [Open Library](https://openlibrary.org/) by `scripts/fetch-covers.mjs` (the “Covers” workflow). Cover art belongs to its publishers and artists and is shown only so readers can recognize a book. If you hold the rights and want a cover removed, open an issue.
 - **Fonts:** [Jost](https://fonts.google.com/specimen/Jost) and [Literata](https://fonts.google.com/specimen/Literata), SIL Open Font License. **Icons:** [Lucide](https://lucide.dev/), ISC License.
 
-unoebasta is a non-commercial project and is not affiliated with the Hugo, Nebula or Locus awards.
+unoebasta is a non-commercial project and is not affiliated with the listed awards.
 
 **Bring your own agent.** Copy a search task from About or a work card, then give it to any capable agent. The [task contract](docs/search-brief.md) assigns 30 works by default and keeps the PR limited to findings files. Readers can also send a link and description through the existing Nostr form.

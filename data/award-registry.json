@@ -51,6 +51,21 @@
         "E",
         "S"
       ]
+    },
+    "wfa": {
+      "code": "WFA",
+      "slug": "world-fantasy",
+      "name": {
+        "en": "World Fantasy Award",
+        "pl": "World Fantasy Award",
+        "ru": "World Fantasy Award",
+        "es": "World Fantasy Award"
+      },
+      "categories": [
+        "N",
+        "WL",
+        "WS"
+      ]
     }
   },
   "categories": {
@@ -124,6 +139,24 @@
         "pl": "Debiut powieściowy",
         "ru": "Дебютный роман",
         "es": "Primera novela"
+      }
+    },
+    "WL": {
+      "form": "novella",
+      "name": {
+        "en": "Long Fiction",
+        "pl": "Dłuższa proza",
+        "ru": "Длинная проза",
+        "es": "Ficción larga"
+      }
+    },
+    "WS": {
+      "form": "short story",
+      "name": {
+        "en": "Short Fiction",
+        "pl": "Krótka proza",
+        "ru": "Короткая проза",
+        "es": "Ficción breve"
       }
     }
   }
