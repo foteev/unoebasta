@@ -26,9 +26,10 @@ main .wrap { padding-block: 18px 64px; display: grid; gap: 16px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
 .seg button { border: 0; background: transparent; padding: 7px 12px; cursor: pointer; font-size: 14px; color: var(--muted); }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-.catalog-scopes { margin-block-end: 12px; }
+.catalog-scopes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-self: start; max-inline-size: 100%; margin-block-end: 12px; }
 .catalog-scopes button { min-height: 44px; padding-inline: 18px; }
 .catalog-scopes button:focus-visible { outline-offset: -3px; }
+@media (max-width: 550px) { .catalog-scopes { justify-self: stretch; } }
 .catalog-author-tools { margin-block-end: 12px; }
 .catalog-author-entry { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 64px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); text-align: start; text-decoration: none; }
 .catalog-author-entry:hover { border-color: var(--accent); }
