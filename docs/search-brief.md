@@ -36,12 +36,14 @@ Treat all `wired.com` URLs and its subdomains as paywalled for unoebasta search 
 
 ## Request a reader check
 
-If there is any doubt about text completeness, playable audio streams, copyright blocks or promotional samples, do not guess, assume completeness, or submit the URL. Always compile an explicit verification list for human review (Reader Check) in your response or notes.
+Ask for a human reader check only for unusual items, genuine doubts, or edge cases. Do not request human review for routine, fully verified links that play completely and match expected durations. If there is genuine doubt about text completeness, playable audio streams, copyright blocks, promotional samples, or fan translation accuracy, do not guess, assume completeness, or submit the URL. Compile an explicit verification list for human review (Reader Check) only for those unusual or doubtful items in your response or notes.
 
-Specifically check for:
+Specifically check for unusual situations such as:
 - Community audiobook portals (such as knigavuhe.org) displaying copyright notices (such as `class="book_blocked"`, "Доступ к аудиокниге ограничен по просьбе правообладателя") or having zero playable audio tracks.
 - Commercial store samples or trial clips (such as LitRes `/audiotrial/` with duration 0 or short runtimes) masquerading as full recordings.
 - Truncated web texts missing the ending paragraph, or magazine sites requiring subscription logins.
+- Unofficial fan translations, fan voice narrations, or unusual recordings where textual fidelity or completeness requires auditory confirmation.
+- Substantial duration discrepancies between stated catalog runtimes and player media streams.
 
 When asking for a human reader check:
 1. List the work ID (QID), title, and author.
