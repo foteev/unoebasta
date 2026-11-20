@@ -10,6 +10,23 @@ Carry the requested batch through discovery, targeted source checks, review, dur
 
 The automatic runner does not perform human verification. Measure useful outcomes by verified new links, resolved title/author identities and specific publication leads; request counts alone do not demonstrate success.
 
+# Human verification list when in doubt
+
+If you have doubt about a source, do not import it. Do not submit unverified or doubtful links into findings or coverage.
+
+Always verify actual text boundaries and playable audio streams before you import. Check for:
+- Copyright blocks on community audio sites (for example: `class="book_blocked"` on knigavuhe).
+- Commercial preview samples (for example: LitRes trial clips with duration 0).
+- Truncated texts that miss the final narrative sentence.
+
+If a link is uncertain, compile a verification list for the human. Write the list in your response. Include:
+1. The work ID (QID), title, and author.
+2. The candidate URL.
+3. The observed status, byte length, or duration.
+4. The exact question for the human to verify in a browser.
+
+Keep uncertain candidates in the research notes as unresolved leads.
+
 # Public catalog pages and Google Search
 
 For each new or substantially updated public page, follow the [publication and indexing checks](docs/catalog-pages.md#publication-and-indexing-checks). Run the local checks for every change. After an authorized deployment, check the live pages and use Search Console for a small sample when access is available. Report crawl and index status separately. Reader-delegated tasks stop at the contribution files.

@@ -36,9 +36,20 @@ Treat all `wired.com` URLs and its subdomains as paywalled for unoebasta search 
 
 ## Request a reader check
 
-If a paywall, consent or bot check, regional restriction, broken player or ambiguous collection sample prevents verification, keep the source as a lead and ask a reader to check the exact URL. Specify which work and language to look for, whether the text or player opens, and which part of the story it contains. When practical, ask whether the beginning and ending are present. On publisher pages that offer both a text excerpt and an audio sample, such as Macmillan, ask the reader to check the two controls separately. Continue other checks while waiting.
+If there is any doubt about text completeness, playable audio streams, copyright blocks or promotional samples, do not guess, assume completeness, or submit the URL. Always compile an explicit verification list for human review (Reader Check) in your response or notes.
 
-Record the date and what the reader confirmed in the matching note and, for an accepted source, in the CSV evidence. A reader confirming playback and identity has checked those two things. Completeness and permission still need their own evidence. Keep a mismatch or an inconclusive result in the notes. Include any remaining reader checks and exact URLs in the findings PR.
+Specifically check for:
+- Community audiobook portals (such as knigavuhe.org) displaying copyright notices (such as `class="book_blocked"`, "Доступ к аудиокниге ограничен по просьбе правообладателя") or having zero playable audio tracks.
+- Commercial store samples or trial clips (such as LitRes `/audiotrial/` with duration 0 or short runtimes) masquerading as full recordings.
+- Truncated web texts missing the ending paragraph, or magazine sites requiring subscription logins.
+
+When asking for a human reader check:
+1. List the work ID (QID), title, and author.
+2. Provide the exact candidate URL.
+3. State what was observed (e.g., status code, duration discrepancy, player error).
+4. State the exact verification needed (e.g., whether audio plays beyond the sample, whether the complete story text is present).
+
+Keep doubtful sources as annotated leads in notes until verified by a human. Record the date and what the reader confirmed in the matching note and, for an accepted source, in the CSV evidence. A reader confirming playback and identity has checked those two things. Completeness and permission still need their own evidence. Keep a mismatch or an inconclusive result in the notes. Include any remaining reader checks and exact URLs in the findings PR.
 
 ## Deliver exactly these files
 
