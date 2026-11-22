@@ -57,6 +57,7 @@ export function validateFound(r) {
   if (r.tier === 'external' && r.license) fail('external sources have unverified permission; do not assign a license');
   if (r.words && (r.kind !== 'full' || !/^[1-9]\d*$/.test(r.words))) fail('words must be a positive integer for full text only');
   if (r.part && (!/^[1-9]\d*$/.test(r.part) || +r.part > 100)) fail('part must be 1..100');
+  if (r.grade && !['1', '2', 1, 2].includes(r.grade)) fail('grade must be 1 or 2');
   if (r.archive && r.archive !== 'yes') fail('archive must be yes or empty');
   if (new URL(r.url).hostname === 'web.archive.org' && r.archive !== 'yes') fail('Wayback needs archive=yes');
 }

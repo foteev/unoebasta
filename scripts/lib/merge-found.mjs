@@ -37,7 +37,7 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
     const hadFull = entry.links.some(l => l.kind === 'full');
     const selected = [];
     const candidates = ok.filter(r => ['full', 'audio'].includes(r.kind))
-      .sort((a, b) => (a.tier === 'external') - (b.tier === 'external') || rank(a.site) - rank(b.site));
+      .sort((a, b) => (+a.grade || 1) - (+b.grade || 1) || (a.tier === 'external') - (b.tier === 'external') || rank(a.site) - rank(b.site));
     for (const rs of groups(candidates, r => `${r.lang}|${r.kind}|${siteName(r.site)}`).values()) {
       // Keep every reviewed site, with multipart validation scoped to that site/language/kind.
       const site = rs[0].site;
@@ -61,11 +61,14 @@ export function mergeFound(source, originalData, rows, { archive = false, now = 
         if (r.archive === 'yes') link.archive = true;
         if (r.part) link.part = +r.part;
         if (r.lang !== 'en') link.lang = r.lang;
+        if (r.grade) link.grade = +r.grade;
+        else if (siteName(r.site).toLowerCase().includes('zanotowane') || link.url.includes('zanotowane.pl')) link.grade = 2;
         if (r.kind === 'full' && /(^|\.)baen\.com$/.test(new URL(r.url).hostname)) link.downloads = true;
         entry.links.push(link); selected.push(r);
       }
     }
     if (entry.links.length === before) continue;
+    entry.links.sort((a, b) => (a.grade || 1) - (b.grade || 1));
     const texts = selected.filter(r => r.kind === 'full'), main = texts.find(r => r.lang === 'en') || texts[0] || selected[0];
     if (!read[qid] || (!hadFull && texts.length)) {
       const words = main.part ? texts.filter(r => r.lang === main.lang && siteName(r.site) === siteName(main.site) && r.part).reduce((n, r) => n + (+r.words || 0), 0) : +main.words || 0;
