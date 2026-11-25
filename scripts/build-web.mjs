@@ -71,7 +71,7 @@ const publicRuntime = replaceOnce(replaceOnce(runtime,
   "JSON.parse(document.getElementById('search-brief').textContent)", brief);
 const shell = replaceOnce(template, '<style>\n__SITE_CSS__</style>', '<link rel="stylesheet" href="../../site.css">')
   .replace(/<script type="application\/json" id="(?:awards-data|search-brief)">.*?<\/script>\n/g, '')
-  .replace(/<script src=/g, '<script defer src=')
+  .replace(/<script (?!defer )src=/g, '<script defer src=')
   .replace(/<script>\n'use strict';[\s\S]*?<\/script>/, '<script defer src="../../catalog-app.js"></script>');
 if (/__[A-Z0-9_]+__/.test(shell)) throw new Error('Unreplaced build marker in public shell');
 mkdirSync(dist, { recursive: true });

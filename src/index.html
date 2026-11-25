@@ -11,7 +11,8 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Cormorant+SC:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Cormorant+SC:wght@700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=Cormorant+SC:wght@700&display=swap"></noscript>
 <style>
 __SITE_CSS__</style>
 
@@ -62,9 +63,9 @@ __SITE_CSS__</style>
 <script type="application/json" id="awards-data">__AWARDS_JSON__</script>
 <script type="application/json" id="search-brief">__SEARCH_BRIEF_JSON__</script>
 <!-- Libraries: Readability (text extraction), DOMPurify (sanitizing), JSZip (EPUB, FB2.ZIP, DOCX, ODT). -->
-<script src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.6.0/Readability.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@mozilla/readability@0.6.0/Readability.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 'use strict';
 __CATALOG_COMPONENTS__
@@ -891,7 +892,7 @@ function availability(q) {
 }
 function availHtml(q) {
   const a = availability(q), audio = new Set(audioLinks(q).map(l => l.lang || 'en'));
-  return `<div class="avail" aria-label="${esc(t('av_h'))}">${[...AV_LANGS, ...(a.es || audio.has('es') || LANG === 'es' || myLangs().includes('es') ? ['es'] : [])].map(l => `<span class="av av-${a[l] || (audio.has(l) ? 'full' : 'none')}"><b>${l.toUpperCase()}</b> ${[a[l] ? t('av_' + a[l]) : '', audio.has(l) ? t('av_audio') : ''].filter(Boolean).join(' · ') || esc(t('av_none'))}</span>`).join('')}</div>`;
+  return `<div class="avail" aria-label="${esc(t('av_h'))}">${[...AV_LANGS, ...(a.es || audio.has('es') || LANG === 'es' || myLangsRef().includes('es') ? ['es'] : [])].map(l => `<span class="av av-${a[l] || (audio.has(l) ? 'full' : 'none')}"><b>${l.toUpperCase()}</b> ${[a[l] ? t('av_' + a[l]) : '', audio.has(l) ? t('av_audio') : ''].filter(Boolean).join(' · ') || esc(t('av_none'))}</span>`).join('')}</div>`;
 }
 /* ---------- reading time: words on the page (READ.w), else pages × 280, else a typical length for the form ---------- */
 const CAT_FORM = Object.fromEntries(CATEGORY_FILTERS.map(c => {
@@ -911,12 +912,12 @@ const LEN = { '15': [0, 25], '40': [25, 60], eve: [60, Infinity] };
 function minutesInLengths(minutes, selection) { const lengths = filterValues(selection, LENGTHS); return !lengths.length || lengths.some(k => minutes > LEN[k][0] && minutes <= LEN[k][1]); }
 const inLen = (q, selection) => minutesInLengths(readingMinutes(q), selection);
 // Read / Listen side by side: Read opens the text at the publisher
-const fullLink = (q, langs = myLangs()) => { const links = (READ[q] && READ[q].links || []).filter(l => l.kind === 'full').sort((a, b) => (a.grade || 1) - (b.grade || 1)); return langs.map(lang => links.find(l => (l.lang || 'en') === lang)).find(Boolean) || links[0]; };
+const fullLink = (q, langs = myLangsRef()) => { const links = (READ[q] && READ[q].links || []).filter(l => l.kind === 'full').sort((a, b) => (a.grade || 1) - (b.grade || 1)); return langs.map(lang => links.find(l => (l.lang || 'en') === lang)).find(Boolean) || links[0]; };
 function readCtl(q, cls, label, f = fullLink(q)) { if (!f) return ''; const L = esc(label || t('read_btn')); return `<a class="${cls}" href="${esc(f.url)}" target="_blank" rel="noopener" data-track="${q}" data-via="read" data-site="${esc(siteLabel(f))}" data-analytics="read_click">${L}${label ? '' : ' ↗'}</a>`; }
 // the Listen button names where you will listen: the magazine's podcast (a human narrator) or ElevenReader (synthetic voice)
 const audioSite = l => (l.site || hostOf(l.url)).replace(/\s*Podcast$/i, '');
 const audioLinks = q => (READ[q]?.links || []).filter(l => l.kind === 'audio').sort((a, b) => {
-  const langs = myLangs(), score = l => { const i = langs.indexOf(l.lang || 'en'); return i < 0 ? langs.length : i; };
+  const langs = myLangsRef(), score = l => { const i = langs.indexOf(l.lang || 'en'); return i < 0 ? langs.length : i; };
   return score(a) - score(b) || (a.grade || 1) - (b.grade || 1) || (+a.part || 1) - (+b.part || 1);
 });
 // a text kept by the Wayback Machine: the publisher once posted it free and no longer does
@@ -927,7 +928,7 @@ const fileOf = q => (local.files || []).find(f => f.workId === q);
 function phoneOK(q) { return ttsOK() && !!fileOf(q); }
 // where this work can be heard, in the default order: a person reading, then ElevenReader, then the phone's own voice
 function listenOpts(q, langs) {
-  const text = fullLink(q, langs || myLangs()), f = text && (!langs || langs.includes(text.lang || 'en')) ? text : null; const o = [];
+  const text = fullLink(q, langs || myLangsRef()), f = text && (!langs || langs.includes(text.lang || 'en')) ? text : null; const o = [];
   audioLinks(q).filter(l => (!langs || langs.includes(l.lang || 'en')) && (!l.part || l.part === 1)).forEach((a, i) => o.push({ id: i ? 'audio:' + a.url : 'pod', type: 'audio', name: audioSite(a) + ' · ' + langName(a.lang || 'en'), sub: t(a.rights === 'unknown' ? 'ls_external_sub' : 'ls_pod_sub'), url: a.url }));
   if (f) o.push({ id: 'eleven', name: 'ElevenReader', sub: t('ls_eleven_sub'), url: f.url });
   if (phoneOK(q) && (!langs || f)) o.push({ id: 'phone', name: t('ls_phone'), sub: t(fileOf(q) ? 'ls_phone_sub_off' : 'ls_phone_sub') });
@@ -1010,18 +1011,37 @@ const langName = code => { try { const n = new Intl.DisplayNames([LANG], { type:
 const cap = s => s.charAt(0).toLocaleUpperCase(LANG) + s.slice(1);
 function browserLangs() { const out = []; for (const l of (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''])) { const c = String(l).toLowerCase().split('-')[0]; if (/^[a-z]{2,3}$/.test(c) && !out.includes(c)) out.push(c); } return out; }
 const explicitLangs = () => Array.isArray(prefs.langs) && prefs.langs.length > 0;
-function myLangs() { return explicitLangs() ? prefs.langs : [...new Set([LANG, ...SOURCE_LANGS, ...dataLangs()])]; }
-const readingLanguageLabel = () => explicitLangs() ? myLangs().map(langName).join(', ') : t('rl_all');
-const matchingFullText = q => { const l = fullLink(q); return l && myLangs().includes(l.lang || 'en'); };
-const matchingReading = q => matchingFullText(q) || audioLinks(q).some(l => myLangs().includes(l.lang || 'en'));
-function readingMinutes(q, langs = explicitLangs() ? myLangs() : null) {
-  const text = fullLink(q, langs || myLangs());
+let DATA_LANGS_PASS = null, MY_LANGS_PASS = null;
+const WORK_LANGS = new Map();
+function withLangPass(fn) {
+  if (DATA_LANGS_PASS) return fn();
+  DATA_LANGS_PASS = computeDataLangs();
+  MY_LANGS_PASS = [...new Set([LANG, ...SOURCE_LANGS, ...DATA_LANGS_PASS])];
+  try { return fn(); } finally { DATA_LANGS_PASS = null; MY_LANGS_PASS = null; }
+}
+const myLangsRef = () => explicitLangs() ? prefs.langs : (MY_LANGS_PASS || [...new Set([LANG, ...SOURCE_LANGS, ...dataLangs()])]);
+function myLangs() { return [...myLangsRef()]; }
+const readingLanguageLabel = () => explicitLangs() ? myLangsRef().map(langName).join(', ') : t('rl_all');
+const matchingFullText = q => { const l = fullLink(q); return l && myLangsRef().includes(l.lang || 'en'); };
+const matchingReading = q => matchingFullText(q) || audioLinks(q).some(l => myLangsRef().includes(l.lang || 'en'));
+function readingMinutes(q, langs = explicitLangs() ? myLangsRef() : null) {
+  const text = fullLink(q, langs || myLangsRef());
   if (text && (!langs || langs.includes(text.lang || 'en'))) return minutesOf(q);
   const audio = audioLinks(q).find(l => !langs || langs.includes(l.lang || 'en'));
   return Number.isFinite(audio?.seconds) && audio.seconds > 0 ? Math.ceil(audio.seconds / 60) : minutesOf(q);
 }
-function workLangs(q) { const r = READ[q], full = new Set(), audio = new Set(), frag = new Set(); if (r) for (const l of r.links) (l.kind === 'audio' ? audio : full).add(l.lang || 'en'); for (const x of excerptLinks(q)) frag.add(x.lang.toLowerCase()); return { full, audio, frag }; }
-const sourceLangs = selection => { const langs = selection === 'mine' ? myLangs() : filterValues(selection, SOURCE_LANGS); return langs.length ? langs : null; };
+function workLangs(q) {
+  const r = READ[q], links = r?.links, linksLen = links ? links.length : 0, w = WORKS[q], ex = w?.ex, gb = w?.gb;
+  const cached = WORK_LANGS.get(q);
+  if (cached && cached.r === r && cached.links === links && cached.linksLen === linksLen && cached.ex === ex && cached.gb === gb && cached.lang === LANG) return cached.val;
+  const full = new Set(), audio = new Set(), frag = new Set();
+  if (r) for (const l of links) (l.kind === 'audio' ? audio : full).add(l.lang || 'en');
+  for (const x of excerptLinks(q)) frag.add(x.lang.toLowerCase());
+  const val = { full, audio, frag };
+  WORK_LANGS.set(q, { r, links, linksLen, ex, gb, lang: LANG, val });
+  return val;
+}
+const sourceLangs = selection => { const langs = selection === 'mine' ? myLangsRef() : filterValues(selection, SOURCE_LANGS); return langs.length ? langs : null; };
 function matchesSourceLanguage(q, selection, kind) {
   const langs = sourceLangs(selection); if (!langs && !kind) return true;
   const found = workLangs(q), sets = kind ? [found[kind]] : [found.full, found.audio, found.frag];
@@ -1029,8 +1049,9 @@ function matchesSourceLanguage(q, selection, kind) {
 }
 function matchesFormats(q, langs, formats) { return !formats.length || formats.some(kind => kind === 'own' ? isMine(q) : matchesSourceLanguage(q, langs, kind)); }
 // 2: the whole text or a reading in a language the reader knows; 1: a fragment in one; 0: nothing in their languages
-function langScore(q) { const m = myLangs(), w = workLangs(q), has = s => m.some(l => s.has(l)); return has(w.full) || has(w.audio) ? 2 : has(w.frag) ? 1 : 0; }
-const dataLangs = () => { const s = new Set(); for (const r of Object.values(READ)) for (const l of r.links) s.add(l.lang || 'en'); return s; };
+function langScore(q) { const m = myLangsRef(), w = workLangs(q), has = s => m.some(l => s.has(l)); return has(w.full) || has(w.audio) ? 2 : has(w.frag) ? 1 : 0; }
+const computeDataLangs = () => { const s = new Set(); for (const r of Object.values(READ)) for (const l of r.links) s.add(l.lang || 'en'); return s; };
+const dataLangs = () => DATA_LANGS_PASS || computeDataLangs();
 function pickList(k) {
   const started = new Set(local.positions.filter(p => p.workId).map(p => p.workId));
   const any = Object.keys(READ).filter(q => WORKS[q] && (fullLink(q) || audioLinks(q).length) && inLen(q, k) && !isDone(q));
@@ -1104,7 +1125,7 @@ function renderHome() {
       ${three.length && three.every(q => langScore(q) < 2) ? `<p class="note">${linkify(t('picks_lang_far', { l: langName([...workLangs(three[0]).full][0] || 'en') }))}</p>` : ''}
     </section>`);
 }
-function renderCatalog() { renderHome(); renderLibrary(); if (PAGE_AUTHOR) renderPublicAuthor(); }
+function renderCatalog() { withLangPass(() => { if (!PAGE_PATH) { renderHome(); renderLibrary(); } if (PAGE_AUTHOR) renderPublicAuthor(); }); }
 function catalogFilterControls(state = filter, prefix = 'lib') {
   return `<div class="filter-grid">
     ${multiFilter(prefix + '-languages', t('source_language'), state.langs, languageOptions())}
@@ -1169,7 +1190,8 @@ function setCatalogScope(scope) {
   else url.searchParams.delete('catalog');
   history.replaceState(history.state, '', url);
 }
-function renderPublicAuthor(onlyBody = false) {
+function renderPublicAuthor(onlyBody = false) { return withLangPass(() => _renderPublicAuthor(onlyBody)); }
+function _renderPublicAuthor(onlyBody = false) {
   if (!authorWorks.length) return;
   if (!onlyBody) {
     const options = AUTHOR_WORK_SORTS.map(k => `<option value="${k}"${authorFilter.sort === k ? ' selected' : ''}>${esc(t(k === 'az' ? 'author_work_title' : 'author_sort_' + k))}</option>`).join('');
@@ -1188,9 +1210,9 @@ function renderPublicAuthor(onlyBody = false) {
     <div class="slips">${list.map(w => slipHtml(w, authorFilter.langs)).join('')}</div>` : `<p class="empty">${esc(t('nothing_found'))}</p>`;
 }
 // the language of the text and of the reading, dimmed when the reader does not know it
-function langChips(q, langs) { const w = workLangs(q), m = myLangs(); const ls = [...new Set([...w.full, ...w.audio, ...w.frag])].filter(l => !langs || langs.includes(l)); return ls.map(l => `<span class="flag flag-lang${m.includes(l) ? '' : ' far'}" title="${esc(langName(l))}">${esc(l.toUpperCase())}</span>`).join(''); }
+function langChips(q, langs) { const w = workLangs(q), m = myLangsRef(); const ls = [...new Set([...w.full, ...w.audio, ...w.frag])].filter(l => !langs || langs.includes(l)); return ls.map(l => `<span class="flag flag-lang${m.includes(l) ? '' : ' far'}" title="${esc(langName(l))}">${esc(l.toUpperCase())}</span>`).join(''); }
 function slipHtml(w, selectedLangs = filter.langs) {
-  const r = READ[w.id], langs = sourceLangs(selectedLangs), candidate = fullLink(w.id, langs || myLangs());
+  const r = READ[w.id], langs = sourceLangs(selectedLangs), candidate = fullLink(w.id, langs || myLangsRef());
   const text = candidate && (!langs || langs.includes(candidate.lang || 'en')) ? candidate : null;
   const audio = audioLinks(w.id).find(l => !langs || langs.includes(l.lang || 'en'));
   const excerpt = excerptLinks(w.id).find(l => !langs || langs.includes(l.lang.toLowerCase()));
@@ -1214,16 +1236,23 @@ function passCatalog(q, state = filter) {
     && (!state.statuses.length || state.statuses.some(status => status === 'starred' ? isStarred(q) : isNew(q)))
     && minutesInLengths(readingMinutes(q, sourceLangs(state.langs)), state.lengths);
 }
-function libraryBody() {
+function libraryBody() { return withLangPass(() => _libraryBody()); }
+function _libraryBody() {
   if (filter.q) {
-    const found = searchWorks(filter.q).filter(q => passCatalog(q)), readable = found.filter(q => READ[q]).sort((a, b) => langScore(b) - langScore(a)), other = found.filter(q => !READ[q]);
+    const found = searchWorks(filter.q).filter(q => passCatalog(q));
+    const readable = found.filter(q => READ[q]);
+    const scores = new Map(readable.map(q => [q, langScore(q)]));
+    readable.sort((a, b) => scores.get(b) - scores.get(a));
+    const other = found.filter(q => !READ[q]);
     return `<p class="count-line">${esc(t('search_all', { n: fmtNum(found.length) }))} · ${clearBtn()}</p>
       ${readable.length ? `<h3 class="sub-h">${esc(t('search_readable', { n: readable.length }))}</h3><div class="slips">${readable.map(q => slipHtml(work(q))).join('')}</div>` : ''}
       ${other.length ? `<h3 class="sub-h">${esc(t('search_other', { n: other.length }))}</h3>${searchRows(other, filter.langs)}` : ''}
       ${found.length ? '' : `<p class="empty">${esc(t('nothing_found'))}</p>`}`;
   }
-  const list = Object.keys(READ).filter(q => passCatalog(q)).map(work)
-    .sort((a, b) => langScore(b.id) - langScore(a.id) || latestYear(b) - latestYear(a) || a.title.localeCompare(b.title));
+  const list = Object.keys(READ).filter(q => passCatalog(q)).map(work);
+  const scores = new Map(list.map(w => [w.id, langScore(w.id)]));
+  const years = new Map(list.map(w => [w.id, latestYear(w)]));
+  list.sort((a, b) => scores.get(b.id) - scores.get(a.id) || years.get(b.id) - years.get(a.id) || a.title.localeCompare(b.title));
   return `${renderNews()}<p class="count-line">${list.length} ${esc(plural(list.length, t('works')))}</p>
     <div class="slips">${list.map(w => slipHtml(w)).join('') || `<p class="empty">${esc(t('nothing_found'))}</p>`}</div>`;
 }
@@ -1316,7 +1345,8 @@ function decadeChips(years) {
   if (decs.length < 3) return '';
   return `<div class="scroller" role="group" aria-label="${esc(t('jump_to'))}">${decs.map(d => `<button class="chip chip-small" data-jump="${d}">${d}${esc(t('decade_suffix'))}</button>`).join('')}</div>`;
 }
-function renderAwards(onlyBody) {
+function renderAwards(onlyBody) { return withLangPass(() => _renderAwards(onlyBody)); }
+function _renderAwards(onlyBody) {
   const v = $('#view-awards'), wide = WIDE();
   if (!['cats','years','authors','table'].includes(AV.mode)) AV.mode = 'years';
   const mode = AV.mode === 'table' && !wide ? 'cats' : AV.mode;
@@ -1729,9 +1759,9 @@ function workFacts(w) {
     esc(showEstimate ? t('work_read_est', { n: fmtNum(minutesOf(q)) }) : fmtDur(readingMinutes(q)))].filter(Boolean).join(' · ');
 }
 const doneCard = q => `<button class="done-card done-btn" data-done="${q}" aria-pressed="${isDone(q)}">${isDone(q) ? DONE_ICON.on : DONE_ICON.off}<span class="dc-t"><span class="dc-n">${esc(isDone(q) ? cap(t('done_on_date', { d: fmtDate(doneAt(q)) })) : t('done_btn'))}</span><span class="dc-s">${esc(t(isDone(q) ? 'done_card_on' : 'done_card_off'))}</span></span></button>`;
-async function openWork(q) {
+async function openWork(q, loaded = false) {
   const w = work(q); if (!w) return;
-  await loadLocal();
+  if (!loaded) await loadLocal();
   const otherOpen = RL.q === q && $('#rl-panel .rl-other')?.open;
   if (RL.q !== q) RL = { q, kind: 'all', otherKind: 'all', mat: null, ask: null };
   const r = READ[q];
@@ -2591,8 +2621,9 @@ window.addEventListener('resize', placePop);
 document.addEventListener('scroll', e => { if (popKind && !popEl(popKind).contains(e.target)) placePop(); }, true);
 document.addEventListener('click', e => { if (!popKind) return; const m = popEl(popKind), from = POP[popKind].from; if (!e.composedPath().some(n => n === m || (n.matches && n.matches(from)))) closePop(); });
 for (const k of Object.keys(POP)) popEl(k).addEventListener('focusout', e => { const r = e.relatedTarget; if (popKind === k && r && !e.currentTarget.contains(r) && !r.matches(POP[k].from)) closePop(); });
-async function refreshAll() {
-  await loadLocal(); applyLang(); renderCatalog(); renderAbout();
+async function refreshAll(skipLocal = false) {
+  if (!skipLocal) await loadLocal();
+  applyLang(); renderCatalog(); if (!PAGE_PATH) renderAbout();
   if (VIEW === 'shelf') renderShelf(); if (VIEW === 'awards') renderAwards();
   const ws = $('#sheet-work'); if (!ws.hidden && ws.querySelector('#own-link-save')) openWork(ws.querySelector('#own-link-save').dataset.wid);
   const as = $('#sheet-author'); if (!as.hidden && as.querySelector('#author-sort')) openAuthor(as.querySelector('#author-sort').dataset.aid);
@@ -2860,7 +2891,7 @@ document.addEventListener('visibilitychange', () => {
   LANG = interfaceLanguage(prefs.lang);
   initVisit();
   // draw the page from the catalog first, then fill in what is stored on the device
-  applyLang(); applyTheme(); renderCatalog(); renderAbout();
+  applyLang(); applyTheme(); renderCatalog(); if (!PAGE_PATH) renderAbout();
   try { window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
   const params = new URLSearchParams(location.search);
   const initialView = params.get('view') || history.state?.ubView;
@@ -2868,7 +2899,12 @@ document.addEventListener('visibilitychange', () => {
   const awardId = AWARDS.find(id => AWARD_REGISTRY.awards[id].code === awardCode);
   if (!PAGE_PATH && awardId) AV.awards = [awardId];
   setView(Object.hasOwn(ANALYTICS_SECTIONS, initialView) ? initialView : PAGE_AUTHOR ? 'library' : 'catalog', true);
-  ensureSchema().catch(e => console.warn('[unoebasta] schema', e)).then(() => refreshAll()).then(() => PAGE_WORK && openWork(PAGE_WORK)).then(() => checkMoveLink()).then(() => {
+  ensureSchema().catch(e => console.warn('[unoebasta] schema', e)).then(async status => {
+    await loadLocal();
+    const hasLocal = STORES.some(s => local[s].length > 0);
+    if (hasLocal || status !== 'ok') await refreshAll(true);
+    if (PAGE_WORK) await openWork(PAGE_WORK, true);
+  }).then(() => checkMoveLink()).then(() => {
     startAnalytics();
     if (syncState() && !location.hash) { syncLast = Date.now(); syncNow(true); }
   }).catch(e => showFatal('start: ' + (e && (e.stack || e.message) || e)));
