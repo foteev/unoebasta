@@ -3,7 +3,7 @@
 const path = require('path'), fs = require('fs');
 const NM = process.argv[2] || path.join(__dirname, '..', 'node_modules'), PAGE = process.argv[3] || path.join(__dirname, '..', 'dist', 'web', 'index.html');
 const { JSDOM } = require(path.join(NM, 'jsdom'));
-const html = fs.readFileSync(PAGE, 'utf8').replace(/<script src=[^>]+><\/script>/g, '').replace(/<link[^>]+>/g, '');
+const html = fs.readFileSync(PAGE, 'utf8').replace(/<script(?: defer)? src=[^>]+><\/script>/g, '').replace(/<link[^>]+>/g, '');
 const errors = [];
 const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</body></html>', {
   url: 'https://example.test/', runScripts: 'dangerously', pretendToBeVisual: true,
@@ -27,6 +27,7 @@ const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</bod
     };
     try { w.eval(fs.readFileSync(path.join(NM, 'qrcode-generator/dist/qrcode.js'), 'utf8') + ';window.qrcode = qrcode;'); } catch (e) {} // the CDN QR library
     { const NZ = require(path.join(NM, 'jszip')); w.JSZip = { loadAsync: d => NZ.loadAsync(Buffer.from(new Uint8Array(d))) }; } // the CDN ZIP library (EPUB, DOCX, ODT); its browser build stalls in jsdom, so the Node build stands in
+    w.DOMPurify = { sanitize: s => s };
     if (!w.Blob.prototype.arrayBuffer) w.Blob.prototype.arrayBuffer = function () { return new Promise(r => { const fr = new w.FileReader(); fr.onload = () => r(fr.result); fr.readAsArrayBuffer(this); }); }; // as in browsers
     w.navigator.clipboard = { writeText: async s => { w.__clip = s; } };
     w.addEventListener('error', e => errors.push(e.message));
@@ -50,8 +51,14 @@ function selectFilter(group, values = []) {
 }
 
 (async () => {
+  const openLibrary = async () => { click($('#tab-library')); await sleep(20); };
   await sleep(400);
   const checks = {};
+  checks['lazy library: empty on Home start with compact DOM and no CDN library tags'] =
+    $$('#view-library *').length === 0 &&
+    w.document.querySelectorAll('*').length < 2000 &&
+    !w.document.querySelector('script[src*="jszip"], script[src*="purify"], script[src*="Readability"]');
+  await openLibrary();
   const nCatalog = w.eval('Object.keys(READ).filter(q => WORKS[q]).length'); // grows with every batch of found texts
   checks['catalog tab: every work with a text or audio'] = nCatalog >= 100 && $$('#view-library .slip').length === nCatalog;
   checks['filters: returning legacy preferences open every group at All'] = $$('.multi-filter').every(el=>el.querySelector('input').value==='all' && el.querySelector('input').checked);
@@ -399,12 +406,13 @@ function selectFilter(group, values = []) {
   checks['done: full card button pressed + date'] = $(`#sheet-work [data-done="${dq}"]`).getAttribute('aria-pressed') === 'true' && /^Прочитано \d+/.test($(`#sheet-work [data-done="${dq}"] .dc-n`).textContent) && /снять отметку/.test($(`#sheet-work [data-done="${dq}"]`).textContent);
   w.eval('closeSheets()');
   checks['done: muted row with mark in award lists'] = /yrow is-done/.test(w.eval(`yearRow(2020, '${dq}', true)`)) && /✓ прочитано/.test(w.eval(`yearRow(2020, '${dq}', true)`)) && /wrow is-done/.test(w.eval(`workRow('x', '${dq}')`)) && /is-done/.test(w.eval(`cellHtml('${dq}')`));
+  await openLibrary();
   checks['done: catalog slip muted, button pressed'] = !!$(`#view-library .slip.is-done [data-done="${dq}"][aria-pressed="true"]`);
   click($('#tab-shelf')); await sleep(60);
   checks['done: on the shelf under Прочитанное'] = !!$(`#shelf-done [data-work="${dq}"]`) && /Прочитанное · 1/.test($('#shelf-done h4').textContent);
   click($(`#shelf-done [data-done="${dq}"]`)); await sleep(60);
   checks['done: removed from the shelf'] = !$(`#shelf-done [data-work="${dq}"]`) && !w.eval(`isDone('${dq}')`) && /Пока пусто/.test($('#shelf-done').textContent);
-  click($('#tab-catalog')); await sleep(20);
+  await openLibrary();
   selectFilter('lib-lengths', ['15']); await sleep(20);
   checks['catalog: time filter, a few minutes'] = $$('#view-library .slip').length > 0 && w.eval("[...document.querySelectorAll('#view-library .slip-open')].length") === $$('#view-library .slip').length && $$('#view-library .slip-time').every(x => x.textContent === 'несколько минут');
   selectFilter('lib-lengths', []); await sleep(20);
@@ -483,7 +491,7 @@ function selectFilter(group, values = []) {
   w.eval(`openWork('${podWork}')`); await sleep(40);
   checks['work card: no phone voice on the web without a file'] = !$('#sheet-work [data-say]');
   w.eval('closeSheets()');
-  w.eval("renderLibrary()"); await sleep(10);
+  await openLibrary();
   const slip = $(`#view-library [data-lsrc="${podWork}"]`);
   checks['listen: ▾ next to a story with podcast + ElevenReader'] = !!slip && /Clarkesworld|Uncanny|Lightspeed|Escape|LibriVox|Strange/.test(slip.closest('.lgrp').querySelector('.ls').textContent);
   click(slip); await sleep(10);
@@ -492,7 +500,7 @@ function selectFilter(group, values = []) {
   checks['listen: ElevenReader chosen and remembered'] = w.eval('prefs.listen') === 'eleven' && !$('#eleven-dialog').hidden && $(`#view-library [data-lsrc="${podWork}"]`).closest('.lgrp').querySelector('.ls').textContent === 'ElevenReader';
   w.eval('closeEleven()');
   await w.eval(`saveFile({ title: 'Test file', byline: '', html: '<p>Первый абзац текста.</p><p>Второй абзац.</p>', format: 'html', workId: '${podWork}' })`);
-  w.eval("renderLibrary()"); await sleep(10);
+  await openLibrary();
   click($(`#view-library [data-lsrc="${podWork}"]`)); await sleep(10);
   checks['listen: phone voice offered for a saved file'] = $$('#listen-dialog .lopt').length === 3 && /без интернета/.test($('#listen-dialog [data-lgo="phone"]').textContent);
   w.__said.length = 0; click($('#listen-dialog [data-lgo="phone"]')); await waitFor(() => w.__said.some(u => u.onend && /Первый абзац/.test(u.text)));
@@ -971,7 +979,8 @@ function selectFilter(group, values = []) {
   checks['home actions: empty reader-language picks still offer an active chooser in the labelled fallback'] = !$('#view-catalog [data-pick-actions=full]') && !!$('#view-catalog [data-picks=other] [data-pick-actions=other] a') && !$('#view-catalog [data-picks=other] [data-pickmore]').disabled;
   checks['fallback: an empty selected-language bucket explicitly explains the other-language books'] = !$('#view-catalog [data-picks=reading] .pick') && /Произведений такой длительности/.test($('#view-catalog [data-picks=other]').textContent) && $$('#view-catalog [data-picks=other] .pick').every(el=>el.dataset.readingLang==='en');
   w.eval("READ.Q6271990.links=window.__plRecording;delete window.__plRecording;");
-  w.eval("Object.assign(filter,{langs:['pl'],q:'',formats:[],awards:[],statuses:[],lengths:[]}); renderLibrary();");
+  w.eval("Object.assign(filter,{langs:['pl'],q:'',formats:[],awards:[],statuses:[],lengths:[]});");
+  await openLibrary();
   checks['language filters: reader languages are first, All is available, and the combined mine chip is removed'] = $$('[data-multi-filter=lib-languages]')[0].value === 'all' && $$('[data-multi-filter=lib-languages]')[1].value === 'pl' && filterInput('lib-languages','pl').checked && !$('#f-mine');
   checks['language filters: Catalog selects Polish texts, audio and scoped fragments'] = !!$('#view-library .slip-open[data-work="Q467388"]') && !!$('#view-library .slip-open[data-work="Q6271990"]') && !$('#view-library .slip-open[data-work="Q25349436"]') && !$('#view-library .slip-open[data-work="Q4102150"]').closest('.slip').querySelector('a[data-via=read]') && !$('#view-library .slip-open[data-work="Q4102150"]').closest('.slip').querySelector('a[data-via=listen]');
   click(filterInput('lib-formats','full')); await sleep(20);
@@ -1059,7 +1068,13 @@ function selectFilter(group, values = []) {
     url: 'https://foteev.github.io/unoebasta/?private_query=test',
     referrer: 'https://referrer.test/private-path?private_query=test',
     runScripts: 'dangerously',
-    beforeParse(win) { win.scrollTo = () => {}; }
+    beforeParse(win) {
+      win.scrollTo = () => {};
+      win.__catBatches = 0;
+      new win.MutationObserver(recs => {
+        if (recs.some(r => r.target.id === 'view-catalog')) win.__catBatches++;
+      }).observe(win.document, { subtree: true, childList: true });
+    }
   }).window;
   try {
     const select = s => analytics.document.querySelector(s);
@@ -1071,6 +1086,9 @@ function selectFilter(group, values = []) {
     };
     const scriptSelector = 'script[src="https://cloud.umami.is/script.js"]';
     await waitFor(() => select(scriptSelector));
+    await sleep(60);
+    checks['startup: empty storage renders Home once without duplicate refreshAll'] = analytics.__catBatches === 1 &&
+      analytics.document.querySelectorAll('#view-library *').length === 0;
     const tracker = select(scriptSelector);
     checks['analytics: only the published site loads the manual tracker'] =
       !$('script[src="https://cloud.umami.is/script.js"]') && tracker?.dataset.autoTrack === 'false' && analytics.location.hash === '';
@@ -1140,11 +1158,17 @@ function selectFilter(group, values = []) {
   const runtime = fs.readFileSync(path.join(publicDir, 'catalog-app.js'), 'utf8');
   const publicCard = new JSDOM(publicHtml.replace('<script defer src="../../catalog-app.js"></script>', () => '<script>' + runtime + '</script>'), {
     url: 'https://foteev.github.io/unoebasta/' + route + '?private=test', runScripts: 'dangerously',
-    beforeParse(win) { win.scrollTo = () => {}; }
+    beforeParse(win) {
+      win.scrollTo = () => {};
+      win.localStorage.setItem('fantastic-prefs', JSON.stringify({ lang: 'en' }));
+      win.localStorage.setItem('fantastic-visit', JSON.stringify({ baseline: Date.parse('2026-10-22T00:00:00Z'), firstTime: false, lastActive: Date.now() - 600e3 }));
+    }
   }).window;
   try {
     const find = s => publicCard.document.querySelector(s);
     await waitFor(() => find('#sheet-work [data-star="Q130213759"]'));
+    checks['public card: news dot appears on public page without rendering library'] =
+      find('#news-dot').hidden === false && publicCard.eval('newsItems().length') > 0 && find('#view-library').innerHTML === '';
     await publicCard.eval("Store.put('bookmarks', { id: 'w:Q130213759', type: 'work', workId: 'Q130213759', at: Date.now() }).then(refreshAll)");
     await waitFor(() => find('#sheet-work [data-star="Q130213759"]')?.getAttribute('aria-pressed') === 'true');
     checks['public card reads an existing bookmark using the same record key'] =
@@ -1179,7 +1203,20 @@ function selectFilter(group, values = []) {
     const initial = ids();
     checks['public author renders all its works with shared cards and independent filters'] = initial.length > 10 &&
       initial.length === author.eval('authorWorks.length') && initial.some(q => author.eval(`!READ['${q}']`)) &&
-      find('#author-works .slip .star') && find('#author-works .slip .slip-actions');
+      !!find('#author-works .slip .star') && !!find('#author-works .slip .slip-actions');
+    checks['cache: public author renders identically with and without cache'] = author.eval(`(() => {
+      const out = [];
+      for (const langs of [undefined, ['ru']]) {
+        if (langs) prefs.langs = langs; else delete prefs.langs;
+        renderPublicAuthor(true);
+        const cached = document.getElementById('author-works').innerHTML;
+        WORK_LANGS.clear();
+        renderPublicAuthor(true);
+        out.push(cached === document.getElementById('author-works').innerHTML);
+      }
+      delete prefs.langs; renderPublicAuthor(true);
+      return out.every(Boolean);
+    })()`);
     const sort = find('#author-work-sort');
     sort.value = 'desc'; sort.dispatchEvent(new author.Event('change', { bubbles: true }));
     const sorted = ids();
@@ -1197,6 +1234,55 @@ function selectFilter(group, values = []) {
     await waitFor(() => ids().length < initial.length);
     checks['public author search returns work cards'] = /Coraline/.test(find('#author-works').textContent) && !find('#fatal');
   } finally { author.close(); }
+  checks['cache: pass resets on throw, nests cleanly, invalidates WORK_LANGS, and matches uncached libraryBody'] = w.eval(`(() => {
+    let threw = false;
+    try { withLangPass(() => { throw 1; }); } catch { threw = true; }
+    const resetOk = threw && DATA_LANGS_PASS === null && MY_LANGS_PASS === null;
+    const nested = withLangPass(() => withLangPass(() => MY_LANGS_PASS));
+    const nestOk = Array.isArray(nested) && nested.length > 0 && DATA_LANGS_PASS === null && MY_LANGS_PASS === null;
+    const q = 'Q19947428';
+    const beforePush = workLangs(q).full.has('es');
+    READ[q].links.push({ kind: 'full', lang: 'es', url: 'https://example.test/x' });
+    const afterPush = workLangs(q).full.has('es');
+    READ[q].links.pop();
+    const afterPop = workLangs(q).full.has('es');
+    const savedEx = WORKS[q].ex;
+    WORKS[q].ex = { ...(savedEx || {}), o: [{ u: 'https://example.test/f', s: 'T', l: 'pl' }] };
+    const afterEx = workLangs(q).frag.has('pl');
+    WORKS[q].ex = savedEx;
+    const savedLangs = prefs.langs, savedQ = filter.q;
+    let eq = true;
+    for (const [langs, query] of [[undefined, ''], [['ru'], ''], [undefined, 'love']]) {
+      if (langs) prefs.langs = langs; else delete prefs.langs;
+      filter.q = query;
+      const a = libraryBody();
+      WORK_LANGS.clear();
+      const b = _libraryBody();
+      if (a !== b) eq = false;
+    }
+    if (savedLangs) prefs.langs = savedLangs; else delete prefs.langs;
+    filter.q = savedQ;
+    return resetOk && nestOk && !beforePush && afterPush && !afterPop && afterEx && eq;
+  })()`);
+  const deepLibrary = new JSDOM(html, {
+    url: 'https://foteev.github.io/unoebasta/?view=library', runScripts: 'dangerously',
+    beforeParse(win) { win.scrollTo = () => {}; }
+  }).window;
+  try {
+    await sleep(60);
+    checks['lazy library: ?view=library renders slips immediately without clicking tab'] =
+      deepLibrary.document.querySelectorAll('#view-library .slip').length === nCatalog;
+    deepLibrary.document.querySelector('#tab-catalog').dispatchEvent(new deepLibrary.MouseEvent('click', { bubbles: true }));
+    await sleep(20);
+    const starQ = deepLibrary.document.querySelector('#view-catalog [data-picks="reading"] [data-done]')?.dataset.done;
+    if (starQ) {
+      await deepLibrary.eval(`toggleStar(${JSON.stringify(starQ)}).then(renderCatalog)`);
+      deepLibrary.document.querySelector('#tab-library').dispatchEvent(new deepLibrary.MouseEvent('click', { bubbles: true }));
+      await sleep(20);
+      checks['lazy library: starring on Home shows pressed star after opening Library'] =
+        deepLibrary.document.querySelector(`#view-library [data-star="${starQ}"]`)?.getAttribute('aria-pressed') === 'true';
+    }
+  } finally { deepLibrary.close(); }
   checks['no runtime errors'] = errors.length === 0;
   console.log(JSON.stringify({ checks, errors }, null, 1));
   process.exit(Object.values(checks).every(Boolean) ? 0 : 1);

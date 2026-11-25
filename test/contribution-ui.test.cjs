@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
-const { resolve, join, extname } = require('node:path');
+const { resolve, join, extname, sep } = require('node:path');
 const assert = require('node:assert/strict');
 const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require('./filter-helpers.cjs');
 
@@ -11,7 +11,7 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
   mkdirSync(out, { recursive: true });
   const server = createServer((req, res) => {
     const file = resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://localhost').pathname));
-    if (file !== root && !file.startsWith(root + '/')) { res.writeHead(403).end(); return; }
+    if (file !== root && !file.startsWith(root + sep)) { res.writeHead(403).end(); return; }
     try {
       const path = file === root ? join(root, 'index.html') : file;
       res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
@@ -31,7 +31,7 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     await page.locator('#tab-about').click();
     await page.locator('#about-contribute [data-agent-task]').click();
     const batch=await page.evaluate(()=>navigator.clipboard.readText());
-    const snapshot=text=>JSON.parse(text.split('PUBLIC CATALOG SNAPSHOT (refresh main before submitting):\n')[1]);
+    const snapshot=text=>JSON.parse(text.replace(/\r\n/g,'\n').split('PUBLIC CATALOG SNAPSHOT (refresh main before submitting):\n')[1]);
     assert.equal(snapshot(batch).length,30);assert.equal(new Set(snapshot(batch).map(w=>w.qid)).size,30);
     assert.match(batch,/data\/found/);assert.match(batch,/coverage.csv/);
     await page.evaluate(()=>openWork('Q19947428'));

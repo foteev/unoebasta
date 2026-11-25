@@ -1,6 +1,20 @@
 // Build-inlined classic-script fragment bundled by scripts/build-web.mjs; shares page global scope; do not import in Node.
 /* ---------- text processing (your own files: TXT, HTML, EPUB, FB2) ---------- */
 const ALLOWED_TAGS = ['p', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'em', 'i', 'strong', 'b', 'blockquote', 'ul', 'ol', 'li', 'hr', 'a', 'img', 'pre', 'code', 'sup', 'sub', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'figure', 'figcaption', 'div', 'section', 'cite', 's', 'del'];
+function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = () => res(); s.onerror = () => { s.remove(); rej(new Error('load ' + src)); }; document.head.appendChild(s); }); }
+const LIBS = {
+  readability: ['https://cdn.jsdelivr.net/npm/@mozilla/readability@0.6.0/Readability.js', () => window.Readability],
+  purify: ['https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js', () => window.DOMPurify],
+  jszip: ['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', () => window.JSZip],
+};
+const libLoads = {};
+function ensureLibs(names) {
+  return Promise.all(names.map(name => {
+    const [url, ready] = LIBS[name];
+    if (ready()) return Promise.resolve();
+    return libLoads[name] || (libLoads[name] = loadScript(url).then(() => { if (!ready()) throw new Error('load ' + name); }).catch(e => { delete libLoads[name]; throw e; }));
+  }));
+}
 function cleanHtml(html, baseUrl) {
   let box;
   if (window.DOMPurify) {
@@ -90,6 +104,7 @@ async function parseFile(file) {
   const text = decodeBytes(buf, declared);
   if (looksBinary(text)) throw new Error(t('file_unknown'));
   if (/\.(html?|xhtml)$/i.test(lower) || /<html|<body|<p[\s>]/i.test(text.slice(0, 4000))) {
+    await ensureLibs(['readability', 'purify']);
     const doc = new DOMParser().parseFromString(text, 'text/html');
     const r = htmlFromDocument(doc, null);
     return { title: r.title || name, byline: r.byline, html: r.html, format: 'html', desc: r.desc };
@@ -98,6 +113,7 @@ async function parseFile(file) {
 }
 const fileTitle = name => name.replace(/\.[^.]+$/, '').replace(/[_]+/g, ' ');
 async function parseZip(buf, name) {
+  await ensureLibs(['jszip']);
   if (!window.JSZip) throw new Error('ZIP');
   const zip = await JSZip.loadAsync(buf);
   const mt = zip.file('mimetype') ? (await zip.file('mimetype').async('string')).trim() : '';
@@ -153,6 +169,7 @@ async function parseOdt(zip, name) {
   return { title, byline: '', html: blocksToHtml(dropTitle(blocks, title)), format: 'odt' };
 }
 async function parseEpub(buf, name) {
+  await ensureLibs(['jszip', 'purify']);
   if (!window.JSZip) throw new Error('EPUB');
   const zip = await JSZip.loadAsync(buf);
   const container = await zip.file('META-INF/container.xml')?.async('string');
@@ -208,5 +225,6 @@ async function parseFb2(buf, name) {
   };
   const bodies = [...doc.getElementsByTagName('body')].filter(b => b.getAttribute('name') !== 'notes');
   const html = bodies.map(b => conv(b)).join('<hr>').replace(/<h2>\s*<\/h2>/g, '');
+  await ensureLibs(['purify']);
   return { title, byline, html: cleanHtml(html, null), format: 'fb2', desc: fdesc };
 }

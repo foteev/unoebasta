@@ -81,14 +81,14 @@ const b64u = bytes => { let str = ''; for (let i = 0; i < bytes.length; i += 0x8
 const unb64u = str => { const bin = atob(str.replace(/-/g, '+').replace(/_/g, '/')); const out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; };
 async function deflate(bytes, pack) {
   const ts = new (pack ? CompressionStream : DecompressionStream)('deflate-raw');
-  const wr = ts.writable.getWriter(); wr.write(bytes).catch(() => {}); wr.close().catch(() => {});
+  const wr = ts.writable.getWriter(); wr.write(bytes).catch(() => { }); wr.close().catch(() => { });
   const rd = ts.readable.getReader(), parts = []; let len = 0;
-  for (;;) { const { value, done } = await rd.read(); if (done) break; parts.push(value); len += value.length; }
+  for (; ;) { const { value, done } = await rd.read(); if (done) break; parts.push(value); len += value.length; }
   const out = new Uint8Array(len); let o = 0; for (const c of parts) { out.set(c, o); o += c.length; } return out;
 }
 async function encodePack(pk) {
   const raw = new TextEncoder().encode(JSON.stringify(pk));
-  if (typeof CompressionStream === 'function') { try { return 'z' + b64u(await deflate(raw, true)); } catch (e) {} }
+  if (typeof CompressionStream === 'function') { try { return 'z' + b64u(await deflate(raw, true)); } catch (e) { } }
   return 'j' + b64u(raw);
 }
 async function decodePack(code) {
@@ -100,7 +100,6 @@ const pageUrl = () => location.href.split('#')[0];
 const transferUrl = () => PAGE_PATH ? new URL(APP_HOME, pageUrl()).href : pageUrl();
 const QR_MAX = 1400; // characters: a denser code is hard to read from a screen
 const QR_LIB = 'https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js';
-function loadScript(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.onload = () => res(); s.onerror = () => rej(new Error('load ' + src)); document.head.appendChild(s); }); }
 function qrSvg(text) {
   const q = window.qrcode(0, 'L'); q.addData(text); q.make();
   const n = q.getModuleCount(); let path = '';
@@ -139,7 +138,7 @@ function closeMove() { const m = $('#move-dialog'); if (m.hidden) return; m.hidd
 async function checkMoveLink() {
   const h = location.hash;
   if (h.startsWith('#sync=')) {
-    try { history.replaceState(history.state, '', pageUrl()); } catch (e) {}
+    try { history.replaceState(history.state, '', pageUrl()); } catch (e) { }
     const key = h.slice(6);
     if (!/^[\w-]{43}$/.test(key)) return toast(t('mv_bad'));
     if (!syncAvailable()) return toast(t('sy_here_no', { u: 'foteev.github.io/unoebasta' }));
@@ -148,8 +147,8 @@ async function checkMoveLink() {
     return openPairDialog(key);
   }
   if (!h.startsWith('#move=')) return;
-  try { history.replaceState(history.state, '', pageUrl()); } catch (e) {}
-  let pk = null; try { pk = await decodePack(h.slice(6)); } catch (e) {}
+  try { history.replaceState(history.state, '', pageUrl()); } catch (e) { }
+  let pk = null; try { pk = await decodePack(h.slice(6)); } catch (e) { }
   if (!pk || !pk.r) return toast(t('mv_bad'));
   if ((+pk.v || 0) > SCHEMA) return toast(t('mv_newer'));
   if (READONLY) return toast(t('data_newer'));
@@ -168,7 +167,7 @@ const RELAYS = ['wss://relay.primal.net', 'wss://nos.lol', 'wss://relay.damus.io
 const NOSTR_LIB = 'https://cdn.jsdelivr.net/npm/nostr-tools@2.25.2/lib/nostr.bundle.js';
 const SYNC_MAX = 28000; // characters of packed shelf: keeps one event under ~40 KB, which every relay above accepts
 const syncState = () => { if (resetting) return null; try { return JSON.parse(localStorage.getItem(SYNC_LS) || 'null'); } catch (e) { return null; } };
-const saveSync = st => { if (resetting) return; try { st ? localStorage.setItem(SYNC_LS, JSON.stringify(st)) : localStorage.removeItem(SYNC_LS); } catch (e) {} };
+const saveSync = st => { if (resetting) return; try { st ? localStorage.setItem(SYNC_LS, JSON.stringify(st)) : localStorage.removeItem(SYNC_LS); } catch (e) { } };
 const toHex = b => Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
 async function syncKeys(key) {
   const N = await nostrLib();
@@ -230,7 +229,7 @@ function syncSoon() { if (!syncState()) return; clearTimeout(syncTimer); syncTim
 let syncLast = 0;
 document.addEventListener('visibilitychange', () => {
   if (!syncState()) return;
-  if (document.visibilityState === 'hidden') { clearTimeout(syncTimer); syncPush().catch(() => {}); }
+  if (document.visibilityState === 'hidden') { clearTimeout(syncTimer); syncPush().catch(() => { }); }
   else if (Date.now() - syncLast > 30000) { syncLast = Date.now(); syncNow(true); }
 });
 function newSyncKey() { return b64u(crypto.getRandomValues(new Uint8Array(32))); }

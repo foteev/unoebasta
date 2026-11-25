@@ -100,3 +100,22 @@ test('built runtime parses as a classic script with no leftover markers', () => 
   const inline = read('dist/web/index.html').match(/<script>\n('use strict';[\s\S]*?)<\/script>/)[1];
   assert.doesNotThrow(() => new vm.Script(inline, { filename: 'index-inline.js' }));
 });
+
+test('built HTML keeps non-blocking assets, prefilled tabs, and on-demand parser libraries', () => {
+  const home = read('dist/web/index.html');
+  for (const label of ['Read', 'Catalog', 'Awards', 'My shelf', 'About']) {
+    assert.ok(home.includes(`>${label}<`), 'Missing prefilled nav label: ' + label);
+  }
+  const fontRe = /<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com\/[^"]+" media="print" onload="this\.media='all'">[\s\S]*?<noscript><link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com\/[^"]+"><\/noscript>/;
+  assert.match(home, fontRe);
+  for (const lib of ['Readability.js', 'purify.min.js', 'jszip.min.js']) {
+    assert.ok(!new RegExp(`<script[^>]+src="[^"]*${lib}`).test(home), lib);
+  }
+  for (const samplePath of [routes.work.Q130213759, routes.author.Q210059, routes.award.h]) {
+    const page = read('dist/web/' + samplePath + 'index.html');
+    assert.match(page, fontRe);
+    assert.ok(!page.includes('defer defer'), samplePath);
+    const scripts = [...page.matchAll(/<script\b[^>]*><\/script>/g)].map(m => m[0]);
+    assert.deepEqual(scripts, ['<script defer src="../../catalog-app.js"></script>'], samplePath);
+  }
+});

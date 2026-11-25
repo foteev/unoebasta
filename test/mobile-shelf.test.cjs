@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
-const { resolve, join, extname } = require('node:path');
+const { resolve, join, extname, sep } = require('node:path');
 const assert = require('node:assert/strict');
 const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require('./filter-helpers.cjs');
 
@@ -11,7 +11,7 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
   mkdirSync(out, { recursive: true });
   const server = createServer((req, res) => {
     const file = resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://localhost').pathname));
-    if (file !== root && !file.startsWith(root + '/')) { res.writeHead(403).end(); return; }
+    if (file !== root && !file.startsWith(root + sep)) { res.writeHead(403).end(); return; }
     try { const path = file === root ? join(root, 'index.html') : file;
       res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
       res.end(readFileSync(path));

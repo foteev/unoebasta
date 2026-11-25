@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const { createServer } = require('node:http');
 const { readFileSync, mkdirSync, writeFileSync } = require('node:fs');
-const { resolve, join, extname } = require('node:path');
+const { resolve, join, extname, sep } = require('node:path');
 const assert = require('node:assert/strict');
 
 (async () => {
@@ -11,7 +11,7 @@ const assert = require('node:assert/strict');
   const server = createServer((req, res) => {
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname).replace(/^\/unoebasta(?=\/)/, '');
     const file = resolve(root, '.' + pathname);
-    if (file !== root && !file.startsWith(root + '/')) { res.writeHead(403).end(); return; }
+    if (file !== root && !file.startsWith(root + sep)) { res.writeHead(403).end(); return; }
     try {
       const path = pathname.endsWith('/') ? join(file, 'index.html') : file;
       res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
@@ -152,6 +152,70 @@ const assert = require('node:assert/strict');
     assert.equal(await home.locator('#lang-cur').textContent(), 'PL');
     assert.equal(await home.locator('#lang-menu [data-readlang="es"]').getAttribute('aria-pressed'), 'true');
     assert.ok(await home.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+
+    // Startup with stored IndexedDB records across work, author, Home, and shelf pages.
+    const storedPage = await context.newPage();
+    storedPage.on('pageerror', e => errors.push(e.message));
+    const qAlg = 'Q130213759';
+    const algWorkUrl = url + await page.evaluate(() => DATA.routes.work.Q130213759);
+    const algAuthorUrl = url + await page.evaluate(() => DATA.routes.author[WORKS.Q130213759.authors[0]]);
+    await storedPage.goto(algWorkUrl, { waitUntil: 'domcontentloaded' });
+    const workStar = storedPage.locator(`#sheet-work [data-star="${qAlg}"]`);
+    await workStar.waitFor();
+    await workStar.click();
+    await storedPage.waitForFunction(q => document.querySelector(`#sheet-work [data-star="${q}"]`)?.getAttribute('aria-pressed') === 'true', qAlg);
+    await storedPage.reload({ waitUntil: 'domcontentloaded' });
+    await storedPage.waitForSelector(`#sheet-work [data-star="${qAlg}"][aria-pressed="true"]`);
+    await storedPage.evaluate(() => {
+      const p = JSON.parse(localStorage.getItem('fantastic-prefs') || '{}');
+      p.filters = { ...(p.filters || {}), v: 1, catalog: { ...((p.filters || {}).catalog || {}), statuses: ['starred'] } };
+      localStorage.setItem('fantastic-prefs', JSON.stringify(p));
+    });
+    await storedPage.goto(algAuthorUrl, { waitUntil: 'domcontentloaded' });
+    await storedPage.waitForSelector(`#author-works .slip [data-work="${qAlg}"]`);
+    await storedPage.goto(url + 'unoebasta/', { waitUntil: 'domcontentloaded' });
+    await storedPage.locator('#tab-library').click();
+    await storedPage.waitForSelector(`#view-library [data-star="${qAlg}"][aria-pressed="true"]`);
+    await storedPage.goto(url + 'unoebasta/?view=shelf', { waitUntil: 'domcontentloaded' });
+    await storedPage.locator('#shelf-bm summary').click();
+    await storedPage.waitForSelector(`#shelf-bm [data-work="${qAlg}"]`);
+    assert.equal(await storedPage.locator('script[src*="jszip"], script[src*="purify"], script[src*="Readability"]').count(), 0);
+
+    // On-demand EPUB libraries: CDN abort shows import_err and stores nothing; stubbed CDN loads once and reuses.
+    await storedPage.evaluate(() => openWork('Q130213759'));
+    await storedPage.locator('[data-mat="file"]').click();
+    const epubPath = join(out, 'test-import.epub');
+    const NodeZip = require('jszip');
+    const nz = new NodeZip();
+    nz.file('mimetype', 'application/epub+zip');
+    nz.file('META-INF/container.xml', '<container><rootfiles><rootfile full-path="c.opf"/></rootfiles></container>');
+    nz.file('c.opf', '<package xmlns:dc="http://purl.org/dc/elements/1.1/"><metadata><dc:title>Test EPUB</dc:title></metadata><manifest><item id="c1" href="c1.xhtml"/></manifest><spine><itemref idref="c1"/></spine></package>');
+    nz.file('c1.xhtml', '<html><body><p>Hello EPUB</p></body></html>');
+    writeFileSync(epubPath, await nz.generateAsync({ type: 'nodebuffer' }));
+    await storedPage.locator('#work-file').setInputFiles(epubPath);
+    await storedPage.locator('#toast').waitFor({ state: 'visible' });
+    assert.equal(await storedPage.evaluate(async () => (await Store.all('files')).length), 0);
+    await storedPage.unroute('**/*').catch(() => {});
+    await storedPage.route('**/*', route => {
+      const reqUrl = route.request().url();
+      if (new URL(reqUrl).hostname === '127.0.0.1') return route.continue();
+      if (reqUrl.includes('jszip')) {
+        return route.fulfill({ contentType: 'text/javascript', body: 'window.JSZip = { loadAsync: async () => ({ file: p => p === "mimetype" ? { async: async () => "application/epub+zip" } : p === "META-INF/container.xml" ? { async: async () => "<container><rootfiles><rootfile full-path=\\"c.opf\\"/></rootfiles></container>" } : p === "c.opf" ? { async: async () => "<package xmlns:dc=\\"http://purl.org/dc/elements/1.1/\\"><metadata><dc:title>Stub EPUB</dc:title></metadata><manifest><item id=\\"c1\\" href=\\"c1.xhtml\\"/></manifest><spine><itemref idref=\\"c1\\"/></spine></package>" } : p === "c1.xhtml" ? { async: async () => "<html><body><p>Stub body</p></body></html>" } : null }) };' });
+      }
+      if (reqUrl.includes('purify')) {
+        return route.fulfill({ contentType: 'text/javascript', body: 'window.DOMPurify = { sanitize: s => s };' });
+      }
+      return route.abort();
+    });
+    await storedPage.locator('#work-file').setInputFiles(epubPath);
+    await storedPage.waitForFunction(async () => (await Store.all('files')).length === 1);
+    assert.equal(await storedPage.locator('script[src*="jszip"]').count(), 1);
+    assert.equal(await storedPage.locator('script[src*="purify"]').count(), 1);
+    await storedPage.locator('#work-file').setInputFiles(epubPath);
+    await storedPage.waitForFunction(async () => (await Store.all('files')).length === 2);
+    assert.equal(await storedPage.locator('script[src*="jszip"]').count(), 1);
+    await storedPage.close();
+
     assert.deepEqual(errors,[]);
     const report={external_recordings:recordings.length,sourced_summary:true,language_audio_badge:true,restoredFromHistory,layouts,errors};
     writeFileSync(join(out,'audio-report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));

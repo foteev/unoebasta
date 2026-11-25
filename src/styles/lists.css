@@ -17,6 +17,7 @@
 .iconbtn { margin-left: 8px; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; font-size: 18px; line-height: 1; display: inline-grid; place-items: center; flex: none; }
 
 main .wrap { padding-block: 18px 64px; display: grid; gap: 16px; }
+#view-catalog:not([hidden]) { min-height: 453px; align-content: start; }
 .intro h2 { font: 700 22px/1.2 var(--f-display); margin: 0 0 6px; text-wrap: balance; }
 .intro p { margin: 0; color: var(--muted); max-width: 62ch; }
 .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -176,6 +177,7 @@ table.board { border-collapse: separate; border-spacing: 0; width: 100%; font-si
   .tabs .dot { position: absolute; top: 9px; left: calc(50% + 10px); margin: 0; }
   .iconbtn { width: 44px; height: 44px; }
   main .wrap { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  #view-catalog:not([hidden]) { min-height: 930px; }
   .toast { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); }
   body .sheet { bottom: calc(61px + env(safe-area-inset-bottom, 0px)); padding-bottom: 0; }
   .chip { min-height: 44px; }
