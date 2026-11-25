@@ -609,6 +609,38 @@ function selectFilter(group, values = []) {
   const n15 = w.eval("pickList('15').length"); const s15 = [];
   for (let i = 0; i < Math.ceil(n15 / 3); i++) { s15.push(...$$('#view-catalog [data-picks=reading] .pick .pick-done').map(b => b.dataset.done)); click($('#view-catalog [data-pickmore]')); await sleep(10); }
   checks['picks: every short story shows before any repeats, then a note'] = new Set(s15).size === n15 && /дальше по кругу/.test($('#view-catalog .picks').textContent);
+  // picks: a weighted shuffle; what counts is the ways to read or hear a work, not its number of links
+  checks['picks: weight counts ways to read, not links'] = w.eval(`(() => {
+    const at = links => { READ.__w = { links }; const v = pickWeight('__w', ['en']); delete READ.__w; PICK_WEIGHTS.delete('__w'); return v; };
+    const T = (site, x) => ({ kind: 'full', url: 'https://' + site + '.test/t', site, ...x }), A = (site, x) => ({ kind: 'audio', url: 'https://' + site + '.test/a', site, ...x });
+    const text = at([T('a')]), both = at([T('a'), A('b')]);
+    const cq = DATA.covers.find(q => READ[q] && READ[q].links.length === 1 && READ[q].links[0].kind === 'full' && !READ[q].links[0].lang && !READ[q].links[0].part);
+    return text === 2 ** 1.25 && both === 4 ** 1.25
+      && at([T('a'), A('b'), A('b', { part: 2 })]) === both    // part 2 of the same recording
+      && at([T('a'), T('z', { grade: 2 })]) === text           // a second-grade fallback host
+      && at([T('a'), T('c')]) === 2.5 ** 1.25                  // a second good site
+      && at([T('a'), T('a', { lang: 'ru' })]) === 2.5 ** 1.25  // a further language
+      && at([T('a', { lang: 'ru' })]) === 2 ** 1.25 * 0.25     // nothing in the reader's languages
+      && !!cq && pickWeight(cq, ['en']) === 3 ** 1.25;         // a cover image
+  })()`);
+  checks['picks: richer works lead about three times as often, and the three still change'] = w.eval(`(() => {
+    const saved = { seed: pickSeed, langs: prefs.langs }; prefs.langs = ['en'];
+    const pool = pickList([]), W = new Map(pool.map(q => [q, pickWeight(q)]));
+    const rich = pool.filter(q => W.get(q) >= 5 ** 1.25), bare = pool.filter(q => W.get(q) === 2 ** 1.25);
+    const hits = new Map(), threes = new Set();
+    for (let s = 1; s <= 300; s++) { pickSeed = s; const three = pickList([]).slice(0, 3); threes.add(three.join()); for (const q of three) hits.set(q, (hits.get(q) || 0) + 1); }
+    pickSeed = saved.seed; if (saved.langs) prefs.langs = saved.langs; else delete prefs.langs;
+    const avg = list => list.reduce((n, q) => n + (hits.get(q) || 0), 0) / list.length;
+    return rich.length >= 20 && bare.length >= 20 && avg(rich) >= 2 * avg(bare) && threes.size >= 290;
+  })()`);
+  checks['picks: a new reader mostly sees works in the site and browser languages, others stay possible'] = w.eval(`(() => {
+    const saved = { seed: pickSeed, langs: prefs.langs }; delete prefs.langs;
+    const langs = pickLangs(), pool = pickList([]), far = q => !langs.some(l => langRichness(READ[q], l) > 0);
+    const farPool = pool.filter(far).length / pool.length; let farPicks = 0;
+    for (let s = 1; s <= 200; s++) { pickSeed = s; farPicks += pickList([]).slice(0, 3).filter(far).length; }
+    pickSeed = saved.seed; if (saved.langs) prefs.langs = saved.langs;
+    return langs[0] === LANG && pool.some(far) && farPicks / 600 < 0.5 * farPool;
+  })()`);
   // covers: an image when the build found one, otherwise a typographic cover
   click($('#tab-library')); await sleep(30);
   checks['covers: every slip has a cover'] = $$('#view-library .slip').every(sl => !!sl.querySelector('.cover'));

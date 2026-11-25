@@ -703,11 +703,11 @@ const latestYear = w => Math.max(...w.awards.map(a => a[2]));
    the build lists them in DATA.covers): s = 80×120 for lists, m = 160×240 for the work card.
    Everything else gets a typographic cover drawn here: title and author on a quiet colour. */
 let COVERS = null;
+const coverSet = () => COVERS || (COVERS = new Set(DATA.covers || []));
 function coverHtml(q, size) {
   const w = WORKS[q]; if (!w) return '';
-  if (!COVERS) COVERS = new Set(DATA.covers || []);
   return catalogCover({ id: q, title: w.title, author: (w.authors[0] && authorName(w.authors[0])) || '',
-    image: COVERS.has(q), size, base: PAGE_PATH ? APP_HOME : '' });
+    image: coverSet().has(q), size, base: PAGE_PATH ? APP_HOME : '' });
 }
 
 /* ---------- icons: Lucide (ISC), thin outline ---------- */
@@ -1061,9 +1061,42 @@ function pickList(k) {
   const fresh = all.filter(q => !started.has(q));
   return orderPicks(fresh.length >= 3 ? fresh : all, k);
 }
+/* ---------- what a pick offers: richer works come up more often, never always first ----------
+   In one language: a free text 2, a recording 2, each further good source (grade 1, another site) 0.5, up to 1.
+   Parts 2+ of one recording and second-grade fallback hosts add nothing: they are not another way to read.
+   The reader's languages are the chosen ones, or for a new reader the site's and the browser's languages.
+   Also: 0.5 for each further language (up to 1), 1 for a cover image. The weight is that score to the power 1.25,
+   so text + recording + cover (5) leads about three times as often as a bare text (2); a work with nothing
+   in the reader's languages gets a quarter of its weight. */
+function langRichness(r, lang) {
+  const ls = r.links.filter(l => (l.lang || 'en') === lang && (+l.part || 1) === 1);
+  const has = kind => ls.some(l => l.kind === kind);
+  const good = kind => new Set(ls.filter(l => l.kind === kind && (l.grade || 1) === 1).map(l => l.site || hostOf(l.url))).size;
+  return (has('full') ? 2 : 0) + (has('audio') ? 2 : 0) + 0.5 * Math.min(2, Math.max(0, good('full') - 1) + Math.max(0, good('audio') - 1));
+}
+const pickLangs = () => explicitLangs() ? prefs.langs : [...new Set([LANG, ...browserLangs()])];
+const PICK_WEIGHTS = new Map(); // q → { r, links, n, key, w }: the same record, link list and languages give the same weight
+function pickWeight(q, langs = pickLangs()) {
+  const r = READ[q]; if (!r) return 1;
+  const key = langs.join(), c = PICK_WEIGHTS.get(q);
+  if (c && c.r === r && c.links === r.links && c.n === r.links.length && c.key === key) return c.w;
+  const w = computePickWeight(r, q, langs);
+  PICK_WEIGHTS.set(q, { r, links: r.links, n: r.links.length, key, w });
+  return w;
+}
+function computePickWeight(r, q, langs) {
+  const all = [...new Set(r.links.map(l => l.lang || 'en'))];
+  const near = Math.max(0, ...langs.map(l => langRichness(r, l)));
+  const others = near ? all.filter(l => !langs.includes(l) && langRichness(r, l) > 0).length : 0;
+  const best = near || Math.max(0, ...all.map(l => langRichness(r, l)));
+  const score = Math.max(1, best + 0.5 * Math.min(2, others) + (coverSet().has(q) ? 1 : 0));
+  return score ** 1.25 * (near ? 1 : 0.25);
+}
 function orderPicks(list, k, kind = 'full') {
   const mix = a => { a ^= a >>> 16; a = Math.imul(a, 0x7feb352d); a ^= a >>> 15; a = Math.imul(a, 0x846ca68b); a ^= a >>> 16; return a >>> 0; };
-  const sk = mix(pickSeed + parseInt(hash(pickScope(k, kind)), 36)); const key = q => mix(parseInt(hash(q), 36) ^ sk);
+  const sk = mix(pickSeed + parseInt(hash(pickScope(k, kind)), 36)); const u = q => (mix(parseInt(hash(q), 36) ^ sk) + 0.5) / 4294967296;
+  // a weighted shuffle (Efraimidis–Spirakis): the same seed gives the same order; a weight three times higher is about three times as likely to lead
+  const langs = pickLangs(), key = kind === 'full' ? q => -Math.log(u(q)) / pickWeight(q, langs) : u;
   const ordered = list.map(q => [key(q), q]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
   // With two or three available books, reshuffle their order instead of hiding the action.
   const previous = [...(pickLast[pickScope(k, kind)] || [])];
