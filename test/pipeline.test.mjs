@@ -332,3 +332,18 @@ test('import-pending imports each new file once, isolates a failing file and the
     { en: 'none', pl: 'none', ru: 'none', es: 'none', audio: '', audio_ru: 'yes' }, { en: 'none', pl: 'none', ru: 'none', es: 'none', audio: '' }];
   assert.deepEqual(coverageTotals(cov), { works: 4, withLink: 3, withoutLink: 1, full: 1, audio: 1 });
 });
+
+test('Mobile shelf workflow triggers on every runtime source', () => {
+  const wf = readFileSync(new URL('../.github/workflows/mobile-shelf.yml', import.meta.url), 'utf8');
+  for (const p of ['src/index.html', 'src/components/**', 'src/styles/**', 'scripts/build-web.mjs']) {
+    assert.equal(wf.split(p).length - 1, 2, p + ' must be in both pull_request and push paths');
+  }
+});
+
+test('src/index.html keeps the layout merge-found and build-web rely on', () => {
+  const s = readFileSync(new URL('../src/index.html', import.meta.url), 'utf8').replace(/\r\n/g, '\n');
+  assert.match(s, /\n\};\nconst CHANGELOG/);                // merge-found: READ end
+  assert.match(s, /^  Q\d+: \{.*\},$/m);                    // merge-found: one-line entries
+  assert.match(s, /<script>\n'use strict';/);              // build-web: runtime extraction
+  assert.ok(s.includes('<style>\n__SITE_CSS__</style>'));  // build-web: public shell stylesheet
+});

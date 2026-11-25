@@ -18,7 +18,7 @@ The main app and public work pages use the same browser origin, QIDs, storage an
 
 ## Versions of the data
 
-`SCHEMA` is the shape of the records (now 4). A new version of the page brings steps `MIGRATIONS[n]` (n−1 → n): pure functions over a plain copy `{ files, positions, links, suggestions, bookmarks, tombs, prefs }`.
+`SCHEMA` is the shape of the records (now 4; defined with `MIGRATIONS` and `ensureSchema` in `src/components/storage.mjs`). A new version of the page brings steps `MIGRATIONS[n]` (n−1 → n): pure functions over a plain copy `{ files, positions, links, suggestions, bookmarks, tombs, prefs }`.
 
 On start, `ensureSchema()`:
 1. data older than the page: keep a backup (the two latest, without file bodies), run the steps in order, write everything back in one transaction;
@@ -64,7 +64,7 @@ While the reader has not chosen languages, a work card whose sources span more t
 
 - **The key.** "Turn on sync" makes 32 random bytes (localStorage `fantastic-sync`, never exported). "Connect another device" shows them as `#sync=<base64url>` in a link and a QR code; the other device opens it and asks first.
 - **From the key:** a Nostr secret key `sha256(key ‖ "unoebasta/nostr-key")` and a label `d = hex(sha256(key ‖ "unoebasta/label"))[0..24]`. Same key → same identity on every device; nobody can tie the label to a person.
-- **The event.** `syncPack()` → deflate → base64url → NIP-44 encrypted to itself → kind 30078 (NIP-78), tag `d`, published to six relays run by different people (`RELAYS` in `src/index.html`). Replaceable: each relay keeps only the newest. Kept under ~40 KB; a bigger shelf drops old history first (`slimPack`).
+- **The event.** `syncPack()` → deflate → base64url → NIP-44 encrypted to itself → kind 30078 (NIP-78), tag `d`, published to six relays run by different people (`RELAYS` in `src/components/sync.mjs`). Replaceable: each relay keeps only the newest. Kept under ~40 KB; a bigger shelf drops old history first (`slimPack`).
 - **When.** Pull + merge when the page opens and when you come back to it (at most every 30 s); push 4 s after a local change and when the page is hidden; "Sync now" on the shelf. A push happens only when the content changed (`h` = hash of the pack).
 - **Library.** nostr-tools 2.25.2 from jsDelivr, loaded on demand for sync or for sending feedback.
 - **Safety.** Relays see ciphertext, the author key (random), the label and times. The main copy stays in the browser: a relay that forgets the event only delays the next sync. Losing every device and the key link loses the copy on the relays too.

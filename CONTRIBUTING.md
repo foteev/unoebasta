@@ -53,11 +53,11 @@ Novels and novellas show a cover from `covers/`; everything else gets a typograp
 
 ## Translations
 
-All strings are in the `I18N` object in `src/index.html`, with one block per language (`en`, `pl`, `ru`, `es`). Every key must exist in every language. Keep the tone short and plain; the motto stays in English everywhere. A new language means a new block and a button in the header; open an issue first.
+All strings are in the `I18N` object in `src/components/i18n.mjs`, with one block per language (`en`, `pl`, `ru`, `es`). Every key must exist in every language. Keep the tone short and plain; the motto stays in English everywhere. A new language means a new block and a button in the header; open an issue first.
 
 ## Code
 
-- **One file, no framework, no build step** beyond inserting the data. Fonts: Jost for the interface, Literata only for the text in the reader. Icons: [Lucide](https://lucide.dev/), inline SVG, stroke 1.6. Libraries come from cdnjs or jsDelivr with an exact version.
+- **No framework, one built page:** `scripts/build-web.mjs` inlines `src/components/` and `src/styles/` into `src/index.html` and writes `dist/web/`. Fonts: Jost for the interface, Literata only for the text in the reader. Icons: [Lucide](https://lucide.dev/), inline SVG, stroke 1.6. Libraries come from cdnjs or jsDelivr with an exact version.
 - **Mobile first.** Design and test at 360–390 px first, then wider screens. Touch targets at least 44 px. Light and dark themes. See [docs/mobile-first-ui.md](docs/mobile-first-ui.md).
 - **One main action per screen.** The page is made for busy readers and readers with ADHD: no streaks, badges, blinking or nagging counters.
 - **Readers’ data is sacred.** Read [docs/data-and-sync.md](docs/data-and-sync.md) before you change anything that is stored. In short: only add fields; renaming or dropping one needs a migration step with a test; never touch the bodies of readers’ files.

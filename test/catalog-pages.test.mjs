@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
 import { catalogRoutes } from '../scripts/lib/public-pages.mjs';
 import { scopeByAward, validateAwards } from '../scripts/lib/awards.mjs';
 
@@ -89,4 +90,13 @@ test('World Fantasy Award keeps shared wins, existing work IDs and ISFDB-only ro
   assert.ok(page.includes(routes.work.T3406511));
   const catalog = { data, works: Object.keys(data.works).map(qid => ({ qid })) };
   assert.equal(scopeByAward(catalog, registry, 'WFA').works.length, 162);
+});
+
+test('built runtime parses as a classic script with no leftover markers', () => {
+  const app = read('dist/web/catalog-app.js');
+  assert.doesNotThrow(() => new vm.Script(app, { filename: 'catalog-app.js' }));
+  assert.doesNotMatch(app, /__[A-Z0-9_]+__/);
+  assert.doesNotMatch(app, /^\s*(?:import(?:\s+[\w]|\s*[{*'"(])|export(?:\s+[\w]|\s*[{*]))/m);
+  const inline = read('dist/web/index.html').match(/<script>\n('use strict';[\s\S]*?)<\/script>/)[1];
+  assert.doesNotThrow(() => new vm.Script(inline, { filename: 'index-inline.js' }));
 });

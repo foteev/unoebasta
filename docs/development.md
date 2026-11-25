@@ -41,9 +41,9 @@ On Windows, the build accepts CRLF source files. File URL paths in tests use `fi
 
 | Path | Purpose |
 |---|---|
-| `src/index.html` | App shell, runtime and interface strings in EN, ES, PL and RU. The `READ` table contains links keyed by Wikidata ID. |
+| `src/index.html` | App shell, runtime script template and the `READ` table keyed by Wikidata ID. |
 | `src/styles/` | Stylesheets assembled in cascade order for the app and public pages. |
-| `src/components/` | Shared templates for the app and public pages. |
+| `src/components/` | `catalog.mjs` is an ES module shared by the app and public-page generator. `i18n.mjs`, `storage.mjs`, `files.mjs`, `voice.mjs`, `sync.mjs`, and `analytics.mjs` are build-inlined classic-script fragments bundled by `scripts/build-web.mjs`; they share the page's global scope and must not be imported in Node. |
 | `data/catalog-slugs.json` | Stable URL slugs for published work and author pages. |
 | `data/award-registry.json` | Award codes, categories and translated labels for Hugo, Nebula, Locus and World Fantasy Award. |
 | `data/awards.json` | Prose winners since 1953, with works, authors, descriptions and sample excerpts (`ex`). |
