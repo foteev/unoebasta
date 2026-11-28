@@ -3,7 +3,10 @@
 const path = require('path'), fs = require('fs');
 const NM = process.argv[2] || path.join(__dirname, '..', 'node_modules'), PAGE = process.argv[3] || path.join(__dirname, '..', 'dist', 'web', 'index.html');
 const { JSDOM } = require(path.join(NM, 'jsdom'));
-const html = fs.readFileSync(PAGE, 'utf8').replace(/<script(?: defer)? src=[^>]+><\/script>/g, '').replace(/<link[^>]+>/g, '');
+const html = fs.readFileSync(PAGE, 'utf8')
+  .replace(/<link rel="stylesheet" href="(?!https?:)([^"]+)">/g, (_, href) => '<style>' + fs.readFileSync(path.join(path.dirname(PAGE), href.split('?')[0]), 'utf8') + '</style>')
+  .replace(/<script(?: defer)? src="(?!https?:)([^"]+)"[^>]*><\/script>/g, (_, src) => '<script>' + fs.readFileSync(path.join(path.dirname(PAGE), src.split('?')[0]), 'utf8') + '</script>')
+  .replace(/<script(?: defer)? src=[^>]+><\/script>/g, '').replace(/<link[^>]+>/g, '');
 const errors = [];
 const dom = new JSDOM('<!doctype html><html><head></head><body>' + html + '</body></html>', {
   url: 'https://example.test/', runScripts: 'dangerously', pretendToBeVisual: true,
@@ -58,7 +61,10 @@ function selectFilter(group, values = []) {
     $$('#view-library *').length === 0 &&
     w.document.querySelectorAll('*').length < 2000 &&
     !w.document.querySelector('script[src*="jszip"], script[src*="purify"], script[src*="Readability"]');
+  checks['home boot: ub-boot removed after the first render'] = !w.document.documentElement.classList.contains('ub-boot');
+  checks['home summary: visible on Read and marked lang="en"'] = !!$('#catalog-summary') && !$('#catalog-summary').hidden && $('#catalog-summary').lang === 'en';
   await openLibrary();
+  checks['home summary and award directory hidden on Catalog'] = !!$('#catalog-summary') && $('#catalog-summary').hidden && !!$('#award-directory') && $('#award-directory').hidden;
   const nCatalog = w.eval('Object.keys(READ).filter(q => WORKS[q]).length'); // grows with every batch of found texts
   checks['catalog tab: every work with a text or audio'] = nCatalog >= 100 && $$('#view-library .slip').length === nCatalog;
   checks['filters: returning legacy preferences open every group at All'] = $$('.multi-filter').every(el=>el.querySelector('input').value==='all' && el.querySelector('input').checked);
@@ -1188,7 +1194,7 @@ function selectFilter(group, values = []) {
   const route = 'work/naomi-kritzer-better-living-through-algorithms-Q130213759/';
   const publicHtml = fs.readFileSync(path.join(publicDir, route, 'index.html'), 'utf8');
   const runtime = fs.readFileSync(path.join(publicDir, 'catalog-app.js'), 'utf8');
-  const publicCard = new JSDOM(publicHtml.replace('<script defer src="../../catalog-app.js"></script>', () => '<script>' + runtime + '</script>'), {
+  const publicCard = new JSDOM(publicHtml.replace(/<script defer src="\.\.\/\.\.\/catalog-app\.js(?:\?v=[^"]+)?"><\/script>/, () => '<script>' + runtime + '</script>'), {
     url: 'https://foteev.github.io/unoebasta/' + route + '?private=test', runScripts: 'dangerously',
     beforeParse(win) {
       win.scrollTo = () => {};
@@ -1221,7 +1227,7 @@ function selectFilter(group, values = []) {
   } finally { publicCard.close(); }
   const authorRoute = 'author/neil-gaiman-Q210059/';
   const authorHtml = fs.readFileSync(path.join(publicDir, authorRoute, 'index.html'), 'utf8');
-  const author = new JSDOM(authorHtml.replace('<script defer src="../../catalog-app.js"></script>', () => '<script>' + runtime + '</script>'), {
+  const author = new JSDOM(authorHtml.replace(/<script defer src="\.\.\/\.\.\/catalog-app\.js(?:\?v=[^"]+)?"><\/script>/, () => '<script>' + runtime + '</script>'), {
     url: 'https://foteev.github.io/unoebasta/' + authorRoute, runScripts: 'dangerously',
     beforeParse(win) {
       win.scrollTo = () => {};

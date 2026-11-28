@@ -1,11 +1,12 @@
 // Build the portable app and the static catalog for GitHub Pages.
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, cpSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { readAwardRegistry, validateAwards } from './lib/awards.mjs';
 import { readTable } from './lib/catalog.mjs';
-import { catalogAwardDirectory, catalogRoutes, SITE, writePublicPages } from './lib/public-pages.mjs';
+import { catalogAwardDirectory, catalogHomeSummary, catalogRoutes, SITE, writePublicPages } from './lib/public-pages.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist', 'web');
@@ -57,28 +58,52 @@ for (const [name, text] of Object.entries(fragments)) {
   if (/<\/script/i.test(text)) throw new Error(name + ': contains </script');
   new vm.Script(text, { filename: name });
 }
-const template = markers.reduce((acc, [marker, value]) => replaceOnce(acc, marker, value), src);
-const app = replaceOnce(replaceOnce(replaceOnce(template, '__SITE_CSS__', css), '__AWARDS_JSON__', dataText), '__SEARCH_BRIEF_JSON__', brief);
-if (/__[A-Z0-9_]+__/.test(app)) throw new Error('Unreplaced build marker in app');
+function stripMaintainerReadFields(source) {
+  const match = source.match(/^const READ = (\{[\s\S]*?\n\});$/m);
+  if (!match) throw new Error('READ table is missing');
+  const ctx = {};
+  vm.runInNewContext('this.READ = ' + match[1], ctx);
+  for (const entry of Object.values(ctx.READ)) {
+    for (const link of entry.links || []) {
+      delete link.evidence;
+      delete link.checked_at;
+    }
+  }
+  return source.replace(match[0], () => 'const READ = ' + safeJson(ctx.READ) + ';');
+}
+const template = stripMaintainerReadFields(markers.reduce((acc, [marker, value]) => replaceOnce(acc, marker, value), src));
+const portableDataText = safeJson({ ...data, covers: [] });
+const portableApp = replaceOnce(replaceOnce(replaceOnce(template, '__SITE_CSS__', css), '__AWARDS_JSON__', portableDataText), '__SEARCH_BRIEF_JSON__', brief);
+if (/__[A-Z0-9_]+__/.test(portableApp)) throw new Error('Unreplaced build marker in app');
 const homeMetadata = `<title>Unoebasta · Award-Winning Sci-Fi and Fantasy to Read or Hear</title>
 <link rel="canonical" href="${SITE}">
 <meta name="google-site-verification" content="K4v2MmrqwzwD1Ve3ygC7yQR0_EYqP9vDwTrx-ODoYzU">`;
-const home = replaceOnce(app, '<title>unoebasta</title>', homeMetadata);
+const portableHome = replaceOnce(portableApp, '<title>unoebasta</title>', homeMetadata);
 const runtime = template.match(/<script>\n('use strict';[\s\S]*?)<\/script>/)?.[1];
 if (!runtime) throw new Error('App script is missing');
 const publicRuntime = replaceOnce(replaceOnce(runtime,
   "JSON.parse(document.getElementById('awards-data').textContent)", dataText),
   "JSON.parse(document.getElementById('search-brief').textContent)", brief);
-const shell = replaceOnce(template, '<style>\n__SITE_CSS__</style>', '<link rel="stylesheet" href="../../site.css">')
+const assetHash = value => createHash('sha256').update(value).digest('hex').slice(0, 8);
+const cssVersion = assetHash(css), appVersion = assetHash(publicRuntime);
+const bootScript = "<script>document.documentElement.classList.add('ub-boot');addEventListener('error',function(e){if(/catalog-app\\.js/.test(e.filename||''))document.documentElement.classList.remove('ub-boot');});</script>";
+const externalShell = (prefix, boot) => replaceOnce(template, '<style>\n__SITE_CSS__</style>',
+  `<link rel="stylesheet" href="${prefix}site.css?v=${cssVersion}">` + (boot ? '\n' + bootScript : ''))
   .replace(/<script type="application\/json" id="(?:awards-data|search-brief)">.*?<\/script>\n/g, '')
   .replace(/<script (?!defer )src=/g, '<script defer src=')
-  .replace(/<script>\n'use strict';[\s\S]*?<\/script>/, '<script defer src="../../catalog-app.js"></script>');
+  .replace(/<script>\n'use strict';[\s\S]*?<\/script>/,
+    `<script defer src="${prefix}catalog-app.js?v=${appVersion}"${boot ? ' onerror="document.documentElement.classList.remove(\'ub-boot\')"' : ''}></script>`);
+const shell = externalShell('../../', false);
 if (/__[A-Z0-9_]+__/.test(shell)) throw new Error('Unreplaced build marker in public shell');
+const read = readTable(src);
+const homeStatic = catalogHomeSummary(data, read) + catalogAwardDirectory(data);
+const webHome = replaceOnce(replaceOnce(externalShell('./', true), '<title>unoebasta</title>', homeMetadata), '</main>', homeStatic + '</main>');
 mkdirSync(dist, { recursive: true });
-writeFileSync(join(dist, 'index.html'), replaceOnce(home, '</main>', catalogAwardDirectory(data) + '</main>'));
+writeFileSync(join(root, 'dist', 'unoebasta.html'), portableHome);
+writeFileSync(join(dist, 'index.html'), webHome);
 writeFileSync(join(dist, 'catalog-app.js'), publicRuntime);
 writeFileSync(join(dist, 'site.css'), css);
 for (const type of ['work', 'author', 'award']) rmSync(join(dist, type), { recursive: true, force: true });
-const pages = writePublicPages(dist, shell, data, readTable(src));
+const pages = writePublicPages(dist, shell, data, read);
 if (data.covers.length) cpSync(cdir, join(dist, 'covers'), { recursive: true });
 console.log('dist/web:', pages, 'catalog pages,', data.aw.length, 'award results,', data.covers.length, 'covers');

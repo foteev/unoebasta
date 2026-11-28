@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { WPM, catalogAudioDuration, catalogAward, catalogCover, catalogExcerpts, catalogLink, catalogPageCount, catalogSlip, catalogWorkHeading } from '../../src/components/catalog.mjs';
+import { WPM, catalogAudioDuration, catalogAward, catalogCover, catalogExcerpts, catalogHasExcerpt, catalogLink, catalogPageCount, catalogSlip, catalogWorkHeading } from '../../src/components/catalog.mjs';
 
 export const SITE = 'https://foteev.github.io/unoebasta/';
 const prefix = new URL(SITE).pathname;
@@ -17,13 +17,58 @@ export function catalogAwardDirectory(data) {
     '<h2 id="award-directory-title" data-i18n="nav_awards">Awards</h2><div class="row">' + links.join('') + '</div></nav>\n';
 }
 
+export function catalogHomeSummary(data, read) {
+  const worksCount = Object.keys(data.works).length;
+  const authorsCount = Object.keys(data.authors).length;
+  const awardsCount = data.aw.length;
+  const langCodes = new Set();
+  let fullText = 0, partOnly = 0, audio = 0, excerpt = 0;
+  for (const q of Object.keys(data.works)) {
+    const links = read[q]?.links || [];
+    for (const l of links) langCodes.add((l.lang || 'en').toLowerCase());
+    const hasFull = links.some(l => l.kind === 'full' && !l.part);
+    const hasPart = links.some(l => l.kind === 'full' && l.part);
+    if (hasFull) fullText++;
+    else if (hasPart) partOnly++;
+    if (links.some(l => l.kind === 'audio')) audio++;
+    if (catalogHasExcerpt(data.ex?.[q], data.gb?.[q])) excerpt++;
+  }
+  const langNames = [...langCodes].map(c => languages.of(c)).filter(Boolean).sort((a, b) => a.localeCompare(b, 'en'));
+  const langText = langNames.length > 1
+    ? langNames.slice(0, -1).join(', ') + ' and ' + langNames[langNames.length - 1]
+    : langNames[0] || '';
+  const awardNames = Object.values(data.registry.awards).map(a => a.name.en);
+  const awardText = awardNames.length > 1
+    ? awardNames.slice(0, -1).join(', ') + ' and ' + awardNames[awardNames.length - 1]
+    : awardNames[0] || '';
+  return '<section id="catalog-summary" lang="en" class="wrap catalog-summary" aria-labelledby="catalog-summary-title">' +
+    '<h2 id="catalog-summary-title">About this catalog</h2>' +
+    '<p><strong>unoebasta</strong> (Italian <em>uno e basta</em>, “one and that’s it”) is a static catalog for reading ' +
+    text(awardText) + ' fiction winners with online text, excerpt, and audio links. ' +
+    'Built for busy readers and readers with ADHD: one main action per screen, estimated reading times, and three picks for the time you have.</p>' +
+    '<p>Currently indexes ' + numbers.format(worksCount) + ' winning works across ' + numbers.format(awardsCount) +
+    ' award entries by ' + numbers.format(authorsCount) + ' authors, including ' + numbers.format(fullText) +
+    ' works with full-text links' + (partOnly ? ', ' + numbers.format(partOnly) + ' serialized in parts' : '') +
+    ', ' + numbers.format(audio) + ' with audio recordings, and ' + numbers.format(excerpt) +
+    ' with sample excerpts; reading and listening links cover ' + text(langText) + '. ' +
+    'No accounts, no ads, and no project server: bookmarks, reading places, notes, and your own files stay in your browser with optional end-to-end encrypted sync.</p>' +
+    '<div class="row">' +
+    '<a href="./?view=library" class="btn btn-small">Browse full catalog</a>' +
+    '<a href="./?view=library&amp;catalog=authors" class="btn btn-small">Browse by author</a>' +
+    '<a href="./?view=awards" class="btn btn-small">Awards board</a>' +
+    '<a href="https://github.com/foteev/unoebasta" class="btn btn-small" rel="noopener">Source on GitHub</a>' +
+    '</div>' +
+    (data.src ? '<p class="small">Sources: ' + text(data.src) + '.</p>' : '') +
+    '</section>\n';
+}
+
 function workSources(q, title, data, entry) {
   const links = (entry?.links || []).map(l => ({
     ...l,
     label: l.kind === 'audio' ? 'Audio' : l.part ? 'Text' : 'Full text',
     details: [l.part && 'Part ' + l.part, catalogAudioDuration(l.seconds),
-      l.kind === 'audio' && l.verification === 'metadata' && 'Recording listed',
-      (l.rights === 'unknown' || l.tier === 'external') && 'Permission unverified']
+    l.kind === 'audio' && l.verification === 'metadata' && 'Recording listed',
+    (l.rights === 'unknown' || l.tier === 'external') && 'Permission unverified']
   }));
   const excerpts = catalogExcerpts({ title, ex: data.ex?.[q], gb: data.gb?.[q] }).map(l => ({
     ...l, label: l.audio ? 'Audio excerpt' : 'Excerpt', details: [l.coll]
@@ -93,8 +138,8 @@ export function writePublicPages(dir, shell, data, read) {
     const entry = read[q], words = entry?.w, pages = catalogPageCount(data.gb?.[q], data.ol?.[q]);
     const hasWordCount = Number.isFinite(words) && words > 0;
     const facts = [w[6] && 'Published ' + w[6], entry?.pub, pages && numbers.format(pages) + ' pages',
-      hasWordCount && 'About ' + numbers.format(words) + ' words',
-      hasWordCount && 'About ' + numbers.format(Math.max(1, Math.round(words / WPM))) + ' min to read']
+    hasWordCount && 'About ' + numbers.format(words) + ' words',
+    hasWordCount && 'About ' + numbers.format(Math.max(1, Math.round(words / WPM))) + ' min to read']
       .filter(Boolean).map(text).join(' · ');
     const heading = catalogWorkHeading({ title: w[0], cover, awards, authors, facts, page: true });
     const title = w[0] + ' by ' + w[3].map(a => data.authors[a][0]).join(', ');
@@ -102,7 +147,7 @@ export function writePublicPages(dir, shell, data, read) {
     const formats = [...new Set(sources.map(l => l.label.toLowerCase()))];
     const awardNames = rows.map(([a, c, y]) => `${y} ${data.registry.awards[a].name.en}, ${data.registry.categories[c].name.en}`);
     const description = [title + '.', formats.length && 'Find ' + formats.join(', ') + '.',
-      awardNames.length && 'Winner: ' + awardNames.join('; ') + '.'].filter(Boolean).join(' ').slice(0, 220);
+    awardNames.length && 'Winner: ' + awardNames.join('; ') + '.'].filter(Boolean).join(' ').slice(0, 220);
     write(data.routes.work[q], title, description, '<section id="sheet-work" class="wrap public-work">' +
       heading + (w[7] ? '<p class="bio">' + text(w[7]) + '</p>' : '') + sourceList(sources) + '</section>', q);
   }

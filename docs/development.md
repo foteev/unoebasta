@@ -11,7 +11,7 @@ npm test
 npm run check:secrets
 ```
 
-Open `dist/web/index.html` in a browser to use the portable app. The build also generates the [public catalog pages](catalog-pages.md) and sitemap. The [Pages workflow](../.github/workflows/pages.yml) publishes `dist/web` from `main`.
+Open `dist/web/index.html` over HTTP (or `dist/unoebasta.html` from `file://` without a server, with typographic covers; importing files and web fonts need a network connection) to use the app. `dist/web/index.html` links shared `site.css` and `catalog-app.js` next to the generated [public catalog pages](catalog-pages.md) and sitemap, and the build strips maintainer-only verification metadata (`evidence`, `checked_at`) from the client runtime. The [Pages workflow](../.github/workflows/pages.yml) publishes `dist/web` from `main`.
 
 ## Test suites
 

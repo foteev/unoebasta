@@ -14,7 +14,7 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     if (file !== root && !file.startsWith(root + sep)) { res.writeHead(403).end(); return; }
     try {
       const path = file === root ? join(root, 'index.html') : file;
-      res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
+      res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
       res.end(readFileSync(path));
     } catch { res.writeHead(404).end(); }
   });

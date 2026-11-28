@@ -5,7 +5,10 @@ a[data-work], a.award, a.author-pill { color: inherit; text-decoration: none; }
 .public-work-actions { justify-content: flex-end; }
 .public-catalog { padding-block: 1rem 5rem; }
 .public-catalog li { margin-block: .35rem; }
-.award-directory { padding-block: 1rem 5rem; }
+main .catalog-summary { padding-block: 1rem 1.25rem; }
+main .catalog-summary p { margin-block: .5rem; max-width: 64ch; }
+main .award-directory { padding-block: 0 5rem; }
+html.ub-boot #catalog-summary, html.ub-boot #award-directory { display: none; }
 .public-author { padding-block: 1rem 5rem; }
 .public-author h1 { margin-block: .5rem 1rem; }
 .public-author #author-controls { min-height: 265px; }

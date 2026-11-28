@@ -49,6 +49,7 @@ export function catalogSlip({ opener, cover, awards, byline, original = '', dura
 
 export const WPM = 200;
 export const catalogPageCount = (gb, ol) => gb?.n || ol?.n || null;
+export const catalogHasExcerpt = (ex, gb) => !!(ex || (gb && (gb.en || gb.pl || gb.ru || gb.es || gb.s)));
 
 export function catalogAudioDuration(seconds) {
   if (!Number.isFinite(seconds) || seconds <= 0) return '';

@@ -1,9 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { catalogRoutes } from '../scripts/lib/public-pages.mjs';
 import { scopeByAward, validateAwards } from '../scripts/lib/awards.mjs';
+import { readTable } from '../scripts/lib/catalog.mjs';
+import { catalogHasExcerpt } from '../src/components/catalog.mjs';
 
 const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
 const registry = JSON.parse(read('data/award-registry.json'));
@@ -11,10 +14,15 @@ const data = { ...JSON.parse(read('data/awards.json')), registry };
 const slugs = JSON.parse(read('data/catalog-slugs.json'));
 const routes = catalogRoutes(data, slugs);
 
-test('the homepage links directly to each generated award page', () => {
+test('the homepage links directly to each generated award page and includes a static summary', () => {
   const home = read('dist/web/index.html');
   const directory = home.match(/<nav id="award-directory"[\s\S]*?<\/nav>/)?.[0];
+  const summary = home.match(/<section id="catalog-summary"[\s\S]*?<\/section>/)?.[0];
   assert.ok(directory);
+  assert.ok(summary);
+  assert.match(summary, /unoebasta/);
+  assert.match(summary, /Browse full catalog/);
+  assert.match(summary, /Browse by author/);
   assert.match(home, /<title>Unoebasta · Award-Winning Sci-Fi and Fantasy to Read or Hear<\/title>/);
   for (const path of Object.values(routes.award)) {
     assert.ok(directory.includes(`href="./${path}"`), path);
@@ -92,17 +100,22 @@ test('World Fantasy Award keeps shared wins, existing work IDs and ISFDB-only ro
   assert.equal(scopeByAward(catalog, registry, 'WFA').works.length, 162);
 });
 
-test('built runtime parses as a classic script with no leftover markers', () => {
+test('built runtime parses as a classic script, strips maintainer metadata, and keeps portable build valid', () => {
   const app = read('dist/web/catalog-app.js');
   assert.doesNotThrow(() => new vm.Script(app, { filename: 'catalog-app.js' }));
   assert.doesNotMatch(app, /__[A-Z0-9_]+__/);
   assert.doesNotMatch(app, /^\s*(?:import(?:\s+[\w]|\s*[{*'"(])|export(?:\s+[\w]|\s*[{*]))/m);
-  const inline = read('dist/web/index.html').match(/<script>\n('use strict';[\s\S]*?)<\/script>/)[1];
-  assert.doesNotThrow(() => new vm.Script(inline, { filename: 'index-inline.js' }));
+  assert.doesNotMatch(app, /"evidence":/);
+  assert.doesNotMatch(app, /"checked_at":/);
+  const portableInline = read('dist/unoebasta.html').match(/<script>\n('use strict';[\s\S]*?)<\/script>/)[1];
+  assert.doesNotThrow(() => new vm.Script(portableInline, { filename: 'portable-inline.js' }));
 });
 
-test('built HTML keeps non-blocking assets, prefilled tabs, and on-demand parser libraries', () => {
+test('built HTML keeps externalized homepage assets, non-blocking fonts, prefilled tabs, and on-demand parser libraries', () => {
   const home = read('dist/web/index.html');
+  assert.match(home, /<link rel="stylesheet" href="\.\/site\.css\?v=[0-9a-f]{8}">/);
+  assert.match(home, /<script defer src="\.\/catalog-app\.js\?v=[0-9a-f]{8}" onerror="[^"]*classList\.remove\('ub-boot'\)[^"]*"><\/script>/);
+  assert.doesNotMatch(home, /<script type="application\/json" id="(?:awards-data|search-brief)">/);
   for (const label of ['Read', 'Catalog', 'Awards', 'My shelf', 'About']) {
     assert.ok(home.includes(`>${label}<`), 'Missing prefilled nav label: ' + label);
   }
@@ -116,6 +129,60 @@ test('built HTML keeps non-blocking assets, prefilled tabs, and on-demand parser
     assert.match(page, fontRe);
     assert.ok(!page.includes('defer defer'), samplePath);
     const scripts = [...page.matchAll(/<script\b[^>]*><\/script>/g)].map(m => m[0]);
-    assert.deepEqual(scripts, ['<script defer src="../../catalog-app.js"></script>'], samplePath);
+    assert.equal(scripts.length, 1, samplePath);
+    assert.match(scripts[0], /^<script defer src="\.\.\/\.\.\/catalog-app\.js\?v=[0-9a-f]{8}"><\/script>$/, samplePath);
   }
+});
+
+test('shared assets are content-fingerprinted on home and public pages', () => {
+  const hash = f => createHash('sha256').update(readFileSync(new URL('../dist/web/' + f, import.meta.url))).digest('hex').slice(0, 8);
+  const home = read('dist/web/index.html'), work = read('dist/web/' + routes.work.Q130213759 + 'index.html');
+  assert.ok(home.includes(`href="./site.css?v=${hash('site.css')}"`));
+  assert.ok(home.includes(`src="./catalog-app.js?v=${hash('catalog-app.js')}"`));
+  assert.ok(work.includes(`href="../../site.css?v=${hash('site.css')}"`));
+  assert.ok(work.includes(`src="../../catalog-app.js?v=${hash('catalog-app.js')}"`));
+});
+
+test('portable build has no dist/web-only covers or relative catalog links', () => {
+  const portable = read('dist/unoebasta.html');
+  const json = portable.match(/<script type="application\/json" id="awards-data">([\s\S]*?)<\/script>/)[1];
+  assert.deepEqual(JSON.parse(json).covers, []);
+  assert.doesNotMatch(portable, /href="\.\/(?:award|work|author)\//);
+  assert.doesNotMatch(portable, /href="\.\/\?/);
+  assert.doesNotMatch(portable, /"evidence":|"checked_at":/);
+});
+
+test('homepage boot class has a load-failure fallback', () => {
+  const home = read('dist/web/index.html'), app = read('dist/web/catalog-app.js'), css = read('dist/web/site.css');
+  assert.match(css, /html\.ub-boot #catalog-summary, html\.ub-boot #award-directory \{ display: none; \}/);
+  assert.match(home, /<script>[^<]*classList\.add\('ub-boot'\)[^<]*addEventListener\('error'[^<]*catalog-app/);
+  assert.match(home, /<script defer src="\.\/catalog-app\.js\?v=[0-9a-f]{8}" onerror="[^"]*classList\.remove\('ub-boot'\)[^"]*"><\/script>/);
+  assert.match(app, /function showFatal[\s\S]{0,400}classList\.remove\('ub-boot'\)/);
+});
+
+test('homepage summary counts and languages come from the catalog', () => {
+  const summary = read('dist/web/index.html').match(/<section id="catalog-summary"[\s\S]*?<\/section>/)[0];
+  const table = readTable(read('src/index.html'));
+  const num = re => Number(summary.match(re)[1].replace(/,/g, ''));
+  assert.equal(num(/indexes ([\d,]+) winning works/), Object.keys(data.works).length);
+  assert.equal(num(/across ([\d,]+) award entries/), data.aw.length);
+  const names = new Intl.DisplayNames('en', { type: 'language' });
+  const langs = new Set(Object.values(table).flatMap(e => (e.links || []).map(l => l.lang || 'en')));
+  for (const lang of langs) assert.match(summary, new RegExp(names.of(lang)), lang);
+  const fullOnly = Object.keys(data.works).filter(q => (table[q]?.links || []).some(l => l.kind === 'full' && !l.part)).length;
+  assert.equal(num(/([\d,]+) works with full-text links/), fullOnly);
+});
+
+test("homepage summary counts use the app's availability rules", () => {
+  const summary = read('dist/web/index.html').match(/<section id="catalog-summary"[\s\S]*?<\/section>/)[0];
+  const table = readTable(read('src/index.html'));
+  const num = re => Number(summary.match(re)[1].replace(/,/g, ''));
+  const qs = Object.keys(data.works), links = q => table[q]?.links || [];
+  const hasExcerpt = q => catalogHasExcerpt(data.ex?.[q], data.gb?.[q]);
+  for (const q of ['Q130640575', 'Q17026037', 'Q131445122']) assert.equal(hasExcerpt(q), false, q);
+  assert.equal(num(/([\d,]+) with sample excerpts/), qs.filter(hasExcerpt).length);
+  assert.equal(num(/([\d,]+) with audio recordings/), qs.filter(q => links(q).some(l => l.kind === 'audio')).length);
+  assert.equal(num(/([\d,]+) serialized in parts/), qs.filter(q => !links(q).some(l => l.kind === 'full' && !l.part) && links(q).some(l => l.kind === 'full' && l.part)).length);
+  assert.equal(num(/by ([\d,]+) authors/), Object.keys(data.authors).length);
+  for (const s of data.src.split(' · ')) assert.ok(summary.includes(s.replace(/ \(.*\)$/, '')), 'attribution: ' + s);
 });

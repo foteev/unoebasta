@@ -13,7 +13,8 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     const file = resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://localhost').pathname));
     if (file !== root && !file.startsWith(root + sep)) { res.writeHead(403).end(); return; }
     try { const path = file === root ? join(root, 'index.html') : file;
-      res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
+      res.setHeader('Content-Type', ({ '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.svg': 'image/svg+xml' })[extname(path)] || 'application/octet-stream');
+      res.setHeader('Cache-Control', 'max-age=600');
       res.end(readFileSync(path));
     } catch { res.writeHead(404).end(); }
   });
@@ -293,6 +294,26 @@ const { filterOption, selectFilter, openLangMenu, siteLang, readLang } = require
     await page.waitForFunction(() => window.storageBeforeStartup?.every(value => value === null) && typeof myLangs === 'function' && prefs.langs === undefined);
     assert.ok(await page.evaluate(() => myLangs().includes('es')), 'Delete everything also resets an already empty shelf');
     assert.deepEqual(errors, [], 'No browser runtime errors');
+    const perf = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const cdp = await perf.context().newCDPSession(perf);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    await cdp.send('Network.enable');
+    await cdp.send('Network.setBlockedURLs', { urls: ['*fonts.googleapis.com*', '*fonts.gstatic.com*'] });
+    await cdp.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1.6e6 / 8 * 0.9, uploadThroughput: 750e3 / 8 * 0.9 });
+    await perf.addInitScript(() => { window.__cls = 0; new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true }); new PerformanceObserver(l => { window.__lcp = l.getEntries().at(-1)?.startTime; }).observe({ type: 'largest-contentful-paint', buffered: true }); });
+    const perfStats = {};
+    for (const visit of ['first', 'returning']) {
+      await perf.goto(url, { waitUntil: 'load' });
+      await perf.waitForFunction(() => !document.documentElement.classList.contains('ub-boot'));
+      await perf.waitForTimeout(2000);
+      const { cls, lcp } = await perf.evaluate(() => ({ cls: window.__cls, lcp: window.__lcp }));
+      perfStats[visit] = { cls, lcp };
+      console.log(JSON.stringify({ visit, cls, lcp }));
+      assert.ok(cls < 0.01, visit + ' visit CLS ' + cls);
+      if (visit === 'first') { await perf.locator('#tab-library').click(); await perf.locator('#view-library [data-star]').first().click(); }
+    }
+    assert.ok(perfStats.returning.lcp < perfStats.first.lcp, `Returning visit LCP (${perfStats.returning.lcp}) should be lower than first visit (${perfStats.first.lcp})`);
+    await perf.close();
     const report = { language_save_and_reload: true, no_english_fallback: true, polish_audio_and_duration: true, interface_language_independent: true, rotating_excerpts: true, home_random_actions: true, small_pool_shuffle: true, available_duration_action: true, collapse_keyboard: true, deletion_and_undo: true, language_menu: true, factory_reset: true, spanish_after_reset: true, empty_shelf_reset: true, stale_sync_blocked: true, other_tab_reloaded: true, layouts, errors };
     writeFileSync(join(out, 'report.json'), JSON.stringify(report, null, 2)); console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); await new Promise(r => server.close(r)); }

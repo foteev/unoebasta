@@ -68,6 +68,7 @@ __SITE_CSS__</style>
 __CATALOG_COMPONENTS__
 /* Visible error line: a broken page should say why instead of staying blank. */
 function showFatal(msg) {
+  document.documentElement.classList.remove('ub-boot');
   let el = document.getElementById('fatal');
   if (!el) { el = document.createElement('div'); el.id = 'fatal'; el.setAttribute('role', 'alert'); el.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad);border-radius:10px;padding:10px 12px;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere'; document.body.appendChild(el); }
   el.textContent = 'unoebasta — ' + msg;
@@ -962,7 +963,7 @@ function listenGo(q, o) {
   if (o.id === 'eleven') return elevenUrl(o.url, q);
   return sayWork(q);
 }
-const hasExcerpt = q => !!(WORKS[q] && (WORKS[q].ex || (WORKS[q].gb && (WORKS[q].gb.en || WORKS[q].gb.pl || WORKS[q].gb.ru || WORKS[q].gb.s))));
+const hasExcerpt = q => !!(WORKS[q] && catalogHasExcerpt(WORKS[q].ex, WORKS[q].gb));
 
 /* ---------- view: Read (catalog of texts) ---------- */
 function updateNewsDot() {
@@ -2533,6 +2534,8 @@ function setView(v, initial = false) {
   ['catalog', 'library', 'awards', 'shelf', 'about'].forEach(x => { $('#view-' + x).hidden = !!PAGE_PATH || x !== v; $('#tab-' + x).setAttribute('aria-selected', String(x === v)); });
   const directory = $('#award-directory');
   if (directory) directory.hidden = v !== 'catalog';
+  const summary = $('#catalog-summary');
+  if (summary) summary.hidden = v !== 'catalog';
   if (!PAGE_PATH && v === 'library' && libraryDirty) renderLibrary();
   if (v === 'shelf') renderShelf();
   if (v === 'awards') renderAwards();
@@ -2927,17 +2930,21 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') refreshResumedPage();
 });
 (function start() {
-  LANG = interfaceLanguage(prefs.lang);
-  initVisit();
-  // draw the page from the catalog first, then fill in what is stored on the device
-  applyLang(); applyTheme(); renderCatalog(); if (!PAGE_PATH) renderAbout();
-  try { window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
-  const params = new URLSearchParams(location.search);
-  const initialView = params.get('view') || history.state?.ubView;
-  const awardCode = params.get('award');
-  const awardId = AWARDS.find(id => AWARD_REGISTRY.awards[id].code === awardCode);
-  if (!PAGE_PATH && awardId) AV.awards = [awardId];
-  setView(Object.hasOwn(ANALYTICS_SECTIONS, initialView) ? initialView : PAGE_AUTHOR ? 'library' : 'catalog', true);
+  try {
+    LANG = interfaceLanguage(prefs.lang);
+    initVisit();
+    // draw the page from the catalog first, then fill in what is stored on the device
+    applyLang(); applyTheme(); renderCatalog(); if (!PAGE_PATH) renderAbout();
+    try { window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
+    const params = new URLSearchParams(location.search);
+    const initialView = params.get('view') || history.state?.ubView;
+    const awardCode = params.get('award');
+    const awardId = AWARDS.find(id => AWARD_REGISTRY.awards[id].code === awardCode);
+    if (!PAGE_PATH && awardId) AV.awards = [awardId];
+    setView(Object.hasOwn(ANALYTICS_SECTIONS, initialView) ? initialView : PAGE_AUTHOR ? 'library' : 'catalog', true);
+  } finally {
+    document.documentElement.classList.remove('ub-boot');
+  }
   ensureSchema().catch(e => console.warn('[unoebasta] schema', e)).then(async status => {
     await loadLocal();
     const hasLocal = STORES.some(s => local[s].length > 0);
